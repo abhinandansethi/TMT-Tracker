@@ -1430,6 +1430,784 @@
     "kind": "monotonic"
    },
    "quirks": "Self-regulatory but ASCI codes are incorporated by reference in Cable TV Rules ad code. Dates ride in the row text. JS show-more hides older rows (fine for new-item detection)."
+  },
+  {
+   "id": "trai_miscellaneous",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Miscellaneous releases (orders, debarments)",
+   "url": "https://trai.gov.in/release-publication/miscellaneous",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_views",
+    "row_floor": 25
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 7
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "order",
+   "quirks": "Found by the 25-08-2026 audit; corrects the v1 belief that no separate orders listing exists. Host intermittently hangs to timeout - retries cover. Upload-folder month can lag the release date; never date from the path."
+  },
+  {
+   "id": "trai_fd_telecom",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Financial Disincentive orders - Telecom",
+   "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cells": [
+     2,
+     3,
+     4,
+     5
+    ],
+    "date_cell": 1,
+    "row_floor": 300,
+    "linkless": true
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cogroup.trai.gov.in",
+    "trai.gov.in"
+   ],
+   "default_type": "order",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "FD enforcement app behind an iframe on trai.gov.in - fetch the cogroup URL directly. No per-row links (auth-gated report API); listing page is the citation. Wide from/to window returns full history in one response (verified live 25-08-2026)."
+  },
+  {
+   "id": "trai_fd_broadcasting",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Financial Disincentive orders - Broadcasting",
+   "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cells": [
+     2,
+     3,
+     4,
+     5
+    ],
+    "date_cell": 1,
+    "row_floor": 30,
+    "linkless": true
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cogroup.trai.gov.in",
+    "trai.gov.in"
+   ],
+   "default_type": "order",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "FD enforcement app behind an iframe on trai.gov.in - fetch the cogroup URL directly. No per-row links (auth-gated report API); listing page is the citation. Wide from/to window returns full history in one response (verified live 25-08-2026)."
+  },
+  {
+   "id": "nccs_circulars_head",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Circulars - Headquarters",
+   "url": "https://nccs.gov.in/home/circularsHead/1?rowsPerPage=50",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 3,
+    "row_floor": 5
+   },
+   "date_formats": [
+    "DD Month YYYY",
+    "YYYY-MM-DD"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "default_type": "circular",
+   "quirks": "Third NCCS division listing (registry had only SAS + SC). Always rowsPerPage=50: the rendered pager hardcodes rowsPerPage=10 while the default is 5, silently skipping serials 6-10 for anyone mixing them."
+  },
+  {
+   "id": "tec_circulars",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "Circulars",
+   "url": "https://www.tec.gov.in/circulars",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 3,
+    "date_cell": 4,
+    "row_floor": 100
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tec.gov.in",
+    "www.tec.gov.in",
+    "docs.google.com"
+   ],
+   "default_type": "circular",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Full archive in one page (127 rows). NOT strictly date-sorted - full-table scan every run, never stop-at-first-older. 96/127 hrefs carry raw spaces - URL-encode before download."
+  },
+  {
+   "id": "tec_gazette_standards",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "Gazette-notified standards",
+   "url": "https://www.tec.gov.in/gazette-notified-standards",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tr",
+    "title_cell": 1,
+    "row_floor": 60
+   },
+   "date_formats": [
+    "DD-Mon-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tec.gov.in",
+    "www.tec.gov.in"
+   ],
+   "default_type": "gazette_notification",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Standards become mandatory on gazette notification (Telecom Act standards framework). CMS-pasted table, no class/id; malformed pre-doctype head. Dates only from the Notification Date column, never filenames."
+  },
+  {
+   "id": "tec_essential_requirements",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "MTCTE Essential Requirements (ER list API)",
+   "url": "https://www.mtcte.tec.gov.in/get_er_list",
+   "status": "live",
+   "method": "json_api",
+   "parser": {
+    "strategy": "tec_er_api",
+    "row_floor": 120
+   },
+   "date_formats": [
+    "YYYY-MM-DD"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "mtcte.tec.gov.in",
+    "www.mtcte.tec.gov.in",
+    "tec.gov.in"
+   ],
+   "default_type": "notification",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "tec.gov.in/essential-requirements is DEAD (empty 200 since ~Apr 2026); the MTCTE portal API serves the full dataset (828 elements = 138 records, stride 6). PDFs need GET - HEAD 403s."
+  },
+  {
+   "id": "dot_eservices_row",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices - Right of Way",
+   "url": "https://eservices.dot.gov.in/right-of-way-permissions",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "psn_rows",
+    "scope_selector": "#Policy",
+    "row_floor": 8
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 6
+   },
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "dot.gov.in"
+   ],
+   "default_type": "order",
+   "quirks": "RoW Rules 2024 + state/UT implementation orders. Scope strictly to #Policy - a sitewide What's-New ticker mimics the row shape."
+  },
+  {
+   "id": "dot_eservices_satellite",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices - Satellite/GMPCS authorisation",
+   "url": "https://eservices.dot.gov.in/satellite-license",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "psn_rows",
+    "scope_selector": ".view-id-services.view-display-id-block_1",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "saralsanchar.gov.in",
+    "dot.gov.in"
+   ],
+   "default_type": "order",
+   "quirks": "Hottest current licensing area (GMPCS/satcom). Only 1 row today - floor honestly 1; 0 rows = FAILED. Same ticker trap as RoW page."
+  },
+  {
+   "id": "inspace_publications",
+   "stratum": "telecom",
+   "regulator": "IN-SPACe",
+   "name": "Publications (NGP, guidelines, advisories)",
+   "url": "https://www.inspace.gov.in/api/now/sp/page?id=inspace_publications",
+   "status": "live",
+   "method": "json_api",
+   "parser": {
+    "strategy": "inspace_api",
+    "row_floor": 30,
+    "undated_ok": true
+   },
+   "date_formats": [
+    "Month D, YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "inspace.gov.in",
+    "www.inspace.gov.in"
+   ],
+   "default_type": "guideline",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "IN-SPACe was entirely absent from the atlas. ServiceNow portal; publications hardcoded in a widget client_script as JS object literals; items carry no dates (undated shelf, first_seen dating). Attachment URLs are sys_id-only."
+  },
+  {
+   "id": "mib_advisories",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Advisories",
+   "url": "https://mib.gov.in/en/documents/notification/advisories",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table.cols-6 tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "row_floor": 15
+   },
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 9
+   },
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "default_type": "advisory",
+   "quirks": "Dedicated advisories listing (v1 tracked only the wing pages). Date column is upload/republish date - instrument date often rides in the title as DD.MM.YYYY."
+  },
+  {
+   "id": "meity_guidelines",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Guidelines (WP-JSON API)",
+   "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Guideline&limit=50&sort=date&order=DESC&search=",
+   "status": "live",
+   "method": "json_api",
+   "parser": {
+    "strategy": "meity_api",
+    "row_floor": 15
+   },
+   "date_formats": [
+    "DD.MM.YYYY",
+    "YYYY-MM-DD"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "meity.gov.in",
+    "www.meity.gov.in",
+    "cms-meity.digifootprint.gov.in"
+   ],
+   "default_type": "guideline",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "CRITICAL: type value is SINGULAR 'Guideline' - MeitY's own UI requests the plural and renders 'No Data Available'. sort=date, not sort=year (year field mostly empty)."
+  },
+  {
+   "id": "uidai_regulations",
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "name": "Updated (consolidated) Regulations",
+   "url": "https://uidai.gov.in/en/updated-regulations",
+   "status": "live",
+   "method": "rsc_api",
+   "http_headers": {
+    "RSC": "1"
+   },
+   "parser": {
+    "strategy": "uidai_rsc",
+    "row_floor": 8
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in"
+   ],
+   "default_type": "regulation",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Amendments are NOT new rows here - the consolidated row's updated_date and file change in place; a changed date creates a new ledger item. Companion gazette listing carries the amendment instruments themselves."
+  },
+  {
+   "id": "uidai_gazetted",
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "name": "Gazetted notifications (amendment instruments)",
+   "url": "https://uidai.gov.in/en/gazetted-notifications",
+   "status": "live",
+   "method": "rsc_api",
+   "http_headers": {
+    "RSC": "1"
+   },
+   "parser": {
+    "strategy": "uidai_rsc",
+    "row_floor": 8
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 2,
+    "first_unparameterised": true,
+    "max_pages": 5
+   },
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in"
+   ],
+   "default_type": "gazette_notification",
+   "quirks": "39 gazette/amendment PDFs over 4 pages, 1-indexed ?page=N. HEAD lies on backend PDFs (200 text/html) - verify with ranged GET."
+  },
+  {
+   "id": "mib_engage",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "MIB Engage portal",
+   "url": "https://engage.mib.gov.in/",
+   "status": "watch",
+   "method": "structure_watch",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 0
+   },
+   "date_formats": [],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "engage.mib.gov.in"
+   ],
+   "default_type": "consultation_notice",
+   "quirks": "Verified 25-08-2026: hosts NO consultations despite the branding (quizzes/campaigns only); Broadcasting Bill consultations ran via PIB + email. Watch for structural change."
+  },
+  {
+   "id": "tdsat_daily_orders",
+   "stratum": "telecom",
+   "regulator": "TDSAT",
+   "name": "Daily orders (POST search)",
+   "url": "https://tdsat.gov.in/Delhi/services/dailyorderlist.php",
+   "status": "planned",
+   "method": "post_forms",
+   "parser": {
+    "strategy": "html_table",
+    "row_floor": 10
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tdsat.gov.in"
+   ],
+   "default_type": "court_order",
+   "quirks": "Trivial urlencoded POST (from_date1/to_date1, no CSRF) verified by the audit; engine needs a POST lane - roadmap. Adjudicatory outputs, lower urgency than instruments."
+  },
+  {
+   "id": "cca_acts",
+   "stratum": "tech_data",
+   "regulator": "CCA",
+   "name": "CCA - Acts/Rules/Regulations/Notifications",
+   "url": "https://www.cca.gov.in/acts_guidelines.html",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cca.gov.in",
+    "www.cca.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "cca_guidelines",
+   "stratum": "tech_data",
+   "regulator": "CCA",
+   "name": "CCA - Guidelines",
+   "url": "https://www.cca.gov.in/guidelines.html",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cca.gov.in",
+    "www.cca.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "cbfc_comms_film",
+   "stratum": "media",
+   "regulator": "CBFC",
+   "name": "CBFC - Important Communications (film)",
+   "url": "https://cbfcindia.gov.in/cbfcAdmin/imp_communication.php?type=film",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cbfcindia.gov.in",
+    "cbfcindia.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "cbfc_comms_general",
+   "stratum": "media",
+   "regulator": "CBFC",
+   "name": "CBFC - Important Communications (general; 'gernal' is the live param)",
+   "url": "https://cbfcindia.gov.in/cbfcAdmin/imp_communication.php?type=gernal",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cbfcindia.gov.in",
+    "cbfcindia.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "ism_notices",
+   "stratum": "telecom",
+   "regulator": "India Semiconductor Mission",
+   "name": "India Semiconductor Mission - Notices",
+   "url": "https://ism.gov.in/notifications/notices",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "ism.gov.in",
+    "ism.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "tec_guidelines",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "TEC - Guidelines",
+   "url": "https://www.tec.gov.in/guidelines",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tec.gov.in",
+    "www.tec.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "tec_consultations",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "TEC - Consultations",
+   "url": "https://www.tec.gov.in/consultations",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tec.gov.in",
+    "www.tec.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "mib_whatsnew",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "MIB - What's New (crosscheck)",
+   "url": "https://mib.gov.in/en/whats-new",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "mib.gov.in",
+    "mib.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "certin_govt_guidelines",
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "CERT-In - Guidelines for Government Entities",
+   "url": "https://www.cert-in.org.in/guidelinesgovtentities.jsp",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cert-in.org.in",
+    "www.cert-in.org.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "trai_acts_policies",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "TRAI - Acts & Policies",
+   "url": "https://www.trai.gov.in/about-us/acts-policies",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in",
+    "www.trai.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "dot_eservices_import",
+   "stratum": "telecom",
+   "regulator": "eServices",
+   "name": "eServices - WPC Import Licence",
+   "url": "https://eservices.dot.gov.in/import-license",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "eservices.dot.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "registry_in_policies",
+   "stratum": "tech_data",
+   "regulator": ".IN Registry",
+   "name": ".IN Registry - Policies (INDRP)",
+   "url": "https://www.registry.in/policies",
+   "status": "planned",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "registry.in",
+    "www.registry.in"
+   ],
+   "default_type": "notification",
+   "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
   }
  ],
  "window_start": "2026-06-01"

@@ -114,6 +114,9 @@ def parse_html_table(soup: BeautifulSoup, cfg: dict, base: str) -> List[Row]:
         if p.get("title_selector"):
             el = tr.select_one(p["title_selector"])
             title = _clean(el.get_text(" ")) if el else None
+        if not title and p.get("title_cells") and len(cells) > max(p["title_cells"]):
+            parts = [_clean(cells[i].get_text(" ")) for i in p["title_cells"]]
+            title = " - ".join(x for x in parts if x)
         if not title and p.get("title_cell") is not None and len(cells) > p["title_cell"]:
             title = _clean(cells[p["title_cell"]].get_text(" "))
         if not title:
@@ -306,6 +309,67 @@ def parse_uidai_rsc(content: bytes, cfg: dict, base: str) -> List[Row]:
     return rows
 
 
+# ---------------------------------------------------------------- psn_rows
+def parse_psn_rows(soup: BeautifulSoup, cfg: dict, base: str) -> List[Row]:
+    """DoT eServices topic pages (RoW, satellite): div.psn-container rows inside a
+    scoped view — a PDF anchor wrapping p.psnDate (badge + date span) and p.psn-name.
+    Scope strictly: a sitewide What's-New ticker on every page mimics the row shape."""
+    p = cfg["parser"]
+    scope = soup.select_one(p["scope_selector"]) if p.get("scope_selector") else soup
+    if scope is None:
+        return []
+    rows: List[Row] = []
+    for box in scope.select(".psn-container"):
+        a = box.select_one("a[href]")
+        name = box.select_one("p.psn-name")
+        date_el = box.select_one(".policy-circular-presentation")
+        badge = box.select_one(".badge")
+        if a is None or name is None:
+            continue
+        rows.append({
+            "date": extract_date(date_el.get_text(" ") if date_el else "", cfg["date_formats"]),
+            "title": _clean(name.get_text(" ")),
+            "url": _abs(base, a["href"]),
+            "extra": {"src_type": _clean(badge.get_text(" ")) if badge else None},
+        })
+    return rows
+
+
+# ---------------------------------------------------------------- inspace_api
+def parse_inspace_api(content: bytes, cfg: dict, base: str) -> List[Row]:
+    """IN-SPACe's ServiceNow portal answers anonymous JSON GETs; the publications list
+    is hardcoded as JS object literals inside a widget's client_script."""
+    # the widget JS rides inside a JSON string, so its quotes arrive escaped
+    txt = content.decode("utf-8", errors="ignore").replace('\\"', '"')
+    rx = re.compile(r'\{\s*title:\s*"((?:[^"\\]|\\.)*)"\s*,\s*belowline:\s*"((?:[^"\\]|\\.)*)"'
+                    r'\s*,\s*url:\s*"((?:[^"\\]|\\.)*)"\s*,\s*category:\s*"((?:[^"\\]|\\.)*)"')
+    rows: List[Row] = []
+    for m in rx.finditer(txt):
+        title, below, url, category = (x.replace('\\"', '"').replace("\\/", "/") for x in m.groups())
+        rows.append({"date": extract_date(below, cfg["date_formats"]),
+                     "title": _clean(title), "url": _abs(base, url),
+                     "extra": {"src_type": _clean(category)}})
+    return rows
+
+
+# ---------------------------------------------------------------- tec_er_api
+def parse_tec_er_api(content: bytes, cfg: dict, base: str) -> List[Row]:
+    """MTCTE portal's get_er_list: a flat JSON array where every 6 consecutive elements
+    are one Essential Requirement record."""
+    import json as _json
+    data = _json.loads(content.decode("utf-8", errors="ignore"))
+    rows: List[Row] = []
+    for i in range(0, len(data) - 5, 6):
+        product, er_num, _orig, start, _end, _status = (str(x or "") for x in data[i:i + 6])
+        if not product:
+            continue
+        title = f"{product} ({er_num})" if er_num else product
+        url = f"https://www.mtcte.tec.gov.in/filedownload?name={er_num}.pdf" if er_num else ""
+        rows.append({"date": extract_date(start, cfg["date_formats"]),
+                     "title": _clean(title), "url": url, "extra": {}})
+    return rows
+
+
 # ---------------------------------------------------------------- egazette_recent
 def parse_egazette_recent(soup: BeautifulSoup, cfg: dict, base: str) -> List[Row]:
     rows: List[Row] = []
@@ -336,6 +400,7 @@ STRATEGIES = {
     "html_table": parse_html_table,
     "tr_with_doc": parse_tr_with_doc,
     "link_shelf": parse_link_shelf,
+    "psn_rows": parse_psn_rows,
     "egazette_recent": parse_egazette_recent,
 }
 
@@ -350,6 +415,10 @@ def parse(source: dict, content: bytes, base: str) -> List[Row]:
         return parse_meity_api(content, source, base)
     if strategy == "uidai_rsc":
         return parse_uidai_rsc(content, source, base)
+    if strategy == "inspace_api":
+        return parse_inspace_api(content, source, base)
+    if strategy == "tec_er_api":
+        return parse_tec_er_api(content, source, base)
     soup = BeautifulSoup(content, "lxml")
     return STRATEGIES[strategy](soup, source, base)
 
@@ -387,6 +456,7 @@ def structure_fingerprint(content: bytes, source: dict) -> str:
            "html_table": source["parser"].get("row_selector", "table tbody tr"),
            "tr_with_doc": "tr", "link_shelf": "a[href]", "rss": "item",
            "regex_rows": "table", "meity_api": "body", "uidai_rsc": "body",
+           "psn_rows": ".psn-container", "inspace_api": "body", "tec_er_api": "body",
            "egazette_recent": "table"}[source["parser"]["strategy"]]
     first = soup.select_one(sel)
     sig = ""

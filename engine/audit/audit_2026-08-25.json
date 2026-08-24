@@ -1,0 +1,1618 @@
+{
+ "enumerated_count": 238,
+ "missing_from_atlas": [
+  {
+   "regulator": "DoT eServices Portal",
+   "venue": "eServices - Right of Way permissions",
+   "url": "https://eservices.dot.gov.in/right-of-way-permissions",
+   "why_it_matters": "RoW Rules 2024 and state/UT RoW instruments post here as PDFs; atlas only has the dead GatiShakti portal for RoW (core)"
+  },
+  {
+   "regulator": "DoT eServices Portal",
+   "venue": "eServices - Satellite / GMPCS authorisation pages",
+   "url": "https://eservices.dot.gov.in/satellite-license",
+   "why_it_matters": "Satcom/VSAT/GMPCS authorisation terms binding operators in the hottest current licensing area; no atlas equivalent (core)"
+  },
+  {
+   "regulator": "DoT WPC Wing (via eServices)",
+   "venue": "eServices - Import Licence (wireless equipment)",
+   "url": "https://eservices.dot.gov.in/import-license",
+   "why_it_matters": "WPC import-licence circulars plus dealer/possession pages under the Radio Equipment Possession Authorisation Rules 2026 (adjacent)"
+  },
+  {
+   "regulator": "DoT",
+   "venue": "Sanchar Saathi portal",
+   "url": "https://sancharsaathi.gov.in/",
+   "why_it_matters": "Operational venue implementing Telecom Cyber Security Rules directions and fraud-management measures (adjacent)"
+  },
+  {
+   "regulator": "DoT",
+   "venue": "Tarang Sanchar EMF portal",
+   "url": "https://tarangsanchar.gov.in/emfportal",
+   "why_it_matters": "EMF compliance norms and tower self-certification requirements (adjacent)"
+  },
+  {
+   "regulator": "DoT / NSCS",
+   "venue": "Trusted Telecom Portal (NSDTS)",
+   "url": "https://trustedtelecom.gov.in/",
+   "why_it_matters": "Trusted-source/product designations conditioning all telco procurement under the NSDTS licence condition (adjacent)"
+  },
+  {
+   "regulator": "DoT / C-DOT",
+   "venue": "PM-WANI Central Registry",
+   "url": "https://pmwani.gov.in/",
+   "why_it_matters": "Operative technical requirements binding PDO/PDOA/app-provider ecosystem (adjacent)"
+  },
+  {
+   "regulator": "TEC",
+   "venue": "TEC Circulars",
+   "url": "https://tec.gov.in/circulars",
+   "why_it_matters": "MTCTE/certification circulars and gazette copies; atlas has only TEC what's-new (dormant since 12/2025), home, MTCTE policy page and ERs (core)"
+  },
+  {
+   "regulator": "TEC",
+   "venue": "TEC Gazette-notified standards",
+   "url": "https://tec.gov.in/gazette-notified-standards",
+   "why_it_matters": "Standards become mandatory on gazette notification under the Telecom Act 2023 standards framework; no atlas entry (core)"
+  },
+  {
+   "regulator": "TEC",
+   "venue": "TEC Guidelines",
+   "url": "https://tec.gov.in/guidelines",
+   "why_it_matters": "Certification and testing guidelines under MTCTE (adjacent)"
+  },
+  {
+   "regulator": "TEC",
+   "venue": "TEC Consultations",
+   "url": "https://tec.gov.in/consultations",
+   "why_it_matters": "Draft standards/ER consultation notices - forward pipeline of equipment mandates (adjacent)"
+  },
+  {
+   "regulator": "NCCS",
+   "venue": "NCCS HQ circulars",
+   "url": "https://nccs.gov.in/home/circularsHead/1",
+   "why_it_matters": "Third division-wise circular listing; registry tracks circularsSc and circularsSas but not HQ (core)"
+  },
+  {
+   "regulator": "TRAI",
+   "venue": "Financial disincentive orders",
+   "url": "https://www.trai.gov.in/release-publication/financial-disincentive",
+   "why_it_matters": "FD enforcement orders against operators; absent from the 12 wired TRAI listings (core)"
+  },
+  {
+   "regulator": "TRAI",
+   "venue": "Miscellaneous releases (orders etc.)",
+   "url": "https://www.trai.gov.in/release-publication/miscellaneous",
+   "why_it_matters": "Orders not fitting other categories; contradicts the registry belief in trai_directions quirks that no separate orders listing exists (core)"
+  },
+  {
+   "regulator": "TRAI",
+   "venue": "Acts and policies",
+   "url": "https://www.trai.gov.in/about-us/acts-policies",
+   "why_it_matters": "TRAI Act amendments and broadcasting entrustment notifications (adjacent)"
+  },
+  {
+   "regulator": "IN-SPACe (Dept of Space)",
+   "venue": "IN-SPACe Publications (NGP, guidelines, advisories)",
+   "url": "https://www.inspace.gov.in/inspace?id=inspace_publications",
+   "why_it_matters": "NGP 2024 and authorisation guidelines for satcom/ground stations; IN-SPACe is entirely absent from the atlas (core, JS_ONLY)"
+  },
+  {
+   "regulator": "IN-SPACe (Dept of Space)",
+   "venue": "IN-SPACe main portal (announcements, authorisations granted)",
+   "url": "https://www.inspace.gov.in/inspace",
+   "why_it_matters": "Announcement layer for new guidelines and authorisations (adjacent)"
+  },
+  {
+   "regulator": "Department of Space",
+   "venue": "DoS website",
+   "url": "https://www.dos.gov.in/",
+   "why_it_matters": "Now 301s to isro.gov.in - no standalone DoS site; watch for space activities legislation creating new venues (adjacent)"
+  },
+  {
+   "regulator": "Controller of Certifying Authorities (CCA)",
+   "venue": "CCA - Acts, Rules, Regulations & Notifications",
+   "url": "https://www.cca.gov.in/acts_guidelines.html",
+   "why_it_matters": "IT Act ch.VI instruments (CA Rules, digital-signature/eSign notifications); CCA absent from atlas entirely (core)"
+  },
+  {
+   "regulator": "Controller of Certifying Authorities (CCA)",
+   "venue": "CCA - Guidelines",
+   "url": "https://www.cca.gov.in/guidelines.html",
+   "why_it_matters": "Interoperability/eSign/crypto-migration guidelines binding licensed CAs and eSign providers (adjacent)"
+  },
+  {
+   "regulator": "Controller of Certifying Authorities (CCA)",
+   "venue": "CCA homepage news/What's New",
+   "url": "https://www.cca.gov.in/",
+   "why_it_matters": "CA suspension/investigation notices exist only as homepage-linked PDFs - scraper must diff homepage links (adjacent)"
+  },
+  {
+   "regulator": "CERT-In",
+   "venue": "Guidelines for Government Entities",
+   "url": "https://www.cert-in.org.in/guidelinesgovtentities.jsp",
+   "why_it_matters": "s.70B(6) guidelines binding government entities and contractually their private vendors/MSPs (adjacent)"
+  },
+  {
+   "regulator": "CERT-In",
+   "venue": "CERT-In Press",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PRESSLIST",
+   "why_it_matters": "Announcement layer for directions and advisories (adjacent)"
+  },
+  {
+   "regulator": "NIXI / .IN Registry",
+   "venue": ".IN Registry - Policies",
+   "url": "https://www.registry.in/policies",
+   "why_it_matters": "INDRP and registrar/registrant policies binding all .in domain clients; NIXI/registry.in absent from atlas (adjacent)"
+  },
+  {
+   "regulator": "NIXI",
+   "venue": "NIXI corporate site",
+   "url": "https://nixi.in/",
+   "why_it_matters": "Occasional .IN/IDN/IPv6 policy announcements; React SPA (adjacent)"
+  },
+  {
+   "regulator": "India Semiconductor Mission",
+   "venue": "ISM - Notices",
+   "url": "https://ism.gov.in/notifications/notices",
+   "why_it_matters": "Semicon India application-window and scheme-modification notices binding applicants; ISM absent from atlas (adjacent)"
+  },
+  {
+   "regulator": "India Semiconductor Mission",
+   "venue": "ISM - Downloads (scheme guidelines)",
+   "url": "https://ism.gov.in/notifications/downloads",
+   "why_it_matters": "Fab/ATMP/OSAT/DLI scheme guidelines and amendments (adjacent)"
+  },
+  {
+   "regulator": "India Semiconductor Mission",
+   "venue": "ISM - Press Releases",
+   "url": "https://ism.gov.in/notifications/press-release",
+   "why_it_matters": "Approval and scheme announcements (adjacent)"
+  },
+  {
+   "regulator": "MeitY",
+   "venue": "Connect > Citizen Engagement (consultations)",
+   "url": "https://www.meity.gov.in/connect/citizen-engagement",
+   "why_it_matters": "Consultation/draft-rule pipeline on the new MeitY site; no atlas equivalent listing (adjacent)"
+  },
+  {
+   "regulator": "MIB",
+   "venue": "MIB - What's New feed",
+   "url": "https://mib.gov.in/en/whats-new",
+   "why_it_matters": "Chronological change-detection feed across all MIB listings (adjacent)"
+  },
+  {
+   "regulator": "MIB",
+   "venue": "MIB Engage - public consultation portal",
+   "url": "https://engage.mib.gov.in/",
+   "why_it_matters": "Draft Broadcasting Services Bill and draft guidelines consultations run here; no atlas entry (core)"
+  },
+  {
+   "regulator": "CBFC",
+   "venue": "Important Communications (film)",
+   "url": "https://cbfcindia.gov.in/cbfcAdmin/imp_communication.php?type=film",
+   "why_it_matters": "Procedural directions and form changes to film applicants; atlas has orders/guidelines/acts pages only (core)"
+  },
+  {
+   "regulator": "CBFC",
+   "venue": "Important Communications (general)",
+   "url": "https://cbfcindia.gov.in/cbfcAdmin/imp_communication.php?type=gernal",
+   "why_it_matters": "Second listing behind the same script; the misspelt 'gernal' param IS the live value (core)"
+  },
+  {
+   "regulator": "PRGI",
+   "venue": "Updates for Printers",
+   "url": "https://prgi.gov.in/updates/updates-for-printers",
+   "why_it_matters": "Formats/directions for printing presses under s.11 PRP Act (adjacent)"
+  },
+  {
+   "regulator": "PRGI",
+   "venue": "Title guidelines",
+   "url": "https://prgi.gov.in/policy/guidelines-admissibility-titles",
+   "why_it_matters": "Binds any client registering a periodical title; static reference page (core)"
+  },
+  {
+   "regulator": "PRGI",
+   "venue": "Press Sewa portal",
+   "url": "https://presssewa.prgi.gov.in/",
+   "why_it_matters": "Statutory e-filing portal carrying process notices; substantive advisories mirror on prgi.gov.in (adjacent)"
+  },
+  {
+   "regulator": "Press Council of India",
+   "venue": "PCI - Norms of Journalistic Conduct",
+   "url": "http://presscouncil.nic.in/Norms.aspx",
+   "why_it_matters": "The operative print-media content code; PCI absent from atlas entirely; HTTPS broken on host, track over http (core)"
+  },
+  {
+   "regulator": "Press Council of India",
+   "venue": "PCI - Adjudications",
+   "url": "http://presscouncil.nic.in/Adjudication.aspx",
+   "why_it_matters": "Inquiry Committee/Council adjudications against newspapers (core)"
+  },
+  {
+   "regulator": "Press Council of India",
+   "venue": "PCI - Important Resolutions",
+   "url": "http://presscouncil.nic.in/Important-Resolutions-By-The-Council.aspx",
+   "why_it_matters": "Council resolutions with normative effect on the press (adjacent)"
+  },
+  {
+   "regulator": "Press Council of India",
+   "venue": "PCI - Gazette Notifications",
+   "url": "http://presscouncil.nic.in/GazetteNotification.aspx",
+   "why_it_matters": "Constitution and levy notifications; levy notices also as homepage PDFs (adjacent)"
+  },
+  {
+   "regulator": "Press Council of India",
+   "venue": "PCI - Press Releases",
+   "url": "http://presscouncil.nic.in/PressRelease.aspx",
+   "why_it_matters": "Announcement layer for adjudications and advisories (adjacent)"
+  },
+  {
+   "regulator": "Central Bureau of Communication (CBC)",
+   "venue": "CBC - Advisories archive",
+   "url": "https://cbcindia.gov.in/advisories-archives/",
+   "why_it_matters": "Empanelment advisories binding media clients holding CBC empanelment for government advertising; CBC absent from atlas (adjacent)"
+  },
+  {
+   "regulator": "NBDA / NBDSA",
+   "venue": "NBDSA - Advisories",
+   "url": "https://www.nbdanewdelhi.com/advisories",
+   "why_it_matters": "Advisories to member news broadcasters (elections, stings, breaking news); atlas has decisions and guidelines but not advisories (core)"
+  },
+  {
+   "regulator": "IBDF",
+   "venue": "IBDF - Public Policy & Regulations",
+   "url": "https://ibdf.com/public-policy-regulations/",
+   "why_it_matters": "Mirror of government instruments reaching industry - useful cross-check (adjacent)"
+  },
+  {
+   "regulator": "CCI",
+   "venue": "CCI - Regulations (antitrust legal framework)",
+   "url": "https://www.cci.gov.in/legal-framwork/regulations",
+   "why_it_matters": "Settlement/commitment/general regulations for digital-markets enforcement; 'legal-framwork' sic is CCI's real slug; atlas lacks all legal-framwork listings (core)"
+  },
+  {
+   "regulator": "CCI",
+   "venue": "CCI - Notifications (gazette)",
+   "url": "https://www.cci.gov.in/legal-framwork/notifications",
+   "why_it_matters": "Commencement notifications incl. deal-value threshold, de minimis and s.54 exemptions (core)"
+  },
+  {
+   "regulator": "CCI",
+   "venue": "CCI - Combination regulations",
+   "url": "https://www.cci.gov.in/combination/legal-framwork/regulations",
+   "why_it_matters": "CCI (Combinations) Regulations 2024 with deal-value-threshold and green-channel mechanics; fragmented from the antitrust listing (core)"
+  },
+  {
+   "regulator": "CCI",
+   "venue": "CCI - Acts",
+   "url": "https://www.cci.gov.in/legal-framwork/act",
+   "why_it_matters": "Competition Act texts incl. amendment acts; slow-moving (adjacent)"
+  },
+  {
+   "regulator": "Dept of Consumer Affairs / CCPA",
+   "venue": "DoCA new site - Consumer Protection acts and rules",
+   "url": "https://consumeraffairs.gov.in/pages/consumer-protection-acts",
+   "why_it_matters": "E-Commerce Rules and CP Act 2019 instruments on the NEW Laravel site; atlas only has the timing-out consumeraffairs.nic.in host (core)"
+  },
+  {
+   "regulator": "Dept of Consumer Affairs / CCPA",
+   "venue": "DoCA new site - Announcements",
+   "url": "https://consumeraffairs.gov.in/pages/announcements",
+   "why_it_matters": "Only working official announcement venue for new consumer-protection rules/guidelines given the CCPA venue outage (core)"
+  },
+  {
+   "regulator": "Dept of Consumer Affairs / CCPA",
+   "venue": "DoCA new site - Legal Metrology acts and rules",
+   "url": "https://consumeraffairs.gov.in/pages/legal-metrology-acts",
+   "why_it_matters": "Packaged Commodities Rules amendments - mandatory declarations on electronics packaging (adjacent)"
+  },
+  {
+   "regulator": "Dept of Consumer Affairs / CCPA",
+   "venue": "DoCA new site - Press releases",
+   "url": "https://consumeraffairs.gov.in/pages/press-release",
+   "why_it_matters": "CCPA action announcements (adjacent)"
+  },
+  {
+   "regulator": "Dept of Consumer Affairs / CCPA",
+   "venue": "DoCA new site - Circulars",
+   "url": "https://consumeraffairs.gov.in/pages/circulars",
+   "why_it_matters": "Low-signal backstop of departmental circulars (adjacent)"
+  },
+  {
+   "regulator": "BIS",
+   "venue": "BIS - Act, Rules and Regulations",
+   "url": "https://www.bis.gov.in/the-bureau/bis-act-rules-and-regulations/?lang=en",
+   "why_it_matters": "BIS Act 2016 / Conformity Assessment Regulations 2018 and amendments; reference shelf missing from atlas BIS coverage (core)"
+  },
+  {
+   "regulator": "BIS - CRS",
+   "venue": "CRS portal public dashboard",
+   "url": "https://www.crsbis.in/BIS/publicdashAction.do",
+   "why_it_matters": "CRS operational notices, product inclusions, test guidelines and fee revisions - a live feed the static crsbis atlas pages miss; server-rendered, scrape this URL not the root (core)"
+  },
+  {
+   "regulator": "DGFT",
+   "venue": "DGFT - Notifications",
+   "url": "https://www.dgft.gov.in/CP/?opt=notification",
+   "why_it_matters": "FTP amendments: laptop/tablet/server import management and SCOMET changes for telecom/encryption gear; DGFT absent from atlas entirely; list is server-side despite SPA look (core)"
+  },
+  {
+   "regulator": "DGFT",
+   "venue": "DGFT - Public Notices",
+   "url": "https://www.dgft.gov.in/CP/?opt=public-notice",
+   "why_it_matters": "Handbook of Procedures amendments and import-authorisation procedures for IT hardware (core)"
+  },
+  {
+   "regulator": "DGFT",
+   "venue": "DGFT - Policy Circulars",
+   "url": "https://www.dgft.gov.in/CP/?opt=circular",
+   "why_it_matters": "Clarificatory circulars interpreting FTP provisions (core)"
+  },
+  {
+   "regulator": "DGFT",
+   "venue": "DGFT - Trade Notices",
+   "url": "https://www.dgft.gov.in/CP/?opt=trade-notice",
+   "why_it_matters": "Operational notices, procedurally binding in practice (adjacent)"
+  },
+  {
+   "regulator": "Legislative Department",
+   "venue": "Acts in PDF / Recent Acts",
+   "url": "https://legislative.gov.in/acts-in-pdf/",
+   "why_it_matters": "Signed PDFs of new Acts on assent (PROG Act, DPDP, Telecom Act landed here); atlas root entry recorded the site as an empty shell but this listing and /recent-acts-of-parliament/ are live (core)"
+  },
+  {
+   "regulator": "Legislative Department",
+   "venue": "Ordinances",
+   "url": "https://legislative.gov.in/ordinances/",
+   "why_it_matters": "Fast-track instruments binding immediately; verified live listing (core)"
+  },
+  {
+   "regulator": "Dept of Publication / NIC",
+   "venue": "e-Gazette - StateGazette.aspx",
+   "url": "https://egazette.gov.in/(S(<session>))/StateGazette.aspx",
+   "why_it_matters": "State gazettes onboarded to the central portal may substitute per-state scrapers; check onboarding before building state pipelines (adjacent)"
+  },
+  {
+   "regulator": "PIB",
+   "venue": "PIB Archive (releases pre-May 2017)",
+   "url": "https://archive.pib.gov.in/",
+   "why_it_matters": "Historical releases for reconstructing regulatory history; separate markup from main PIB (adjacent)"
+  },
+  {
+   "regulator": "Rajya Sabha Secretariat",
+   "venue": "rajyasabha.nic.in legacy portal",
+   "url": "https://rajyasabha.nic.in/",
+   "why_it_matters": "RS Committee on Subordinate Legislation reports and papers laid; resolves but times out from US vantage - India egress needed (adjacent)"
+  },
+  {
+   "regulator": "SFLC (monitored tracker)",
+   "venue": "SFLC Internet Shutdowns Tracker",
+   "url": "https://internetshutdowns.in/",
+   "why_it_matters": "Logs telecom/internet suspension orders that are frequently never gazetted, with order copies; distinct dataset from sflc.in which the atlas does have (core)"
+  },
+  {
+   "regulator": "DoT / TRAI (monitored press)",
+   "venue": "TelecomTalk",
+   "url": "https://telecomtalk.info/",
+   "why_it_matters": "Already named in the live signals_news sweep list but absent from the atlas itself; working WordPress RSS at /feed/ (adjacent)"
+  },
+  {
+   "regulator": "MeitY / courts (platform disclosures)",
+   "venue": "Lumen Database",
+   "url": "https://lumendatabase.org/",
+   "why_it_matters": "Sometimes the only public copy of s.69A/court takedown orders forwarded by platforms (adjacent)"
+  },
+  {
+   "regulator": "Courts (monitored press)",
+   "venue": "Bar & Bench",
+   "url": "https://www.barandbench.com/",
+   "why_it_matters": "Same-day reporting of hearings where unpublished blocking orders and Sahyog notices are read into the record; RSS at /stories.rss (adjacent)"
+  },
+  {
+   "regulator": "Courts (monitored press)",
+   "venue": "LiveLaw",
+   "url": "https://www.livelaw.in/",
+   "why_it_matters": "Publishes order PDFs in s.69A/Sahyog/IT Rules litigation that court sites bury; partial paywall (adjacent)"
+  },
+  {
+   "regulator": "Punjab & Haryana High Court",
+   "venue": "P&H HC cause lists",
+   "url": "https://highcourtchd.gov.in/?trs=cause_list",
+   "why_it_matters": "Cause-list watch for internet-shutdown/suspension challenges disclosing unpublished orders (adjacent)"
+  },
+  {
+   "regulator": "Government of NCT of Delhi",
+   "venue": "Delhi Govt - Notifications notice-board",
+   "url": "https://delhi.gov.in/notice-board/notifications",
+   "why_it_matters": "No Delhi venue in the atlas at all; Delhi has no consolidated e-gazette so notifications fragment across departments - itself a coverage risk (core, state-scope)"
+  },
+  {
+   "regulator": "Government of Maharashtra",
+   "venue": "Maharashtra Government Resolutions (GR) portal",
+   "url": "https://gr.maharashtra.gov.in/",
+   "why_it_matters": "GRs (film shooting, IT policy, cable administration) often never reach the gazette (adjacent, state-scope)"
+  },
+  {
+   "regulator": "Government of Haryana",
+   "venue": "Haryana e-Gazette",
+   "url": "http://www.egazetteharyana.gov.in/",
+   "why_it_matters": "Haryana gambling/cinema/data-centre notifications; HTTP-only, flag for TLS policy (adjacent, state-scope)"
+  },
+  {
+   "regulator": "Government of Gujarat",
+   "venue": "Gujarat e-Gazette",
+   "url": "https://egazette.gujarat.gov.in/",
+   "why_it_matters": "Cinema regulation and GIFT City-adjacent notifications (adjacent, state-scope)"
+  },
+  {
+   "regulator": "Government of Kerala",
+   "venue": "Kerala e-Gazette (COMPOSE)",
+   "url": "https://compose.kerala.gov.in/",
+   "why_it_matters": "Post-Feb-2022 Kerala gazette issues; legacy portal geo-fenced (adjacent, state-scope)"
+  },
+  {
+   "regulator": "Government of Nagaland",
+   "venue": "Nagaland Games of Skill licensing portal",
+   "url": "https://gamesofskill.nagaland.gov.in/",
+   "why_it_matters": "One of two state skill-gaming licensing regimes; licence-holders' obligations still turn on it post the central 2025 Act (adjacent, state-scope)"
+  },
+  {
+   "regulator": "Government of Meghalaya",
+   "venue": "Meghalaya Gazette (megpns portal)",
+   "url": "https://megpns.gov.in/gazette/",
+   "why_it_matters": "Gaming Act 2021 lineage and successor instruments; WAF 403s the path - keep only if a client has Meghalaya exposure (adjacent, state-scope)"
+  }
+ ],
+ "scope_flags": [
+  "placeholder"
+ ],
+ "diff_summary": "The 277-venue atlas is strong where the tracker already lives - TRAI, DoT eServices, NCCS, TDSAT, MeitY, MIB, CERT-In, UIDAI, BIS, RBI, courts and the gazette/PIB safety net - and roughly 85-90% of the fresh statute-first enumeration maps onto an existing atlas entry. The gaps cluster four ways. (1) Seven regulators/venues are entirely absent: CCA (IT Act ch.VI), Press Council of India, DGFT (IT-hardware import management), IN-SPACe/DoS (space authorisation), NIXI/.IN Registry, India Semiconductor Mission, and CBC - plus the SFLC internetshutdowns.in tracker, Lumen, Bar & Bench and LiveLaw on the disclosure side. (2) High-value listing pages are missing on regulators the atlas thinks it covers: TEC circulars and gazette-notified standards, NCCS HQ circulars, TRAI financial-disincentive and miscellaneous orders (the latter contradicting the registry's recorded belief that no orders listing exists), eServices RoW and satellite/GMPCS pages, CBFC important-communications, NBDSA advisories, MIB Engage, all four CCI legal-framwork listings, and the Legislative Department's live acts-in-pdf/ordinances listings (the atlas wrote the site off as an empty shell). (3) Unmapped migrations are silently breaking coverage: DoCA moved to consumeraffairs.gov.in while the atlas only holds the timing-out nic.in host; UIDAI's entire legal-framework path 404s and the planned uidai_circulars URL in sources.json is dead (new flat /en/ listings verified); CCI combination orders moved to /combination/orders-section31; Karnataka and Maharashtra gazette hosts are stale/misspelt in the atlas. (4) Standing structural gaps need decisions, not scrapers: no working CCPA venue anywhere, no UP or WB online gazette, DPB and OGAI still siteless (watch), Sahyog login-gated, and several NIC hosts India-geo-fenced. The 40-entry worklist takes all 16 surviving planned sources (meity_whatsnew dropped as retired; three planned URLs corrected in place) plus 24 additions; missing-core rows that fell below the cap - CCI framework listings, DGFT public notices/circulars, DoCA CP-acts, BIS act-rules shelf, CRS dashboard, Legislative acts/ordinances, PCI norms/adjudications, CBFC imp-comms, NBDSA advisories, PRGI title guidelines and Delhi notifications - are the next tranche and are all captured in missing_from_atlas with exact URLs.",
+ "activation_worklist_full": [
+  {
+   "id": "meity_gazettes",
+   "regulator": "MeitY",
+   "name": "Gazette Notifications",
+   "url": "https://www.meity.gov.in/documents/gazettes-notifications",
+   "stratum": "tech_data",
+   "why": "Highest-value planned source: s.79A examiner notifications sat unnoticed ~6 weeks here; headless render or sitemap+index diffing"
+  },
+  {
+   "id": "meity_orders_notices",
+   "regulator": "MeitY",
+   "name": "Orders & Notices",
+   "url": "https://www.meity.gov.in/documents/orders-and-notices",
+   "stratum": "tech_data",
+   "why": "OGAI registration forms, IT Rules/DPDP clarifications and OMs land here; interim OGAI venue until its portal exists"
+  },
+  {
+   "id": "meity_acts_policies",
+   "regulator": "MeitY",
+   "name": "Acts & Policies (incl. DPDP, PROG Act)",
+   "url": "https://www.meity.gov.in/documents/act-and-policies",
+   "stratum": "tech_data",
+   "why": "DPDP Rules 2025, PROG Act/Rules and policy texts; planned source, same SPA constraint"
+  },
+  {
+   "id": "meity_guidelines",
+   "regulator": "MeitY",
+   "name": "Guidelines",
+   "url": "https://www.meity.gov.in/documents/guidelines",
+   "stratum": "tech_data",
+   "why": "AI advisories under IT Rules due diligence post here; core atlas venue not in sources.json at all"
+  },
+  {
+   "id": "certin_directions",
+   "regulator": "CERT-In",
+   "name": "s.70B(6) Directions page",
+   "url": "https://www.cert-in.org.in/Directions70B.jsp",
+   "stratum": "tech_data",
+   "why": "The single highest-stakes CERT-In page (6-hour incident reporting, log retention, VPN KYC) plus FAQs"
+  },
+  {
+   "id": "certin_advisories",
+   "regulator": "CERT-In",
+   "name": "Advisories (CIAD, year-indexed)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBADVLIST02&year=2026",
+   "stratum": "tech_data",
+   "why": "Anchors intermediary due-diligence expectations; trivially scrapable servlet pages"
+  },
+  {
+   "id": "uidai_circulars",
+   "regulator": "UIDAI",
+   "name": "Circulars",
+   "url": "https://uidai.gov.in/en/circulars",
+   "stratum": "tech_data",
+   "why": "Fastest-moving UIDAI venue binding AUA/KUA/ASA clients; NOTE sources.json planned URL (media-resources path) is dead after the site relaunch - this new flat URL verified 2026-08-25"
+  },
+  {
+   "id": "uidai_regulations",
+   "regulator": "UIDAI",
+   "name": "Regulations",
+   "url": "https://uidai.gov.in/en/regulations",
+   "stratum": "tech_data",
+   "why": "Aadhaar regulations and amendments; atlas URL (legal-framework/regulations.html) now 404s - new flat listing verified server-rendered"
+  },
+  {
+   "id": "uidai_notifications",
+   "regulator": "UIDAI",
+   "name": "Notifications",
+   "url": "https://uidai.gov.in/en/notifications",
+   "stratum": "tech_data",
+   "why": "Gazette notifications under the Aadhaar Act; replaces dead legal-framework path"
+  },
+  {
+   "id": "trai_fd_orders",
+   "regulator": "TRAI",
+   "name": "Financial disincentive orders",
+   "url": "https://www.trai.gov.in/release-publication/financial-disincentive",
+   "stratum": "telecom",
+   "why": "Enforcement orders against operators - a hole in the supposedly complete live TRAI coverage"
+  },
+  {
+   "id": "trai_miscellaneous",
+   "regulator": "TRAI",
+   "name": "Miscellaneous releases (orders etc.)",
+   "url": "https://www.trai.gov.in/release-publication/miscellaneous",
+   "stratum": "telecom",
+   "why": "Corrects the registry belief that no separate orders listing exists; site flaky, needs retries"
+  },
+  {
+   "id": "nccs_circulars_head",
+   "regulator": "NCCS",
+   "name": "HQ circulars",
+   "url": "https://nccs.gov.in/home/circularsHead/1",
+   "stratum": "telecom",
+   "why": "Third NCCS division listing missing from the live set (Sc and SAS are wired); same scraper pattern"
+  },
+  {
+   "id": "tec_circulars",
+   "regulator": "TEC",
+   "name": "Circulars",
+   "url": "https://tec.gov.in/circulars",
+   "stratum": "telecom",
+   "why": "MTCTE circulars and gazette-notification copies; tec_whatsnew alone is dormant and insufficient; use www host if bare-host TLS regresses"
+  },
+  {
+   "id": "tec_essential_requirements",
+   "regulator": "TEC",
+   "name": "Essential Requirements (MTCTE)",
+   "url": "https://tec.gov.in/essential-requirements",
+   "stratum": "telecom",
+   "why": "ERs directly bind equipment OEMs/importers; sibling listing /essential-requirements-2 also live - track both"
+  },
+  {
+   "id": "tec_gazette_standards",
+   "regulator": "TEC",
+   "name": "Gazette-notified standards",
+   "url": "https://tec.gov.in/gazette-notified-standards",
+   "stratum": "telecom",
+   "why": "Standards become mandatory on notification under the Telecom Act standards framework"
+  },
+  {
+   "id": "dot_eservices_row",
+   "regulator": "DoT",
+   "name": "eServices - Right of Way permissions",
+   "url": "https://eservices.dot.gov.in/right-of-way-permissions",
+   "stratum": "telecom",
+   "why": "RoW Rules 2024 state/UT instruments post here; GatiShakti portal is dead so this is the working RoW venue"
+  },
+  {
+   "id": "dot_eservices_satellite",
+   "regulator": "DoT",
+   "name": "eServices - Satellite/GMPCS authorisation",
+   "url": "https://eservices.dot.gov.in/satellite-license",
+   "stratum": "telecom",
+   "why": "Satcom authorisation terms in the most active current licensing area; sibling GMPCS page verified live"
+  },
+  {
+   "id": "tdsat_daily_orders",
+   "regulator": "TDSAT",
+   "name": "Daily Orders",
+   "url": "https://tdsat.gov.in/Delhi/services/dailyorderlist.php",
+   "stratum": "telecom",
+   "why": "Stay orders on TRAI/DoT instruments matter immediately; crawlable unlike the POST-only judgments search"
+  },
+  {
+   "id": "inspace_publications",
+   "regulator": "IN-SPACe",
+   "name": "Publications (NGP, guidelines, advisories)",
+   "url": "https://www.inspace.gov.in/inspace?id=inspace_publications",
+   "stratum": "telecom",
+   "why": "The space-authorisation rulebook; regulator entirely absent from atlas; needs headless render, attachment URLs unstable"
+  },
+  {
+   "id": "mib_acts_policy",
+   "regulator": "MIB",
+   "name": "Acts/Policies/Guidelines master view",
+   "url": "https://mib.gov.in/en/documents/notification/acts-policy-guidelines",
+   "stratum": "media",
+   "why": "Master statutory listing across all MIB wings; planned source; always /en/ prefix, retry on flaky server"
+  },
+  {
+   "id": "mib_orders_notices",
+   "regulator": "MIB",
+   "name": "Orders & Notices",
+   "url": "https://mib.gov.in/en/documents/notification/notices",
+   "stratum": "media",
+   "why": "Planned source - but wire the /en/ URL; the sources.json URL without /en/ serves Hindi titles and showed BLOCKED"
+  },
+  {
+   "id": "mib_other_comms",
+   "regulator": "MIB",
+   "name": "Other Communications",
+   "url": "https://mib.gov.in/en/documents/notification/Other-communication",
+   "stratum": "media",
+   "why": "Where most MIB advisories to broadcasters/OTT physically land; use /en/ URL, not the sources.json unprefixed one"
+  },
+  {
+   "id": "mib_advisories",
+   "regulator": "MIB",
+   "name": "Advisories listing",
+   "url": "https://mib.gov.in/en/documents/notification/advisories",
+   "stratum": "media",
+   "why": "Dedicated advisories listing in the atlas that neither sources.json nor the fresh enumeration captured - cheap same-pattern Drupal scrape"
+  },
+  {
+   "id": "mib_digital_media",
+   "regulator": "MIB",
+   "name": "Digital Media Wing (IT Rules Part III)",
+   "url": "https://mib.gov.in/en/ministry/our-wings/digital-media",
+   "stratum": "media",
+   "why": "Part III instruments, SRB registrations, OTT advisories; pair with PIB since rule 16 blocking often surfaces only there"
+  },
+  {
+   "id": "mib_broadcasting",
+   "regulator": "MIB",
+   "name": "Broadcasting Wing document table",
+   "url": "https://mib.gov.in/en/ministry/our-wings/broadcating-wing",
+   "stratum": "media",
+   "why": "Planned source; the misspelt slug 'broadcating-wing' is canonical - do not fix it"
+  },
+  {
+   "id": "mib_engage",
+   "regulator": "MIB",
+   "name": "MIB Engage consultation portal",
+   "url": "https://engage.mib.gov.in/",
+   "stratum": "media",
+   "why": "Draft Broadcasting Services Bill and draft guidelines consultations run here - earliest text of future media obligations"
+  },
+  {
+   "id": "certin_guidelines",
+   "regulator": "CERT-In",
+   "name": "Guidelines (CISG)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW01",
+   "stratum": "tech_data",
+   "why": "Guidelines referenced by binding directions; planned source, static HTML"
+  },
+  {
+   "id": "certin_vuln",
+   "regulator": "CERT-In",
+   "name": "Vulnerability Notes (CIVN)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=VLNLIST02&year=2026",
+   "stratum": "tech_data",
+   "why": "Planned source; informational tier but same scraper as advisories, near-zero marginal cost"
+  },
+  {
+   "id": "cca_acts_rules",
+   "regulator": "CCA",
+   "name": "Acts, Rules, Regulations & Notifications",
+   "url": "https://www.cca.gov.in/acts_guidelines.html",
+   "stratum": "tech_data",
+   "why": "IT Act ch.VI instruments for CA/eSign/digital-signature clients; regulator entirely missing from atlas; also diff homepage news PDFs"
+  },
+  {
+   "id": "tnoga_acts_rules",
+   "regulator": "TNOGA",
+   "name": "Acts, Rules & Regulations",
+   "url": "https://www.tnonlinegamingauthority.tn.gov.in/Acts_rules.aspx",
+   "stratum": "tech_data",
+   "why": "TNOGA RMG Regulations 2025 (KYC, blank hours, spend limits); central-vs-TN interplay is exactly what gaming clients will ask"
+  },
+  {
+   "id": "prgi",
+   "regulator": "PRGI",
+   "name": "Latest Updates (advisories)",
+   "url": "https://prgi.gov.in/latest-updates",
+   "stratum": "media",
+   "why": "Planned source - wire the listing page rather than the sources.json root URL; also sweep /updates/updates-for-publishers; TLS-tolerant fetcher"
+  },
+  {
+   "id": "cbfc",
+   "regulator": "CBFC",
+   "name": "Orders and Circulars",
+   "url": "https://cbfcindia.gov.in/cbfcAdmin/orders-and-circular.php",
+   "stratum": "media",
+   "why": "Planned source; pair with the two imp_communication.php listings (type=film and the sic type=gernal) which the atlas misses"
+  },
+  {
+   "id": "asci",
+   "regulator": "ASCI",
+   "name": "Advisories",
+   "url": "https://www.ascionline.in/advisories/",
+   "stratum": "media",
+   "why": "Planned source; sector advisories (offshore betting, AI in ads) with rule 7(9) Cable TV Rules statutory hook"
+  },
+  {
+   "id": "nbdsa_decisions",
+   "regulator": "NBDA/NBDSA",
+   "name": "Decisions",
+   "url": "https://www.nbdanewdelhi.com/decisions",
+   "stratum": "media",
+   "why": "Adjudicatory orders against news broadcasters incl. digital arms; fragile unpadded dot-dates, force day-first parsing"
+  },
+  {
+   "id": "ibdf_bccc_decisions",
+   "regulator": "IBDF/BCCC",
+   "name": "BCCC Decisions",
+   "url": "https://ibdf.com/bccc-decisions/",
+   "stratum": "media",
+   "why": "Content orders against GECs under the recognised SRB structure; ibdf.com is the live domain (ibdfindia.com dead)"
+  },
+  {
+   "id": "dpcgc_disclosures",
+   "regulator": "DPCGC",
+   "name": "Disclosures (GRB orders)",
+   "url": "https://www.dpcgc.org/discolsures/",
+   "stratum": "media",
+   "why": "OTT grievance-board orders under IT Rules Part III r.12; the misspelt slug 'discolsures' is canonical"
+  },
+  {
+   "id": "internet_shutdowns_tracker",
+   "regulator": "SFLC",
+   "name": "Internet Shutdowns Tracker",
+   "url": "https://internetshutdowns.in/",
+   "stratum": "safety_net",
+   "why": "Suspension orders are the archetypal never-published instrument class (~40% of the Jul-Aug 2026 test window was letter-form); feeds the SIGNALS lane"
+  },
+  {
+   "id": "cci_antitrust_orders",
+   "regulator": "CCI",
+   "name": "Antitrust orders",
+   "url": "https://www.cci.gov.in/antitrust/orders",
+   "stratum": "perimeter",
+   "why": "s.26/27/28 orders imposing behavioural obligations directly on platforms; note combination orders moved to /combination/orders-section31 (atlas URL 404s)"
+  },
+  {
+   "id": "dgft_notifications",
+   "regulator": "DGFT",
+   "name": "Notifications",
+   "url": "https://www.dgft.gov.in/CP/?opt=notification",
+   "stratum": "perimeter",
+   "why": "IT-hardware import management and SCOMET changes bite hardware clients with deadline effect; list is curl-scrapable despite SPA look"
+  },
+  {
+   "id": "doca_announcements",
+   "regulator": "DoCA/CCPA",
+   "name": "Announcements (new site)",
+   "url": "https://consumeraffairs.gov.in/pages/announcements",
+   "stratum": "perimeter",
+   "why": "With no working CCPA venue anywhere, this plus PIB is the only official detection channel for consumer-protection instruments hitting TMT advertisers"
+  }
+ ],
+ "verified_sources": [
+  {
+   "id": "meity_gazettes",
+   "url": "https://www.meity.gov.in/documents/gazettes-notifications",
+   "reachable": "OK",
+   "method": "json_api",
+   "json_api_endpoint": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Gazettes%20Notifications&limit=10&page=1",
+   "row_structure": "JSON: each item is an element of top-level posts[] array. Per item: post_title (str, item title), acf_data.date (str, DD.MM.YYYY document date, may be \"\"), acf_data.file[0].pdf.url (absolute PDF URL on www.meity.gov.in — use this, NOT acf_data.file[0].pdf.link which points at cms-meity.digifootprint.gov.in), acf_data.file[0].external_link (alternative when pdf absent; currently unused), ID (int, stable diff key), post_slug (str), post_date (\"YYYY-MM-DD HH:MM:SS\" CMS publish time — this is what the list is sorted by, desc). Response envelope: {posts: [...], total_items: 105, total_pages, current_page}.",
+   "date_formats": [
+    "DD.MM.YYYY in acf_data.date and acf_data.file[].file_date (e.g. 16.12.2025); empty string \"\" on 3 of 105 legacy rows — fall back to post_date",
+    "YYYY-MM-DD HH:MM:SS in post_date/post_modified (CMS publish time, IST) and post_date_gmt"
+   ],
+   "pagination": "Query params ?limit=N&page=M on the wp-json endpoint; response reports total_items/total_pages/current_page. Verified: page=2 returns the next distinct items; limit honored at least up to 100 (105 total items -> 2 pages at limit=100, 21 pages at limit=5). The public HTML page itself paginates client-side only.",
+   "row_floor": 10,
+   "allowed_domains": [
+    "www.meity.gov.in",
+    "cms-meity.digifootprint.gov.in"
+   ],
+   "pdf_pattern": "https://www.meity.gov.in/static/uploads/{YYYY}/{MM}/{name}.pdf — {name} is a 32-char lowercase-hex hash for recent uploads (e.g. 3c7ebbae0e5456f493f486e6845df86b.pdf); the 2024 bulk-migration batch uses human-readable snake_case names (e.g. 2024/02/LDCE__PA-1.pdf). All 100 sampled file links are PDFs on www.meity.gov.in; upload YYYY/MM is the CMS upload month, not the document date.",
+   "quirks": "(1) Listing HTML is an empty Next.js static-export shell (nextExport, empty pageProps) — HTTP 200 with zero rows is the NORMAL server response; never diff the HTML, and note any unknown path (e.g. /feed) also returns this same shell with 200, so status codes prove nothing: validate that the response parses as JSON and posts[] is non-empty. (2) Data source is headless WordPress (cms-meity.digifootprint.gov.in, digifootprint gov CMS platform) proxied same-origin at /cms/; the frontend sends header apikey: 4bW5t13453pa but the endpoint answers without it — send it anyway for parity. (3) type param must be exactly \"Gazettes Notifications\" URL-encoded (site slug gazettes-notifications maps to it in code); sibling types on the same endpoint: \"Act and policies\", \"Orders and Notices\", \"Publications\", \"Report\", \"Press Release\", \"Related documents\". The alternate wp-json/post-page/documents?slug_name=gazettes-notifications returns [] — do not use. (4) Sort order is post_date (CMS publish time) DESC, not document date: acf_data.date lags publish by ~1 day on fresh items, and 2009–2011 gazettes were bulk-migrated with post_date 2024-12-27, so date-ordered diffing breaks — diff on ID (or post_slug). post_modified changes on edits. (5) 3/105 rows have empty acf_data.date/file_date/file_year. (6) acf_data.file is an array (currently always length 1) and schema supports external_link instead of pdf — handle both; pdf_type values like \"English and Hindi\" indicate bilingual merged PDFs; titles mix curly (U+2018/2019) and ASCII quotes and guid fields contain HTML entities (&#038;). (7) gazettes_notifications_category is currently always \"General\". (8) Newest item is dated 16.12.2025 as of 2026-08-25 — a slow-moving source, consistent with items sitting unnoticed; poll cheaply (limit=10) and compare IDs. (9) TLS clean (HTTP/2, no -k needed); ~12 rapid requests drew no WAF/rate-limit. (10) Companion fixture with verified live API page 1 (limit=100) saved at /Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_gazettes_api.json; note the shared fixtures/scratch dir is also written by sibling source-verifier runs — use per-source filenames.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_gazettes.html",
+   "sample_rows": [
+    "16.12.2025 | Corrigendum to Digital Personal Data Protection Rules 2025 | https://www.meity.gov.in/static/uploads/2025/12/3c7ebbae0e5456f493f486e6845df86b.pdf",
+    "24.11.2025 | Recruitment Rules for Group ‘A’ Non-S&T posts of MeitY | https://www.meity.gov.in/static/uploads/2025/11/b0e68c644735a2ce7f9b9a2ad8e0db82.pdf",
+    "07.10.2025 | Recruitment Rules for Group 'A' S&T posts | https://www.meity.gov.in/static/uploads/2025/10/43b1c95276d7aa43e6c2f508f06bf7bd.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Gazette Notifications",
+   "why": "Highest-value planned source: s.79A examiner notifications sat unnoticed ~6 weeks here; headless render or sitemap+index diffing"
+  },
+  {
+   "id": "meity_orders_notices",
+   "url": "https://www.meity.gov.in/documents/orders-and-notices",
+   "reachable": "OK",
+   "method": "json_api",
+   "json_api_endpoint": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Orders%20and%20Notices&limit=10&page=1",
+   "row_structure": "JSON object {posts: [...], total_items, total_pages, current_page}. Each item in posts[]: document date = acf_data.date (DD.MM.YYYY, occasionally empty -> fall back to post_date YYYY-MM-DD HH:MM:SS); title = post_title (plain text, may contain \\xa0 and en-dashes); links = iterate acf_data.file[] -> file[i].pdf.url (absolute PDF on www.meity.gov.in) with file[i].external_link as alternate (currently always empty); stable keys = ID (int) and post_slug; category = acf_data.orders_and_notices_category (\"General\" or null). The HTML page itself is an empty Next.js export shell with __NEXT_DATA__ pageProps {} — never parse the HTML.",
+   "date_formats": [
+    "DD.MM.YYYY (acf_data.date and file[].file_date)",
+    "YYYY-MM-DD HH:MM:SS (post_date / post_modified, IST; post_date_gmt also present)",
+    "titles may embed dates as DD-MM-YYYY free text, e.g. 'dtd. 16-07-2026'"
+   ],
+   "pagination": "Query params &limit=N&page=M on the JSON endpoint; response carries total_items/total_pages/current_page. Tested: page=2 with limit=10 returns the next 10 rows (current_page:2); limit=100&page=1 returns the entire collection (45 rows, total_pages:1) in one call — no cap hit at 100. UI default appears to be limit=10 (45 items = 5 pages).",
+   "row_floor": 10,
+   "allowed_domains": [
+    "www.meity.gov.in",
+    "cms-meity.digifootprint.gov.in"
+   ],
+   "pdf_pattern": "https://www.meity.gov.in/static/uploads/YYYY/MM/<32-hex-hash>.pdf — filenames are md5-style hashes with zero semantic value; the YYYY/MM path segment is upload month, not document date",
+   "quirks": "(1) posts are ordered by WordPress post_date DESC, NOT by document date — old documents get re-published and surface at the top with 2024 acf dates (e.g. row 4 of page 1: acf date 29.08.2024, post_date 2026-07-09); dedupe by ID/post_slug and never assume date-sorted. (2) One current row has empty acf_data.date — fall back to post_date. (3) Multi-file rows exist (Archive - Delegation of Powers; IT Act 2000 notifications) and bilingual files (pdf_type \"English and Hindi\", language[] array) — capture all file[] entries, not just file[0]. (4) guid and media 'link' fields point at the CMS backend cms-meity.digifootprint.gov.in — cosmetic only; all download URLs are on www.meity.gov.in. (5) Same endpoint serves sibling strata via type=: \"Gazettes Notifications\", \"Guidelines\", \"Press Release\", \"Related documents\". (6) No WAF/rate-limit observed; API returns 200 even with default curl UA; TLS clean, no -k needed. (7) Titles contain non-breaking spaces (\\xa0), en-dashes and raw ampersands. (8) API base was reverse-engineered from Next.js chunks: axios baseURL \"/cms/\" + \"wp-json/document/documents?type=...\" (type string \"Orders and Notices\" verified live). Fixtures: JSON at /Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_orders_notices.json (28,851 bytes, limit=10 page=1); the empty HTML shell saved as evidence at /Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_orders_notices.html (3,197 bytes).",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_orders_notices.json",
+   "sample_rows": [
+    "13.08.2026 | Appointment of Chief of Media & Communications for MeitY | https://www.meity.gov.in/static/uploads/2026/08/a2a0e44f5f0898052874755c5aef73b4.pdf",
+    "12.08.2026 | Special Campaign 6.0 for Institutionalizing Swachhata and Minimizing Pendency in Government Offices during 2nd October 2026 to 31st October2026 – Advancement of Preparatory action w.e.f. 15th August, 2026 in MeitY and its organizations reg | https://www.meity.gov.in/static/uploads/2026/08/edf3c03985635c9a4acbb76d40c77172.pdf",
+    "16.07.2026 | Delegation of Powers dtd. 16-07-2026 | https://www.meity.gov.in/static/uploads/2026/07/c9b573f3d1ebc80cdec172a338416e7f.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Orders & Notices",
+   "why": "OGAI registration forms, IT Rules/DPDP clarifications and OMs land here; interim OGAI venue until its portal exists"
+  },
+  {
+   "id": "meity_acts_policies",
+   "url": "https://www.meity.gov.in/documents/act-and-policies",
+   "reachable": "OK",
+   "method": "json_api",
+   "json_api_endpoint": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Act%20and%20policies&limit=50&page=1&sort=acf&order=DESC&search=",
+   "row_structure": "JSON, not HTML (page is an empty Next.js export shell — never parse the HTML). Envelope: {posts: [...], total_items, total_pages, current_page}. One row = one element of posts[]: date = acf_data.date (DD.MM.YYYY string, may be \"\"), title = acf_data.title (fallback post_title), documents = acf_data.file[] — a LIST of 1..63 file objects each with {title, file_date (DD.MM.YYYY), file_year, language[], pdf_type, external_link, pdf:{url, filename, filesize}}; primary href = first file's pdf.url (absolute). Stable key = post ID; change detection = post_modified + the file[] list (amendments/corrigenda are appended as new files under the EXISTING post, so diff at file level, not post level).",
+   "date_formats": [
+    "DD.MM.YYYY — acf_data.date and file[].file_date (e.g. 14.11.2025)",
+    "YYYY-MM-DD HH:MM:SS — post_date/post_modified (IST) and *_gmt variants",
+    "empty string — 11 of 42 posts have blank acf_data.date; fall back to post_date or file_date/file_year"
+   ],
+   "pagination": "Query params page=N and limit=N. Response carries total_pages/total_items/current_page. Site UI uses limit=10; limit=50 is honored and returned all 42 items in one call (total_pages=1). page=2 at limit=10 tested OK (returned items 11-20, correct current_page=2). sort=acf&order=DESC = strict acf-date descending, with the 11 empty-date posts sorted last.",
+   "row_floor": 35,
+   "allowed_domains": [
+    "www.meity.gov.in",
+    "meity.gov.in",
+    "egazette.gov.in",
+    "cms-meity.digifootprint.gov.in"
+   ],
+   "pdf_pattern": "https://www.meity.gov.in/static/uploads/YYYY/MM/{32-hex-hash}.pdf — filenames are opaque hashes with zero semantics; use the file object's title field for naming. YYYY/MM is upload date, which can differ from both acf date and file_date.",
+   "quirks": "(1) HTML at /documents/act-and-policies is a 3.2KB Next.js static-export shell with empty __NEXT_DATA__ pageProps — JS-only page; all data is client-side XHR to the WP API above. (2) The API needs NO auth via the meity.gov.in /cms/ reverse proxy; the JS bundle also embeds apikey \"4bW5t13453pa\" for the upstream base https://master-util.digifootprint.gov.in/ but that is not needed — pin www.meity.gov.in. (3) In a real browser the site rewrites its host to the Hindi IDN domain एमईआईटीवाई.सरकार.भारत (punycode xn--m1bdba5a7gresc7dsa.xn--11b7cb3a6a.xn--h2brj9c); curl sees no redirect — always fetch www.meity.gov.in. (4) type= value must be the exact string \"Act and policies\" (sibling slugs on same endpoint: \"Gazettes Notifications\" etc.). (5) Posts are FOLDERS: DPDP corrigenda, amendment notices and translations arrive as new entries in acf_data.file[] under an existing post (e.g. post 26620: post_date 2026-03-30 but post_modified 2026-08-12, containing a file dated 21.04.2026 that postdates the post's own acf date) — a tracker diffing only post IDs/titles will MISS new rules texts; diff the file[] list and watch post_modified. (6) 11/42 posts have empty acf_data.date and sort last. (7) One external_link points to egazette.gov.in/(S(...))/ViewPDF.aspx with an ASP.NET session token baked into the path — session-bound/stale, not a stable URL. (8) Mixed English/Hindi: use language[] and pdf_type (\"English and Hindi\") per file. (9) acf_data.act_and_policies_category is \"General\" or null. (10) row_floor 35 assumes the limit=50 call (42 items on 2026-08-25, corpus back to 2000, should only grow); if using the site's own limit=10 call, floor is 10. (11) Raw page-1 API envelope saved as fixture meity_acts_policies.api.json alongside the HTML shell; a bare 42-post list from a sibling run exists at meity_acts_policies.json. (12) No RSS/sitemap needed; TLS clean, no WAF/rate-limit observed across ~6 rapid curl hits.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_acts_policies.html",
+   "sample_rows": [
+    "30.03.2026 | Draft amendments to the IT Rules, 2021 in relation to strengthening intermediary compliance with clarifications, advisories and directions issued by the Ministry and digital media oversight | https://www.meity.gov.in/static/uploads/2026/04/ec197f1206279efb4964965f0dede6c1.pdf",
+    "14.11.2025 | Digital Personal Data Protection Rules 2025 | https://www.meity.gov.in/static/uploads/2025/12/3c7ebbae0e5456f493f486e6845df86b.pdf",
+    "23.10.2025 | Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 (IT Rules, 2021) | https://www.meity.gov.in/static/uploads/2026/03/0b576f2071694b52e4cd6bb1b6dfab1e.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Acts & Policies (incl. DPDP, PROG Act)",
+   "why": "DPDP Rules 2025, PROG Act/Rules and policy texts; planned source, same SPA constraint"
+  },
+  {
+   "id": "meity_guidelines",
+   "url": "https://www.meity.gov.in/documents/guidelines",
+   "reachable": "OK",
+   "method": "json_api",
+   "json_api_endpoint": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Guideline&limit=10&page=1&sort=date&order=DESC&search=",
+   "row_structure": "HTML at the page URL is a Next.js static-export shell (3197 bytes, __NEXT_DATA__ pageProps empty) — zero rows ever in HTML; parse the wp-json API instead. Response JSON: {posts:[...], total_items:int, total_pages:int, current_page:int}. One row = one posts[] object: title=post_title (str, may embed \"dated DD/MM/YYYY\"; one title is Hindi); date=post_date \"YYYY-MM-DD HH:MM:SS\" (IST; post_date_gmt/post_modified also present); slug=post_slug; acf_data.year=\"YYYY\" but usually empty; files=acf_data.file[] (1–3 per post), each {type:\"PDF\"|\"Content\", pdf:{url,filename,filesize}, external_link:\"\", content:\"<inline legacy Drupal HTML>\"}. Item href = acf_data.file[n].pdf.url when type==\"PDF\"; type==\"Content\" rows have NO file URL — body is inline HTML in the content field.",
+   "date_formats": [
+    "YYYY-MM-DD HH:MM:SS (post_date/post_modified, IST, with _gmt twins)",
+    "YYYY (acf_data.year, frequently empty/null)",
+    "DD/MM/YYYY (embedded in post_title, e.g. 'dated 31/10/2022')",
+    "YYYY/MM in PDF upload path /static/uploads/YYYY/MM/"
+   ],
+   "pagination": "Query params page=N&limit=M on the wp-json endpoint; response returns total_items/total_pages/current_page. Verified live: page=1→10 rows, page=2→10 rows, page=3→3 rows (23 total, 3 pages at limit=10). limit=50 accepted and returns all 23 in one call — recommended. sort=year&order=DESC (the site's own query) is unreliable because year is usually empty; use sort=date&order=DESC for recency (verified: newest post_date 2025-07-24 first).",
+   "row_floor": 10,
+   "allowed_domains": [
+    "www.meity.gov.in",
+    "meity.gov.in",
+    "cms-meity.digifootprint.gov.in",
+    "xn--m1bdba5a7gresc7dsa.xn--11b7cb3a6a.xn--h2brj9c"
+   ],
+   "pdf_pattern": "https://www.meity.gov.in/static/uploads/YYYY/MM/{name}.pdf where {name} is either a human-readable slug (Dos-Donts-for-OVSE-for-uploading-on-MeitY-website.pdf) or a 32-char md5 hex (938d31293d53c94bb049ee43bfd10bfd.pdf); attachment metadata pages live on cms-meity.digifootprint.gov.in",
+   "quirks": "CRITICAL: the live site's own /documents/guidelines UI is broken — it requests type=Guidelines (plural), which returns 0 posts, so the page renders \"No Data Available\" even in a real browser; the correct ACF value is singular type=Guideline (23 items). Type strings are inconsistent per venue and must match exactly: Report(29), Guideline(23), Press Release(21) singular, but Publications(15) and Orders and Notices(45) plural; Act/Rule/Notification/Advisory/Guidelines all return empty-but-200 {posts:[]} — an extractor cannot distinguish a wrong type from an empty venue, so enforce row_floor. SCOPE WARNING for the atlas: this Guideline set is grant/scheme/procedural guidelines + Aadhaar do's-and-don'ts; the IT Rules/Intermediary-Guidelines instruments (incl. GAC notifications) post under type=Orders and Notices, not here — verified by search=intermediar. Other notes: no UA/cookie/Referer needed (plain curl 200s), no WAF or rate limiting seen, TLS clean; search= param works server-side; browser navigation sometimes redirects to the IDN mirror इलेक्ट्रॉनिकी.सरकार.भारत (punycode xn--m1bdba5a7gresc7dsa...) serving the identical API — curl stays on www.meity.gov.in; backend is WordPress at cms-meity.digifootprint.gov.in proxied under /cms/; post_date reflects CMS migration/upload (2024-2025), NOT original issuance — real issue dates only appear as DD/MM/YYYY inside titles; acf_data.year mostly empty; some rows are type=Content with inline legacy-Drupal HTML and no file; one row per venue can carry up to 3 PDFs; one title is Hindi-only (mixed language). API JSON fixture saved alongside the HTML shell at /Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_guidelines_api_p1.json.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/meity_guidelines.html",
+   "sample_rows": [
+    "2024-12-27 13:50:15 | Do’s and Don’ts for OVSEs dated 31/10/2022 | https://www.meity.gov.in/static/uploads/2024/02/Dos-Donts-for-OVSE-for-uploading-on-MeitY-website.pdf",
+    "2025-07-24 21:47:57 | R and D project Proforma   Terms and Conditions governing Grant-in-aid and Guidelines | https://www.meity.gov.in/static/uploads/2025/07/938d31293d53c94bb049ee43bfd10bfd.pdf",
+    "2025-02-24 18:07:04 | Annexure DPR Template World Bank Assited projects | https://www.meity.gov.in/static/uploads/2025/02/9b7ea08090c2954ad919d5af50457e7e.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Guidelines",
+   "why": "AI advisories under IT Rules due diligence post here; core atlas venue not in sources.json at all"
+  },
+  {
+   "id": "certin_directions",
+   "url": "https://www.cert-in.org.in/Directions70B.jsp",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Content region = the H2 'Directions by CERT-In under Section 70B, Information Technology Act 2000' followed by <table class=\"hcontent\" width=\"639\">. Each item row is a <p align=\"JUSTIFY\"> bullet containing <a class=\"style2\" href=\"/PDF/...pdf\" target=_blank><b>TITLE</b></a>. Reliable extraction: strip HTML comments first, then regex/select anchors matching a[class=\"style2\"][href^=\"/PDF/\"]; title = inner <b> text (whitespace-collapsed, HTML-unescaped); date = regex r'dated (\\d{2}\\.\\d{2}\\.\\d{4})' from title text, fallback to date token in the PDF filename. Do NOT select by generic PDF href: the left-nav sidebar (class=\"mhov\" cells) carries 7+ unrelated PDF links (Blueprint, MSME controls, SBOM, Smart City, space guidelines, RFC2350) and a commented-out block contains /PDF/Vul_Report.pdf.",
+   "date_formats": [
+    "DD.MM.YYYY embedded in title text as '(dated 28.04.2022)' — 2 of 3 rows",
+    "DD.MM.YYYY embedded in PDF filename (e.g. _28.04.2022.pdf, _27.06.2022.pdf)",
+    "MonYYYY in PDF filename only (FAQs_..._May2022.pdf) — the FAQ row has NO date in its title; parser needs filename fallback or null date"
+   ],
+   "pagination": "None. Single static page holding all items (3 bullets, unchanged since 2022). No page-2 scheme exists to test — new directions would appear as additional <p> bullets on this same page.",
+   "row_floor": 3,
+   "allowed_domains": [
+    "www.cert-in.org.in"
+   ],
+   "pdf_pattern": "/PDF/<Title_Words_Joined_By_Underscores>[_DD.MM.YYYY|_MonYYYY].pdf on www.cert-in.org.in (hrefs are root-relative /PDF/...). Examples: CERT-In_Directions_70B_28.04.2022.pdf, FAQs_on_CyberSecurityDirections_May2022.pdf, CERT-In_directions_extension_MSMEs_and_validation_27.06.2022.pdf. Verified real: ranged GET returns %PDF-1.5 magic bytes.",
+   "quirks": "CRITICAL soft-404: any missing URL (tested /sitemap.xml) AND every HEAD request — even to valid URLs — returns HTTP 200 with a 938-byte 'The requested URL is not found.' HTML stub (title 'Cert-In - Home Page', ETag 35c-68443bf0). Health checks MUST validate content markers (e.g. 'section 70B' H2 or a.style2 present, size >> 1KB), never HTTP status; verify PDFs via ranged GET checking %PDF magic, never HEAD. Other quirks: (1) invalid legacy HTML — <p> item bullets sit directly inside <table> outside any <tr>/<td>, and attributes like class =content; are malformed, so DOM parsers may relocate nodes; regex on a.style2 anchors is safer; (2) an HTML comment block contains an extra PDF link (Vul_Report.pdf) — strip comments before parsing; (3) charset declared ISO-8859-1; titles contain &amp; entities needing unescape; one sidebar filename contains raw & and commas; (4) sets JSESSIONID cookie (not required); TLS valid, no -k needed; no UA gating (default curl UA gets identical 68,206-byte body); repeat fetches byte-identical (same md5), no rate limiting observed; (5) no RSS/atom feed, no JSON/XHR endpoint — the s2cMainServlet?pageid=... URLs are HTML navigation for other site pages, not an API; (6) FAQ row's only date signal is 'May2022' in the filename.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/certin_directions.html",
+   "sample_rows": [
+    "28.04.2022 | Directions under sub-section (6) of section 70B of the Information Technology Act, 2000 relating to information security practices, procedure, prevention, response and reporting of cyber incidents for Safe & Trusted Internet (dated 28.04.2022) | https://www.cert-in.org.in/PDF/CERT-In_Directions_70B_28.04.2022.pdf",
+    "(no date in title; filename says May2022) | Frequently Asked Questions on Cyber Security Directions of 28.04.2022 | https://www.cert-in.org.in/PDF/FAQs_on_CyberSecurityDirections_May2022.pdf",
+    "27.06.2022 | Extension of timelines for enforcement of Cyber Security Directions of 28.04.2022 for MSMEs and for implementation of mechanism for validation of subscribers/customers details by Data Centres, VPS providers, Cloud Service providers and VPN Service providers (dated 27.06.2022) | https://www.cert-in.org.in/PDF/CERT-In_directions_extension_MSMEs_and_validation_27.06.2022.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "s.70B(6) Directions page",
+   "why": "The single highest-stakes CERT-In page (6-hour incident reporting, log retention, VPN KYC) plus FAQs"
+  },
+  {
+   "id": "certin_advisories",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBADVLIST02&year=2026",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Inside div#print_content, each advisory is its own <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\" width=\"639\" class=\"content\"> block of 5 <tr>s: tr[0] = li > a[href=\"/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-YYYY-NNNN\"] with anchor text \"CERT-In Advisory CIAD-YYYY-NNNN\"; tr[1] = span[class=\"contentTD,DateContent\"] containing \"&nbsp;&nbsp;&nbsp; (Month DD, YYYY)\" with irregular internal spaces; tr[2] = DIV[style=\"height: 30px; overflow: hidden\"] > span[style=\"padding-left: 20px\"] holding the advisory title text. HTML is malformed (unclosed/misnested spans, comma inside class attribute, \"class = verblue2\" with spaces) — parse by regex over the VLCODE anchor, then the next DateContent span, then the next padding-left span, collapsing \\s+; CSS-selector parsing is unreliable here.",
+   "date_formats": [
+    "(Month DD, YYYY) with variable internal whitespace and sometimes zero-padded day, e.g. \"(August    20, 2026)\", \"(August 07, 2026)\", \"(June 08, 2026)\" — collapse \\s+ before parsing as %B %d, %Y",
+    "Detail page: \"Original Issue Date:&nbsp;Month   DD, YYYY\" e.g. \"Original Issue Date:&nbsp;August    20, 2026\""
+   ],
+   "pagination": "None. year=YYYY selects the year, but the servlet returns ONLY the latest 15 advisories of that year (verified: 2026 shows CIAD-2026-0028..0042, 2025 shows exactly CIAD-2025-0041..0055). pageno/page/start/offset params are silently ignored (tested — identical 15 rows). Omitting year returns the current year's same 15 rows. Older items in a year are reachable only by direct detail-URL enumeration: /s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-YYYY-NNNN with sequential 4-digit zero-padded NNNN (verified CIAD-2026-0001 resolves with its Original Issue Date).",
+   "row_floor": 15,
+   "allowed_domains": [
+    "www.cert-in.org.in"
+   ],
+   "pdf_pattern": "No per-advisory PDFs — item links go to HTML detail pages (PUBVLNOTES02 servlet). Site-level static guideline PDFs live at /PDF/<Name>.pdf (e.g. /PDF/RFC2350.pdf) but are not row items; a DownloadPdf(pagename,filename) JS helper exists but is unused by advisory rows.",
+   "quirks": "1) Listing is hard-capped at latest 15 per year with no pagination — polling less than ~weekly can silently drop advisories if more than 15 land between polls; detect gaps by checking VLCODE sequence continuity and backfill via direct PUBVLNOTES02&VLCODE= enumeration. 2) Soft-404s everywhere: unknown paths (/rss.xml, /sitemap.xml, bad pageids) return HTTP 200 with a ~938-byte HTML home/error stub — never treat 200 as success; require >=1 VLCODE match, and treat <15 rows as a degraded fetch. 3) No RSS, no sitemap, no JSON/XHR API — pure legacy JSP/servlet server-rendered HTML (page even ships a window.open helper named rajneesh()). 4) Malformed HTML: unclosed </span>s, class=\"contentTD,DateContent\" (comma in class), \"class = verblue2\" — use regex, not strict parsers. 5) Irregular runs of spaces inside dates AND titles; titles carry verbatim typos (e.g. \"A End of Mainstream for Windows Server 2022\") — do not normalize beyond whitespace. 6) TLS verifies cleanly (no -k needed); no WAF/rate-limiting observed across ~10 rapid curl requests with a browser UA; plain curl works. 7) Item hrefs are root-relative (/s2cMainServlet?...) — prefix https://www.cert-in.org.in. 8) English-only content on this listing.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/certin_advisories.html",
+   "sample_rows": [
+    "August 20, 2026 | CERT-In Advisory CIAD-2026-0042 — A End of Mainstream for Windows Server 2022 | https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0042",
+    "August 19, 2026 | CERT-In Advisory CIAD-2026-0041 — Multiple Vulnerabilities in Apple Products | https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0041",
+    "August 18, 2026 | CERT-In Advisory CIAD-2026-0040 — Multiple Vulnerabilities in SAP Products | https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0040"
+   ],
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "Advisories (CIAD, year-indexed)",
+   "why": "Anchors intermediary due-diligence expectations; trivially scrapable servlet pages"
+  },
+  {
+   "id": "uidai_circulars",
+   "url": "https://uidai.gov.in/en/circulars",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Rows live in the LAST self.__next_f.push([1,\"...\"]) script before </body> (Next.js RSC flight stream), not in parseable anchors. Procedure: find 'pdfDetails\\\":' in the raw HTML, take the substring through 'total_pages', unescape \\\" to \", then json-parse '\"data\":[...]' — each item is {pid,nid,fid,type:\"circulars\",title,name,Publication,file_url,file_size,extension,updated_date} followed by '\"pagination\":{total,page,limit,total_pages}'. The server-rendered visible rows (div.MuiTypography-root[id=slugified-title] + text 'Doc Type: PDF • Size: N KB • Uploaded On: DD-MM-YYYY') carry NO hrefs — Download is a <button>; file URLs exist only in the embedded JSON. MUI class suffixes (mui-5cfpfa etc.) are build-hashed — never select on them.",
+   "date_formats": [
+    "DD-MM-YYYY — updated_date / 'Uploaded On' field, e.g. 04-06-2026 (this is the UPLOAD date, not the circular's issue date)",
+    "DD.MM.YYYY and D.M.YYYY embedded in titles as the true issue date, e.g. 'Circular 30.04.2026', 'OM dated 21.9.2025'",
+    "DD-MM-YYYY occasionally in titles too, e.g. 'SOP dated 28-10-2021'",
+    "YYYY-MM as the upload-month folder in file_url paths, e.g. /media/document/2026-07/"
+   ],
+   "pagination": "Query param ?page=N on the same URL, rendered server-side into the flight JSON (verified live: ?page=2 gave 10 different rows with pagination.page=2; ?page=3 gave 7 rows; total=27, limit=10, total_pages=3). ?p= and ?page_no= are ignored. The pagination object in the JSON is authoritative — iterate 1..total_pages.",
+   "row_floor": 10,
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in"
+   ],
+   "pdf_pattern": "https://backend.uidai.gov.in/get/files/media/document/YYYY-MM/Title_With_Underscores.pdf (YYYY-MM = upload month; verified GET returns real %PDF bytes, application/pdf, e.g. 126KB)",
+   "quirks": "1) STREAMED RESPONSE: row data arrives in the final flight chunk; a truncated fetch yields a valid-looking HTML file with ZERO rows — observed live this session (a 125KB truncated copy ending mid-stream). Parser MUST validate 'total_pages' appears near EOF before trusting a fetch, and retry otherwise. 2) HEAD on PDF URLs returns 200 text/html (2.7KB error page) — verify PDFs with GET + %PDF magic bytes, never HEAD. 3) updated_date is the upload date, not the issue date; issue date must be regexed out of the title. 4) True duplicates exist: page-1 rows pid 2139/2140 share title AND the same file SOP_Auth_Approved21032023.pdf with different updated_dates — dedupe on file_url (or pid), never title. 5) canonical/og URLs point to beta.uidai.gov.in and some nav hrefs point to /hi/ paths even on /en/ — pin the /en/circulars URL, ignore page-level locale signals. 6) No public JSON API: Drupal REST gives 406 ('only supports HTML format') and /jsonapi 404; menu JSON leaks internal host uidai-backend.uidai-website-revamp.svc.cluster.local in 'absolute' fields — ignore those, use file_url (backend.uidai.gov.in). 7) No WAF/TLS/rate-limit issues seen with a browser UA; page ~355KB. 8) In-page JSON is escaped inside a JS string (\\\" for quotes) — unescape before json.loads. 9) Old media-resources path is dead as stated; this flat URL is the post-relaunch venue.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/uidai_circulars.html",
+   "sample_rows": [
+    "04-06-2026 | Circular 30.04.2026 - Validity of Aadhaar Verifiable Credential shown, shared and/or verified through Aadhaar Application. | https://backend.uidai.gov.in/get/files/media/document/2026-07/Circular_30_04_2026_Validity_of_Aadhaar_Verifiable_Credential_shown_shared_andor_verified_through_Aadhaar_Application.pdf",
+    "30-09-2025 | OM 29.09.2025 Waiver of Charges for MBU-1 | https://backend.uidai.gov.in/get/files/media/document/2026-05/OM-Waiver_of_charges_for_MBU-I_of_children_aged_7_to_15_years_-_reg.pdf",
+    "26-09-2025 | OM dated 21.9.2025 - Revised rates of financial assistance by UIDAI to registrars alongwith fees to be collected by registrars against Aadhaar services | https://backend.uidai.gov.in/get/files/media/document/2026-05/OM_21925_revised_rates_of_assistance_1.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "name": "Circulars",
+   "why": "Fastest-moving UIDAI venue binding AUA/KUA/ASA clients; NOTE sources.json planned URL (media-resources path) is dead after the site relaunch - this new flat URL verified 2026-08-25"
+  },
+  {
+   "id": "uidai_regulations",
+   "url": "https://uidai.gov.in/en/updated-regulations",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Next.js App Router page (MUI div soup, no <table>, no <a href> on rows — Download buttons are JS-only). Parse the embedded RSC payload instead: concatenate all self.__next_f.push([1,\"...\"]) script-chunk strings (regex self\\.__next_f\\.push\\(\\[1,\"((?:[^\"\\\\]|\\\\.)*)\"\\]\\) then json.loads('\"'+chunk+'\"')), locate '\"pdfDetails\":{\"data\":[' and JSON-parse the bracket-balanced array. Each row object: {pid, nid, fid, type:\"updated_regulations\", title, name, file_url (absolute https://backend.uidai.gov.in/get/files/... PDF), file_size (\"1.01 MB\"), extension:\"PDF\", updated_date (\"DD-MM-YYYY\")}. A \"pagination\":{total,page,limit,total_pages} object immediately follows the array. Human-visible fallback: each row is div.mui-1thsucp with title in div[id=slugified-title] and 'Uploaded On: DD-MM-YYYY' in a sibling <p>, but the PDF URL exists ONLY in the RSC JSON.",
+   "date_formats": [
+    "DD-MM-YYYY (updated_date / 'Uploaded On:', e.g. 16-06-2026)",
+    "D Month YYYY (page meta 'Published on'/'Last Updated', e.g. 29 May 2026)",
+    "YYYY-MM (PDF URL path segment, e.g. /document/2026-06/)"
+   ],
+   "pagination": "?page=N query param, honored server-side. updated-regulations currently has pagination {\"total\":10,\"page\":1,\"limit\":10,\"total_pages\":1} — single page; ?page=2 returns the shell with 0 rows and no pagination block (treat as end-of-data, not failure). Scheme live-verified on sister page /en/gazetted-notifications (total 39, limit 10, total_pages 4) where ?page=2 returned 10 fresh rows with page:2. Parser should read total_pages from the payload rather than probing blindly.",
+   "row_floor": 10,
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in",
+    "beta.uidai.gov.in"
+   ],
+   "pdf_pattern": "https://backend.uidai.gov.in/get/files/media/document/YYYY-MM/<Underscored_Title>.pdf — filenames are messy: images_/images_8__ prefixes, double underscores, ALL-CAPS variants, trailing _pdf_0; do not derive metadata from filenames. GET serves real application/pdf; HEAD lies (200 text/html, 2735 bytes) — verify PDFs with ranged GET, never HEAD.",
+   "quirks": "(1) Given URL /en/regulations is now a listing-free hub page (saved as uidai_regulations_hub.html) linking to two children: /en/updated-regulations (10 consolidated principal regulations) and /en/gazetted-notifications (39 gazette/amendment PDFs, 4 pages). CRITICAL: amendments are NOT separate rows on updated-regulations — e.g. 'Aadhaar (Enrolment and Update) First Amendment Regulations, 2026' appears only on gazetted-notifications, while on updated-regulations the principal row keeps its 2016 title but its file_url silently swaps to the amendment PDF and updated_date bumps (row 1 exhibits exactly this). A tracker for 'regulations and amendments' must also watch /en/gazetted-notifications, and must diff on (pid|fid, file_url, updated_date), not titles. (2) PDF URLs live only in the inline RSC JSON, not in DOM anchors. (3) Payload 'absolute' URLs leak internal k8s hostnames (uidai-backend.uidai-website-revamp.svc.cluster.local) — use file_url / 'relative' only. (4) HEAD on backend.uidai.gov.in PDFs returns 200 text/html; use GET. (5) sitemap.xml and canonical/alternate tags point at beta.uidai.gov.in — same site family, may swap hosts. (6) Hindi mirror at /hi/*. (7) Source typos preserved in titles ('Adhaar', 'of(Authentication)') and near-duplicate rows (two 'Payment of Fees…2023', two 'Sharing of Information…2016') — dedupe by pid/fid. (8) No JSON API found publicly (Drupal backend 404s /jsonapi and ?_format=json); curl -H 'RSC: 1' returns the same payload as text/x-component but is a fragile Next.js internal, not a stable API. (9) No TLS problems, no WAF/blocking with a browser UA; page ~330KB.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/uidai_regulations.html",
+   "sample_rows": [
+    "16-06-2026 | Aadhaar (Enrolment and Update) Regulations, 2016 | https://backend.uidai.gov.in/get/files/media/document/2026-06/Aadhaar_Enrolment_and_Update_First_Amendment_Regulations_2026_pdf_0.pdf",
+    "13-03-2026 | Unique Identification Authority of India (Salary, Allowances and other Terms and Conditions of Service of Employees) Regulations, 2020 | https://backend.uidai.gov.in/get/files/media/document/2026-05/images_8__The_Unique_Identification_Authority_of_India_Salary_Allowances_and_other_Terms_and_Conditions_of_Service_of_Employees_Regulations_2020.pdf",
+    "13-03-2026 | Unique Identification Authority of India (Appointment of Officers and Employees) Regulations, 2020 | https://backend.uidai.gov.in/get/files/media/document/2026-06/images_THE_UNIQUE_IDENTIFICATION_AUTHORITY_OF_INDIA_APPOINTMENT_OF_OFFICERS_AND_EMPLOYEES_REGULATIONS_2020.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "name": "Regulations",
+   "why": "Aadhaar regulations and amendments; atlas URL (legal-framework/regulations.html) now 404s - new flat listing verified server-rendered"
+  },
+  {
+   "id": "uidai_notifications",
+   "url": "https://uidai.gov.in/en/notifications",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Parse the escaped-JSON Next.js flight chunks, NOT the DOM: concatenate all self.__next_f.push([1,\"...\"]) script payloads, unicode-unescape, then locate \"pdfDetails\":{\"data\":[...records...],\"pagination\":{...}}. Each record: {\"pid\":str,\"nid\":str,\"fid\":str,\"type\":\"notifications\",\"title\":str,\"name\":str,\"Publication\":\"\",\"file_url\":\"https://backend.uidai.gov.in/get/files/media/document/YYYY-MM/<name>.pdf\",\"file_size\":\"N KB\",\"extension\":\"PDF\",\"updated_date\":\"DD-MM-YYYY\"} — regex \\{\"pid\":\"\\d+\",\"nid\":\"\\d+\",\"fid\":\"\\d+\",\"type\":\"notifications\".*?\\} works. DOM equivalent (fallback/verification only): repeated div blocks each holding title in a div with id=<slugified-title> (MUI class mui-5cfpfa) and a meta p reading \"Doc Type: PDF • Size: N KB • Uploaded On: DD-MM-YYYY\"; the two Download <button> elements per row have aria-label but NO href — PDF URLs are only in flight JSON, so DOM-only parsing cannot yield links. MUI emotion class hashes (mui-19s3t1h etc.) are build-generated and unstable across deploys — never anchor on them.",
+   "date_formats": [
+    "DD-MM-YYYY (updated_date field and visible 'Uploaded On:' text, e.g. 18-04-2024)"
+   ],
+   "pagination": "Query string ?page=N&limit=10 on /en/notifications, server-side rendered and 1-indexed: page=0 and page=1 both return page 1; page=2 (tested) returns the remaining 4 records (21-07-2016, 12-07-2016 x3). Authoritative counts in embedded flight JSON: \"pagination\":{\"total\":14,\"page\":N,\"limit\":10,\"total_pages\":2}. On-page pager links render hrefs /notifications?page=0..2&limit=10 — ignore them, iterate page=1..total_pages.",
+   "row_floor": 10,
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in"
+   ],
+   "pdf_pattern": "https://backend.uidai.gov.in/get/files/media/document/YYYY-MM/<Name>.pdf — most filenames prefixed \"images_\" with underscores (e.g. images_Notification_Appointment_Sh_Amit_Agrawal_CEO.pdf). The YYYY-MM path segment is the CMS upload month (all 2026-04..2026-07 from the site migration), NOT the notification date — never derive item dates from it.",
+   "quirks": "(1) Next.js SSR: data lives in self.__next_f.push flight chunks as backslash-escaped JSON inside the served HTML; DOM Download buttons have no href, so file_url is only recoverable from the flight JSON. (2) HEAD on backend.uidai.gov.in PDF URLs lies: returns 200 Content-Type:text/html (2735-byte HTML page); GET returns the real application/pdf (verified 1,011,500 bytes = listed 987.79 KB) — validate PDFs with GET, not HEAD. (3) page=0 and page=1 return identical content — dedupe by pid/nid, iterate 1-indexed. (4) MUI class hashes are unstable across deploys. (5) Site is freshly migrated (beta.uidai.gov.in referenced; all document paths under 2026-XX upload months) — old uidai.gov.in legal-framework URLs are dead, and URLs may churn again. (6) Low-churn list: only 14 items total (2016-2024, newest 18-04-2024), mix of HR appointment notifications and MeitY/Legal/DoPT gazette notifications; genuine gazette items may instead land on sibling listings /en/circulars-notifications-official-memorandums and /en/gazetted-notifications (seen in nav) — worth registering as separate sources. (7) Hindi mirror at /hi/notifications — pin to /en/. (8) No RSS; no public JSON API (backend /api, /jsonapi, /get/notifications all 404); sitemap.xml exists (200). (9) HTML is single 64K-char lines, no terminators — line-based grep counts mislead. (10) TLS clean, no -k needed; no rate limiting or WAF challenge observed with a Chrome UA.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/uidai_notifications.html",
+   "sample_rows": [
+    "18-04-2024 | Recruitment rules for engagement of Assistant Technical Officers in UIDAI | https://backend.uidai.gov.in/get/files/media/document/2026-05/images_Recruitment_rules_for_engagement_of_Assistant_Technical_Officers_in_UIDAI-English_Version.pdf",
+    "23-06-2023 | Notification (HR) Regarding Appointment of Sh. Amit Agrawal as Chief Executive Officer PDF | https://backend.uidai.gov.in/get/files/media/document/2026-05/images_Notification_Appointment_Sh_Amit_Agrawal_CEO.pdf",
+    "14-10-2021 | Notification_(HR)_Regarding Appointment of Sh. Saurabh Garg as Chief Executive Officer PDF | https://backend.uidai.gov.in/get/files/media/document/2026-05/images_Notification_Appointment_Sh_Saurabh_Garg_CEO_1.pdf"
+   ],
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "name": "Notifications",
+   "why": "Gazette notifications under the Aadhaar Act; replaces dead legal-framework path"
+  },
+  {
+   "id": "trai_fd_orders",
+   "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2026-08-25",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "The listed trai.gov.in URL is a Drupal wrapper whose only body content is <iframe src=\"https://cogroup.trai.gov.in/fdapp/public/dashboard\"> — parse the iframe target, a server-rendered Spring/Thymeleaf page. Row = table > tbody > tr with 7 tds keyed by data-label: td[data-label=\"S.No\"]; td[data-label=\"Date of Issue\"] DD-MM-YYYY; td[data-label=\"Service Provider\"] > strong (provider name); td[data-label=\"Regulation\"] (regulation title, free text); td[data-label=\"Clause Violated\"] (e.g. \"10\", \"4&10\"); td[data-label=\"Period of Violation\"] (\"Mon YYYY - Mon YYYY\"); td.amount[data-amount=\"600000.00\"] — the numeric amount lives ONLY in the data-amount attribute (visible text is a bare \"₹\" filled client-side by JS). Rows contain zero hyperlinks — the FD-order/report link column is commented out in the template.",
+   "date_formats": [
+    "DD-MM-YYYY (Issue Date column, e.g. 17-08-2026)",
+    "Mon YYYY - Mon YYYY (Period of Violation, e.g. Jan 2026 - Mar 2026)",
+    "DD.MM.YYYY embedded in Regulation titles (e.g. QoS Regulations dated 02.08.2024)",
+    "YYYY-MM-DD (from/to GET query params)"
+   ],
+   "pagination": "None — no pager; a &page= param is ignored (identical 412 rows with or without it). Server filters via GET query params on /fdapp/public/dashboard: category=Telecom|Broadcasting, period=CUSTOM|CFY|LFY, from/to=YYYY-MM-DD, provider, and a hidden-but-live type=FD|SCN. A wide window (from=2000-01-01) returns the entire history in one response: 412 Telecom FD rows (24-07-2013 to 17-08-2026), 48 Broadcasting FD rows, 8 Telecom SCN rows. Rows sorted newest-first.",
+   "row_floor": 400,
+   "allowed_domains": [
+    "www.trai.gov.in",
+    "cogroup.trai.gov.in"
+   ],
+   "pdf_pattern": "None — no PDFs are linked. A latent per-order report route exists in commented-out template code (/fdapp/api/fd/report/{reportFilePath}) but /fdapp/api/* currently 302s to /fdapp/login (auth-gated), so no order documents are publicly downloadable from this app.",
+   "quirks": "1) Iframe indirection: the trai.gov.in page carries no data — a parser fetching only the listed URL gets zero rows every time; it must fetch the cogroup.trai.gov.in iframe target. 2) Date-window trap: the dashboard with NO query params defaults to from=2025-04-01&to=(yesterday) and returned exactly 100 rows today — a coincidental round number, not a page cap (verified: widening the window monotonically grows the count 100→179→412). Always pass explicit from=2000-01-01&to=(today) for full history. 3) Amounts are ONLY in the data-amount attribute; visible cell text is an empty \"₹\" until client JS runs — parse the attribute, never innerText. Same for the tfoot Grand Total. 4) Sector split: category=Telecom (default) and category=Broadcasting are disjoint result sets; Broadcasting FDs (48 rows) are missed unless fetched separately. 5) Hidden type=SCN param still works server-side (Show Cause Notices, 8 rows) despite the selector being commented out. 6) No hyperlinks or IDs in rows — dedupe key must be composite (issue date + provider + regulation + clause + period + amount); same provider/date/regulation appears across multiple quarters. 7) HTML is littered with commented-out Thymeleaf (th:*) markup — naive comment-insensitive regex scraping will pick up phantom columns; use a real HTML parser that skips comments. 8) TLS clean, no -k needed; no WAF/rate-limit behaviour observed across ~10 rapid requests; ~172KB response for the default window. 9) Data fixture saved alongside the wrapper as trai_fd_orders_iframe.html.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/trai_fd_orders.html",
+   "sample_rows": [
+    "17-08-2026 | Bharat Sanchar Nigam Ltd. (BSNL) — QoS Regulations dated 02.08.2024 — clause 10 — Jan 2026 - Mar 2026 — data-amount=600000.00 | (no href: rows carry no links)",
+    "17-08-2026 | Mahanagar Telephone Nigam Limited (MTNL) — QoS Regulations dated 02.08.2024 — clause 4&10 — Jan 2026 - Mar 2026 — data-amount=1200000.00 | (no href: rows carry no links)",
+    "04-08-2026 | Mahanagar Telephone Nigam Limited (MTNL) — QoS Regulations dated 02.08.2024 — clause 4&10 — Oct 2025 - Dec 2025 — data-amount=1200000.00 | (no href: rows carry no links)"
+   ],
+   "json_api_endpoint": "",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Financial disincentive orders",
+   "why": "Enforcement orders against operators - a hole in the supposedly complete live TRAI coverage"
+  },
+  {
+   "id": "trai_miscellaneous",
+   "url": "https://www.trai.gov.in/release-publication/miscellaneous",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "div.globaltable div.view-content ul.item-list > li — per li: div.serial-number.tablefield span.field-content = serial; div.title-number.tablefield span.field-content = title (plain text, NO anchor); div.release-date.tablefield span.field-content = date DD/MM/YYYY (trailing spaces); div.division-section.tablefield span.field-content = division (e.g. \"Admin and HRM, Miscellaneous\"); div.download-field.tablefield wraps a NESTED Drupal view (view-tenders-documents block_9) whose document links are a[href^=\"/sites/default/files/\"] with aria-label starting \"Download PDF for\", each preceded by a span carrying the sub-document label. MUST skip div.view-header ul.table-header li, which contains the same tablefield divs (serial-number etc.) but no span.field-content — require field-content to qualify as a row.",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "Drupal zero-indexed query param: ?page=N (page 2 = ?page=1 — tested live, returned 30 rows continuing chronologically from page 1). Pager markup: nav.pager ul.pager__items, li.pager__item--next a[rel=next]. 6 pages listed at verification time (~175 items total).",
+   "row_floor": 30,
+   "allowed_domains": [
+    "www.trai.gov.in",
+    "trai.gov.in"
+   ],
+   "pdf_pattern": "https://www.trai.gov.in/sites/default/files/YYYY-MM/Name_DDMMYYYY.pdf — optional _0 (upload dedupe) and _Hindi suffixes. WARNING: the YYYY-MM upload folder can lag the release date by weeks (e.g. release 21/08/2025 lives in /2025-09/, release 19/11/2024 in /2024-12/) — never derive the item date from the path. All 34 download hrefs on page 1 are .pdf, all relative to trai.gov.in.",
+   "quirks": "(1) Flaky as registry warned: 1 of 3 identical curl probes hung to the 30s timeout (curl code 000) while the others returned 200 in <0.5s — use retries with timeout+backoff, not just headers. TLS was clean, no -k needed. (2) Header <li> inside ul.table-header mimics data rows (same serial-number/title-number divs) — parser must require span.field-content or it emits a phantom empty row. (3) Some rows repeat their download anchors twice verbatim in the HTML (page-1 serial 29 had 4 anchors for 2 files) — dedupe hrefs within a row. (4) Hindi PDFs cross-listed in the same row with Devanagari labels and _Hindi.pdf suffix. (5) Multi-document rows carry labeled sub-files (e.g. \"Letter\" + \"Enclosure to letter dt. 21/08/2025\"). (6) Titles mix hyphen \"-\" and en-dash \"–\" for identical constructs; field-content values carry trailing whitespace — strip and normalise. (7) Rows have no title link; the only per-item page is the http:// (not https) node alias in data-a2a-url on the share widget. (8) js-view-dom-id class hashes change every fetch — never key selectors on them. (9) An exposed filter form (title/date GET params) precedes the table; ignorable. (10) No __NEXT_DATA__/nuxt/JSON API — classic server-rendered Drupal, static_html is correct; page is ~540KB.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/trai_miscellaneous.html",
+   "sample_rows": [
+    "20/07/2026 | Debarment Order - M/s Shiv Shutra Enterprises (GeM Contract No. GEMC-511687755697904) | https://www.trai.gov.in/sites/default/files/2026-07/SSE_20072026.pdf",
+    "16/07/2026 | Debarment Order – M/s MI2C Business Enterprises Private Limited (GeM Contract No. GEMC-511687781019390) | https://www.trai.gov.in/sites/default/files/2026-07/MI2C_16072026.pdf",
+    "10/07/2026 | Panel of Auditors (Updated List) to carry out audit of Digital Addressable Systems (DAS) | https://www.trai.gov.in/sites/default/files/2026-07/Auditor_list_10072026.pdf"
+   ],
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Miscellaneous releases (orders etc.)",
+   "why": "Corrects the registry belief that no separate orders listing exists; site flaky, needs retries"
+  },
+  {
+   "id": "nccs_circulars_head",
+   "url": "https://nccs.gov.in/home/circularsHead/1",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "table#table.table.table-striped.table-bordered > tbody > tr, 4 cells: td[0]=serial number (ascending, newest item first), td[1]=title plain text (no link), td[2]=a[href] pointing to /public/circulars_head/*.pdf with visible text \"Download (pdf)\" plus file size in KB, td[3]=<time datetime=\"YYYY-MM-DD\">DD Month YYYY</time>. Same structure on pagination pages and on the archive listing (/home/circularsHead/archive/1).",
+   "date_formats": [
+    "YYYY-MM-DD (machine, in time/@datetime attribute — parse this one)",
+    "DD Month YYYY (human text inside <time>, e.g. \"23 June 2026\", \"05 March 2026\" — zero-padded day, full English month)"
+   ],
+   "pagination": "Path-segment page number: /home/circularsHead/{page} with optional ?rowsPerPage={5|10|20|50}. Default rowsPerPage is 5 (bare page 1 = serials 1-5; bare page 2 verified = serials 6-10). Total shown in div#totalItems (\"Total Items : 13\"). TRAP: the rendered Next/page links hardcode rowsPerPage=10, so following the rendered link from a default page-1 fetch jumps from serial 5 to serial 11 and silently skips 6-10 — never mix default pages with rendered links. Recommended: single fetch of /home/circularsHead/1?rowsPerPage=50 which returns all 13 rows (verified, serials 1-13). Older items live in a separate archive at /home/circularsHead/archive/1 (same table, own pagination, \"Total Items : 30\", verified).",
+   "row_floor": 5,
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "pdf_pattern": "https://nccs.gov.in/public/circulars_head/{free-form filename}.pdf — filenames contain literal spaces, parentheses, underscores, double spaces, and ampersands (HTML-escaped as &amp; in source); must be URL-encoded before fetching (verified: encoded URL returns 200 application/pdf)",
+   "quirks": "1) Pagination-link trap: default page size is 5 but rendered pagination hrefs hardcode rowsPerPage=10 — a crawler mixing the two skips serials 6-10; always fetch page 1 with explicit rowsPerPage=50. 2) HTML contains commented-out Thymeleaf template remnants (e.g. th:text=\"${#temporals.format(circularsHead?.date, 'dd-MM-yyyy')}\" inside <!-- -->) directly adjacent to the real date cell — a regex-based parser will match ghost markup; use a real HTML parser or strip comments first, and note the dd-MM-yyyy in comments is NOT the live format (live is <time datetime=\"YYYY-MM-DD\">). 3) PDF hrefs have unencoded spaces/parens/&amp; — URL-encode before use. 4) Titles contain curly quotes (U+2018/2019) and en-dashes — normalize before hashing/dedupe. 5) Page <title> has a typo: \"NCCS - HQ Cirulars\" — don't key on correct spelling. 6) Older items roll off into a separate archive listing (/home/circularsHead/archive/1, 30 items, same row structure) — disappearance from the main list is not deletion. 7) Content is administrative/HR (vacancies, internships, RA/consultant engagement), unlike the Sc/SAS divisions' technical circulars — classify accordingly. 8) No TLS issues, no WAF/rate-limiting observed across 6 fetches; curl with browser UA suffices. No RSS, no JSON API found (page is server-rendered Spring/Thymeleaf; axios is loaded but the table arrives fully rendered in HTML).",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/nccs_circulars_head.html",
+   "sample_rows": [
+    "23 June 2026 | Extension of Last date for receipt of Applications in response to NCCS Notification for Engagement of Research Associates as per NCCS Research Associate Scheme | https://nccs.gov.in/public/circulars_head/Corrigendum (date of Extension) for Engagement of RAs in NCCS.pdf",
+    "21 May 2026 | Engagement of Research Associates as per ‘NCCS Research Associate Scheme’ in NCCS, Bengaluru | https://nccs.gov.in/public/circulars_head/NCCS RA Notification 21 May 26 signed.pdf",
+    "30 April 2026 | Extension of Last date for receipt of Applications in response to NCCS Vacancy Circular for Engagement of consultants against the vacant posts of Telecom Assistant (TA) and Lower Division Clerk (LDC) on temporary and short term contract basis in the Office of Sr DDG, NCCS, Bangalore | https://nccs.gov.in/public/circulars_head/Corrigendum (date of Extension) for TA and LDC.pdf"
+   ],
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "HQ circulars",
+   "why": "Third NCCS division listing missing from the live set (Sc and SAS are wired); same scraper pattern"
+  },
+  {
+   "id": "tec_circulars",
+   "url": "https://tec.gov.in/circulars",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Sole <table> on the page (bare '<table >' tag, no class/id; DataTables CSS linked but never initialised). thead th: S.No. | Division | Circular no. | Subject/ Particulars | Issued On | Download. Each item = tbody tr with td[0]=serial int, td[1]=division code (SD/IoT/Radio/MT/MRA/...), td[2]=circular number string, td[3]=subject text (use as title), td[4]='<span style=\"display:none;\">YYYYMMDD</span> DD-MM-YYYY' (strip hidden span or take last whitespace token), td[5]='<a href=\"<pdf-url>\" target=\"_blank\"><img src=\"https://tec.gov.in/pdf.png\" width=\"30\"></a>' (no anchor text; href is already absolute)",
+   "date_formats": [
+    "DD-MM-YYYY (visible text in td[4], e.g. 01-04-2026)",
+    "YYYYMMDD (hidden sort key in span style=display:none inside td[4], e.g. 20260401; always matches the visible date)"
+   ],
+   "pagination": "None. Entire archive (127 rows, 2020->2026) is served in one HTML response; no server-side page parameter, no client-side DataTable init despite the DataTables CSS link. Fetch page once, parse all rows.",
+   "row_floor": 100,
+   "allowed_domains": [
+    "tec.gov.in",
+    "www.tec.gov.in",
+    "docs.google.com"
+   ],
+   "pdf_pattern": "https://tec.gov.in/pdf/{Circular|Whatsnew|MTCTE|MRA|CAS|NWG|3gpp|consultations|meetings}/<free-form filename>.pdf — filenames are free-form with RAW UNENCODED SPACES and parentheses in 96/127 hrefs (e.g. 'Draft Letter_DCC_withdraw of GRs_Test Guides (1).pdf'); some carry -YYYYMMDDHHMMSS timestamp suffixes. Percent-encode the path before fetching.",
+   "quirks": "(1) 96/127 hrefs contain raw spaces/parentheses — must URL-encode before download. (2) Table is roughly newest-first but NOT strictly sorted: 9 out-of-order date adjacencies; do full-table scan + href-based dedupe, never stop-at-first-older-row incremental logic. (3) Top row's cell date (22-04-2025) contradicts its own PDF filename ('dated. 22.04.2026') and subject (FY 2026-27) — site data-entry year typo; displayed dates can be wrong. (4) One Download link is a docs.google.com Google Form, not a PDF. (5) PDFs are cross-listed from other TEC sections (/pdf/Whatsnew, /pdf/MTCTE, etc.) — dedupe against tec_whatsnew source by href. (6) Malformed HTML: a stray title/meta/script fragment (including leftover foreign og:site_name 'PMI Musi Banyuasin' and a CSRF meta — Laravel app) appears BEFORE <!DOCTYPE html>; parser must tolerate junk ahead of the doctype. (7) Download cell has no anchor text (icon img only) — title must come from td[3]. (8) Bare host TLS currently fine (no -k needed); https://www.tec.gov.in/circulars also returns 200 as fallback. (9) No WAF/rate-limit behaviour observed on repeated fetches.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/tec_circulars.html",
+   "sample_rows": [
+    "22-04-2025 | Annual Action Plan for FY 2026-2027 | https://tec.gov.in/pdf/Circular/TEC Annual Action Plan AAP 2026-27 dated. 22.04.2026.pdf",
+    "01-04-2026 | Extension of deadlines for Inviting Nominations for reconstitution of Consultative Committee (CC) for Adoption of TSDSI transposed oneM2M (Release 2A, additional Release 3 and Release 4) standards as National Standards, by Telecommunication Engineering Centre (TEC) | https://tec.gov.in/pdf/Circular/TEC deadline extension letter inviting nominations for reconstitution of CC for oneM2M standards adoption.pdf",
+    "25-03-2026 | Withdrawal of Standards of GRs and associated Test Guides of Radio Division – reg. | https://tec.gov.in/pdf/Circular/Draft Letter_DCC_withdraw of GRs_Test Guides (1).pdf"
+   ],
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "Circulars",
+   "why": "MTCTE circulars and gazette-notification copies; tec_whatsnew alone is dormant and insufficient; use www host if bare-host TLS regresses"
+  },
+  {
+   "id": "tec_essential_requirements",
+   "url": "https://www.mtcte.tec.gov.in/er_list",
+   "reachable": "OK",
+   "method": "json_api",
+   "json_api_endpoint": "https://www.mtcte.tec.gov.in/get_er_list",
+   "row_structure": "Flat JSON array (no objects); every 6 consecutive elements = one ER record: [i]=product name, [i+1]=ER number (portal/digital form; ''=not yet uploaded; PDF at /filedownload?name=<ERNUM>.pdf), [i+2]=original-form PDF filename(s) (''=\\\"Will be Uploaded\\\"; multiple names joined by ':@:' with a TRAILING ':@:' delimiter; optional '<name>@wef@<date>' suffix per name), [i+3]=ER start date, [i+4]=ER end date, [i+5]=ER valid-upto date. Rendered headers on er_list page: S.No. | Product Name | ERs in Portal Form (Digital format) | ERs in Original Form (Text format) | ER Start Date | ER End Date | ER Valid Upto. For reference, the dead tec.gov.in page's last-good structure (Wayback 2026-04-10 fixture) was a bare <table> (no id/class), thead S.No.|Name of ER|ER Number|Division|MTCTE Phase|Download|Date of Issue, 73 tr data rows, with Bootstrap modal divs interleaved BETWEEN <tr> elements.",
+   "sample_rows": [
+    "2024-01-01 | Softswitch (TEC67792401) | https://www.mtcte.tec.gov.in/filedownload?name=TEC67792401.pdf",
+    "2023-01-01 | Softswitch (TEC67792301) | https://www.mtcte.tec.gov.in/filedownload?name=TEC67792301.pdf",
+    "2024-07-01 | G3 Fax Machine (TEC13292407) | https://www.mtcte.tec.gov.in/filedownload?name=TEC13292407.pdf"
+   ],
+   "date_formats": [
+    "YYYY-MM-DD (get_er_list JSON, all three date fields)",
+    "DD-MM-YYYY (visible text in dead tec.gov.in table, per Wayback fixture)",
+    "YYYYMMDD (hidden <span style=display:none> sort key in same table cell)",
+    "YYMM embedded as last 4 digits of ER number = approval year/month (TECGPPPYYMM scheme)"
+   ],
+   "pagination": "None. get_er_list returns the full dataset (828 elements = 138 records) in one response; no page/offset params exist. DataTables paginates client-side only. The dead tec.gov.in page likewise served all 73 rows in one HTML response.",
+   "row_floor": 120,
+   "allowed_domains": [
+    "www.mtcte.tec.gov.in",
+    "mtcte.tec.gov.in",
+    "tec.gov.in",
+    "www.tec.gov.in"
+   ],
+   "pdf_pattern": "https://www.mtcte.tec.gov.in/filedownload?name=<FILENAME> — portal-form ERs use <ERNUMBER>.pdf (verified live: TEC67792401.pdf returned a real 327KB PDF 1.7, Content-Type APPLICATION/OCTET-STREAM); original-form filenames come verbatim from JSON field [i+2] (e.g. TEC1329.pdf, TEC70012008.pdf). Must use GET — HEAD returns 403. On the dead tec.gov.in page PDFs were NOT direct links: POST https://tec.gov.in/dowanloadpdfform (typo is real) with Laravel CSRF _token + name/email/mobile + Google reCAPTCHA v2 — do not attempt to automate that path; one direct exception seen: https://tec.gov.in/pdf/ERs/downloadDocument_Annexures_to_ER-Dec2024.pdf",
+   "quirks": "CRITICAL: the originally specified URL https://tec.gov.in/essential-requirements is DEAD — returns HTTP 200 with Content-Length: 0 to curl (every UA/cookie/HTTP-version/referer variant, consistently ~0.8s) AND to real Chrome (single document request, empty body, no JS, no XHR). Broke between 2026-04-22 (last good ~20KB Wayback capture) and 2026-08-25. Monitor it for resurrection but do not treat empty-200 as 'no new items' — treat as FAILED fetch. Sibling https://tec.gov.in/essential-requirements-2 is live static HTML but is a PROSE article (ER definition, TECGPPPYYMM numbering, MATCOF formulation/withdrawal process) with 0 tables and 0 PDF links — useful only for text-diff monitoring; nav/menu text is duplicated twice per page, and og:site_name is a template leftover ('PMI Musi Banyuasin'). Corrected source (authoritative per TEC's own process doc: approved ERs are uploaded on the MTCTE portal): GET https://www.mtcte.tec.gov.in/get_er_list — plain JSON, needs no cookies/headers/captcha, works with default curl UA. JSON includes superseded ER revisions (same product listed multiple times with different validity windows); sentinel dates 2050-01-01/2050-04-01 mean open-ended/current. No server-side ordering guarantee (grouped by product, not by date) — sort in parser. BotDetect captcha assets on er_list page are for login only, not the JSON. tec.gov.in soft-404s: unknown paths return the full HTML 404 page (53KB) with status 404 — check status not size; no sitemap.xml, no RSS; robots.txt allows all; Laravel tec_session cookie issued but never required. Use https://www.mtcte.tec.gov.in host (nav links say http://www.mtcte.tec.gov.in; it redirects). Fixtures: mandated live fetch (0 bytes, evidence of the dead page) at .../fixtures/tec_essential_requirements.html; parser fixture (JSON) at .../tec_essential_requirements.get_er_list.json; last-good table structure at .../tec_essential_requirements.wayback-20260410.html (Wayback 2026-04-10, 73 rows); sibling prose page at .../tec_essential_requirements-2.html. sample_rows above are the first 3 records verbatim from the live-fetched JSON; hrefs constructed exactly per the site's own Input_for_er_list() JS (checkinput.js) and verified to resolve.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/tec_essential_requirements.get_er_list.json",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "Essential Requirements (MTCTE)",
+   "why": "ERs directly bind equipment OEMs/importers; sibling listing /essential-requirements-2 also live - track both"
+  },
+  {
+   "id": "tec_gazette_standards",
+   "url": "https://tec.gov.in/gazette-notified-standards",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "The first (and only) <table> in the page body — a CMS-pasted table with NO id/class, only inline styles (border=1, style=\"border-collapse: collapse; width: 600px...\"). Select it as the sole <table>, or as the table whose header row contains \"Notification Date\". Each data <tr> has exactly 5 <td>: td[0]=serial integer (skip the header row where td[0] is non-numeric \"S.NO\"), td[1]=standard name (plain text; earlier rows wrap it in <p> tags, later rows use bare text with <br />; multi-line names), td[2]=standard number, USUALLY inside <a href=standard-PDF> but occasionally plain text with no link (row 70, TEC 21141:2026), td[3]=notification date DD-Mon-YYYY, td[4]=<a href=\"/pdf/SD_DIV/*.pdf\">Notification</a> (gazette PDF, always present, always relative).",
+   "date_formats": [
+    "DD-Mon-YYYY (e.g. 23-Jan-2026) — sole format in the Notification Date column, verified uniform across all 72 rows",
+    "gazette PDF FILENAMES additionally embed dates as DDMMYY (gazette_230126_3.pdf), DD-MON-YYYY (06-AUG-2026_2.pdf) and DDMMYYYY (Gazette_29052026.pdf) — never parse dates from filenames, use the column"
+   ],
+   "pagination": "None. All 72 rows are in one server-rendered page. jQuery DataTables 1.13.11 is loaded from CDN with paging:true, but that is client-side cosmetic paging targeting #example1/#example2 ids the content table does not even have — a curl fetch gets the complete dataset. No ?page= scheme exists.",
+   "row_floor": 72,
+   "allowed_domains": [
+    "tec.gov.in"
+   ],
+   "pdf_pattern": "Standard PDFs: https://tec.gov.in/pdf/{GRs|GRFA|TSTP}/<name>.pdf — mixed absolute and relative hrefs, some with %20-encoded spaces. Gazette PDFs: https://tec.gov.in/pdf/SD_DIV/<name>.pdf with four inconsistent naming styles: gazette_DDMMYY_N.pdf, DD-MON-YYYY[_N|_TSDSI].pdf, Gazette_DDMMYYYY.pdf, no.NNNN.pdf. Both HEAD-checked live (HTTP 200, Apache).",
+   "quirks": "(1) Malformed HTML: a block of <title>/<meta>/<script> tags precedes <!DOCTYPE html> — parser must tolerate pre-doctype content; also og:site_name is bizarrely \"PMI Musi Banyuasin\" (foreign template leftover — ignore head metadata entirely). (2) Cell markup is inconsistent between older and newer rows (<p>-wrapped vs bare text with <br />) — extract text, never select <p>. (3) td[2] standard link is OPTIONAL (row 70 has plain text only); td[1] title cell never carries the link — the item PDF link lives in the Standard No. cell. (4) Cross-listing: multiple standards share one gazette PDF (rows 1-3 all point to gazette_230126_3.pdf; 06-AUG-2026_2.pdf covers several rows) — dedupe by gazette URL if tracking notifications, keep per-row if tracking standards. (5) Standard hrefs mix absolute https://tec.gov.in/... and relative /pdf/... — always absolutize against https://tec.gov.in. (6) &nbsp; (U+00A0) padding throughout headers, dates and link cells — normalize NBSP before matching. (7) Serials are sequential 1..72 and the table is append-only, so serial continuity is a good health check. (8) No WAF/rate-limit encountered; plain Apache, TLS clean, 200 in ~1.9s with a browser UA. (9) Table has zero stable hooks (no id/class/thead) — do not anchor on styling attributes like the px widths, which differ row to row.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/tec_gazette_standards.html",
+   "sample_rows": [
+    "23-Jan-2026 | Standard for Generic Requirements Splice Closure for Optical Fibre Cables (TEC 87080:2025) | https://tec.gov.in/pdf/GRs/TX_GR_Splice_Closure_87080-2025.pdf",
+    "23-Jan-2026 | Standard for Generic Requirements Lightning and Surge Protection of Telecom Sites (TEC 66130:2025) | https://tec.gov.in/pdf/GRFA/GR_LSPD_FA%20Division_v02.pdf",
+    "23-Jan-2026 | Standard for Generic Requirements SMPS Based Power Plants (TEC 66110:2025) | https://tec.gov.in/pdf/GRFA/SMPS_TEC_GR%2066110_2025_v02.pdf"
+   ],
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "Gazette-notified standards",
+   "why": "Standards become mandatory on notification under the Telecom Act standards framework"
+  },
+  {
+   "id": "dot_eservices_row",
+   "url": "https://eservices.dot.gov.in/right-of-way-permissions",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "div#Policy div.view-id-services div.view-content div.psn-container — each row: a[href=relative PDF, target=_blank] wrapping p.psnDate (span.badge.rounded-pill = category, e.g. \"Orders\" / \"Policy, Act and Rules\"; span.policy-circular-presentation = date \"DD/MM/YYYY \" with trailing space) and p.psn-name (title, may contain HTML entities like &amp;); following sibling span.text-nowrap = file size (e.g. \"666.14 KB\"). Scope selector to #Policy — div.psn-container appears only there (10 on page 1), but the page also has an unrelated sitewide news view (div.news-bars) that must not be matched.",
+   "date_formats": [
+    "DD/MM/YYYY (in span.policy-circular-presentation, trailing space; verified as the only machine-readable format across all 52 rows)",
+    "freeform dates inside titles only — e.g. 'dt: 10th September, 2025', 'Republished on 29.01.2026' — do not parse these"
+   ],
+   "pagination": "Querystring pager, plain GET, server-rendered: ?page=N, 0-indexed (page 1 = bare URL or ?page=0, page 2 = ?page=1). 6 pages at verification (page=0..5), 10 rows/page, last page partial (2 rows), 52 items total, reverse-chronological. Verified live: ?page=1 returns rows 11-20 (Sikkim 16/06/2025 first), ?page=5 returns the 2016/2017 Telegraph RoW Rules. Pager markup: nav ul.pagination li.page-item a.page-link with rel=next and a 'Last »' link to compute page count.",
+   "row_floor": 10,
+   "allowed_domains": [
+    "eservices.dot.gov.in"
+   ],
+   "pdf_pattern": "All 52 items are PDFs at /sites/default/files/circular-notifications/&lt;slug&gt;.pdf (relative hrefs — absolutize against https://eservices.dot.gov.in). Slugs are freeform: hyphens, underscores, dots and %20-encoded spaces all occur (e.g. om-06.03.2026_mopng.pdf, Notification-for%20adoption%20of%20RoW%202024.pdf). No non-PDF items in the listing.",
+   "quirks": "1) Page carries a sitewide \"What's New\" popup view (div.news-bars inside #popupSection, same DD/MM/YYYY dates, includes non-RoW items and press-release rows with empty href=\"\") — a parser grepping globally for dated links will ingest cross-listed junk; scope strictly to #Policy .psn-container. 2) The Statistics section contains raw pasted ChatGPT conversation HTML (data-message-author-role=\"assistant\", data-message-model-slug=\"gpt-4o-mini\") — content is hand-curated CMS paste, expect occasional malformed markup; regex/loose parsing safer than strict DOM assumptions. 3) Titles contain HTML entities (&amp;) and en-dashes — unescape before storing. 4) Date span has a trailing space. 5) Category badge varies (\"Orders\" vs \"Policy, Act and Rules\") and is styling-inconsistent — treat as free text. 6) MoD item title says 10/09/2025 but filename is policy-on-shared-communication.pdf; filenames are uninformative, never derive metadata from them. 7) Response is cache-control: no-cache/must-revalidate (x-cache-status MISS, via Google LB) — no stale-cache risk; PHPSESSID cookie set but not required for GET. 8) canonical/hreflang tags point at http:// — cosmetic, ignore. 9) TLS clean, fast (~0.25s), no WAF/rate-limit observed across 7 fetches; Drupal /views/ajax POST endpoint exists (view_name=services, view_display_id=block_1, view_args=226) as fallback but plain GET pagination suffices.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/dot_eservices_row.html",
+   "sample_rows": [
+    "15/05/2026 | West Bengal Order reg. the implementation of The Telecommunications Right of Way (RoW) Rules, 2024 | https://eservices.dot.gov.in/sites/default/files/circular-notifications/notification-related-to-row.pdf",
+    "14/05/2026 | Telangana-GHMC (Greater Hyderabad Municipal Corporation) – Levy of Road Lease/Rental Charges and Waiver of Road Restoration Charges for OFC Laying – Permission Accorded – Instructions Issued | https://eservices.dot.gov.in/sites/default/files/circular-notifications/telangana-order.pdf",
+    "06/03/2026 | MoPNG- Guidelines for Oil &amp; Gas CPSEs/attached offices on Telecom Infrastructure (RoW Matters) | https://eservices.dot.gov.in/sites/default/files/circular-notifications/om-06.03.2026_mopng.pdf"
+   ],
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices - Right of Way permissions",
+   "why": "RoW Rules 2024 state/UT instruments post here; GatiShakti portal is dead so this is the working RoW venue"
+  },
+  {
+   "id": "dot_eservices_satellite",
+   "url": "https://eservices.dot.gov.in/satellite-license",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Target listing = the page-specific \"Policy / Circular / Presentation\" Drupal view: div.view.view-services.view-id-services.view-display-id-block_1 > div.view-content > div.psn-container. Each row: a[href][target=_blank] (href = relative PDF path) containing p.psnDate > span.badge (category label, e.g. \"Orders\") + span.policy-circular-presentation (date DD/MM/YYYY with trailing space) and p.psn-name (title); sibling span.text-nowrap holds file size (e.g. \"5.02 MB\"). Secondary undated list: \"Details of Service\" <ol><li><p><a hreflang=en href=absolute-eservices-URL> with 13 satellite service sub-pages (DTH, HITS, Teleport, DSNG, MSS, VSAT, IFMC, NLD, ILD, etc.).",
+   "date_formats": [
+    "DD/MM/YYYY (psn rows and what's-new ticker, e.g. 11/12/2023, trailing space inside span)",
+    "DD-MM-YYYY (footer/last-updated <time> text, e.g. 28-05-2025)",
+    "ISO 8601 with +05:30 offset in <time datetime> attributes (e.g. 2026-08-20T16:33:05+05:30)"
+   ],
+   "pagination": "Drupal views pager, query param ?page=N (0-indexed). Tested https://eservices.dot.gov.in/satellite-license?page=1 → HTTP 200 but the view-services block renders with zero psn-container rows (only 1 item total, so page 2 is empty; heading remains). No pager links rendered on page 1. Same view also pageable via the /views/ajax POST endpoint with a page parameter.",
+   "row_floor": 1,
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "saralsanchar.gov.in",
+    "dot.gov.in"
+   ],
+   "json_api_endpoint": "POST https://eservices.dot.gov.in/views/ajax with form body view_name=services&view_display_id=block_1&view_args=165&view_path=%2Fnode%2F1328&pager_element=0&page=0&_drupal_ajax=1 and header X-Requested-With: XMLHttpRequest → HTTP 200 application/json: array of Drupal AJAX commands; the \"insert\" command's \"data\" field contains the rendered psn-container rows HTML (verified live, returns the same 1 row)",
+   "pdf_pattern": "/sites/default/files/circular-notifications/<name>.pdf (relative hrefs — must absolutize against https://eservices.dot.gov.in). Older files use percent-encoded spaces and mixed case (Spectrum%20Charges%20...%20Captive%20_Users.pdf); newer site-wide ones are lowercase-hyphenated (instruction-of-user-identification-rules-2026.pdf)",
+   "quirks": "1) Page has only ONE row in its satellite-specific circulars view, so 3 sample rows are impossible from the fetched bytes — row_floor is honestly 1; treat 0 rows as FAILED, 1 as healthy. 2) CRITICAL scoping trap: a site-wide \"What's New\" ticker (div.view-what-s-new, rows = div.news-bars, 5 items, same DD/MM/YYYY dates + badge labels, e.g. 14/08/2026 User Identification Rules PDF) appears on every eservices page including this one; a parser that greps for dates/PDFs page-wide will ingest unrelated DoT-wide items — scope strictly to view-id-services within <main>. 3) Page is Drupal node/1328; the circulars view is keyed by view_args=165 (taxonomy id for this service). view_base_path \"document-required-for-services\" 404s as a direct URL. 4) TLS fine with plain curl + browser UA, no -k, no WAF challenge on the page itself; but /rss.xml → 403 (iso-8859-1 Apache-style forbidden, WAF blocks some paths) and /sitemap.xml → 404 (203KB HTML 404 page — 404s are large HTML, check status not size). 5) Canonical/hreflang links use http:// not https. 6) Two conflicting \"last updated\" stamps: main content \"28-05-2025\" vs footer \"20-08-2026\". 7) Date span carries a trailing space (\"11/12/2023 \"); badge category vocabulary seen: Orders, Notifications, Circulars, Press Release, Policy Act and Rules. 8) Apply links go off-domain to //saralsanchar.gov.in (protocol-relative href). Fixture saved from a live 200 fetch, 178005 bytes.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/dot_eservices_satellite.html",
+   "sample_rows": [
+    "11/12/2023 | Spectrum Charges for Assignment of Frequencies to Captive Users (being charged on formula basis) for different types of Radiocommunication Services and applications | https://eservices.dot.gov.in/sites/default/files/circular-notifications/Spectrum%20Charges%20for%20Assignment%20of%20Frequencies%20to%20Captive%20_Users.pdf"
+   ],
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices - Satellite/GMPCS authorisation",
+   "why": "Satcom authorisation terms in the most active current licensing area; sibling GMPCS page verified live"
+  },
+  {
+   "id": "tdsat_daily_orders",
+   "url": "https://tdsat.gov.in/Delhi/services/dailyorderlist.php",
+   "reachable": "OK",
+   "method": "post_forms",
+   "row_structure": "GET returns a form-only shell (no rows). Rows come from a plain urlencoded POST to the same URL with from_date1=DD/MM/YYYY&to_date1=DD/MM/YYYY&frm3=&submit11=Go (form name=frm3, no cookies/CSRF/session needed). In the response, the result table is the final <table width=\"100%\" align=\"center\"> after the DATEWISE fieldset, header <tr> of th: Serial No. | Case No. | Party Detail | Order Date, then repeating <tr> rows: td[0] colspan=\"1\" = serial int; td[1] colspan=\"2\" = <a href=\"javascript:popsurety_pet_adv_name('<BASE64>');\">CASETYPE/NUM/YEAR</a>; td[2] colspan=\"2\" = <font color='black'>PETITIONER</font><br><font color='blue'>V</font><br><font color='black'>RESPONDENT</font>; td[3] colspan=\"2\" = DD-MM-YYYY. Item URL must be constructed: https://tdsat.gov.in/Delhi/services/daily_order_view.php?filing_no=<BASE64> (the base64 decodes to a numeric internal filing_no, e.g. NzQ2MTI= -> 74612). Regex that matched all 140 rows: <tr>\\s*<td colspan=\"1\" >(\\d+)</td>\\s*<td colspan=\"2\" ><a href=\"javascript:popsurety_pet_adv_name\\('([^']+)'\\);\">\\s*([^<]+)</a></td>\\s*<td colspan=\"2\">\\s*(.*?)</td>\\s*<td colspan=\"2\">\\s*([\\d-]+)</td>",
+   "date_formats": [
+    "DD-MM-YYYY (listing Order Date column, e.g. 21-08-2026)",
+    "DD/MM/YYYY (POST form inputs from_date1/to_date1 and the 'Dated:' line on the order-view page, e.g. 21/08/2026)"
+   ],
+   "pagination": "None. The full date-range result comes in one response: 18-25/08 window returned 140 rows (56KB); a 01-25/08 window returned 761 rows (272KB) with no cap or truncation observed. \"Pagination\" is done by narrowing the from_date1/to_date1 POST window. An old_orders.php page (red OLD ORDERS link) exists for the archive.",
+   "row_floor": 10,
+   "allowed_domains": [
+    "tdsat.gov.in"
+   ],
+   "pdf_pattern": "None — orders are served as full-text HTML at daily_order_view.php?filing_no=<base64>. A \"Save as PDF\" link to orderp.php?filing_no=<base64> exists but is commented out in the markup, and orderp.php itself returns text/html (4.9KB), not a PDF.",
+   "quirks": "(1) The daily-order listing itself is POST-only despite the premise — but the POST is trivial: urlencoded from_date1/to_date1 in DD/MM/YYYY, no session/cookie/CSRF; POST evidence fixture saved at /Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/tdsat_daily_orders_post.html. (2) Item links are javascript: handlers, not real hrefs — extract the base64 arg of popsurety_pet_adv_name('...') and build daily_order_view.php?filing_no=<b64>; dedupe on the decoded numeric filing_no. (3) Rows are NOT date-sorted — dates mix within the window (grouped roughly by case type/number), so sort client-side. (4) Publication lag: on Tue 2026-08-25 the newest order date present was Fri 2026-08-21 — poll with a trailing 7-10 day window and dedupe. Only weekday dates appear; TDSAT vacation weeks can legitimately thin a window (hence conservative row_floor=10; a normal term-time week carried 140). (5) Some rows have an empty petitioner cell (e.g. MISC APPLICATION/60/2026: \"<font color='black'></font><br>V<br>...\"). Party names carry &amp; entities and erratic casing. (6) Markup is broken XHTML soup (tables inside <h3>, duplicate <head>/<body>, unclosed tags) — use regex or a tolerant parser, never strict XML. (7) Case types span TELECOM APPEAL/PETITION, BROADCASTING APPEAL/PETITION, AERA, CYBER APPEAL, MISC APPLICATION, E A, REVIEW APPLICATION — TRAI/DoT stay orders can sit under MISC APPLICATION attached to any case type, so do not pre-filter to TELECOM-prefixed types. (8) No WAF/rate-limit/TLS issues observed (no -k needed); repeated fetches byte-identical. Hindi header text on every page (mixed-language, cosmetic only). (9) Beware \"LIMIT\"-style keyword greps: party names (\"...LIMITED\") pollute naive matches.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/tdsat_daily_orders.html",
+   "sample_rows": [
+    "21-08-2026 | BROADCASTING PETITION/1/2022 — SITI NETWORKS LTD V R.K.CABLE NETWORK | https://tdsat.gov.in/Delhi/services/daily_order_view.php?filing_no=NzQ2MTI=",
+    "18-08-2026 | BROADCASTING PETITION/5/2023 — THAMIZHAGA CABLE TV COMMUNICATIONS PVT LTD V M/S M R S SAT SYSTEM | https://tdsat.gov.in/Delhi/services/daily_order_view.php?filing_no=NzQ0NTc=",
+    "21-08-2026 | MISC APPLICATION/60/2026 — [empty petitioner] V M/S M R S SAT SYSTEM | https://tdsat.gov.in/Delhi/services/daily_order_view.php?filing_no=NzQ2MTg="
+   ],
+   "stratum": "telecom",
+   "regulator": "TDSAT",
+   "name": "Daily Orders",
+   "why": "Stay orders on TRAI/DoT instruments matter immediately; crawlable unlike the POST-only judgments search"
+  },
+  {
+   "id": "inspace_publications",
+   "url": "https://www.inspace.gov.in/inspace?id=inspace_publications",
+   "reachable": "OK",
+   "method": "json_api",
+   "json_api_endpoint": "https://www.inspace.gov.in/api/now/sp/page?id=inspace_publications",
+   "row_structure": "Not HTML. GET the json_api_endpoint (anonymous, browser UA); take result.containers[0].rows[0].columns[0].widgets[0].widget.client_script (a string of Angular controller JS); it contains a hardcoded array `c.docs = [...]` of JS object literals with UNQUOTED keys: { title: \"...\", belowline: \"...\", url: \"...\", category: \"...\", isNew: 0|1 }. Extract with regex: \\{\\s*title:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"\\s*,\\s*belowline:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"\\s*,\\s*url:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"\\s*,\\s*category:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"\\s*,\\s*isNew:\\s*(\\d+). 11 category values (e.g. \"Guidelines, Reports & White Papers\", \"Circulars and Policy Documents\", \"EoI Documents\").",
+   "date_formats": [
+    "(none — items carry no dates at all; do not expect a date column)",
+    "Month YYYY — rare free text inside belowline, seen once: 'PDF - 3 MB, Published in January 2023'"
+   ],
+   "pagination": "None. The entire list (42 rows) is hardcoded in one widget client_script and returned in a single JSON response; no paging scheme exists to test.",
+   "row_floor": 35,
+   "allowed_domains": [
+    "www.inspace.gov.in"
+   ],
+   "pdf_pattern": "Attachment URLs carry no filename — only /sys_attachment.do?sys_id=<32-hex>. Two coexisting forms: relative \"/sys_attachment.do?sys_id=...\" and absolute \"https://www.inspace.gov.in/inspace/sys_attachment.do?sys_id=...\"; both serve the same store (normalize on sys_id). Real filename only via Content-Disposition: attachment; filename*=UTF-8''<snake_case>.pdf (verified: eoi_ground_station.pdf, 499,009 bytes, %PDF-1.7). Anonymous GET works; Range GET returns 206 with full size in Content-Range.",
+   "quirks": "1) Static HTML is an empty ServiceNow Service Portal Angular shell (ng-app=\"sn.$sp\", portal_id=94b328b687a8151054e2eb9abbbb3576) — zero rows in HTML; never parse it. No headless browser needed despite the atlas note: the sp/page JSON API answers anonymous GETs (adding &portal_id=94b3...3576 returns a richer 108KB response vs 24KB; docs identical in both). 2) Rows are JS object literals (unquoted keys) inside a string field — regex, not json.loads, on client_script. 3) 3 of 42 rows link to other portal pages instead of attachments: ?id=capacity_provisioning_contracts, ?id=inspace_pdf_carousel, and — critically — the NGP rulebook itself at ?id=inspace_ngp_update_page (its belowline is literally \"URL\"); resolve those via the same /api/now/sp/page?id=... API (NGP page verified 200, contains 1 sys_attachment link, no dates). 4) No per-item dates: change detection must diff the full docs array; isNew:1 flags recent additions (1 of 42 today). 5) HEAD on sys_attachment.do returns empty 200 (Content-Length: 0) — useless; use Range GET. 6) sys_id is the only file identity, so any re-upload silently changes the URL (matches \"attachment URLs unstable\" — track items by title+category, treat url/sys_id as mutable). 7) Server snow_adc sets BIGipServer + JSESSIONID cookies; no WAF/rate-limit friction observed with a Chrome UA; TLS clean (no -k needed). 8) Mixed URL absolutization: relative urls resolve against https://www.inspace.gov.in/ (bare form verified working) even though HTML has base href=\"/inspace\". 9) 42 rows today across 11 categories; row_floor set at 35 for headroom. 10) API response also saved as fixture: /Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/inspace_publications.api.json — parse target for the extractor.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/inspace_publications.html",
+   "sample_rows": [
+    "(no date) | EoI for establishment and operation of ground stations by Indian private operators at NRSC/ISRO, Shadnagar | https://www.inspace.gov.in/sys_attachment.do?sys_id=0ac09d842b0d0fd0e95ef17b6e91bf5f",
+    "(no date) | L1 Overview of BIS Process of Standards development | https://www.inspace.gov.in/inspace/sys_attachment.do?sys_id=0c7dcefe2b000390e95ef17b6e91bfab",
+    "(no date) | L2 Systems Engineering Standards | https://www.inspace.gov.in/inspace/sys_attachment.do?sys_id=047dcefe2b000390e95ef17b6e91bfaf"
+   ],
+   "stratum": "telecom",
+   "regulator": "IN-SPACe",
+   "name": "Publications (NGP, guidelines, advisories)",
+   "why": "The space-authorisation rulebook; regulator entirely absent from atlas; needs headless render, attachment URLs unstable"
+  },
+  {
+   "id": "mib_acts_policy",
+   "url": "https://mib.gov.in/en/documents/notification/acts-policy-guidelines",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "table.cols-7 > tbody > tr, 7 cells addressed by headers attribute: td[headers=\"view-counter-table-column\"]=serial, td[headers=\"view-title-table-column\"]=title (plain text, no link), td[headers=\"view-field-date-range-table-column\"]=date DD-MM-YYYY, td[headers=\"view-field-notifications-category-table-column\"]=category (Guidelines|Notification), td[headers=\"view-field-wings-category-table-column\"]=wing (e.g. Film Wing, Broadcasting Wing), td[headers=\"view-nothing-1-table-column\"]=file-type icon + size text, td[headers=\"view-nothing-table-column\"]=a.btn[href=relative PDF path] with text \"View\". The document link lives ONLY in the last cell; the title cell carries no anchor.",
+   "date_formats": [
+    "DD-MM-YYYY (date column, e.g. 07-08-2026)",
+    "DD.MM.YYYY embedded inside title text and PDF filenames (e.g. 'dated 30.11.2023') — never parse dates from titles"
+   ],
+   "pagination": "Drupal pager, query param ?page=N, 0-indexed (page 1 = ?page=0 or no param), 20 rows per page. nav.pager > ul.pager__items with li.pager__item--next and li.pager__item--last (currently ?page=4, i.e. 5 pages / ~81-100 items). Verified live: ?page=1 returned 20 different rows with serial counter continuing at 21. Rows sorted by date descending, so new items appear on page 0.",
+   "row_floor": 20,
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "pdf_pattern": "https://mib.gov.in/sites/default/files/YYYY-MM/<kebab-or-snake-slug>.pdf — relative hrefs like /sites/default/files/2026-08/clarification-reg-exhibition-of-psa-films.pdf; occasional Drupal dedupe suffix _0 (amendment-to-television-ratings-policy-2026_0.pdf) and literal dots inside slugs (advisory-to-iptv-service-providers-dated-22.04.2026_0.pdf). All 20 page-1 links were same-domain PDFs.",
+   "quirks": "1) SEVERELY FLAKY: first fetch hard-timed-out at 30s (HTTP 000); retry succeeded in 37.5s; page-2 fetch hung twice at 60s then returned in 0.6s. Parser needs >=3 retries with 45-60s timeout and must treat timeout as retryable, not source-dead. No WAF/403 seen; TLS fine (no -k needed). 2) /en/ PREFIX MANDATORY: the same path without /en/ returns HTTP 200 with Content-language: hi — the Hindi page is served silently, no redirect. A parser that drops the prefix gets Hindi titles with no error signal. 3) Two decoy div.views-row elements exist in the footer (site-ownership blurb, visitor counter) — scope strictly to table.cols-7, not .views-row. 4) Title cell has no href; only the last cell's View button links to the PDF. 5) Titles embed dates in DD.MM.YYYY that differ from the row date — use the date column only. 6) Serial counter continues across pages (page 2 starts at 21) — do not use it as an ID; use PDF href. 7) Two rows can share one date (e.g. 10-03-2026 x2, 30-12-2025 x2). 8) One PDF is shared cross-listing style (corrigendum-and-original-notification.pdf covers both a corrigendum row and relates to the original notification row's subject) — dedupe on href+title, not href alone. 9) Server sends Cache-Control: no-cache/private; some in-page absolute URLs use http:// scheme (icons, breadcrumb JSON-LD). 10) No __NEXT_DATA__/nuxt/JSON API found — plain server-rendered Drupal 9/10; no RSS link on the page.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/mib_acts_policy.html",
+   "sample_rows": [
+    "07-08-2026 | Clarification regarding exhibition of Public Service Awareness (PSA) Films in Cinema Theatres under Guidelines dated 30.11.2023 issued by Ministry of Information & Broadcasting - reg. | https://mib.gov.in/sites/default/files/2026-08/clarification-reg-exhibition-of-psa-films.pdf",
+    "25-06-2026 | Inviting comments from stakeholders on the draft Recruitment Rules in respect of the CCW Engineering Cadre of Prasar Bharati-reg. | https://mib.gov.in/sites/default/files/2026-06/circular_inviting-comments-from-stakeholders-on-draft-rrs.pdf",
+    "24-06-2026 | Corrigendum to notification for notifying sporting events of national importance under Sports Broadcasting Signals (Mandatory Sharing with Prasar Bharati) Act, 2007 | https://mib.gov.in/sites/default/files/2026-06/corrigendum-and-original-notification.pdf"
+   ],
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Acts/Policies/Guidelines master view",
+   "why": "Master statutory listing across all MIB wings; planned source; always /en/ prefix, retry on flaky server"
+  },
+  {
+   "id": "mib_orders_notices",
+   "url": "https://mib.gov.in/en/documents/notification/notices",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "table.cols-6 > tr (skip the th header row; keep tr containing td). Cell order: td[0]=serial number, td[1]=title (plain text, NO link), td[2]=date DD-MM-YYYY, td[3]=wings category (e.g. \"Broadcasting Section\", \"Digital Media Wing\"), td[4]=file size (e.g. \"330.14 KB\"), td[5]=anchor with text \"View\" whose href is the relative PDF path — the only link in the row.",
+   "date_formats": [
+    "DD-MM-YYYY (zero-padded, e.g. 05-08-2026)"
+   ],
+   "pagination": "Drupal query pager, zero-indexed: ?page=N, 10 rows per page. Page 1 is ?page=0 (or bare URL); tested ?page=1 → HTTP 200 with 10 distinct rows, serials continuing at 11 (first row: 09-04-2026 \"Final Seniority list of SGB as per CAT order dated 15.01.2026\"). Currently 9 pages (last = ?page=8), pager links carry \"Next ›\" / \"Last »\".",
+   "row_floor": 10,
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "pdf_pattern": "All item links are PDFs at /sites/default/files/YYYY-MM/{slug}.pdf (relative hrefs — prepend https://mib.gov.in). Slugs are free-form kebab-case, sometimes scanner dumps like doc03665520260715204500.pdf. Zero non-PDF links on pages 1–2.",
+   "quirks": "1) MUST use the /en/ URL: the same path without /en serves the Hindi site (html lang=\"hi\", title \"आदेश एवं नोटिस\", Hindi row titles, and a differently-ordered node set) — confirmed live today. 2) Intermittent slowness: the first curl attempt timed out at 30s with zero bytes; the retry succeeded in seconds. Use retries (2-3) and a generous timeout; treat 0-byte responses as transient, not empty-page. 3) Server sets a TCP_AW_UID cookie (app-layer LB/anti-bot) but serves full static HTML on the first request with a plain browser UA — no JS challenge, no cookie needed for subsequent fetches. 4) Cache-Control: no-cache/no-store, so fetches are always fresh. 5) Title cell has no href — the PDF link lives only in the last \"View\" cell; pair them by row. 6) Multiple rows can share one date (three rows dated 26-05-2026 on page 1), so date alone is not a row key — use the href. 7) No RSS feed, no __NEXT_DATA__/inline JSON — plain server-rendered Drupal. 8) Listing mixes broadcast-policy items with internal HR/admin orders (promotions, seniority lists); filter by title/wings-category downstream if only regulatory items are wanted. 9) No Devanagari leakage inside the /en table.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/mib_orders_notices.html",
+   "sample_rows": [
+    "05-08-2026 | Details of operational Pvt FM Radio channels - 31.07.2026 | https://mib.gov.in/sites/default/files/2026-08/386-pvt-fm-channels-operational-as-on-31.07.2026.pdf",
+    "15-07-2026 | Inter-Ministerial Committee (IMC) to examine Complaints/Grievances related to Private FM Radio and Community Radio Stations | https://mib.gov.in/sites/default/files/2026-07/doc03665520260715204500.pdf",
+    "23-06-2026 | Notification dated 22.06.2026 in compliance with Order dated 19.06.2026 passed by Hon'ble High Court of Delhi in W.P.(C) No. 8284 of 2026 – Badminton Association Of India Vs. Union of India & Anr.-reg. | https://mib.gov.in/sites/default/files/2026-06/notification_22062026_with-annexure-i_1.pdf"
+   ],
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Orders & Notices",
+   "why": "Planned source - but wire the /en/ URL; the sources.json URL without /en/ serves Hindi titles and showed BLOCKED"
+  },
+  {
+   "id": "mib_other_comms",
+   "url": "https://mib.gov.in/en/documents/notification/Other-communication",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "table.cols-6 > tr (skip header row 'S. No. | Title | Date | wings category | Type/Size | Download/Details'): td[0]=serial number (global across pages), td[1]=plain-text title (NO link), td[2]=date DD-MM-YYYY, td[3]=wing (currently all 'Film Wing'), td[4]=file size (e.g. '5.88 MB'), td[5]=a[href] with link text 'View' — this anchor, not the title, carries the document URL. Parse with html.parser; page is fully server-rendered Drupal, no JS needed.",
+   "date_formats": [
+    "DD-MM-YYYY (date column, zero-padded, e.g. 04-02-2026)",
+    "DD.MM.YYYY and DD.MM.YY appear embedded inside title text only (e.g. 'on 28.01.2026') — never in the date column"
+   ],
+   "pagination": "Drupal zero-indexed query param ?page=N. Page 1 = bare URL (or ?page=0), page 2 = ?page=1 — tested live, returned 6 rows (serials 21-26, so serials continue globally). Currently exactly 2 pages / 26 items total. Pager markup: nav.pager > ul.pager__items > li.pager__item, with pager__item--next / pager__item--last.",
+   "row_floor": 20,
+   "allowed_domains": [
+    "mib.gov.in",
+    "skill.nfdcindia.com"
+   ],
+   "pdf_pattern": "/sites/default/files/YYYY-MM/{kebab-or-snake-case-slug}.pdf (relative hrefs; prefix https://mib.gov.in). Note: nearly all historical files were re-uploaded under /2024-12/ during a 2024 site migration, so the path's YYYY-MM does NOT equal the document date. Filenames sometimes embed dates (e.g. om-dated-08-08-2024-...) or are bare country names (australia.pdf, poland1.pdf).",
+   "quirks": "(1) Intermittent full-connection hangs: first ?page=1 attempt returned HTTP 000 after 30s, immediate retry succeeded in 0.5s — parser needs 1-2 retries with backoff. (2) The unprefixed URL https://mib.gov.in/documents/notification/Other-communication (the old sources.json one) hangs indefinitely — timed out at 40s with no HTTP response at all; the /en/ prefix is mandatory. (3) Hindi mirror exists at /hi/documents/... and the pager block contains /hi/ links — filter to /en/ + relative hrefs only. (4) The document link is on the td[5] 'View' anchor; titles are unlinked plain text. (5) Not all rows are PDFs: serial 10 links to external https://skill.nfdcindia.com/ — don't assume .pdf. (6) Content mismatch vs stratum expectation: the listing is currently 100% Film Wing (mostly audio-visual co-production agreements + film advisories); no broadcaster/OTT advisories present today — the 'wings category' column (td[3]) is the filter hook if that changes. (7) Naive date regex over raw HTML over-counts (26 matches for 20 rows) because dates recur in titles and PDF filenames — extract the date from td[2] only. (8) Rows are sorted newest-first by date. (9) Site rss.xml (200, application/rss+xml) covers Mann Ki Baat/news only, not this listing; /sitemap.xml is 404. (10) TLS was fine, no -k needed; no WAF challenge observed with a browser UA.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/mib_other_comms.html",
+   "sample_rows": [
+    "04-02-2026 | Meeting on ICH portal with States/UTs under the chairmanship of Secretary(I&B) on 28.01.2026 | https://mib.gov.in/sites/default/files/2026-02/meeting-on-ich-poral-28.01.26-2.pdf",
+    "10-03-2025 | Regulations of 70th National Film Awards | https://mib.gov.in/sites/default/files/2025-03/70th_nfa_regulation-english-1.pdf",
+    "25-12-2024 | Incorporation of Indian Institute of Creative Technologies (IICT) as a Section 8 company under Companies Act, 2013 | https://mib.gov.in/sites/default/files/2024-12/nscan.pdf"
+   ],
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Other Communications",
+   "why": "Where most MIB advisories to broadcasters/OTT physically land; use /en/ URL, not the sources.json unprefixed one"
+  },
+  {
+   "id": "mib_advisories",
+   "url": "https://mib.gov.in/en/documents/notification/advisories",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "table.cols-6 tbody tr (scope to the table with class 'cols-6' — it is the only views table). Each tr has 6 tds: td[0].views-field-counter = global serial number (continues across pages: page k starts at 20k+1); td[1].views-field-title = title as PLAIN TEXT, no anchor, no detail page; td[2].views-field-field-date-range = date DD-MM-YYYY; td[3].views-field-field-wings-category = issuing wing (e.g. 'Broadcasting Section', 'Digital Media Wing'); td[4].views-field-nothing-1 = pdf icon img + file size text (e.g. '306.99 KB'); td[5] = single <a class=\"btn btn-info bi bi-eye\" href=\"/sites/default/files/YYYY-MM/slug.pdf\" target=\"_blank\">View</a> — this href is the only link and the natural dedupe key. All cell text is whitespace-padded; strip() required.",
+   "date_formats": [
+    "DD-MM-YYYY (Date column, e.g. 20-08-2026)",
+    "DD.MM.YYYY (embedded in titles and in PDF filenames, e.g. 'Advisory dated 13.08.2025', advisory-22.04.2025.pdf)"
+   ],
+   "pagination": "Drupal zero-indexed query param: ?page=N. Page 1 = bare URL or ?page=0. Currently pages 0-8 (9 pages). Tested ?page=1 (rows 21-40, works) and ?page=8 (last page, 17 rows, counters 161-177). Total 177 items. Pager nav is <nav aria-labelledby=\"pagination-heading\"> with hrefs ?page=0..?page=8.",
+   "row_floor": 15,
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "pdf_pattern": "/sites/default/files/YYYY-MM/<slug>.pdf (relative; prefix https://mib.gov.in). Slugs often advisory-DD.MM.YYYY.pdf with occasional _0 / _repaired suffixes (e.g. narcotics-advisory-dated-20.08.2026_repaired.pdf, advisory-21.03.2024_0.pdf). HEAD on sample returned 200 application/pdf, 314359 bytes.",
+   "quirks": "(1) Date column is NOT reliably the issuance date — it appears to be upload/republish date: e.g. row dated 05-06-2026 links advisory-22.04.2025.pdf, and a title saying 'Advisory dated 13.08.2025' carries Date column 13-08-2026. Parser should also capture DD.MM.YYYY dates from title/filename. (2) Ordering is reverse-date on early pages but the LAST page is jumbled (2008-2017 interleaved), so do not assume strict chronology; incremental detection should diff page-1 PDF hrefs, and the global serial counter in td[0] verifies pagination health. (3) The inline drupalSettings JSON contains the literal string 'No results match' plus embedded HTML tables — never grep the raw page for 'No results' or count all <tbody>/<tr>; scope strictly to table.cols-6. (4) No per-item detail pages; the PDF href is the canonical item URL and dedupe key. (5) Titles are plain text with heavy trailing whitespace (~10 spaces); strip everything. (6) Some rows are cross-listed rules/guidelines, not advisories proper (e.g. 'Cable TV Network (Amendment) Rules, 2015'). (7) Icon img srcs use http:// scheme (mixed content) — ignore. (8) No WAF, no rate limiting observed, TLS clean, plain curl with browser UA suffices. (9) A transient fetch of ?page=1 once parsed to 0 rows via a piped one-liner but a refetch to file parsed 20 rows — parse from saved bytes and treat a 0-row cols-6 table as FAILED fetch, not an empty listing.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/mib_advisories.html",
+   "sample_rows": [
+    "20-08-2026 | Display of Disclaimer relating to the Harmful Effects of Drug Abuse on Private Satellite Television Channels - reg. | https://mib.gov.in/sites/default/files/2026-08/narcotics-advisory-dated-20.08.2026_repaired.pdf",
+    "13-08-2026 | Advisory dated 13.08.2025 for carriage of sign language Interpretation of Independence Day 2026 Commentary/ Ceremony by Private Satellite TV channels. | https://mib.gov.in/sites/default/files/2026-08/independence-day-advisory.pdf",
+    "05-06-2026 | Advisory on adherence of Indian Laws and the Code of Ethics prescribed under the Information Technology (Intermediary Guidelines and Digital Media, Ethics Code) Rules, 2021 - reg. | https://mib.gov.in/sites/default/files/2026-06/advisory-22.04.2025.pdf"
+   ],
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Advisories listing",
+   "why": "Dedicated advisories listing in the atlas that neither sources.json nor the fresh enumeration captured - cheap same-pattern Drupal scrape"
+  },
+  {
+   "id": "mib_digital_media",
+   "url": "https://mib.gov.in/en/ministry/our-wings/digital-media",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Wing page = Drupal quicktabs accordion div#quicktabs-digital_media with 5 inline tables (all content server-rendered, no AJAX needed). Primary listing (Communication panel, also standalone at /en/offerings/digital-media/communication): table.cols-5 tbody tr with td.views-field-counter (serial), td.views-field-title (title, PLAIN TEXT — no anchor), td.views-field-field-date-range (DD-MM-YYYY), td.views-field-nothing-2 (either literal 'Link' for PIB items or pdf-icon img + size like '306.99 KB'), td.views-field-nothing (the href: div.external-link-button > a.mib-rti-link → pib.gov.in PressReleaseDetail.aspx, OR a.btn[target=_blank] → relative /sites/default/files/...pdf). Secondary: SRB registrations table.cols-4 tr with td.views-field-title, one-or-MORE 'View' anchors in the download td, date td DD-MM-YYYY; About/News-publishers tables are cols-5 same shape as Communication; OTT register table.cols-0 (99 rows, S.No|Platform|Entity, no dates, no links).",
+   "date_formats": [
+    "DD-MM-YYYY (all table date cells, e.g. 22-08-2026)",
+    "DD.MM.YYYY (embedded in PDF filenames, e.g. narcotics-advisory-dated-20.08.2026_repaired.pdf)",
+    "DD Mon YYYY (some PDF filenames e.g. 'WJAI Registration Letter 03 Sep 2021.pdf', and the footer Last Updated stamp)"
+   ],
+   "pagination": "Wing page itself has NO pager — shows only newest 20 Communication rows. Full archive at standalone Drupal view https://mib.gov.in/en/offerings/digital-media/communication?page=N, zero-indexed, 20 rows/page; tested page=1 → serials 21-40 (22-07-2026 down to 20-06-2026); pager links show pages 0-8 (~180 rows). Same ?page=N scheme exists for /en/offerings/digital-media/self-regulatory-bodies, /OTT-platforms, /news-and-current-affairs-publishers (view_base_path values in drupalSettings).",
+   "row_floor": 20,
+   "allowed_domains": [
+    "mib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "pdf_pattern": "https://mib.gov.in/sites/default/files/YYYY-MM/<slug>.pdf — folder is upload month, not document date (e.g. /sites/default/files/2026-08/narcotics-advisory-dated-20.08.2026_repaired.pdf); older files have %20-encoded spaces and mixed-case names (e.g. /sites/default/files/2024-02/JMAGC%20Registration%20Letter%20dated%2017.01.2023.pdf)",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/mib_digital_media.html",
+   "sample_rows": [
+    "22-08-2026 | First Steering Committee Meeting For 57th IFFI Held Under Chairmanship of MoS Dr. L. Murugan to Review Festival Preparations | https://www.pib.gov.in/PressReleaseDetail.aspx?PRID=2302236&reg=3&lang=1",
+    "20-08-2026 | Display of Disclaimer relating to the Harmful Effects of Drug Abuse on Private Satellite Television Channels - reg. | https://mib.gov.in/sites/default/files/2026-08/narcotics-advisory-dated-20.08.2026_repaired.pdf",
+    "14-08-2026 | Government Removes 12-Minute Advertisement Duration Cap for Television Channels | https://www.pib.gov.in/PressReleaseDetail.aspx?PRID=2299626&reg=3&lang=1"
+   ],
+   "quirks": "(1) Title cell carries NO link — the href lives in the last td ('View'/'Visit Link'); PIB press-release items are distinguishable by Type/Size cell = literal 'Link' and a.mib-rti-link class, hosted PDFs by size text + a.btn. Rule 16 blocking actions surface as PIB links here, so resolve pib.gov.in PRID URLs. (2) SRB table rows can contain TWO 'View' anchors in one download cell (registration letter + member list, e.g. PADMA row) — parser must not assume one href per row. (3) Footer 'Last Updated: 27 Sep 2024' is stale sitewide boilerplate — ignore it; rows run to 22-08-2026. (4) Communication feed is ministry-wide (TV ad-cap, IFFI, TRP policy items mixed with digital-media advisories) — keyword-filter if Part III-only needed. (5) canonical/shortlink/hreflang use http:// and a /hi/ twin exists — dedupe cross-language. (6) /sitemap.xml serves an HTML page (Hindi), /rss.xml is a Hindi general node feed — neither usable. (7) One transient curl HTTP 000 (connection drop) on first ?page=1 attempt, retry succeeded — add retry; no WAF, no TLS errors, no -k needed. (8) ~200 hits for 'table' in raw HTML are CSS/layout — anchor on div#quicktabs-digital_media or the standalone view pages. (9) Wing page today: Communication 20 rows + SRB 11 + About 3 + NewsPubs 1 + OTT register 99 = 134 data rows total; row_floor 20 applies to the Communication table specifically. (10) IT Rules consolidated PDF re-posted 15-05-2026 at /sites/default/files/2026-05/it-rules-2021-2.pdf — Post Date column reflects re-uploads, not instrument dates.",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Digital Media Wing (IT Rules Part III)",
+   "why": "Part III instruments, SRB registrations, OTT advisories; pair with PIB since rule 16 blocking often surfaces only there"
+  },
+  {
+   "id": "mib_broadcasting",
+   "url": "https://mib.gov.in/en/ministry/our-wings/broadcating-wing",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "table.cols-5 > tbody > tr, with td[0]=td.views-field-counter (running serial), td[1]=td.views-field-title (plain text, no link), td[2]=td.views-field-field-date-range (DD-MM-YYYY), td[3]=td.views-field-nothing-1 (pdf icon img + file size text), td[4]=td.views-field-nothing > p > a.btn.btn-info[href] (relative PDF href, link text 'View'). Parse EVERY table.cols-5 on the page and concatenate their tbody rows — on pages >=2 the same view renders as 2+ captioned tables (captions: Advisories / CRS- Guidelines / Archives). Ignore table.cols-4 (undated auxiliary blocks: Uplinking-Downlinking guidelines, MSO registration, JWG/LEDC).",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "Drupal views query pager: ?page=N, 0-indexed (?page=0 == bare URL). 3 pages at verification time: 20 + 20 + 14 = 54 rows. Tested ?page=1 (rows 21-40, dates continue descending 05-03-2025...) and ?page=2 (rows 41-54) — both 200. Pager markup: nav.pager li.pager__item a[href='?page=N'].",
+   "row_floor": 20,
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "pdf_pattern": "/sites/default/files/YYYY-MM/<kebab-case-slug>.pdf (relative hrefs; occasional _0 / _repaired suffixes; all 54 audited item links match this pattern, all .pdf, none external)",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/mib_broadcasting.html",
+   "sample_rows": [
+    "19-08-2026 | List of Commissioned Community Radio Stations in India as on 31.07.2026 | https://mib.gov.in/sites/default/files/2026-08/commissioned-crs-as-on-31.07.2026_0.pdf",
+    "03-08-2026 | DETAILS OF GRANT RELEASED TO COMMUNITY RADIO STATIONS UNDER THE SCHEME \"SUPPORTING COMMUNITY RADIO MOVEMENT IN INDIA\" FROM FINANCIAL YEAR 2021-2022 TO 2025-26 | https://mib.gov.in/sites/default/files/2026-08/grant-data-for-uploading-in-website.pdf",
+    "28-07-2026 | Guidelines for implementation of the Central Sector Scheme \"Supporting Community Radio Movement in India\" 2026-31 | https://mib.gov.in/sites/default/files/2026-07/scheme-guidelines-2026-31.pdf"
+   ],
+   "quirks": "(1) Misspelt slug 'broadcating-wing' is canonical — serves 200 directly with no redirect; do not correct it. (2) Page carries 4 tables but composition VARIES BY PAGE: the ?page param is shared, so the undated MSO cols-4 block present on page 1 disappears on ?page>=1, and the dated view splits into 2 captioned cols-5 tables on pages 2-3 — never select tables by index, select by class cols-5 / td.views-field-field-date-range. (3) Group captions are unreliable: page 1's table is captioned 'Advisories' yet contains CRS lists/guidelines; a caption group can straddle a page boundary. (4) Serial counter is continuous 1-54 across pages and groups — usable as a completeness check. (5) The exposed sort form shows 'Oldest to Latest' (created_ASC) as selected while rows actually render newest-first — do not trust the sort label; sort_bef_combine=created_DESC is accepted as a query param. (6) Titles contain HTML entities (&quot;), erratic ALL-CAPS, and embedded DD.MM.YYYY 'as on' dates — parse dates only from td.views-field-field-date-range. (7) One transient timeout observed (curl 30s -> HTTP 000) that succeeded on retry in ~2s — build in one retry; no WAF challenge, no TLS issues (no -k needed), plain curl with browser UA suffices. (8) Icon img srcs use http:// (mixed content) — irrelevant to parsing. (9) Alternate listing path exists at /en/our-wings/broadcating-wing/advisories (200, the view form's action) if the main page layout churns. (10) No RSS feed; /sitemap.xml is 404; no __NEXT_DATA__/JSON API — HTML is the only source.",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Broadcasting Wing document table",
+   "why": "Planned source; the misspelt slug 'broadcating-wing' is canonical - do not fix it"
+  },
+  {
+   "id": "mib_engage",
+   "url": "https://engage.mib.gov.in/",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "NO consultation rows exist on this portal — the source premise is wrong. Live site is a citizen-engagement portal (quizzes, competitions, campaigns, infographics); site search, /sitemap, rss.xml and Google index all confirm zero consultation content, and /consultation(s), /public-consultation, /discussions, /polls, /broadcasting-services-regulation-bill all 404. Homepage has no dated rows (image sliders with 'View Details' links only). Only dated listing on the domain is /latest-update (infographic campaigns, NOT regulation): div.views-view-grid > div.participate-box containing img[title], h4 (title), div.activate_date with 'From: DD Mon, YYYY' / 'To: DD Mon, YYYY' spans, div.category 'Type: X', div.details a[href=/latest-updates/<slug>]. Recommended parser: change-detector on homepage nav/section headings (h1.common-heading set: My Gov, Participate, Latest Update, Campaigns, MIB Exclusive, Publications, Cinemas Of India, Upcoming Events) that alerts if a Consultation-like section appears; actual Broadcasting Bill consultations run via mib.gov.in/PIB with comments by email, not here.",
+   "date_formats": [
+    "DD Mon, YYYY (e.g. '04 Mar, 2025' — From/To dates on /latest-update, the only dated listing)",
+    "DD/Mon/YYYY (e.g. footer 'Last Updated: 21/Aug/2026')"
+   ],
+   "pagination": "None on homepage. Drupal views pager ?page=N (0-indexed) exists site-wide; tested /latest-update?page=1 → HTTP 200 with EMPTY grid (all 10 items fit on page 0). Empty pages return 200, never 404 — a crawler must stop on 0 rows, not on HTTP status.",
+   "row_floor": 0,
+   "allowed_domains": [
+    "engage.mib.gov.in",
+    "mib.gov.in",
+    "pib.gov.in",
+    "newindiasamachar.pib.gov.in",
+    "publicationsdivision.nic.in",
+    "youtube.com"
+   ],
+   "quirks": "CRITICAL: portal does not host consultations despite its 'Engage' branding — Broadcasting Services (Regulation) Bill 2023 draft was released 10.11.2023 via mib.gov.in/PIB (PRID 1976200) with comments by EMAIL; later consultations were closed-door (per IFF/Storyboard18 reporting). Treat this source as dormant: monitor for structural change, not rows. Technical quirks: (1) server-rendered Drupal 9/10, no JS needed, /jsonapi 404, no inline JSON; (2) /rss.xml exists but channel has ZERO items — useless; (3) Drupal node search index is empty — every keyword yields 'no results', so search cannot be used as a discovery channel; (4) /sitemap page renders empty, /sitemap.xml 404; (5) malformed HTML attributes throughout — views templates emit broken quoting like <a href=\"\" target=\"_blank\" title=\"PM\" meets the prime minister of...> and many empty href=\"\" anchors; use a tolerant parser (html.parser ok), never assume valid attribute lists; (6) meta keywords/description are copy-pasted from a Ministry of CIVIL AVIATION template (mentions AAI, DGCA, airports) — never trust <meta> for content; (7) transient connection drops: 2 of ~20 curl requests returned curl code 000 with 0 bytes, immediate retry succeeded — retry once before declaring failure; (8) some breadcrumbs use /index.php/ path prefix — normalise; (9) no PDFs anywhere on homepage/listings — assets are JPG/PNG under /sites/default/files/YYYY-MM/; (10) participation features (quizzes/competitions) are login-gated (/participate-register), but no evidence of a login-gated consultation module; (11) footer carries 'Last Updated: DD/Mon/YYYY' + visitor counter — usable as a cheap liveness signal; (12) no TLS issues, no WAF, plain curl with browser UA suffices.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/mib_engage.html",
+   "sample_rows": [],
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "MIB Engage consultation portal",
+   "why": "Draft Broadcasting Services Bill and draft guidelines consultations run here - earliest text of future media obligations"
+  },
+  {
+   "id": "certin_guidelines",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW01",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Inside div#print_content > table.content (width=639), each item = 3 consecutive <tr> rows: (1) tr > td > li > a[href=\"s2cMainServlet?pageid=GUIDLNVIEW02&refcode=CISG-YYYY-NN\"] > b = item code/title (\"CERT-In Security Guidelines CISG-YYYY-NN\"); (2) tr > td > span.DateContent = \"&nbsp;&nbsp;&nbsp; (Month DD, YYYY)\" with month name space-padded to 9 chars; (3) tr > td.contentTD > span > SPAN.subhead = subject text. Anchor on the refcode link and read the next DateContent and subhead spans. Working stdlib regex: <a href='(s2cMainServlet\\?pageid=GUIDLNVIEW02&refcode=(CISG-[\\d-]+))'><b>([^<]+)</b></a>.*?<span class=\"DateContent\">(?:&nbsp;)*\\s*\\(([^)]+)\\)</span>.*?<SPAN class=subhead>([^<]+)</SPAN> with re.S. refcode is the stable unique key (dates repeat across items).",
+   "date_formats": [
+    "(Month DD, YYYY) e.g. \"(June      10, 2026)\" — full English month name space-padded to width 9, zero-padded 2-digit day, 4-digit year, wrapped in literal parentheses, prefixed by &nbsp;&nbsp;&nbsp;; collapse internal whitespace then strptime \"%B %d, %Y\""
+   ],
+   "pagination": "None — all 31 items (CISG-2003-01 through CISG-2026-03) are on the single GUIDLNVIEW01 page; no page-2 parameter or next link exists.",
+   "row_floor": 31,
+   "allowed_domains": [
+    "www.cert-in.org.in"
+   ],
+   "pdf_pattern": "Detail page (pageid=GUIDLNVIEW02&refcode=CISG-YYYY-NN) links https://www.cert-in.org.in/Downloader?pageid=6&type=2&fileName=<FILE>.pdf where <FILE> is CIGU-YYYY-NNNN (serial zero-padded to 4; observed for 2024-2026 items, e.g. CIGU-2026-0003.pdf) but CISG-YYYY-NN for old items (e.g. CISG-2003-01.pdf) — scrape fileName from the detail page, never derive it from the refcode. Downloader REQUIRES a Referer header from cert-in.org.in or it serves an HTTP-200 soft-404 HTML page (~938 bytes); with Referer it returns application/pdf (verified %PDF-1.7, 246543 bytes for CIGU-2026-0003.pdf). Range headers are ignored (full body returned).",
+   "quirks": "Legacy Java servlet site, charset ISO-8859-1 (decode as iso-8859-1, not utf-8). HEAD requests are useless: they return a 938-byte HTTP-200 soft-404 shell (\"The requested URL is not found\") with a stale Last-Modified (Jun 2025) — always use GET and ignore caching headers. Soft-404s everywhere: bad URLs return HTTP 200 with that same ~938-byte shell; detect failure by body containing \"The requested URL is not found\", never by status code. Downloader PDF endpoint requires Referer (see pdf_pattern). On detail pages the download <a href=' is split across a newline inside the attribute value — normalize \\n\\r\\t before regexing hrefs. Listing date spans contain internal padding spaces and &nbsp; — collapse whitespace before date parsing. Multiple items share the same date (e.g. three items dated October 21, 2003); use refcode as unique key. The site menu elsewhere on the page also contains a self-link with pageid=GUIDLNVIEW01 and direct /PDF/*.pdf links to unrelated documents — scope parsing to the GUIDLNVIEW02&refcode= anchors inside div#print_content. No WAF/rate-limiting observed across ~8 rapid requests; TLS fine without -k; no cookies required.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/certin_guidelines.html",
+   "sample_rows": [
+    "June      10, 2026 | CERT-In Security Guidelines CISG-2026-03 — Guidelines regarding AI-Accelerated Vulnerability Protection and Response Requirements for Original Equipment in Manufacturers (OEMs), and Technology Providers | https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW02&refcode=CISG-2026-03",
+    "May       25, 2026 | CERT-In Security Guidelines CISG-2026-02 — Blueprint for Reducing Exposure and Defending against AI-Assisted Vulnerabilities Exploitation in Digital Infrastructure | https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW02&refcode=CISG-2026-02",
+    "February  26, 2026 | CERT-In Security Guidelines CISG-2026-01 — Cyber Security Framework and Guidelines for Space including Satellite Communication | https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW02&refcode=CISG-2026-01"
+   ],
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "Guidelines (CISG)",
+   "why": "Guidelines referenced by binding directions; planned source, static HTML"
+  },
+  {
+   "id": "certin_vuln",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=VLNLIST02&year=2026",
+   "reachable": "OK",
+   "method": "static_html",
+   "row_structure": "Inside div#print_content, each item is its own <table class=\"content\" width=\"639\"> block containing three tr > td.contentTD rows in fixed order: (1) li > a[href^=\"/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-\"] > span.verblue2 whose anchor text is \"CERT-In Vulnerability Note CIVN-YYYY-NNNN\"; (2) span.DateContent containing the date in parentheses, nbsp-padded: \"(August    24, 2026)\"; (3) div[style*=overflow] > span[style*=padding-left] holding the human-readable vulnerability title. Markup is sloppy legacy HTML: unquoted attributes (class=contentTD), mixed-case tags (TABLE/TBODY/TR/TD) — parser must be attribute-quote and case tolerant. A robust regex anchor is the VLCODE=CIVN-\\d{4}-\\d+ href followed by DateContent span followed by padding-left:15px span.",
+   "date_formats": [
+    "Month D, YYYY with a variable run of spaces between month and day, wrapped in parentheses and &nbsp;-padded, e.g. '(August    24, 2026)' — collapse \\s+ before parsing",
+    "detail page: 'Original Issue Date:August    24, 2026' (same format, no space after colon)",
+    "footer freshness signal: 'Last Updated On August 25, 2026'"
+   ],
+   "pagination": "Offset param on the servlet URL: &next=N in steps of 20 (page 2 = ...pageid=VLNLIST02&year=2026&next=20, verified returns CIVN-2026-0400..0381; next=40 returns 0380..0361). The on-page \"Next >>\" link points to /VulNotesList.jsp?next=20 which soft-404s standalone (even with JSESSIONID cookie) — do not follow it; construct the s2cMainServlet form instead (VulNotesList.jsp works only if &year= is also appended). &start= is silently ignored (returns page 1). Backfill by year via &year=YYYY (year=2025 verified, 20 rows, newest CIVN-2025-0390).",
+   "row_floor": 20,
+   "allowed_domains": [
+    "www.cert-in.org.in"
+   ],
+   "pdf_pattern": "None for vulnerability notes — detail pages (pageid=PUBVLNOTES01&VLCODE=CIVN-YYYY-NNNN) are full HTML with no per-note PDF. Site-wide /Downloader?pageid=..&fileName=.. and /PDF/<name>.pdf exist but serve logos and unrelated guideline documents only.",
+   "quirks": "1) Soft-404s everywhere: bad URLs (including /sitemap.xml, /rss.xml, /RssFeed) return HTTP 200 with a ~938-byte \"The requested URL is not found\" HTML shell — never trust status codes; validate a healthy fetch by counting VLCODE=CIVN- hrefs. 2) No RSS, no sitemap, no JSON/XHR API — legacy JSP/servlet, HTML scraping is the only path. 3) The rendered \"Next >>\" href is broken standalone; pagination must be constructed as s2cMainServlet?pageid=VLNLIST02&year=YYYY&next=N. 4) Dates carry variable internal whitespace and &nbsp; padding; titles sometimes have trailing spaces — normalize whitespace. 5) Sloppy markup: unquoted attributes, mixed-case tags, not XML-valid — use lenient html.parser/regex, not strict XML. 6) Description div is CSS-clipped (height:30px overflow:hidden) but full text is present in the bytes. 7) JSESSIONID cookie is set but not required; no WAF/rate-limiting observed over ~10 rapid requests; TLS clean with default curl (no -k needed). 8) Early-January edge: a freshly started year list may briefly hold <20 rows, so a sub-floor count in the first week of January is not necessarily breakage. 9) Anchor text is boilerplate (\"CERT-In Vulnerability Note CIVN-YYYY-NNNN\"); the meaningful title lives in the third row's span. 10) Footer \"Last Updated On <date>\" is a usable freshness signal.",
+   "fixture_path": "/Users/abhinandansethi/Desktop/TMT Tracker/engine/fixtures/certin_vuln.html",
+   "sample_rows": [
+    "August 24, 2026 | CERT-In Vulnerability Note CIVN-2026-0420 — Multiple vulnerabilities in Google Chrome for Desktop | https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0420",
+    "August 24, 2026 | CERT-In Vulnerability Note CIVN-2026-0419 — Arbitrary Code Execution Vulnerability in Elementor Elementor Pro Plugin of Wordpress | https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0419",
+    "August 24, 2026 | CERT-In Vulnerability Note CIVN-2026-0418 — Multiple Vulnerabilities in Mozilla Products | https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0418"
+   ],
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "Vulnerability Notes (CIVN)",
+   "why": "Planned source; informational tier but same scraper as advisories, near-zero marginal cost"
+  }
+ ]
+}

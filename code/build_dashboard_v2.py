@@ -142,7 +142,10 @@ TYPE_LABEL = {"consultation_notice": "Consultation", "consultation_paper": "Cons
 rows: list[dict[str, Any]] = []
 for it in items["items"]:
     rows.append({
-        "id": it["id"], "date": it["date"], "reg": it["regulator"],
+        # date may be null: several media/tech_data listings publish undated rows. Kept in
+        # the ledger, rendered as "—", and excluded from every date bucket — placing an
+        # undated instrument inside a date range would be a claim the source does not make.
+        "id": it["id"], "date": it.get("date") or None, "reg": it["regulator"],
         "routine": it.get("routine", False),
         "stratum": row_stratum(it),
         "type": TYPE_LABEL.get(it.get("type", ""), (it.get("type", "") or "").replace("_", " ").title()),
@@ -176,7 +179,9 @@ def fold_notices(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]
     idx: dict[tuple[str, str, str], dict[str, Any]] = {}
     for r in rows:
         m = ACRO.search(r["official"])
-        if m and r["type"] in ("Consultation", "Draft"):
+        # Undated rows are never auto-folded: regulator+acronym alone is too weak a key
+        # without a date, and a wrong fold silently deletes a row from the ledger.
+        if m and r["date"] and r["type"] in ("Consultation", "Draft"):
             idx.setdefault((r["reg"], r["date"], m.group(1)), {})[r["type"]] = r
     folded = 0
     for pair in idx.values():
@@ -190,6 +195,12 @@ def fold_notices(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]
 
 
 rows, folded_n = fold_notices(rows)
+
+# Dated rows keep items.json order exactly as v1 renders them; only the undated ones move
+# to the end. A stable partition, not a re-sort: they have no place on the timeline, and
+# leaving them at the head of the file would bury every dated instrument beneath them.
+rows.sort(key=lambda r: r["date"] is None)
+undated_n = sum(1 for r in rows if r["date"] is None)
 
 # ---- coverage: live sources grouped stratum -> regulator -> venue, with health ----
 HEALTH_UI = {"OK": ("OK", "ok"), "WARN": ("Warn", "warn"), "FAILED": ("Failed", "bad")}
@@ -323,7 +334,8 @@ payload: dict[str, Any] = {
 }
 data_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
 
-TEMPLATE = r"""<title>TMT Regulatory Radar</title>
+TEMPLATE = r"""<meta charset="utf-8">
+<title>TMT Regulatory Radar</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -405,6 +417,7 @@ input::placeholder{color:var(--ghost)}
 .row .line{cursor:pointer;display:grid;grid-template-columns:var(--grid);column-gap:24px;align-items:baseline;
   padding:16px 0 17px 4px}
 .c-date{font-family:var(--mono);font-size:12.5px;color:var(--mute);white-space:nowrap}
+.c-date.none{color:var(--faint)}
 .c-reg{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row.routine .c-reg{color:var(--faint)}
 .c-title{position:relative;min-width:0}
@@ -607,8 +620,9 @@ const $ = s => document.querySelector(s);
 const esc = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const prettyUrl = u => { try { const x = new URL(u); return x.hostname.replace(/^www\./,'') + x.pathname.replace(/\/$/,''); } catch(e) { return u; } };
 const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const fmt = iso => { const p = iso.split('-'); return p[2] + ' ' + MON[+p[1]-1] + ' ' + p[0]; };
+const fmt = iso => { if (!iso) return '—'; const p = String(iso).split('-'); return p[2] + ' ' + MON[+p[1]-1] + ' ' + p[0]; };
 const days = iso => Math.round((new Date(iso) - new Date(D.today)) / 86400000);
+const pl = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 
 $('#upd').textContent = D.updated;
 const state = { q: '', reg: 'All', stratum: 'All', dates: 'all', routine: false, open: null, ven: null };
@@ -653,7 +667,7 @@ function dlCell(r) {
   return '<div class="c-dl' + (n >= 0 && n <= 30 ? ' hot' : '') + '">' + fmt(r.deadline) + '</div>';
 }
 function metaCells(r) {
-  const m = [['Source', r.venue], ['Issued', fmt(r.date)]];
+  const m = [['Source', r.venue], ['Issued', r.date ? fmt(r.date) : 'Not dated on venue']];
   m.push(r.deadline ? [/consult|draft/i.test(r.type) ? 'Comments' : 'Lapses', fmt(r.deadline)] : ['Deadline', 'None stated']);
   m.push(['Status', (r.flags || []).includes('needs_verification') ? 'Gazette pending' : 'On official venue']);
   return m.map(x => '<div><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + '</div></div>').join('');
@@ -673,7 +687,7 @@ function render() {
   const q = state.q.trim().toLowerCase();
   const b = dateBounds(state.dates);
   const list = D.rows.filter(r =>
-    (!b || (r.date >= b[0] && r.date <= b[1])) &&
+    (!b || (r.date && r.date >= b[0] && r.date <= b[1])) &&
     (state.routine || !r.routine) &&
     (state.stratum === 'All' || r.stratum === state.stratum) &&
     (state.reg === 'All' || r.reg === state.reg) &&
@@ -683,7 +697,7 @@ function render() {
     const open = state.open === r.id;
     return '<div class="row' + (r.routine ? ' routine' : '') + (open ? ' open' : '') + '" data-id="' + r.id + '">' +
       '<div class="line" tabindex="0" role="button" aria-expanded="' + open + '">' +
-        '<div class="c-date">' + fmt(r.date) + '</div>' +
+        '<div class="c-date' + (r.date ? '' : ' none') + '">' + fmt(r.date) + '</div>' +
         '<div class="c-reg">' + esc(r.reg) + '</div>' +
         '<div class="c-title">' +
           ((r.pdf || r.page)
@@ -757,9 +771,9 @@ function renderCoverage() {
   $('#strata').innerHTML = D.coverage.strata.map(s =>
     '<div class="stsec">' +
       '<div class="sechead"><div class="l">' + esc(s.label) + '</div>' +
-      '<div class="r">' + s.regs + ' regulators, ' + s.venues + ' venues</div></div>' +
+      '<div class="r">' + pl(s.regs, 'regulator') + ', ' + pl(s.venues, 'venue') + '</div></div>' +
       '<div class="covgrid">' + s.groups.map(g =>
-        '<div class="grp"><div class="h"><b>' + esc(g.reg) + '</b><i>' + g.venues.length + ' venues</i></div>' +
+        '<div class="grp"><div class="h"><b>' + esc(g.reg) + '</b><i>' + pl(g.venues.length, 'venue') + '</i></div>' +
         g.venues.map(v => {
           const tip = (v.notes || []).concat(v.info || []).join(' · ');
           const open = state.ven === v.id;
@@ -775,7 +789,7 @@ function renderCoverage() {
     '<div class="legend">' +
       '<span><i class="dot ok"></i>OK</span><span><i class="dot warn"></i>Warn</span>' +
       '<span><i class="dot bad"></i>Failed</span><span><i class="dot pending"></i>No sweep yet</span>' +
-      '<span>' + D.coverage.regs + ' regulators, ' + D.coverage.live + ' venues live' +
+      '<span>' + pl(D.coverage.regs, 'regulator') + ', ' + pl(D.coverage.live, 'venue') + ' live' +
       (D.coverage.healthAt ? ' · health ' + esc(D.coverage.healthAt) + ' IST' : '') + '</span>' +
     '</div>';
 
@@ -806,9 +820,9 @@ $('#sigs').innerHTML = D.signals.map(s =>
 """
 
 html = TEMPLATE.replace("__DATA__", data_json)
-(DIST / "tmt-radar-v2.html").write_text(html)
+(DIST / "tmt-radar-v2.html").write_text(html, encoding="utf-8")
 print(f"wrote {DIST/'tmt-radar-v2.html'} ({len(html):,} bytes)")
-print(f"rows={len(rows)} folded={folded_n} live_venues={live_count} regs={reg_count} "
-      f"blind={len(blind)} notlive={notlive}")
+print(f"rows={len(rows)} folded={folded_n} undated={undated_n} live_venues={live_count} "
+      f"regs={reg_count} blind={len(blind)} notlive={notlive}")
 print("stratum_counts=" + json.dumps(stratum_counts))
 print("health=" + json.dumps(health_tally) + f" (registry={len(registry['sources'])}, health_entries={len(health)})")

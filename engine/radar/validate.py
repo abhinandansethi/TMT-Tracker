@@ -28,6 +28,11 @@ def gate(row: Row, source: dict, today: date) -> Tuple[Optional[Row], Optional[s
         return None, f"title length {len(title)} outside [{TITLE_MIN},{TITLE_MAX}]: {title[:80]!r}"
 
     url = str(row.get("url") or "")
+    if source["parser"].get("linkless"):
+        # some venues (TRAI FD dashboard) carry no per-item links; the listing page
+        # itself is the citation
+        url = url or source["url"]
+        row = dict(row, url=url)
     if not _domain_ok(url, source.get("allowed_domains", [])):
         return None, f"link off allowed domains: {url[:120]!r}"
 

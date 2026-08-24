@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Dashboard</title>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Segoe UI', Arial, sans-serif;
+	background: #f4f6f9;
+	font-size: 14px;
+}
+
+/* Filter Bar */
+.filter-bar {
+	background: white;
+	padding: 0.5rem 0.3rem;
+	border-bottom: 1px solid #e0e0e0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: flex-end;
+	overflow: visible;
+}
+
+.filter-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	position: relative;
+}
+
+.filter-group label {
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: 0.4px;
+}
+
+.filter-group select, .filter-group input[type="date"] {
+	padding: 6px 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 0.95rem;
+	background: white;
+	min-width: 130px;
+}
+
+.filter-group input[type="date"]:disabled {
+	background: #f0f0f0;
+	color: #aaa;
+	cursor: not-allowed;
+}
+
+/* Period radio group */
+.period-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.period-group label.top-label {
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: 0.4px;
+}
+
+.radio-row {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	padding: 6px 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background: white;
+}
+
+.radio-row label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 0.95rem;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.radio-row input[type="radio"] {
+	cursor: pointer;
+}
+
+.apply-btn {
+	padding: 7px 15px;
+	background: #00438e;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-size: 1rem;
+	cursor: pointer;
+	align-self: flex-end;
+}
+
+.apply-btn:hover {
+	background: #003070;
+}
+
+/* Table */
+.table-wrap {
+	padding: 0.5rem 0rem;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background: white;
+	overflow: hidden;
+	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+}
+
+thead th {
+	background: #00438e;
+	color: white;
+	padding: 9px 12px;
+	font-size: 1rem;
+	text-align: left;
+	white-space: normal;
+}
+
+tbody tr:nth-child(even) {
+	background: #f9f9f9;
+}
+
+tbody tr:hover {
+	background: #eef4ff;
+	transition: background 0.15s;
+}
+
+tbody td {
+	padding: 9px 12px;
+	font-size: 1rem;
+	border-bottom: 1px solid #f0f0f0;
+	color: #333;
+}
+
+tbody td.amount {
+	font-weight: 600;
+	color: #27ae60;
+	white-space: nowrap;
+	text-align: right;
+}
+
+tbody td.status {
+	text-align: center;
+}
+
+tfoot td {
+	padding: 9px 12px;
+	font-weight: 700;
+	background: #f0f4ff;
+	border-top: 2px solid #dde;
+	font-size: 1rem;
+}
+
+tfoot td.amount {
+	color: #27ae60;
+	white-space: nowrap;
+}
+
+.no-data {
+	text-align: center;
+	padding: 3rem;
+	color: #aaa;
+	font-size: 0.9rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media ( max-width : 768px) {
+	.filter-bar {
+		flex-direction: column;
+		gap: 1rem;
+		padding: 0.8rem 1rem;
+	}
+	.filter-group, .period-group {
+		width: 100%;
+	}
+	.filter-group select, .filter-group input[type="date"] {
+		width: 100%;
+		font-size: 1rem;
+	}
+	.radio-row {
+		flex-wrap: wrap;
+		gap: 0.6rem;
+	}
+	.radio-row label {
+		font-size: 0.9rem;
+		white-space: normal;
+	}
+	.apply-btn {
+		width: 100%;
+		padding: 10px;
+		font-size: 1rem;
+		align-self: stretch;
+	}
+	.table-wrap {
+		padding: 0.8rem 0.5rem;
+	}
+
+	/* Stack table as cards on mobile */
+	table, thead, tbody, tfoot, th, td, tr {
+		display: block;
+	}
+	thead tr {
+		display: none; /* hide header row */
+	}
+	tbody tr {
+		background: white;
+		border-radius: 8px;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+		margin-bottom: 0.8rem;
+		padding: 0.5rem 0;
+		border: 1px solid #e8e8e8;
+	}
+	tbody tr:nth-child(even) {
+		background: white;
+	}
+	tbody tr:hover {
+		background: white;
+	}
+	tbody td {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		padding: 7px 12px;
+		font-size: 0.88rem;
+		border-bottom: 1px solid #f5f5f5;
+		gap: 1rem;
+	}
+	tbody td:last-child {
+		border-bottom: none;
+	}
+
+	/* Label from data-label attribute */
+	tbody td::before {
+		content: attr(data-label);
+		font-weight: 600;
+		color: #555;
+		font-size: 0.78rem;
+		white-space: nowrap;
+		flex-shrink: 0;
+		min-width: 120px;
+	}
+	tbody td.amount {
+		background: #f6fff9;
+	}
+	tfoot tr {
+		background: #f0f4ff;
+		border-radius: 8px;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+		margin-top: 0.5rem;
+		border: 1px solid #dde;
+	}
+	tfoot td {
+		display: flex;
+		justify-content: space-between;
+		padding: 8px 12px;
+		font-size: 0.9rem;
+	}
+	tfoot td::before {
+		content: attr(data-label);
+		font-weight: 700;
+	}
+}
+
+@media ( max-width : 480px) {
+	body {
+		font-size: 13px;
+	}
+	.filter-group label, .period-group label.top-label {
+		font-size: 0.9rem;
+	}
+}
+
+.autocomplete-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.suggestions-box {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 100%; /* now matches input perfectly */
+	background: white;
+	border: 1px solid #ccc;
+	max-height: 180px;
+	overflow-y: auto;
+	z-index: 999;
+	border-radius: 5px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	display: none; /* ✅ hidden by default */
+}
+
+.suggestions-box div {
+	padding: 6px 10px;
+	cursor: pointer;
+}
+
+.suggestions-box div:hover {
+	background: #eef4ff;
+}
+
+#providerInput {
+	padding: 6px 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 0.95rem;
+	border-radius: 5px;
+}
+</style>
+</head>
+<body>
+
+	<!-- Filter Form -->
+	<form method="get" action="/fdapp/public/dashboard" id="filterForm">
+		<div class="filter-bar">
+
+			<!-- Type -->
+			<!-- <div class="filter-group">
+				<label>Type</label> <select name="type" id="typeSelect"
+					onchange="submitForm()">
+					<option value="FD" th:selected="${type == 'FD'}">Financial
+						Disincentive</option>
+					<option value="SCN" th:selected="${type == 'SCN'}">Show
+						Cause Notice</option>
+				</select>
+			</div> -->
+
+			<!-- Service Provider Category -->
+			<div class="filter-group">
+				<label>Sector</label> <select name="category" id="categorySelect"
+					onchange="submitForm()">
+					<option value="Telecom">Telecom</option>
+					<option value="Broadcasting"
+						selected="selected">Broadcasting</option>
+				</select>
+			</div>
+
+			<!-- Service Provider -->
+			<div class="filter-group">
+				<label>Service Provider</label>
+
+				<div class="autocomplete-wrapper">
+					<input type="text" id="providerInput" value=""
+						placeholder="Search provider..." autocomplete="off"> <input
+						type="hidden" name="provider" id="providerHidden">
+
+					<div id="suggestions" class="suggestions-box"></div>
+				</div>
+			</div>
+
+			<!-- Payment Status -->
+			<!-- <div class="filter-group">
+				<label>Payment Status</label> <select name="paymentStatus">
+					<option value="" th:selected="${paymentStatus == '' or paymentStatus == null}">All</option>
+					<option value="PAID" th:selected="${paymentStatus == 'PAID'}">Paid</option>
+					<option value="UNPAID" th:selected="${paymentStatus == 'UNPAID'}">Unpaid</option>
+					<option value="PARTIALLY_PAID" th:selected="${paymentStatus == 'PARTIALLY_PAID'}">Partial</option>
+				</select>
+			</div> -->
+
+			<!-- Issuance Period -->
+			<div class="period-group">
+				<label class="top-label">Issuance Period</label>
+				<div class="radio-row">
+					<label> <input type="radio" name="period" value="CUSTOM"
+						onchange="toggleDates(this.value)" checked="checked"> Custom
+					</label> <label> <input type="radio" name="period" value="CFY"
+						onchange="toggleDates(this.value)">
+						Current FY
+					</label> <label> <input type="radio" name="period" value="LFY"
+						onchange="toggleDates(this.value)">
+						Last FY
+					</label>
+				</div>
+			</div>
+
+			<!-- From -->
+			<div class="filter-group">
+				<label>From</label> <input type="date" name="from" id="fromDate"
+					value="2000-01-01">
+			</div>
+
+			<!-- To -->
+			<div class="filter-group">
+				<label>To</label> <input type="date" name="to" id="toDate"
+					value="2026-08-24">
+			</div>
+
+			<button type="submit" class="apply-btn">Apply Filter</button>
+
+			<button type="button" class="apply-btn" style="background: #6c757d;"
+				onclick="resetFilters()">Reset</button>
+
+		</div>
+	</form>
+
+	<!-- FD Table -->
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>S.No</th>
+					<th style="width: 9%;">Issue Date</th>
+					<th style="width: 22%;">Service Provider</th>
+					<th style="width: 30%;">Regulation</th>
+					<th style="width: 10%;">Clause Violated</th>
+					<th style="width: 12%;">Period of Violation</th>
+					<th style="width: 11%;">Amount Imposed (₹)</th>
+					<!-- <th style="width: 10%;">Payment Status</th> -->
+					<!-- <th style="width: 20%;">Remarks</th> -->
+					<!-- <th style="width: 6%;">FD Order</th> -->
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td data-label="S.No">1</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Akshaya Diginet Cable Vision Pvt. Limited.</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">2</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>M/s LPS Vision Production</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">3</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>AJK TV</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">4</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Satellite Cable Communication</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">5</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>M/s The Nandyal Communications</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">6</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>M/s Zonet TV Private Limited</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">7</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Skyvision Master Channel</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">8</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Blue Sky Network</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">9</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>I-Vision Digital LLP</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">10</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Blue Chip Systems</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">11</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Aristo Telemedia Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">12</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>JAK Communications Private Limited</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">13</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Subhodaya Digital Entertainment Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">14</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>VK Digital Network Private Limited</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">15</td>
+					<td data-label="Date of Issue">21-07-2026</td>
+					<td data-label="Service Provider"><strong>Metro Cast Network India Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulation 2017</td>
+					<td data-label="Clause Violated">15(1)</td>
+					<td data-label="Period of Violation">Jan 2024 - Dec 2024</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">16</td>
+					<td data-label="Date of Issue">08-07-2025</td>
+					<td data-label="Service Provider"><strong>Kerala Communicators Cable Ltd</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">18(2)</td>
+					<td data-label="Period of Violation">Mar 2025 - Mar 2025</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="25000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">17</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Rajasthan Infotech Media services Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">18</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Vaadi Television</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">19</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Altimeric Digital Pvt.Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="98000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">20</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>In Islampur Cable Network (Prop. Khanderao Ramchandra Jadhav)</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">21</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Akash Tori Infocom Services Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">22</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Blue Chip Systems</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">23</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Andhra Pradesh State Fibernet Limited</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">24</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Kodada Communication Networks</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">25</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Victory Digital Network Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">26</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Bright Way Communication</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">27</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>V4 Digital infotech</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="110000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">28</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Tamil Nadu Arasu Cable TV Corporation Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="20000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">29</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>U Digital Network Private Limited</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">30</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Signet Digital Private Limited</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">31</td>
+					<td data-label="Date of Issue">16-04-2025</td>
+					<td data-label="Service Provider"><strong>Axom Communication &amp; Cable Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2023 - Dec 2023</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">32</td>
+					<td data-label="Date of Issue">22-04-2024</td>
+					<td data-label="Service Provider"><strong>Sattyam Tori Pvt Ltd, Murshidabad, W.B</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2022 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">33</td>
+					<td data-label="Date of Issue">22-04-2024</td>
+					<td data-label="Service Provider"><strong>Subhodaya Digital Entertainment Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2021 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="400000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">34</td>
+					<td data-label="Date of Issue">22-04-2024</td>
+					<td data-label="Service Provider"><strong>Novabase Digital Entertainment Pvt Ltd</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="600000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">35</td>
+					<td data-label="Date of Issue">22-04-2024</td>
+					<td data-label="Service Provider"><strong>Rajasthan Infotech Media services Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2022 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">36</td>
+					<td data-label="Date of Issue">22-04-2024</td>
+					<td data-label="Service Provider"><strong>Sahoo Cable Network</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="600000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">37</td>
+					<td data-label="Date of Issue">22-04-2024</td>
+					<td data-label="Service Provider"><strong>Reachnet Cable Services Pvt. Ltd</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2022 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="200000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">38</td>
+					<td data-label="Date of Issue">22-04-2024</td>
+					<td data-label="Service Provider"><strong>Cablecast New Media Pvt Ltd</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="600000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">39</td>
+					<td data-label="Date of Issue">12-05-2023</td>
+					<td data-label="Service Provider"><strong>Multicity Digital Consortium Pvt Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="600000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">40</td>
+					<td data-label="Date of Issue">12-05-2023</td>
+					<td data-label="Service Provider"><strong>Sristi</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="600000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">41</td>
+					<td data-label="Date of Issue">12-05-2023</td>
+					<td data-label="Service Provider"><strong>Channel Nine Net</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="600000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">42</td>
+					<td data-label="Date of Issue">05-04-2023</td>
+					<td data-label="Service Provider"><strong>Aadhar Digital Vision Pvt Ltd</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="560000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">43</td>
+					<td data-label="Date of Issue">05-04-2023</td>
+					<td data-label="Service Provider"><strong>Manakula Vinayagar Digital Pvt Ltd</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="560000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">44</td>
+					<td data-label="Date of Issue">27-03-2023</td>
+					<td data-label="Service Provider"><strong>Take one JK Media Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="540000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">45</td>
+					<td data-label="Date of Issue">27-03-2023</td>
+					<td data-label="Service Provider"><strong>Digital Entertainment Network</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2022</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="540000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">46</td>
+					<td data-label="Date of Issue">20-01-2023</td>
+					<td data-label="Service Provider"><strong>Alwar telelink Pvt. Ltd</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2021</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="400000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">47</td>
+					<td data-label="Date of Issue">20-01-2023</td>
+					<td data-label="Service Provider"><strong>Gentle Entertainment Pvt. Ltd.</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2021</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="400000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				<tr>
+					<td data-label="S.No">48</td>
+					<td data-label="Date of Issue">20-01-2023</td>
+					<td data-label="Service Provider"><strong>Lucky Cable Network</strong></td>
+					<td data-label="Regulation">Interconnection Regulations 2017</td>
+					<td data-label="Clause Violated">15 (1)</td>
+					<td data-label="Period of Violation">Jan 2020 - Dec 2021</td>
+					<td class="amount" data-label="FD Amount (₹)"
+						data-amount="400000.00">₹<span
+						class="inr-amount"></span>
+					</td>
+					<!-- <td class="status" data-label="Payment Status" th:text="${r.paymentStatus}"></td> -->
+					<!-- <td data-label="Remarks" th:text="${r.remarks ?: '-'}"></td> -->
+					<!-- <td data-label="Report"><a th:if="${r.reportFilePath != null}"
+						th:href="@{/api/fd/report/{f}(f=${r.reportFilePath})}"
+						target="_blank"
+						style="display: inline-block; padding: 4px 10px; background: #00438e; color: white; border-radius: 4px; font-size: 0.8rem; text-decoration: none;">View
+					</a> <span th:if="${r.reportFilePath == null}" style="color: #bbb;">—</span></td> -->
+				</tr>
+				
+			</tbody>
+			<!-- <tfoot th:unless="${#lists.isEmpty(fdRecords)}">
+				<tr>
+					<td colspan="7" data-label="Grand Total" style="text-align: right;">Grand
+						Total</td>
+					<td class="amount" data-label="">₹<span
+						th:text="${#numbers.formatDecimal(grandTotal,1,'COMMA',2,'POINT')}"></span>
+					</td>
+				</tr>
+			</tfoot> -->
+		</table>
+	</div>
+
+	<!-- SCN Table -->
+	
+
+	<script>
+	
+	let providers = ["5 Star Network","9X MEDIA PRIVATE LIMITED","A B C O","A ONE NEWS TIME BROADCASTING PRIVATE LIMITED","A S Cable Network (Prop. Mahendra Singh Chouhan)","A-Vision Channel","A.C.N Cable Pvt. Ltd.","AAE Communications Pvt. Ltd.","AAMODA BROADCASTING COMPANY PRIVATE LIMITED","AAP MEDIA PVT.LTD.","ABC (Anil Broadcasting) Digital Network","ABC News Palwal","ABP Network Private Limited (Formerly known as ABP News Network Pvt. Ltd.)","ABS Digital Cable Pvt. Ltd.","ABSK Digital Private Limited","ABSK Digital Private Limited (IPTV)","ACN Cable Network","ACN Cable Pvt. Ltd.","ACT Digital Home Entertainment Pvt Ltd.","ACT Digital Home Entertainment Pvt. Ltd. (IPTV)","ADN Broadband Pvt. Ltd.","AETN 18 Media Pvt Limited","AJI INTERNATIONAL PRIVATE LIMITED","AJK TV","ALLIANCE BROADCASTING PRIVATE LIMITED","ALLIANCE STRATEGIES LIMITED","AM Television Pvt. Ltd","AMA-ABA Multipurpose Co-Operative Society Limited","AMRITA ENTERPRISES PRIVATE LIMITED","ANDHRAPRABHA PUBLICATIONS LIMITED (India Ahead News Pvt Ltd)","ANGEL BROADCASTING NETWORK PVT. LTD.","ANGEL MEDIA NETWORK PVT LTD","ARADANA BROADCASTING INTERNATIONAL PRIVATE LIMITED","ARG Outlier Media Pvt. Ltd","ARPAN MEDIA PRIVATE LIMITED","ASHIRWAD TELENETWORK PRIVATE LIMITED","ASHOKA PRODUCTIONS AND COMMUNICATION PVT LTD","ASIANET NEWS NETWORK PRIVATE LIMITED","ASPIRATION MEDIA PVT. LTD.","ASSOCIATED BROADCASTING COMPANY PRIVATE LIMITED","AVANTI MEDIA LIMITED","Aadhar Digital Vision Pvt Ltd","Aakriti Cable Network","Aama TV Cable Network (Prop. Biswabhusan Sahoo)","Abhishek Cable Network","Abhishek Cable Network (IPTV)","Admire Network Pvt. Ltd.","Aerpace Communications Pvt. Ltd.","Aftab Cable Vision","Ahir Cable","Airfiber Networks Pvt. Ltd.","Airnet Cable and Datacom Pvt.Ltd.","Airtravel Enterprises India Limited","Akash Tori Infocom Services Pvt. Ltd.","Akshaya Diginet Cable Vision Pvt. Limited.","Alampur Cable Network (Prop. Abdul Majeed)","Alegra Communication Pvt. Ltd.","Ali Cable Network","Alisha Digital Cable Network","Alliance Broadband Services Pvt. Ltd.","Alok Bindu Cable \u0026 Broadband Operators Welfare Association","Alone Cable Network","Altimeric Digital Pvt.Ltd.","Alwar telelink Pvt. Ltd","Aman Cable Network","Amareshwar Cable TV Network (Prop. Somashekhar)","Amba Cable Network","Ambara Media Souharda Sahakari Niyamitha (Ltd)","Ambika Electricals (Prop. Rajendra Tilokchand Jain)","Amma cable","Andaman Cable Network","Andhra Pradesh State Fiber Net Limited (APSFL)","Andhra Pradesh State Fibernet Limited","Angel Air Network Solutions Pvt. Ltd.","Angel's Vision (Prop. Ginkhopau Tonsing)","Anjaneya Cable Net","Anjaneya Cable Net (Prop. M. Jagadeeswara Reddy)","Ankita Star Vision","Anonet Communications Pvt. Ltd \n(formerly ANI Broadband Services Pvt.Ltd.)","Ansari Cable TV Network","Antariksh Softtech Pvt. Ltd.","Antariksha Cable Network","Anushree Cable Network","Aparna Star TV Network","Apna Digital Cable Network","Arambha Media Networks Pvt. Ltd.","Aristo Telemedia Pvt. Ltd.","Arkays Digital Media Pvt. Ltd.","Arohon Cable TV Network Limited","Aruna Chaitanya cable Network","Arya Associates India Pvt. Ltd.","Ashoka Cable TV Network (Prop. Ashok Kumar)","Asianet Digital Network Private Limited","Asianet Satellite Communications Ltd.","Asnani Builders \u0026 Developers Ltd","Asoke Network (Cable TV)","Assistive Netspeed Technologies Pvt Ltd","Assistive Netspeed Technologies Pvt. Ltd.","Aswal Cable Network","Athulya Info Media P. Ltd","Atmakur Communication Network","Atria Convergence Technologies Ltd.","Aurangabad Satellite Cable Service Centre","Avyakth Software Pvt. Ltd.","Axom Communication \u0026 Cable Pvt. Ltd.","Axom Communication \u0026 Cable Pvt. Ltd. (IPTV)","B K Vision (Prop. Sanjaya Kumar Biswal)","B4U TELEVISION NETWORK INDIA LIMITED","BBC Global News India Private Limited","BCC Network","BCN Cable Network","BHARAT BROADCASTING NETWORK LIMITED","BHARAT HYDEL PROJECTS PRIVATE LIMITED","BHUMI CABLE","BIZZ NEWS PRIVATE LIMITED","BKR international Media Private Limited","BLOOMBERG TELEVISION PRODUCTION SERVICES INDIA PRIVATE LIMITED","BMT Digital","BPL MEDIA LIMITED","BRAHMAPUTRA TELE-PRODUCTIONS PRIVATE LIMITED","BRAND VALUE COMMUNICATIONS PRIVATE LIMITED","BSL Cable Network (IPTV)","BT Global Communications  India Private Limited","Baba Enterprises","Baba Matu Nath Cable Network (Prop. Lalit Kumar Sharma)","Bahubali Cable Network","Bajarangi Cable Network (Prop. Chitranjan Swain)","Balaji Teleworks Development Pvt. Ltd.","Balasore Cablenet Services","Baleen Vasini Cable TV Network (Prop. Ram Singh)","Bangalore Broadband Network Pvt Ltd.","Bangalore Broadband Network Pvt. Ltd.","Barak Communication","Barale Cable Network","Baran Cable Network","Barasat Cable TV Network Pvt. Ltd.","Bardhaman World Cable \u0026 Broadband Pvt. Ltd.","Bargabhima Cable and Broadband Services","Baronia Digital Network (Prop. Rukmani Badoniya)","Barsha Vision Cable Network","Basava Cable Network (Prop. M.S. Siddaruda)","Beam Telecom Private Limited","Beginnen Media Pvt. Ltd.","Bennett Coleman \u0026 Company Limited","Bhagyalakshmi Communication Network","Bhairavnath Cable Network (Prop. Rajendra Bhim Rao Patil)","Bham Bham Network (Prop. Shaik Mahammed Rafiq)","Bharat Cable Network","Bharat Digital Cable Network","Bharat Sanchar Nigam Ltd. (BSNL)","Bharti Airtel Limited","Bharti Cable Net Work","Bharti Telemedia Limited","Bhaskar Cable Network","Bhima Riddhi Broadband Pvt. Ltd.","BhimaRiddhi Infotainment Pvt. Ltd","Bhimavaram Community Network","Bhole Baba Real Estate Developers Pvt. Ltd.","Bhoomika Digital Cable Services Pvt. Ltd.","Bhorer Alo Cable \u0026 Broadband Private Limited","Bhosale Cable Network","Bhusawal Cable Network Pvt. Ltd","Bilas Digital","Binodan Digital Pvt Ltd","Biraja Cable Network","Bling Ice Network Pvt. Ltd.","Blue Chip Systems","Blue Sky Network","Blue Star Digital Network","Bluelotus Support Services Pvt.Ltd. (formerly Limras Eronet Broadband Service Pvt Ltd)","Bobby Cable Network","Box Cinemedia Services Pvt. Ltd.","Brambhani Traders(Prop. Ranjit Basu)","Bright Way Communication","Brightstar Media Cable Network Pvt. Ltd.","Broadways","Brundaban Setlite Communication (Prop. Bhajaram Muni)","Business Broadcast News Pvt. Ltd.","CABSAT CHANNEL PRIVATE LIMITED","CALCUTTA TELEVISION NETWORK PRIVATE LIMITED","CAPTAIN MEDIA PRIVATE LIMITED","CCN Digital Private Limited","CCN Entertainment (India) Pvt. Ltd.","CCN Mandla","CCNDS Cable \u0026 Network Pvt. Ltd.","CHANNEL BHARAT ENTERTAINMENT PRIVATE LIMITED","CHANNEL NO 2 NEWS MEDIA PVT LTD","CHARHDIKALA PUBLICATIONS PRIVATE LIMITED","CITY NETWORK BROADCAST CONVERGENCE PVT LTD","CKP Digital Network","COXSWAIN TECHNOLOGIES LIMITED","CREATIVE CHANNEL ADVERTISING AND MARKETING PRIVATE LTD","CSL Infomedia Private Limited","CZS Cable","Cable Combine Communication Pvt.Ltd.","Cable Operator Association of Yamunanagar N Jagadhri","Cable Vision","Cablecast New Media Pvt Ltd","Candor Infosolution Pvt. Ltd.","Catvision Limited","Cauvery Power Trading Chennai Pvt. Ltd","Celebrities Management Pvt Limited","Chambal Cable Network Private Limited","Champa Siti Cable Network","Champhai Cable Network","Chandni Cable Network","Chandrama Cable Network","Chandrasekhar TV (Prop. Himangshu Sekhar Puhan)","Channel Nine Net","Charotar Digital Network Pvt. Ltd.","Charotar Telelink Pvt. Ltd.","Chauhan Cable Network","Chauhan Cable Network (Prop. Gaurav Chauhan)","Chennai Murasu Private Limited","Chetak Cable Network (Prop. Rishi Birwal)","Chhattisgarh Network","Chiranth Cable Network","Chitra Cable Network","Chitrashala Cable network","Chowdhury Cable Service","Cinema 24x7 Pvt. Ltd","Citi Link Digital Networks Private Limited","City Cable Network","City Cable Vision (Prop. N.M. Prasad)","City Channel","City Channel Cable Network","City Online Media Private Ltd. (IPTV)","City Online Services Limited","City Star Cable Network","City Transmission Network Pvt. Ltd.","Citynet Infra Pvt. Ltd.","Clarity Cable Star Network","Cobol Communications Pvt. Ltd.","Cooch Behar Cable Operators Network Private Limited","Corpus Enterprises Pvt. Ltd.","Creative Cable Network","Creative Cable Network (IPTV)","Culver Max Entertainment Private Limited","D-ATUM Vilcom Pvt. Ltd.","D-Atum Vilcom Pvt. Ltd.","D.M.V Cable Network","DCN Cable Network","DDC CATV NETWORK PVT LTD","DDNK Media Pvt. Ltd.","DELINET BROADBAND PVT LTD","DEN ABC Cable Network Ambarnath Pvt. Ltd.","DEN Ambey Cable Networks Pvt. Ltd.","DEN Broadband Limited","DEN Enjoy Cable Networks Pvt. Ltd.","DEN Networks Limited","DERA TELEVISIONS PRIVATE LIMITED","DEV Digital","DEVBHUMI BROADCAST PRIVATE LIMITED","DHARM MEDIA VENTURES PRIVATE LIMITED","DIKSAT TRANSWORLD LIMITED","DIRECT NEWS PRIVATE LIMITED (Earlier INX NEWS PRIVATE LIMITED)","DISHA MEDIA PVT. LTD. (earlier DHALIWAL ENTERTAINMENT PVT LTD)","DIVYA BROADCASTING NETWORK PRIVATE LIMITED","DL GTPL Broadband Pvt. Ltd.","DL GTPL Cabnet Pvt. Ltd","DNA Infotel Pvt Ltd","Dabas Cable Cartel Private Limited","Dainik Savera News and Media Network","Dalora Cable Network","Damoh Cable Network","Darpita Trading Company Pvt. Ltd.","Darsh Digital Network Pvt. Ltd.","Das Broadband Digital Communication Pvt. Ltd.","Dattakrupa Cable Network (Prop. Samrudhi Sunil Kanekar)","Dayal Cable Network (Prop. Bijender Singh)","Debjani Cable TV Network (Prop. Debabrata Dhali)","Deenet Services Pvt. Ltd.","Deenet Services Pvt. Ltd. (IPTV)","Deep Cable Vision","Deepanshu Cable Network","Den ADN Network Pvt. Ltd.","Den Discovery Digital Network Pvt. Ltd.","Den FK Cable TV Network Pvt Ltd","Den Networks Ltd.","Den New Broad Communication Pvt.Ltd.","Den Premium Multilink Cable Network Pvt. Ltd.","Den Rajkot City Communication Pvt. Ltd.","Den Satellite Nework Private Limited","Desai Network (Prop. Shri Desai Gururaja Rao)","Deshkal Network Pvt. Ltd.","Dessert Saurashtra Entertainment Pvt Ltd","Dev Bhumi Cable Network (Prop. Rohit Kanwar)","Dev Versha Jatropha Bio Energy Private Limited","Dhanraj Cable Network","Dharampal Satyapal Limited","Digi India Cable Services","Digi Maharaja Cable Network Pvt. Ltd.","Digiana Industries Pvt Ltd.","Digiana Projects Private Limited","Digimedia Cable Networks LLP","Digital Cable TV Network","Digital Entertainment Network","Digital Fusion Network Pvt. Ltd.","Digital India Cable Network \u0026 Broadband (Prop. Rajesh Kumar Sharma)","Digital Network Associates Pvt. Ltd.","Digital Satellite Connect Pvt. Ltd.","Discovery Communications India","Dish Tv India Limited","Divya Cable TV Network (Prop. Jeradoddi Venkataiah)","Divya Drishti Cable Network (Prop. Ganesh Atmaram Patil)","Dombivali Optical Network Cable (OPC) Pvt. Ltd.","Dombivali Optical Network Cable Pvt. Ltd.\n","E-Cable Vision(Prop. Manju Soni)","E2 Info Solutions","E2 Info Solutions (Prop. P.S. Chandra Mohan Singh)","E24 Glamour Limited","EASTERN MEDIA LIMITED","EASWARI MEDIA PRIVATE LIMITED","EKAM Convergence Private Limited (formerly AAACloud Telephony Pvt. Ltd.)","EKAM Convergence Private Limited (formerly AAACloud Telephony Pvt. Ltd.) - IPTV","EMT Services","ENTER 10 TELEVISION PRIVATE LIMITED","ESSENCE TELEVISION PVT.LTD.","EXCLUSIVE VISION BROADCAST PVT. LTD.","EXCLUSIVE VISION MEDIA PVT. LTD.","EXPRESS BROADCASTING PRIVATE LIMITED","Eenadu Televisoin Private Limited","Elxire IT Services Pvt. Ltd.","Eminent Cable Network Pvt. Ltd.","Esto Media Private Limited","Esto Networks Pvt. Ltd.\n","Ethernet Xpress(I) Pvt. Ltd.","Excell Media Pvt. Ltd.","Excitel Broadband Private Limited","Extranet Digital Pvt Ltd","Extranet Supports Pvt. Ltd. (Formerly Dwan Supports Pvt. Ltd.)","Eye Vision Cable Network (Prop. Shafique Khan)","Ezhilnidhi Cable Net Work","FCN Cable Network(Prop. Ravinder Kumar)","Fame Media Private Limited","Fastway Media Cable Network Pvt. Ltd","Fastway Transmission Pvt. Ltd. (IPTV)","Fastway Transmissions Pvt. Ltd.","Fibervalley Communications Pvt. Ltd.","Fiberx Networks Pvt. Ltd.","Firozabad Digital Cable Network (Prop. Milan Yadav)","Five Internet Solutions Pvt. Ltd.","Five Net Service Provider Pvt. Ltd.","Five Star Cable Network","Free TV Entertainment (India) Pvt. Ltd.","Free TV Entertainment India Pvt. Ltd. (IPTV)","Friend Star Cable Network (Prop. Govula Suresh Kumar)","Friends Cable Network","Friends Digital Network","Fun Cable Network (Prop. Azeem Miyan)","Fusionnet Web Services Pvt. Ltd.","Future Connect Broadband Pvt. Ltd.","G B Communication","G-7 Cable Service","G-NEXT MEDIA PRIVATE LIMITED","G.K.S.S Communications","G.M Reddy Cable Network(Prop. Gangireddy Muralidhar Reddy)","GEFO Communications Pvt. Ltd.","GLOBAL TELECASTING PVT. LTD.","GN INFOMEDIA PVT LTD","GTPL Broadband Pvt. Ltd.","GTPL DCPL Pvt. Ltd.","GTPL Deesha Cable Net Pvt. Ltd.","GTPL Hathway (Old name as Gujarat Telelink Pvt. Ltd.)","GTPL Hathway Ltd","GTPL Jay Santoshima Network Pvt. Ltd.","GTPL KCBPL Broadband Private Limited","GTPL Kolkata Cable And Broadband Pariseva Ltd.","GTPL Raja Rajeshwari Network","GTPL Rajwadi Network Private Limited","GTPL V\u0026S Cable Pvt. Ltd.","GTPL Vision Services Private Limited","GULISTAN TV NETWORK PRIVATE LIMITED","Gagan Media Services","Gajanan Digital Cable Services Pvt. Ltd.","Ganapati Cable(Prop. Jyoti Sarup)","Ganapati Communication","Ganesh Cable Network (Prop. Tanaji Dhondiram Ghorpade)","Ganesh Digital Networks Pvt Ltd.","Ganga Cable Network","Ganpati Cable Network (Prop. Ram Kumar)","Gautam Cable Network","Gazon Communications India Limited","Gee Cable Network (Prop. Urmila Devi Sharma)","Genstar Network Solutions Pvt. Ltd.","Gentle Entertainment Pvt. Ltd.","Ginirex Private Limited","Gnet Infotainment Alliance Pvt. Ltd.","God Media Pvt. Ltd.","Godfather Communication Private Limited","Goienkars Digital Network Pvt. Ltd.","Gokann International Media Pvt. Ltd","Goldy Diginet Pvt. Ltd.","Gollaleshwar","Gondal Cable Communication","Good News Channel Pvt Ltd","Goodness Media Private Limited","Gopi Cable Network (Prop. Gopi Lal Kashyap)","Grameen Digital Cable Network TV Abbigeri (Prop. Shreeshailappa Veerappa Maranabasari)","Grand Gumber Network","Graphisads Private Limited","Greycells18 Media Limited","Gujarat News Broadcasters Private Limited","HARE KRSNA CONTENT BROADCAST PVT LTD","HARI BHOOMI COMMUNICATIONS PVT. LIMITED (EARLIER KNOWN AS LEGEND TRAVEL PVT. LTD.)","HATHWAY PATIALA CABLE PRIVATE LIMITED","HORIZON SATELLITE SERVICE PVT LTD","HYDERABAD MEDIA HOUSE LIMITED","HYOSEC Solutions Pvt. Ltd.","Hannure Cable Network","Har Charan Network (Prop. Harcharan Singh)","Haribuva Cable Network","Harsh Channel Pvt. Ltd.","Harsh Communication (Prop. Ashish Kumar N. Pandya)","Haryana Digital Network","Hathway CBN Multinet Pvt. Ltd.","Hathway Cable \u0026 Datacom Pvt. Ltd.","Hathway Digital Limited","Hathway Digital Limited (IPTV)","Hathway MCN Pvt. Ltd.","Hathway Sai Star Cable \u0026 Datacom Private Ltd.","Hathway Sonali Om Crystal Cable Pvt. Ltd.","Hindaun City Plus Cable Network","Hinduja Global Solutions Limited","Hinduja Global Solutions Limited- HITS","Hingoli Fiber Network","Hira Cable Network","Hira Cable Network (IPTV)","Home System Pvt Ltd.","Honeycomb Telnet Private Limited","Hornbill Digital Pvt. Ltd.","I-Vision Digital LLP","IBCTAMIL Private Limited","IBN Lokmat News Private Ltd","IKF Technologies Limited","IMAGE BROADCASTING INDIA PRIVATE LIMITED","IMPACT TELEVISION PRIVATE LIMITED","IN10 Media Private Limited","INDIRA TELEVISION LIMITED","INDO ASIAN NEWS CHANNEL PVT LTD","INFORMATION TV PRIVATE LIMITED","INSAT Cable Network (Prop. Ms. Varsha Jitendra Pisal)","Icon Networks India Pvt. Ltd.","Impact Medianet \u0026 Communication Pvt. Ltd.","In Islampur Cable Network (Prop. Khanderao Ramchandra Jadhav)","Inam Cable Network","Independent News Service Private Limited","Indian Cable Net Company Limited","Indinet Service Pvt. Ltd","Indusind Media And Communication Limited ","Infocus Networks Pvt. Ltd.","Information Service Television Network","Inhome Infotainment Pvt. Ltd.","Innolens Media and Broadcasting Pvt. Ltd.","Innovision Future Tech Pvt. Ltd.","Inspire Infratech Pvt. Ltd.","Instanet Technologies Pvt. Ltd.","Intech Online Pvt. Ltd.","Intermedia Cable Communication Pvt. Ltd.","Ipcon International Pvt. Ltd.","Ishan Netsol Pvt Ltd.","Ishita Cable Network","Ishwar Media Private Limited","J 9 Cable Network","J K Cable Network (Prop. Shri lmtiyaz Ahmad Mir)","J.V. Cable Net","JAK Communications Private Limited","JANAPRIYA COMMUNICATION LTD.","JBM Cable Network","JCN Digital","JDM Internet Solutions Pvt. Ltd.","JDM Internet Solutions Pvt. Ltd. (IPTV)","JEEVAN TELECASTING CORPORATION LIMITED","JGD Infotainment Pvt. Ltd.","JK KTV Set","JOSH MEDIA VISION PVT LTD","JPR Channel (IPTV)","JPR Channel (Prop. Shri Raja Bakkiyanathan Nadar)","Jadeshwer Cable Network","Jagsumi Perspectives Private Limited.","Jaheer Cable Communications (Prop. K. Imam Hussaian)","Jai Bhavani Communication (Prop. Ashutosh Tiwari)","Jai Durga Cable Network (Prop. Vikash Ahlawat)","Jai Maa Vaishnavi Jai Mata Di Star Cable TV","Jai Mata Dee Digital Network(Prop. Umesh Kumar Soni)","Jai Mata Di","Jai SD Networks","Jai Shree Krishna Cable Network","Jai mata di cable network","Jain Satellite","Jajpur Digital Network Services Private Limited","Jaju Cable Network","Jalaram Cable Network","Jaleswar Cable Link","Janam Multi Media Ltd.","Jay Ambe Cable Network (Prop. Harish Kumar Patel)","Jay Ambe Traders","Jay Mata Di Digital Network","Joister Infoserve Pvt. Ltd. (formerly Syscon Infoway Pvt. Ltd.)","Jot Cable TV Network","Jupiter Cable Network (Prop. Jogesh Nehra)","Juweriyah Networks Private Limited","Jyothi Digital Vision Pvt. Ltd.","K NET Solutions Private Limited","K Net Solutions Pvt. Ltd.","K.K. MEDIA PRODUCTION PVT.LTD.","K.T.Vision","KALAIGNAR TV PRIVATE LIMITED","KAMADHENU TELEFILMS PRIVATE LIMITED","KASHISH DEVELOPERS LTD.","KASTHURI MEDIAS PRIVATE LIMITED","KBJ Digital cable Network","KCN Cable TV Network (Prop. Basavaraj Molekoppa)","KERALA KAUMUDI PVT LTD","KGN Cable Network (Prop. Anul Haque)","KHUSBOO MULTIMEDIA PVT. LTD.","KRISHNA SHOWBIZ SERVICES PVT. LTD.","Kable First India Pvt. Ltd.","Kalinga Media \u0026 Entertainment Pvt. Ltd.","Kanhan Cable Network","Kankroli Digital Network","Kantheswari Cable Service (Prop. Khageswar Sahoo)","Karnal Siti Broadband Cable Network","Karnataka Fastnet Pvt. Ltd.","Kasu Communication Network (Prop. Karri Venkata giri)","Kerala Communicators Cable Ltd","Kerala Fibre Optic Network Ltd.","Kerala Vision Broad Band Ltd.","Kerala communications cable ltd.","Keranad Digi World Pvt. Ltd.","Khabar Guru Media Bajrang Network","Khatri Cable Network (Prop. Rakesh Kumar)","Khemundi Digital Network","Khetramani Cable Vision (Prop. Laxman Kumar Das)","Kings Broadband Pvt. Ltd","Kinnera Cable Network (Prop. S K Gilani)","Kodada Communication Networks","Kohinoor Cable Network","Konark IP Dossiers Pvt. Ltd.","Koshi Broadcasting Cable Network Pvt. Ltd.","Kothapeta Communication Network (Prop. Shri. N. Veera Venkata Raja)","Kozhikode Cable Communication Limited","Krishna Cable Network","Krishnaa Technologies","Krystal Cable Network","Kumchur Communication Cable Network (Prop. Yogesh K)","LCGC Broadcasting (India) Private Limited","LIFESTYLE \u0026 MEDIA BROADCASTING LIMITED","LIVE NEWS INDIA NETWORK PVT LTD","Lalat Communications","Lalat Internet Service Private Limited","Landmark Apartment Pvt. Ltd.","Landmark Infonet Pvt. Ltd.","Latiyal TV Club","Liberty Cable Network (Prop. Dhananjay Chandrasen Deshmukh)","Libra Cable Network Private Limited","Live India Today Entertainment Pvt Ltd.","Live Today TV \u0026 Web Private Limited (earlier Pavitar Entertainment Pvt Ltd)","Living Entertainment Enterprises Private Ltd","Local Cable Operator Digital Network","Love India Entertainment Private Limited","Lucky Cable Network","Lucky Digital Network","M Netplus Communication Services Pvt. Ltd.","M Netplus Communication Services Pvt. Ltd. (IPTV)","M.H. ONE TV NETWORK LIMITED","M.K Entertainment Channel","M\/S Indhuandmahadev Broadband Pvt. Ltd.","M\/S TRIBENI ENTERTAINMENT","M\/s 4K Digital Communication Pvt. Ltd.","M\/s AJK TV (IPTV)","M\/s Ani Data Services (OPC) Pvt. Ltd.","M\/s Ani Data Services (OPC) Pvt. Ltd. (IPTV)","M\/s Array Access Digital Services Pvt. Ltd.","M\/s Aryabhatt Digital Network Pvt. Ltd.","M\/s Aurangabad Satellite Cable Service Centre\nShri Ziauddin Biswas, Partner\n","M\/s B Primo Telecommunications Pvt. Ltd.","M\/s BA Digital Networks LLP","M\/s BSL Cable Network","M\/s Balaji Cable Network","M\/s Bharti Hexacom Ltd.\n","M\/s Bhimavaram Community Network\n","M\/s Blue Star Cable Services","M\/s Capital Digital Cable Network","M\/s Captain Video Pvt Ltd.","M\/s Catvision Limited","M\/s Catvision Ltd.\n\nCompliance officer: Ghanshyam Sharma\n","M\/s Charotar Digital Network Pvt. Ltd.\n","M\/s City Cable Network","M\/s City Online Media Pvt. Ltd.","M\/s Cloudnet Infocom Private Limited","M\/s Digicast Network Pvt. Ltd.","M\/s Digital Service Provider","M\/s E-STAR DIGITAL CABLE TV NETWORK","M\/s ESTO NETWORKS Pvt. Ltd (Formerly M\/s Erin Media Pvt. Ltd.)","M\/s Extranet Digital Pvt. Ltd.\n","M\/s Feroz Digital Networks","M\/s Fibre Air Services Pvt. Ltd.","M\/s Galaxy Star Media Services","M\/s Gatrad Krupa Cable Network","M\/s Gayatri Communications","M\/s Ginirex Pvt. Ltd.\n","M\/s Global Telecom","M\/s Global Vision Cable Tv \u0026 Internet","M\/s Grand Vision","M\/s Haji Malang Baba Cable Network","M\/s Haur Cable Network","M\/s Home to Vision","M\/s Hyderabad Cable Digital Service Pvt. Ltd.","M\/s IT Spectrum Technology INC\n","M\/s IT Spectrum Technology Inc.","M\/s Innolens Media \u0026 Broadcasting Pvt. Ltd\nShri Ezhilraj G, COO\n","M\/s Iscom Media Pvt. Ltd.","M\/s JCC Network","M\/s JK Communication and Satellite Network","M\/s Jai Durga Digital Network","M\/s Janani Cable Network","M\/s Kal Cables Pvt Ltd","M\/s Kamdhenu Digital Network","M\/s Karnataka Grameena Cable Networks","M\/s Keranad Digi World Pvt. Ltd.\n","M\/s Keya Cable Network","M\/s Kstalysts Productions Pvt. Ltd","M\/s LPS Vision Production","M\/s Lalu Digital Pvt. Ltd.","M\/s Lamhas Satellite Services Ltd","M\/s Lightfiber Telenetworks Pvt. Ltd","M\/s M.D. Cable Network","M\/s M.S. Cable Network","M\/s MAA KALI CABLE TV NETWORK","M\/s Mak Infrapromoters Ltd.","M\/s Maruthi Satellite System","M\/s Maruti Dev Channel","M\/s Modern Network Digital Pvt. Ltd.","M\/s Moka Malleshara Cable Network","M\/s New Skynet Digital Services","M\/s PR EHUB\n ","M\/s Parivar Cable","M\/s Peak Air Pvt. Ltd","M\/s Pioneer Digital TV Pvt. Ltd.","M\/s Quick Vision","M\/s RCN Cable and Broadband Pvt. Ltd.","M\/s RK Digital Cable Network","M\/s Raaga Communication","M\/s Radha Soami Satsang Beas","M\/s Raghogarh Digital Cable Network R Media","M\/s Raj Digital Cable T.V. Network","M\/s Raj Enterprises","M\/s Ranchi Digital","M\/s Realtouch Cable \u0026 Broadband Pvt. Ltd.","M\/s Rohin Connect","M\/s SITI SaiStar Digital Media Private Limited","M\/s SR Enterprises","M\/s Saharanpur Digital Yug Private Limited","M\/s Sai Cable","M\/s Sai Cable Network","M\/s Samosune Cablenet India Pvt. Ltd","M\/s Sampat Harisingh (SHS) Digital \u0026 Broadband Networks","M\/s Sampriti Cable and Braodband Services Pvt Ltd.","M\/s Sangani Cable Network","M\/s Shanti Cable Network","M\/s Sherie Plexus","M\/s Shiva Cable Communications","M\/s Shree Sai Vision","M\/s Shree Vitthal Rukmini Cable Net Service","M\/s Shri Bhagvati Satellite","M\/s Siddhi Vinayak Cable Bhainsdehi","M\/s Siti Siri Digital Network Pvt. Ltd.","M\/s Sky Media","M\/s Soham Cable Network","M\/s Sony Cable","M\/s Spacenet Communication","M\/s Sri Ganesh Digital Network","M\/s Sri Laxmi Narasimha Swamy Communication","M\/s Sri Srinivasa Cable Network","M\/s Star Cable","M\/s Surat Digital Network Pvt. Ltd.","M\/s Swastik Network Solution","M\/s Tejays Industries Pvt. Ltd.","M\/s Thamizhaga Cable TV Communication Ltd.\nShri Nagamanikam, Director\n","M\/s The Nandyal Communications","M\/s Third Eye Digital Pvt. Ltd.","M\/s Trans Tele Data Pvt. Ltd.","M\/s Triple Play Network (India) Pvt. Ltd.","M\/s Udyan Digital Cable Service Pvt. Ltd","M\/s Usilai Digital Cables\n","M\/s VD Communication Services","M\/s VEE DIGITAL 5","M\/s Vayu Media Llp","M\/s Veera Cable Satelite Communication Network","M\/s Vsn Network","M\/s WI Bro Solutions Pvt. Ltd","M\/s Wired Entertainment","M\/s Yogesh Cable Network","M\/s Zee Communication","M\/s Zonet TV Private Limited","MADHA MEDIA RENAISSANCE PVT. LTD.","MADHYAMAM BROADCASTING LTD","MADURAI KRISHNA NETWORK PVT. LTD.","MAKKAL THOLAI THODARPU KUZHUMAM LIMITED","MALAYALAM COMMUNICATIONS LIMITED","MAYAJAAL ENTERTAINMENT LIMITED","MC \u0026 CATV Network","MCN Digital \u0026 Broadband (Prop. Nikhil Namdeo Shinde)","MCN INTERNATIONAL INDIA PVT LTD.","MCN Services","MEDIA GURU BROADCAST PVT LTD","MEDIA GURU NEWS PVT. LTD.","MEDIA NETWORK BROADCASTING PVT LTD","METRONATION CHENNAI TELEVISION PVT LTD","MGK PRINTING WORKS PVT LTD","MGV Digital Network Pvt. Ltd.","MICROSCAN INTERNET LIMITED (formerly Five Network Solution (India) Ltd.)","MITCON INFRASPROJECT PRIVATE LIMITED","MM TV LIMITED","MONICA BROADCASTING PRIVATE LIMITED","MOON VISION PRIVATE LIMITED","MR Network (Prop. Ingaladahal Mabusahib)","MRK Digital (Prop. Krushna Chandra Das)","MSM-Worldwide Factual Media Private Limited","MUKUNDHAA NETWORK PRIVATE LIMITED","MULTIREACH MEDIA PRIVATE LIMITED","Maa \u0026 Mahadev Vision","Maa Ashapura Cable (Prop. Virendrasinh L. Jadeja)","Maa Cable TV (Prop. Santosh Kumar Sethy)","Maa Home Cable (Prop. Prasanta Kumar Mahala)","Maa Laxmi Cable Network (Prop. Suresh Kumar Nayak)","Maa Mangala Doordarshan (Prop. Somnath Panigrahy)","Maa Tara Tarini Digital","Maddikera Cable Network","Madhuri Cable Network (Prop. Manisha Singh)","Magadi Cable Network","Mahalakshmi Digitals","Mahamaya Cable","Mahanagar Telephone Nigam Limited (MTNL)","Mahapatra Dooradarshan Cable Network System","Maharaja Entertainment","Mahasatta Media Services Pvt. Ltd.","Mahavir Den Entertainment Pvt. Ltd","Mahesh Cable Network","Mahesh Hardware \u0026 Pipes Pvt. Ltd","Mahesh Satellite Communication Network","Maheshwar Cable Network(Prop. Ram Prakash)","Malanad Communication Pvt. Ltd.","Malnad Infotech Private Limited","Malvan Digital","Manakula Vinayagar Digital Pvt Ltd","Mangaluru Broadband Network Pvt. Ltd.","Manorajan Cable Network (Prop. Sandip Ashok Randive)","Manoranjan Vision (Prop. Kailas Bhagavat Vyavahare)","Mansion Cable Network Pvt. Ltd.","Maruti Cable Network","Mass Media Network (Prop. K Viswasen)","Mass Telecasting pvt. Ltd.","Master Channel Community Network Pvt. Ltd.","Master Channel Network","Matarani Cable TV Network","Mauli Cable Network","Mavis Satcom Limited","Media World Wide Limited","Meenakshi Networks Pvt. Ltd.","Meghbela Cable \u0026 Broadband Services (P) Ltd","Meghbela Cable \u0026 Broadband Services (P) Ltd.","Meghbela Infitel Cable \u0026 Broadband (P) Ltd.","Metro Cast Network India Pvt. Ltd.","Metrocast SSV Network Pvt. Ltd.","Microscan Infocommtech Pvt Ltd. (formerly Microscan Computers Pvt. Ltd)","Milan Satalite","Minnal Digital Network","Minnal Digital Network (IPTV)","Mishra Cable Network","Mohanty \u0026 Mohanty Vision Media","Mohini Vision(Prop. Bhagaban Panda)","Mokshadayini cable network Pvt. Ltd.","Mona Netvision (Prop. Shri Pradip Keshralal Dhakre)","Movements Digital India Pvt. Ltd.","Mubarak Digital Network","Muktai Cable Network (Prop. Sunil Sudhakar Talele)","Multicity Digital Consortium Pvt Ltd.","Multicraft Digital Technologies Private Limited","Munny Entertainments Pvt Ltd.","Music Trax Multivision","Mybharat Net Pvt. Ltd.","N K MEDIA VENTURES PVT LTD","N\u0026D COMMUNICATIONS PVT. LTD.","NAMAN BROADCASTING AND TELECOMMUNICATIONS PVT. LTD.","NARNE NETWORKS PRIVATE LIMITED","NEON SOLUTION PVT. LTD","NETSET MEDIA SERVICES PVT LTD","NEW ERA MEDIA CORPORATION CHENNAI PRIVATE LIMITED (earlier TRP MEDIA PRIVATE LIMITED)","NEW GENERATION MEDIA CORPORATION PVT LTD","NEXTGEN Broadband Pvt. Ltd.","NTT Communications India Network Services Private Limited (formerly known as NTT Communications India Network Private Limited)","Nadeem Cable Services","Nag Cable Network","Nakoda Cable Network","Nakrekal Communications (Prop.Venkateshwar Rao)","Napalchyal Cable Network","Narnaul Cable Service Pvt. Ltd.","Narsimha Swamy Network","Naval Cables","Navkar Supertech Pvt. Ltd.","Navshakti Cable Network (Prop. Prashant Tiwari)","Nehra Cable Network","Netink Technologies Pvt Ltd.","Netplus Broadband Services Pvt. Ltd","Network 18 Media \u0026 Investments Limited","New CG Cable Network","New Delhi Television Ltd.","New Harika Star \u0026 Cable TV Network","New Jai Bharat Cable Network","New Jai Maa Laxmi Satellite Vision","New RK Entertainment (Prop. Rajesh Mishra)","New Sai Cable Network","New Sitara Cable Network","News Nation Network Pvt. Ltd","News24 Broadcast India Limited","Nexgen Telelinks Pvt. Ltd","Nimbeshwar Cable Network","Nimbus Television Pvt. Ltd.","Nishu Cable Network (Prop. Ayodhya Singh)","Nitika Enterprises","Nitin Digital network","Nova Digital \u0026 Broadband Pvt. Ltd.","Novabase Digital Entertainment Pvt Ltd","OM Cable Network (Prop. Brajesh Singh Jadon)","OMEGA BROADCAST PVT LTD","OMEGA TV MEDIA PVT LTD","ONEOTT iNTERTAINMENT LTD","ONKAR ENTERTAINMENT PRIVATE LIMITED","OSCAR MEDIA PRIVATE LIMITED","Odisha Television Ltd","Oem Datta Chile Cable Network","Om Bangar Digital Cable Network (Prop. Ishwar Singh)","Om Namah Bhagawan Gosain Digital","Om Sai Cable Network","Om Sai Group","Om Sarbay Deba Debi Cable Network (Prop. Durga Charan Mishra)","Om Shanti Digital Network(Prop. Chandrahas Natwarlal Gujarathi)","Omkar Digital Cable Network","Omm Krishna Sky Vision","Omnero Media Pvt. Ltd.","One Digital TV Services","Ozone Media. Comm Private Limited","P. digital Cable Network","PALM BROADCASTING PRIVATE LIMITED","PANCHAJANYA MEDIA PVT LTD","PARSHAVNATH MEDIA PVT. LTD.","PAUL ENTERTAINMENT PRIVATE LIMITED","PC Network","PERFECT OCTAVE MEDIA PROJECTS LIMITED","PIGEON INFORMATION TECHNOLOGY PRIVATE LIMITED","PINKCITY JEWEL HOUSE PVT. LTD.","PMC Network","POLIMER MEDIA PRIVATE LIMITED","PR EHUB","PRIDE EAST ENTERTAINMENTS PRIVATE LIMITED","PTLD Broadcasting Pvt. Ltd.","Pacenet Meghbela Broadband Pvt. Ltd.","Padmesh Citi Cable","Page 3 Entertainment India Pvt. Ltd.","Panmetro Convergence Private Limited","Panmetro Convergence Private Limited (IPTV)","Paradise Telecom Pvt. Ltd.","Paramount Digital Media Services (P) Ltd.","Parwanoo Satellite Services","Patri Cable Network","Paul Digital Cable(Prop. Brij Mohan)","Paul E Commerce Pvt. Ltd.","Paynet Broadband Services Pvt. Ltd.","Pimpri Chinchwad Media Communications Pvt Ltd.","Pioneer Digital TV Pvt. Ltd.\n","Pioneer Elabs Limited","Pooja Star TV Network (Prop. T. Balarama Goud)","Poona Cables Systems \u0026 Services","Popular Electronics (Prop. Gobinda Nath Dhara)","Prachi Vision","Priyadarshini Cable TV","Priyanka Infosolution","Pruthvi Channel network","Quadrant Televentures Ltd. (M\/s. QTL)","Quadrant Televentures Ltd. (QTL)","Quest Consultancy Pvt. Ltd.","R R Group","R.D Cable Network","R.G. Technosolutions Pvt. Ltd.","RACHANA TELEVISION PRIVATE LIMITED","RAFTAAR MEDIA PRIVATE LIMITED","RAHUL SPRINGS PVT LTD","RAINBOW ENTERTAINMENT AND DIGITAL SOLUTIONS","RAJA Satellite Communications","RAYUDU VISION MEDIA LIMITED","RD Cable Network\n","RI Networks Pvt Ltd","RJ Veghela Digital Pvt. Ltd","ROCKLAND MEDIA AND COMMUNICATION PRIVATE LIMITED","RP TECHVISION INDIA PRIVATE LIMITED","RST Digital Media Services","RVR DIGITAL INFRASTRUCTURES LIMITED","Raagul Sat Vision Private Limited","Rachit Cable Network","Radhey Cable T.V. Network","Radhika Digital Network","Radiant Digitek Network Ltd.","Radiant Digitek Network Ltd. (IPTV)","Radinet Info Solutions Pvt Ltd","Raghav Agency","RailTel Corporation of India Ltd.","Rainbow Digitech Private Limited","Raj Cable Network","Raj Cable Network (Prop. Rajesh Kumar)","Raj Cable Network (Prop. Shri Abid Hussain)","Raj Television Network Limited","Raja Network","Rajasthan Infotech Media services Pvt. Ltd.","Rajat Sky TV (Prop. Rajat Rout)","Rajesh Digital \u0026 Datacom Pvt. Ltd.","Rajesh Fun Square","Rajhans Cable Network (Prop. Shri Ashvinbhai)","Rajmoti Network","Rajputana Cable Works","Ravalnath Cable Network","Reachnet Cable Services Pvt. Ltd","Reachnet SSS Entertainment Private Limited","Readylink Internet Services Limited","Rekha Cable Network (Prop. Kancham Vasudeva Reddy)","Reliance Communication Limited","Reliance Communication Limited (RCOM)","Reliance Jio Infocomm Ltd (RJIL)","Reliance Telecom Limited","Rewanchal Cable Network","Ridhdhi Cable Network","Ridhi Sidhi Cable Network","Ritam Cable Network (Prop. Tapan Chakraborty)","Rizwan Cable Network","Rockline Telecommunications Pvt. Ltd.","Roopwanti Digital Cable Network","Royal Digital cable and Communication Pvt. Ltd.","Rudra Media House","Rupnarayan Cable and Broadband Services Pvt. Ltd","Rural Cable Network","S.D.BANSAL IRON AND STEEL PVT. LTD.","S.G.S Digital Video Systems Pvt. Ltd.","S.M.V. Cable Network (Prop. Santosh Madan Gote)","S.S. Cable Network","SAANVI STUDIOZ LIMITED","SAB Cable TV Network","SAB GLOBAL ENTERTAINMENT MEDIA PVT. LTD.","SADHNA MEDIA NETWORK PVT. LTD.","SADHNA MEDIA PRIVATE LIMITED","SAFARI MULTIMEDIA PVT. LTD","SAI NAMO DIGITAL CABLE NETWORK (OPC) PVT LTD","SAIRAM MEDIA NETWORK PVT. LTD.","SANATAN INDIA NETWORKING PRIVATE LIMITED","SANGEET AUDIO INDIA PRIVATE LIMITED","SANSKAR INFO TV PRIVATE LIMITED","SATHIYAM MEDIA VISION PRIVATE LIMITED","SATHYADHARA COMMUNICATION PVT LTD","SAURABH INTERNATIONAL PRIVATE LIMITED","SB Cable","SB MULTIMEDIA PVT. LTD.","SEA TV NETWORK LIMITED","SEE MEDIA SERVICES PVT LTD","SENTINEL BROADCASTING PVT LTD","SEVEN STAR SATELLITE PRIVATE LIMITED","SHALOM COMMUNICATIONS LIMITED","SHARP EYE ADVERTISING PRIVATE LIMITED","SHUBH MEDIA PVT. LTD.","SIGNET COMMUNICATIONS PRIVATE LIMITED","SILVERSTAR COMMUNICATIONS LIMITED","SITI Broadband Services Pvt. Ltd.","SK Cable Network","SK Group","SKY B (BANGLA) PRIVATE LIMITED","SKY NEWS MEDIA PRIVATE LIMITED","SLJ Fiber Networks Pvt. Ltd.","SMART INDIA DIGITAL SERVICES","SME Cable Network","SOBHAGAYA MEDIA PRIVATE LIMITED","SOFIYA ENTERTAINMENT PRIVATE LIMITED","SOFTLINE CREATION PRIVATE LIMITED","SOUND TELENETWORKS PRIVATE LIMITED","SRI SAI CABLE AND BROADBAND PVT. LTD.","SRI SAI Cable \u0026 Broadband Pvt. Ltd\n","SRI SAI MEDIA PVT. LTD.","SS Vision (Prop. Santosh Kr. Bisoyi)","SSCN DIGITAL TV AND BROADBAND","ST Broadband Cable Service","ST Broadband Cable Service\n","STANDARD CORPORATION INDIA LIMITED","SUBHARTI MEDIA LIMITED","SUMMA REAL MEDIA PRIVATE LIMITED","SUN TV Network Limited","SVB Cable TV Network (Prop. Bogala Murali)","SVM Cable Network","Sagar Cable network.","Sahana films Pvt. Ltd.","Sahara India Commercial Corporation Ltd.","Sahasra Television Pvt. Ltd.","Sahoo Cable Network","Sahoo Cable TV","Sahu Cable Network","Sahyog Cable Network (Prop. Gulammayodin Abdulgani Shaikh)","Sai Babha Network Pvt. Ltd","Sai Cable Network (Prop. Balu Shivaji Baad)","Sai Citi Cable Network","Sai Communication Network","Sai Infocomm","Sai Krishna Communications (Prop. B. Reddy Prasad)","Sai Prasad Internet Services Pvt. Ltd.","Sai TV (IPTV)","Sai TV (Prop. V. Venkatesh)","Sai Vision Cable Network","Sairam Cable Network (Prop. Sidha Ranjan Das)","Saiyam Network Pvt. Ltd","Sajal Cable Network","Sakal Papers Private Limited","Sakharkherda Cable Network","Samarth Digital Cable Services (Prop. Bhagyashree Bhalchandra Dhurat)","Sampark Cable Network (Prop. Narayan Chandra Nayak)","Samrat Cable Network","Sancfil Technologies Internet Services Pvt. Ltd.","Sandhyarani Cable Network (Prop. T Mohan Reddy)","Sangeet Television Network Pvt. Ltd.","Sangli Media Communication","Sanjay Cable Network (Prop. Vinod Kumar)","Sanjay Optical Solution (Prop. Dinesh Kumar)","Santosh Cable Network","Sanyasi Cable Service (Prop. Sanyasi Pradhan)","Sapna Cable Network (Prop. Vaishali Sawn Nikhade)","Saptagiri Cable Network","Sarbamangala Gramin Cable Network","Sarthak Music Private Limited","Satcom Media Broadcast Pvt. Ltd","Satellite Cable Communication","Satlinks(Ms. P.K Asha RaniProperietor of SatlinksW\/o R. B Anil Kumar;Samthrupthy)","Satpura Network","Sattyam Tori Pvt Ltd, Murshidabad, W.B","Satzilio Telecom Private Limited (STPL)","Sea TV Network Limited","Seven Star Dot Com Private Limited","Shalini Television Network Pvt Ltd.","Shambhavi Cable Network","Sharda Maa City Cable","Sharknet Cable Network Pvt. Ltd.","Sharma Cable Network","Sharpline Network Private Limited","Shimla Satellite Cable Pvt. Ltd.","Shine Communications Pvt. Ltd.","Shiv Cable (Prop. Lalabhai Pithabhai Vagh)","Shiv Cable Network","Shiv Cable Network (Prop. Ajay Singh Rawat)","Shiv Cable Network (Prop. Shivbhadrasinh Girirajsinh Jadeja)","Shiv Sai Cable Network (Prop. Sudhir Singh)","Shiv Sandesh Cable Network","Shiva Cable Communications (Prop. A. Shathanna)","Shiva Cable Network (Prop. Mudigonda Nagender)","Shiva Shakti Cable Network","Shivam Cable Network","Shivam JI Cable Network","Shivraj Cable Network","Shopping Zone India TV Pvt. Ltd","Shree Balaji Cable Network","Shree Balaji Cable Network.","Shree Balaji Digital Network (Prop. Vijay Kumar)","Shree Bhairee Bhavani Vision Pvt. Ltd.","Shree Digital","Shree Digital Cable System","Shree Gollaleshwar Cable Network","Shree Hari Vishnu Jee Cable Network (Prop. H. Umesh Kumar)","Shree Laxmi Narayan Cable Network (Prop. Mahesh Vasant Joshi)","Shree Mahadev Cable Network","Shree Mangalmurti Enterprises","Shree Om Sai Cable Network (Prop. Shri Dnyaneshwar Kisan Patil)","Shree Om Sai Cable Network (Prop. Surendra Bajirao Nemade)","Shree Omkar Infocom Pvt. Ltd.","Shree Shyam Cable Network","Shree Star Cable Network","Shreya Broadcasting Pvt. Ltd","Shreyarth Aaspas Limited","Shri BadriKedar Digital Cable Network","Shri Balaji Digital Cable Communication","Shri Basaveshwara Cable Network","Shri Chamunda Cable Network (Prop. Reena Kumari Dhiman)","Shri Jain Cable Network","Shri Jawalamalini Cable Networks","Shri Sai Cable Network","Shri Sai Cable Network.","Shri Salasar Balaji Cable Network","Shri Sharda Satellite Pvt. Ltd.","Shri Shyam Baba Cable Network","Shri Siddhanath Cable Network (Prop. Anandrao Vasantrao Patil)","Shri Vinayak Cable Network","ShriShiridiSai Baba International Dish Antenna","Shridham Cable Network","Shyam Spectra Private Limited","Siddeshwar Cable Network","Siddharaj Cable Network (Prop. Sunil Pralhad Ghail)","Siddheshwar Cable Network (Prop. Sanjay Ganpat Sangade)","Siddhi Cable Network (Prop. Amol Hanmant Deshmane)","Siddhnath Cable Network","Sidharth Broadcasting Private Limited","Sify Technologies Limited","Signet Digital Private Limited","Signum Digital Networks Private Limited","Sihimogge Digital Network","Sikka Broadband(P) Ltd.","Sikka Infratech Pvt. Ltd.","Siliguri Internet \u0026 Cable TV Pvt. Ltd.","Singh Satellite","Siti Channel","Siti Jind Digital Media Communications Pvt. Ltd.","Siti Maurya Cable Net Pvt. Ltd.","Siti Networks Limited","Siti Networks Limited (IPTV)","Siti Prime Uttranchal Communication Private Limited","Siti Vision Digital Media Pvt. Ltd.","Siva Dish Cable Network (Prop. J. Siva Goud)","Sivabalaji Cable T.V. (Prop. E Chandra Sekhar Goud)","Sivabhi Channel","Sky Link Digital Cable Pvt. Ltd.","Sky Net Media (Prop. H. Pauzamuan)","Sky Nexus Entertainment Pvt. Ltd.","Sky Touch Cable Vision","Skyber Media Serivces Pvt. Ltd.","Skylink Networks (IPTV)","Skylink Networks (Prop. Senthil Kumar K)","Skynet Digital Services","Skynet Digital Services Pvt. Ltd","Skynet Digital Services Pvt. Ltd. (IPTV)","Skypro Communications","Skystar Entertainment Pvt ltd","Skyvision Master Channel","Skywave Cable Communication Pvt. Ltd.","Smart Cable","Snet Networks Pvt. Ltd.","Softline Media Network Private Limited","Soham Cable Network Prop. Girish Dnyaneshwarrao","Soibam Technology Pvt. Ltd","Soibam Technology Pvt. Ltd. (IPTV)","Sonali Cable","Soni Cable (Prop. Deepmala Soni)","Space Cable Network","Specific Net Pvt. Ltd","Spiderlink Networks Pvt. Ltd.","Spoorthi Communication Pvt. Ltd.","Sree Cable TV Network (Prop. Sampati Srisailam)","Sree Devi Digital Systems Pvt. Ltd.","Sri Balaji Cable Network","Sri Durga Cable Network (Prop. Sonu Kumar)","Sri Ganesh Cable Network","Sri Guru Raghavendra Cable Network (Prop. T N Ashok Patel)","Sri Janapriya Communications (Prop. M Ramakrishna)","Sri Lakshmi Ganapathi Cable Network (Prop. Malyala Mahammad Rafi)","Sri Lakshmi Ganapathi Cable Network (Prop. U. Sreedhar)","Sri Laxmi Chenna Kesava Cable TV Network (Prop. T. Ranga Swammy)","Sri Sai Communication And Internet Pvt.Ltd.","Sri Sai Communication Cable Networks","Sri Sai Digital communications","Sri Sai Future Solution Pvt. Ltd.","Sri Sai Ganesh Media Digital Network","Sri SaiVinayaka Cable Network","Sri Satya Communications (Prop. Chinthapalli Aruna Kumari)","Sri Siddi Vinayaka Cable Network (Prop. Ms. Y Sree Gawri)","Sri Vankateswara Cable Network","Sri Venkata Nrisimha Digital Media Pvt. Ltd.","Sri Venkateshwara Cable Network \u0026 Electronics (Prop. B. Ganesh)","Sri Venkateswara Cable (Prop. DV Ramana)","Sri Venkateswara Cable Network (Prop. Reddy;gari Sesha Chalapathi Reddy)","Sri Vijaynagar Cable Network","Sri Vinayaka Cable Service (Prop. P.L Lakshmana)","Srinivasa Cable Net (Prop. P Venkata Lakshumma)","Srisivakami Amman Cable TV System","Sristi","Sristi Sanchar Webnet Limited","Star Broadband Services (India) Pvt. Ltd.","Star Cable Network","Star Cable Network (Prop. Anand H Talwakar)","Star Club","Star India Private Limited","Star Vision","Star Vision Network","Star Vision Network Jath (Prop. Umarfaruq Rafiqahmad Algur)","Subham Cable","Subham Cable Vision","Subhodaya Digital Entertainment Pvt. Ltd.","Sudarshan TV Channel Ltd.","Sudarshi Cable Network","Sun Direct TV Pvt Ltd","Sunil Cable","Sunny ENTERTAINMENT HOUSE PRIVATE LIMITED","Surabhi Cable Network","Suraj Cable Network","Suresh Network","Surya Digital Network (Prop. B.V Thippeswamy)","Surya Processed Food Pvt. Ltd (Surya Sagar Communication Pvt Ltd)","Surya Sat Vision (Prop. Shaik Munna)","Suryansh broadcasting Private limited","Swami Cable TV Network","Swami City Cable","Swamy Cable Network","Swastika","T C Network (Prop. H. Thangboi Chongloi)","T. SARKAR PVT. LTD.","TAAZA INFOTAINMENT PRIVATE LIMITED","TATA","TCN Enterprises (Prop. Poonam)","TELANGANA BROADCASTING PRIVATE LIMITED","THE MATHRUBHUMI PRINTING AND PUBLISHING COMPANY LIMITED","THE SANDESH LIMITED","TIME TODAY MEDIA NETWORK PRIVATE LIMITED","TJ Cable Network","TK Cable Network","TOURISM AND TRAVEL MEDIA ENTERTAINMENT PRIVATE LIMITED","TRAC MEDIA PVT LTD","TTV Cable Network","TURMERIC VISION PRIVATE LIMITED","TV LIVE INDIA PRIVATE LIMITED","TV Today Network Limited","TV VISION PVT. LTD.","Tachyon Communications Private Limited","Take one JK Media Pvt. Ltd.","Talcher TV Home Cable Network","Talluri Digitals","Tamil Nadu Arasu Cable TV Corporation Ltd.","Tanuku Communication Network Digital Private Limited","Tarang Broadcasting Company Limited","Tarini Cabal Network (Prop. Sanjaya Kumar Das)","Tarini Sky Vision","Tata Play","Tata Play Broadband Private Limited (formerly Tata Sky Broadband Pvt.Ltd.)","Tata Teleservices (Maharashtra) Ltd. (TTML)","Tata Teleservices Limited (TTSL)","Tayyab Cable Network (Prop. Anwar Ali)","Taz Cable Network","Tejas Doordarshan Cable Network","Teleone Consumers Product Pvt Ltd","Thamizhaga Cable TV Communication Limited","Thamizhaga Internet Communications Pvt Ltd.","The Bhimavaram Community Network","The Meham Choubisi Digital Cable Pvt. Ltd.","The Sky Vision (Prop. Rajalaxmi Dash)","Tikona Infinet Ltd.","Tirath Cable","Tirumala Cable Networks","Tomar Cable Network (Prop. Vishnu Singh Tomar)","Total Telefilms Pvt. Ltd","Transmedia Software Limited","Treeshakti Cable Network","Trimurty Star Vision","Triple Play Broadband Pvt Ltd","Triple Play Network (India) Pvt. Ltd.","Triple Play Teleservices (P) Ltd.","Trishakti Vision","Tulasi Broadcasting Network Ltd","Tulip Telecom Limited","Tyagi Cable TV Network","U Digital Network Private Limited","U Digital Network Private Limited (IPTV)","U.D. Digital","UCAST Media Private Limited","UCN Cable Network Pvt. Ltd.","UCN Fibrenet Pvt. Ltd.","UCN Network","UDC Network","UNISSION NETWORK MEDIA PVT.LTD.","US BROADCAST INDIA PRIVATE LIMITED","Uday Infosys","Uddana Grameena Cable Operators Welfare Association","Udupi Fastnet Pvt. Ltd.","Ujjain Cable Network","Uma Cable Network (Prop. Natvarlal Nanjibhai Maheta)","Umbrella Cable Systems Pvt. Ltd.","Umbrella Cable Systems Pvt. Ltd. (IPTV)","United Telecoms Limited","Usha Sree Cable Network (Prop. Payidela Chandra Sekhar Reddy)","Usilai Digital Cables","Utkal Cable Vision","V.B Digital Distribution Cable Network","V.K. Digital Network Private Ltd.","V4 Digital infotech","VAARTHA BROADCASTING LTD","VALUE VISION BROADCASTING PRIVATE LIMITED","VARUN MEDIA PRIVATE LIMITED","VASANTH AND CO MEDIA NETWORK PRIVATE LIMITED","VEDIC BROADCASTINGS LIMITED","VEECON MEDIA AND BROADCASTING PVT LTD","VERTENT MEDIA SOFT PRIVATE LIMITED","VIKAAS TV ALLIANCE PVT LTD","VIL MEDIA PVT. LTD. (EARLIER NIKIT INVESTMENT PRIVATE LIMITED)","VINMEHTA FILMS PRIVATE LIMITED (Earlier known as PPALTECH COOLING TOWERS AND EQUIPMENTS LIMITED)","VINTAGE STUDIO PVT LTD","VISION CORPORATION LIMITED","VK Digital Network Private Limited","VRL MEDIA LIMITED","Vaadi Television","Vainavi Industries Ltd.","Vande Mahamaya Cable Network","Vardaanlive Media Network Pvt. Ltd.","Vardhman Television Pvt. Ltd.","Vardhman Television Pvt. Ltd. (IPTV)","Velankani Electronics \u0026 Automotive Pvt. Ltd.","Velocity Digital Cable Private Limited","Velocity Digital Cable Private Limited (IPTV)","Venkateshwara Cable Network (Prop. G. Sathya Narayana)","Verai Cable (Prop. Shambhubhai Bhikhabhai Vaghasiya)","Vessati Media India Pvt. Ltd.","Victory Digital Network Pvt. Ltd.","Vidarbha Chandrapur Cable Network Pvt. Ltd.","Vijay Cable Network (Prop. R Lokesh)","Vijayendra Cable Network","Vijaylakshmi Net Services Pvt.Ltd.","Vinsat Digital Pvt. Ltd.","Vishwam Cable Network","Vision point","Vivek Cable Network","Vodafone Idea Limited (VIL)","Vortex Entertainment Pvt. Ltd.","Vortex Infocom Pvt. Ltd.","Vortex Netsol Pvt. Ltd.","WEONE Broadband Pvt. Ltd.","WIN TV PRIVATE LIMITED","WRITEMEN MEDIA PRIVATE LIMITED","Wan and Lan Internet Pvt. Ltd.","WarnerMedia India Private Limited","Wave Cable and Broadband Service (Prop. Siddhartha Roy)","Wave Fiber Pvt. Ltd. (Formerly Coastal Broadband and Online Services Pvt. Ltd.)","Weebo Networks Pvt Ltd.","Western Digital Cable Network (Prop. Vikas Punia)","Whitefield Communication Pvt. Ltd.","Win Trendz Exim Pvt. Ltd.","Wired Entertainment","Wish Net Pvt. Ltd.","World Phone Internet Services Pvt. Ltd.","YASH SATELLITE INDUSTRIES PRIVATE LIMITED","YASH TV ENTERTAINEMENT PVT.LTD.","YELAMANCHILI TV PVT. LTD","Yash Cable Network","Yash Cable Services (Prop. Pravin Jethalal Machhar)","Yashash Cable Network Pvt Ltd","Yashodeep Cable Network Pvt. Ltd.","Yerraguntla Cable Network Pvt. Ltd.","Yes Digital Solution LLP","You Broadband India Ltd.","ZEUS NETWORKING PRIVATE LIMITED","ZITA Telecom Pvt. Ltd.","ZONET CABLE TV PRIVATE LIMITED","Zee Akaash News Private Limited","Zee Entertainment Enterprises Limited","Zee Media Corporation Limited","Ziggtv Pvt. Ltd.","Ziggtv Pvt. Ltd. (IPTV)","Zoom Entertainment Network Ltd","Zorins Technologies Pvt. Ltd."];
+		
+		function toggleDates(value) {
+		    const isCustom = value === 'CUSTOM';
+		    document.getElementById('fromDate').disabled = !isCustom;
+		    document.getElementById('toDate').disabled = !isCustom;
+		    if (!isCustom) submitForm();
+		}
+
+		function submitForm() {
+			document.getElementById('filterForm').submit();
+		}
+
+		function resetFilters() {
+			window.location.href = "\/fdapp\/public\/dashboard";
+		}
+		
+		const input = document.getElementById('providerInput');
+		const hidden = document.getElementById('providerHidden');
+		const box = document.getElementById('suggestions');
+
+		input.addEventListener('input', function () {
+		    hidden.value = '';
+
+		    const value = this.value.toLowerCase();
+		    box.innerHTML = '';
+
+		    if (!value) {
+		        box.style.display = 'none';
+		        return;
+		    }
+
+		    const filtered = providers.filter(p => p.toLowerCase().includes(value));
+
+		    if (filtered.length === 0) {
+		        box.style.display = 'none';
+		        return;
+		    }
+
+		    filtered.forEach(p => {
+		        const div = document.createElement('div');
+		        div.textContent = p;
+		        div.onclick = () => {
+		            input.value = p;
+		            hidden.value = p;
+		            box.style.display = 'none';
+		        };
+		        box.appendChild(div);
+		    });
+
+		    box.style.display = 'block';
+		});
+
+		// close suggestions on click outside
+		document.addEventListener('click', function (e) {
+			if (!box.contains(e.target) && !input.contains(e.target)) {
+				box.style.display = 'none';
+				}
+			});
+		
+		document.getElementById('fromDate').addEventListener('change', function () {
+			document.getElementById('toDate').min = this.value;
+			});
+		
+		function formatINR(num) {
+		    if (num === null || num === undefined || isNaN(num)) return '0.00';
+		    let [intPart, decPart] = parseFloat(num).toFixed(2).split('.');
+		    // Indian grouping: last 3 digits, then groups of 2
+		    let lastThree = intPart.slice(-3);
+		    let rest = intPart.slice(0, -3);
+		    if (rest.length > 0) {
+		        lastThree = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + lastThree;
+		    }
+		    return lastThree + '.' + decPart;
+		}
+
+		// Apply to all amount cells
+		document.querySelectorAll('td[data-amount] .inr-amount').forEach(span => {
+		    const raw = span.closest('td').dataset.amount;
+		    span.textContent = formatINR(raw);
+		});
+	</script>
+</body>
+</html>
