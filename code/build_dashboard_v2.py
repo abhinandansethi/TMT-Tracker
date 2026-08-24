@@ -196,11 +196,14 @@ def fold_notices(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]
 
 rows, folded_n = fold_notices(rows)
 
-# Dated rows keep items.json order exactly as v1 renders them; only the undated ones move
-# to the end. A stable partition, not a re-sort: they have no place on the timeline, and
-# leaving them at the head of the file would bury every dated instrument beneath them.
-rows.sort(key=lambda r: r["date"] is None)
-undated_n = sum(1 for r in rows if r["date"] is None)
+# Newest instrument first: what changed this week is what a partner opens this page for.
+# Undated shelf rows carry no timeline position, so they sit after every dated row rather
+# than sorting to either end of it.
+_dated = [r for r in rows if r["date"]]
+_undated = [r for r in rows if not r["date"]]
+_dated.sort(key=lambda r: (r["date"], r["id"]), reverse=True)
+rows = _dated + _undated
+undated_n = len(_undated)
 
 # ---- coverage: live sources grouped stratum -> regulator -> venue, with health ----
 HEALTH_UI = {"OK": ("OK", "ok"), "WARN": ("Warn", "warn"), "FAILED": ("Failed", "bad")}

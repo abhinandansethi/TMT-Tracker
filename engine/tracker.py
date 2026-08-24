@@ -192,7 +192,8 @@ def export() -> int:
             "open_deadlines": sum(1 for i in out_items
                                   if i.get("deadline") and str(i["deadline"]) >= date.today().isoformat()),
         },
-        "items": sorted(out_items, key=lambda i: (i.get("date") or "", i["id"])),
+        # newest first; undated rows (document shelves) fall to the end
+        "items": sorted(out_items, key=lambda i: (i.get("date") or "", i["id"]), reverse=True),
     }
     path.write_text(json.dumps(payload, indent=1, ensure_ascii=False))
     print(f"exported {len(out_items)} items -> {path}")
