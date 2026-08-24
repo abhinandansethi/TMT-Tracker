@@ -1,0 +1,5 @@
+{
+ "_note": "Explicit display folds: {announcement_id: instrument_id}. An announcement of a document already in the ledger is not a second row; its link is attached to the instrument it announces. Same principle as folding a TRAI press release into the direction it announces. Both records stay in items.json.",
+ "42f7801414": "e8f640c5b8",
+ "cd398c9a41": "1cbb4dae1f"
+}

@@ -1,0 +1,896 @@
+{
+ "schema_version": "1.0",
+ "updated": "2026-08-24",
+ "scope_note": "Stratum 1 (telecom) is LIVE. Strata 2 (tech_data) and 3 (media) are fully mapped and marked planned — activating them is a registry flip, not a rebuild. Every venue was verified by live fetch on 24-08-2026.",
+ "validation_gates": {
+  "date": "must parse against the source's declared date formats; rows with unparseable dates go to quarantine, never the ledger",
+  "url": "item links must match the source's allowed_domains; anything else quarantined",
+  "title": "8–300 chars after whitespace collapse",
+  "dedupe": "sha1(normalized_title + date) primary; PDF filename secondary; 'also' array records cross-listings",
+  "failure_policy": "a fetch failure or empty parse NEVER passes silently — source health is set to FAILED/WARN with a note, and two consecutive failures raise an alert on the dashboard"
+ },
+ "sources": [
+  {
+   "id": "trai_regulations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Regulations",
+   "url": "https://trai.gov.in/release-publication/regulations",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY",
+    "DD-MM-YYYY"
+   ],
+   "pagination": "?page=N (0-indexed)",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "pdf_pattern": "/sites/default/files/{YYYY-MM}/*.pdf",
+   "check": "every_run",
+   "quirks": "PDF filenames regular: Regulation_DDMMYYYY.pdf"
+  },
+  {
+   "id": "trai_directions",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Directions & Orders",
+   "url": "https://trai.gov.in/release-publication/directions",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "pdf_pattern": "Direction_*.pdf / Order_*.pdf",
+   "check": "every_run",
+   "quirks": "Non-tariff orders interleaved here; no separate orders page exists (404)."
+  },
+  {
+   "id": "trai_tariff_telecom",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Telecom Tariff Orders",
+   "url": "https://trai.gov.in/telecom/telecom-tariff",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Directions cross-listed here; dedupe against trai_directions."
+  },
+  {
+   "id": "trai_tariff_broadcasting",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Broadcasting Tariff Orders",
+   "url": "https://trai.gov.in/broadcasting/tariff-orders",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Low frequency (last item 2024)."
+  },
+  {
+   "id": "trai_consultations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Consultation Papers",
+   "url": "https://trai.gov.in/release-publication/consultation",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "pdf_pattern": "CP_DDMMYYYY.pdf",
+   "check": "every_run",
+   "quirks": "Items link to detail pages; PDF one hop deeper."
+  },
+  {
+   "id": "trai_open_consultations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Open Consultations (deadline register)",
+   "url": "https://trai.gov.in/open-consultation",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Single page; the 'Closing on' column may show counter-comment date — CP detail page holds the written-comment date. Use for deadline tracking."
+  },
+  {
+   "id": "trai_recommendations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Recommendations",
+   "url": "https://trai.gov.in/release-publication/recommendation",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "check": "every_run"
+  },
+  {
+   "id": "trai_press_releases",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Press Releases",
+   "url": "https://trai.gov.in/notifications/press-release",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "pdf_pattern": "PR_No{n}of{yyyy}.pdf",
+   "check": "every_run",
+   "quirks": "CRITICAL: ?page=0 can serve a stale cache missing the newest items — ALWAYS fetch the unparameterised URL for page one. PR numbering is sequential; a gap in PR numbers = a missed item. Clarifications with legal effect appear only here (e.g. PR 91/2026)."
+  },
+  {
+   "id": "trai_whats_new",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "What's New (cross-check)",
+   "url": "https://trai.gov.in/what-s-new",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Aggregator; used to catch items missed on category pages (e.g. DAS auditor panel)."
+  },
+  {
+   "id": "trai_standing_directions",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Standing Directions (5 division sub-pages)",
+   "url": "https://trai.gov.in/release-publication/standing-directions/quality-of-Service",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "JS Load-More; first 13 rows server-rendered",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "check": "daily",
+   "quirks": "Five sub-pages (broadband-and-policy-analysis, broadcasting-and-cable-services, financial-and-economic-analysis, network-spectrum-and-licensing, quality-of-Service — capital S). Only first 13 rows visible without JS; sufficient for new-item detection."
+  },
+  {
+   "id": "dot_eservices_circulars",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices — Circulars/Notifications/Others",
+   "url": "https://eservices.dot.gov.in/circular-notifications-others",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "?page=N (0-indexed, ~23 pages)",
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "pdf_pattern": "/sites/default/files/circular-notifications/*.pdf",
+   "check": "every_run",
+   "quirks": "THE machine-readable DoT source (portal notified 23-06-2026). Mixes doc types; tier by rules. Some rows link out to PIB."
+  },
+  {
+   "id": "dot_eservices_rules",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices — Act & Rules shelf",
+   "url": "https://eservices.dot.gov.in/act-and-rules",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "dot.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Reference shelf of Telecom Act 2023 rules. KNOWN LAG: gazetted rules can be missing for weeks (Network Authorisation Rules 20-07-2026 and User Identification Rules 09-08-2026 absent as of 24-08-2026) — the gazette cross-check lane covers this gap."
+  },
+  {
+   "id": "dot_eservices_home",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices — homepage recent block + ticker",
+   "url": "https://eservices.dot.gov.in/",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "eservices.dot.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Ticker carries undated operational announcements (application windows opening) — record as notes, not ledger items."
+  },
+  {
+   "id": "nccs_latest",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Latest Updates",
+   "url": "https://nccs.gov.in/home/latestUpdates/1",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD Month YYYY"
+   ],
+   "pagination": "/home/latestUpdates/{page}?rowsPerPage=50",
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "PDF filenames contain literal spaces — URL-encode. Cross-lists with circularsSas and circularsSc — dedupe by title+date."
+  },
+  {
+   "id": "nccs_sas",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Circulars — Security Assurance Standards",
+   "url": "https://nccs.gov.in/home/circularsSas/1",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD Month YYYY"
+   ],
+   "pagination": "/home/circularsSas/{page}",
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "check": "every_run"
+  },
+  {
+   "id": "nccs_sc",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Circulars — Security Certification (ComSec)",
+   "url": "https://nccs.gov.in/home/circularsSc/1",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD Month YYYY"
+   ],
+   "pagination": "/home/circularsSc/{page}",
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Skip internship/administrative rows (routine regex)."
+  },
+  {
+   "id": "nccs_itsars",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Notified ITSARs",
+   "url": "https://nccs.gov.in/home/itsars",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "none (all on one page)",
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "pdf_pattern": "/public/itsar/ITSAR{number}.pdf",
+   "check": "daily",
+   "quirks": "Binding security standards; new ITSAR = tier 1."
+  },
+  {
+   "id": "tec_whatsnew",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "What's New",
+   "url": "https://www.tec.gov.in/whats-new",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "tec.gov.in",
+    "www.tec.gov.in"
+   ],
+   "check": "daily",
+   "quirks": "ALWAYS use www host — bare tec.gov.in has a broken TLS chain. Dormant since 22-12-2025; watch for MTCTE ER notifications."
+  },
+  {
+   "id": "tdsat_notices",
+   "stratum": "telecom",
+   "regulator": "TDSAT",
+   "name": "Notices / Circulars",
+   "url": "https://tdsat.gov.in/writereaddata/Delhi/docs/notices.php",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "none (single ~405-row table)",
+   "allowed_domains": [
+    "tdsat.gov.in"
+   ],
+   "check": "daily",
+   "quirks": "Practice directions (rare, tier 1) appear among routine sitting notices."
+  },
+  {
+   "id": "pib_moc",
+   "stratum": "telecom",
+   "regulator": "PIB",
+   "name": "PIB — Ministry of Communications releases",
+   "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+   "status": "live",
+   "method": "rss_plus_search",
+   "date_formats": [
+    "DD Mon YYYY"
+   ],
+   "pagination": "n/a",
+   "allowed_domains": [
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "NO per-ministry RSS exists — the global feed must be filtered by fetching PRID pages (ministry name on page), or use targeted search. Instrument-announcing releases only; the instrument itself is the ledger item where available."
+  },
+  {
+   "id": "egazette_recent",
+   "stratum": "safety_net",
+   "regulator": "e-Gazette",
+   "name": "eGazette homepage recent lists (Extraordinary + Weekly)",
+   "url": "https://egazette.gov.in/",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "egazette.gov.in"
+   ],
+   "check": "daily",
+   "quirks": "Filter rows by ministry string (Communications/Electronics/Information & Broadcasting). Legally authoritative venue; regulator sites can lag it. Full ministry×date search requires ASP.NET postback flow (documented in runbook; automated in local runner via sushant354/egazette approach). Fallback mirror: archive.org collections in.gazette.central.e.YYYY-MM-DD.*"
+  },
+  {
+   "id": "signals_news",
+   "stratum": "safety_net",
+   "regulator": "Press sweep",
+   "name": "Unpublished-instrument signals sweep",
+   "url": "https://www.medianama.com/",
+   "status": "live",
+   "method": "search",
+   "date_formats": [],
+   "pagination": "n/a",
+   "allowed_domains": [],
+   "check": "weekly_mon_fri",
+   "quirks": "~40% of instruments in the Jul-Aug 2026 test window were letter-form and NEVER published (DoT references to TRAI, directions to TSPs, suspension orders). Sweep Medianama, ET Telecom, TelecomTalk, IFF, ThePrint, tele.net. Output goes to the SIGNALS lane, clearly labelled unofficial/unpublished — never into the instruments ledger."
+  },
+  {
+   "id": "dot_main",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "dot.gov.in main site (circulars, gazette notifications, Telecom Act page, what's new)",
+   "url": "https://dot.gov.in/circulars",
+   "status": "blocked",
+   "method": "headless_required",
+   "date_formats": [],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "dot.gov.in"
+   ],
+   "check": "weekly",
+   "quirks": "Serves an EMPTY HTML shell to non-browser clients on every path. Content largely mirrors to eServices, but drafts (e.g. Spectrum Assignment draft rules 18-06-2026) can appear here first. Local runner uses headless Chromium; cloud lane covers via gazette + PIB + signals.",
+   "blind_reason": "Empty shell to scripts"
+  },
+  {
+   "id": "wpc_legacy",
+   "stratum": "telecom",
+   "regulator": "DoT/WPC",
+   "name": "WPC legacy site",
+   "url": "http://www.wpc.dot.gov.in/",
+   "status": "blocked",
+   "method": "none",
+   "date_formats": [],
+   "pagination": "",
+   "allowed_domains": [],
+   "check": "monthly",
+   "quirks": "Host times out. WPC/SACFA material surfaces via eServices and Saral Sanchar.",
+   "blind_reason": "Host unreachable"
+  },
+  {
+   "id": "saralsanchar",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "Saral Sanchar public notices",
+   "url": "https://saralsanchar.gov.in/",
+   "status": "blocked",
+   "method": "headless_required",
+   "date_formats": [],
+   "pagination": "",
+   "allowed_domains": [
+    "saralsanchar.gov.in"
+   ],
+   "check": "weekly",
+   "quirks": "403 WAF to non-browser clients. Local runner with browser UA may pass; licensing notices also mirror to eServices.",
+   "blind_reason": "Blocked by firewall"
+  },
+  {
+   "id": "tdsat_judgments",
+   "stratum": "telecom",
+   "regulator": "TDSAT",
+   "name": "Judgments & Daily Orders",
+   "url": "https://tdsat.gov.in/Delhi/services/judgment.php",
+   "status": "blocked",
+   "method": "post_forms",
+   "date_formats": [],
+   "pagination": "POST search only",
+   "allowed_domains": [
+    "tdsat.gov.in"
+   ],
+   "check": "weekly",
+   "quirks": "No GET-crawlable list; local runner can POST date-range searches. Phase-2 candidate.",
+   "blind_reason": "Search form, no listing"
+  },
+  {
+   "id": "trai_rss",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "TRAI sitewide RSS",
+   "url": "https://trai.gov.in/rss.xml",
+   "status": "supplement",
+   "method": "rss",
+   "date_formats": [
+    "RFC-822"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "VERIFIED LAGGING (~6 weeks behind site on 24-08-2026). Never rely on it as primary trigger; HTML listings govern.",
+   "blind_reason": "Lags the site, not a trigger"
+  },
+  {
+   "id": "meity_gazettes",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Gazette Notifications",
+   "url": "https://www.meity.gov.in/documents/gazettes-notifications",
+   "status": "planned",
+   "method": "headless_required",
+   "date_formats": [],
+   "pagination": "?page=0-3",
+   "allowed_domains": [
+    "meity.gov.in",
+    "www.meity.gov.in"
+   ],
+   "check": "",
+   "quirks": "JS SPA — empty shell to plain fetch; no public JSON API; sitemap.xml lacks lastmod. PDFs at /static/uploads/YYYY/MM/{hash}.pdf fetch fine. Headless render or sitemap+index diffing required. HIGH VALUE: s.79A examiner notifications sat unnoticed ~6 weeks here."
+  },
+  {
+   "id": "meity_acts_policies",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Acts & Policies (incl. DPDP, PROG Act)",
+   "url": "https://www.meity.gov.in/documents/act-and-policies",
+   "status": "planned",
+   "method": "headless_required",
+   "date_formats": [],
+   "pagination": "?page=0-4",
+   "allowed_domains": [
+    "meity.gov.in"
+   ],
+   "check": "",
+   "quirks": "Same SPA constraint."
+  },
+  {
+   "id": "meity_orders_notices",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "Orders & Notices",
+   "url": "https://www.meity.gov.in/documents/orders-and-notices",
+   "status": "planned",
+   "method": "headless_required",
+   "date_formats": [],
+   "pagination": "?page=0-3",
+   "allowed_domains": [
+    "meity.gov.in"
+   ],
+   "check": "",
+   "quirks": "Same SPA constraint."
+  },
+  {
+   "id": "meity_whatsnew",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "name": "What's New",
+   "url": "https://www.meity.gov.in/whatsnew",
+   "status": "planned",
+   "method": "headless_required",
+   "date_formats": [],
+   "pagination": "",
+   "allowed_domains": [
+    "meity.gov.in"
+   ],
+   "check": "",
+   "quirks": "Same SPA constraint. DPB constitution/appointment notices appear here."
+  },
+  {
+   "id": "certin_advisories",
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "Advisories (CIAD, year-indexed)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBADVLIST02&year=2026",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "Month D, YYYY"
+   ],
+   "pagination": "year param + prev/next",
+   "allowed_domains": [
+    "cert-in.org.in",
+    "www.cert-in.org.in"
+   ],
+   "check": "",
+   "quirks": "Trivially scrapable servlet pages. No RSS (rss.xml 404)."
+  },
+  {
+   "id": "certin_vuln",
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "Vulnerability Notes (CIVN)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=VLNLIST02&year=2026",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "Month D, YYYY"
+   ],
+   "pagination": "year param",
+   "allowed_domains": [
+    "cert-in.org.in"
+   ],
+   "check": ""
+  },
+  {
+   "id": "certin_guidelines",
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "Guidelines (CISG)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW01",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "Month D, YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "cert-in.org.in"
+   ],
+   "check": ""
+  },
+  {
+   "id": "certin_directions",
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "name": "s.70B(6) Directions page",
+   "url": "https://www.cert-in.org.in/Directions70B.jsp",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "DD.MM.YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "cert-in.org.in"
+   ],
+   "check": ""
+  },
+  {
+   "id": "uidai_circulars",
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "name": "Circulars/Memoranda/Notifications (media resources)",
+   "url": "https://uidai.gov.in/en/media-resources/uidai-documents/circulars-memorandums-notification-01.html",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "D Mon YYYY"
+   ],
+   "pagination": "numbered (7 pages)",
+   "allowed_domains": [
+    "uidai.gov.in"
+   ],
+   "check": "",
+   "quirks": "robots.txt blocks several legal-framework listing paths (regulations.html, notifications.html); circulars listings are allowed. Listings fragmented across 3 sections + archive."
+  },
+  {
+   "id": "dpb_watch",
+   "stratum": "tech_data",
+   "regulator": "Data Protection Board",
+   "name": "DPB website watch",
+   "url": "https://dpb.gov.in/",
+   "status": "watch",
+   "method": "dns_check",
+   "date_formats": [],
+   "pagination": "",
+   "allowed_domains": [],
+   "check": "weekly",
+   "quirks": "NO website exists as of 24-08-2026 (dpb.gov.in / dpbi.gov.in DNS dead; Board not operational). Until live, DPB instruments surface via MeitY + eGazette + PIB. Weekly DNS check; alert when a site appears.",
+   "blind_reason": "No site published yet"
+  },
+  {
+   "id": "ogai_watch",
+   "stratum": "tech_data",
+   "regulator": "Online Gaming Authority of India",
+   "name": "OGAI portal watch",
+   "url": "https://devogai.negd.in/",
+   "status": "watch",
+   "method": "dns_check",
+   "date_formats": [],
+   "pagination": "",
+   "allowed_domains": [],
+   "check": "weekly",
+   "quirks": "Dev portal 403 as of 24-08-2026; registration forms released via MeitY OGAI page. OGAI advisories have been letter-form/unpublished (Jul 2026 advisory to app stores/banks/ISPs known only via press). Watch for production domain.",
+   "blind_reason": "Portal not in production"
+  },
+  {
+   "id": "mib_acts_policy",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Acts/Policies/Guidelines master view",
+   "url": "https://mib.gov.in/en/documents/notification/acts-policy-guidelines",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "check": "",
+   "quirks": "ALWAYS use /en/ prefix — unprefixed paths serve Hindi titles. Drupal; category + wing filters."
+  },
+  {
+   "id": "mib_orders_notices",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Orders & Notices",
+   "url": "https://mib.gov.in/documents/notification/notices",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "?page=N (8 pages)",
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "check": ""
+  },
+  {
+   "id": "mib_other_comms",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Other Communications (advisories, OMs, gazette, court orders)",
+   "url": "https://mib.gov.in/documents/notification/Other-communication",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "?page=N",
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "check": ""
+  },
+  {
+   "id": "mib_digital_media",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Digital Media Wing (IT Rules Part III, OTT advisories)",
+   "url": "https://mib.gov.in/en/ministry/our-wings/digital-media",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "?page=N (~36 pages)",
+   "allowed_domains": [
+    "mib.gov.in",
+    "pib.gov.in"
+   ],
+   "check": ""
+  },
+  {
+   "id": "mib_broadcasting",
+   "stratum": "media",
+   "regulator": "MIB",
+   "name": "Broadcasting Wing document table",
+   "url": "https://mib.gov.in/en/ministry/our-wings/broadcating-wing",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "single page",
+   "allowed_domains": [
+    "mib.gov.in"
+   ],
+   "check": "",
+   "quirks": "URL contains MIB's own typo 'broadcating-wing'. Operational licensing on new.broadcastseva.gov.in."
+  },
+  {
+   "id": "prgi",
+   "stratum": "media",
+   "regulator": "Press Registrar General",
+   "name": "PRGI advisories/public notices (PRP Act 2023)",
+   "url": "https://prgi.gov.in/",
+   "status": "planned",
+   "method": "static_html_tls_tolerant",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": "Drupal nodes; consolidated listing TLS-flaky",
+   "allowed_domains": [
+    "prgi.gov.in"
+   ],
+   "check": "",
+   "quirks": "Intermittently broken TLS chain — retry with tolerance; advisories at /sites/default/files/YYYY-MM/advisory_no._*.pdf"
+  },
+  {
+   "id": "cbfc",
+   "stratum": "media",
+   "regulator": "CBFC",
+   "name": "Orders and Circulars",
+   "url": "https://cbfcindia.gov.in/cbfcAdmin/orders-and-circular.php",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": "none",
+   "allowed_domains": [
+    "cbfcindia.gov.in"
+   ],
+   "check": "",
+   "quirks": "Administrative only — statutory Cinematograph instruments surface via MIB/eGazette."
+  },
+  {
+   "id": "asci",
+   "stratum": "media",
+   "regulator": "ASCI (self-regulatory)",
+   "name": "Advisories + Press Announcements",
+   "url": "https://www.ascionline.in/advisories/",
+   "status": "planned",
+   "method": "static_html",
+   "date_formats": [
+    "Month DD, YYYY",
+    "Month YYYY"
+   ],
+   "pagination": "JS Show-More (initial list in HTML)",
+   "allowed_domains": [
+    "ascionline.in",
+    "www.ascionline.in"
+   ],
+   "check": ""
+  },
+  {
+   "id": "pib_rss_global",
+   "stratum": "safety_net",
+   "regulator": "PIB",
+   "name": "PIB global RSS (all ministries)",
+   "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+   "status": "live",
+   "method": "rss",
+   "date_formats": [],
+   "pagination": "none",
+   "allowed_domains": [
+    "pib.gov.in"
+   ],
+   "check": "every_run",
+   "quirks": "Only feed PIB offers (no per-ministry feeds; Minid param ignored; legacy ministry RSS page dead). Items may lack pubDate and mix languages. Filter by fetching PRID pages."
+  },
+  {
+   "id": "sansad_bills",
+   "stratum": "safety_net",
+   "regulator": "Parliament",
+   "name": "Digital Sansad bill tracker",
+   "url": "https://sansad.in/ls/legislation/bills",
+   "status": "watch",
+   "method": "headless_required",
+   "date_formats": [],
+   "pagination": "in-app",
+   "allowed_domains": [
+    "sansad.in"
+   ],
+   "check": "weekly",
+   "quirks": "React SPA, empty without JS, no documented API. As of 24-08-2026 neither the Digital India Act nor a Broadcasting Services Bill is before Parliament — MeitY/MIB consultation pages + PIB are the effective pending-bill net.",
+   "blind_reason": "Renders only with JavaScript"
+  },
+  {
+   "id": "indiacode",
+   "stratum": "safety_net",
+   "regulator": "India Code",
+   "name": "Consolidated statutes (amendment reference)",
+   "url": "https://indiacode.gov.in",
+   "status": "watch",
+   "method": "manual",
+   "date_formats": [],
+   "pagination": "",
+   "allowed_domains": [
+    "indiacode.gov.in"
+   ],
+   "check": "monthly",
+   "quirks": "Mid-migration from indiacode.nic.in; new host unreachable through cloud proxy (502/cert mismatch). Consolidation reference, not a detection net.",
+   "blind_reason": "Host unreachable"
+  }
+ ],
+ "classification": {
+  "note": "No tiers. One deterministic split: an item is either substantive or routine. What the document IS comes from its own type label, taken from the source. Audit with code/audit_routine.py — the ledger and this regex must agree exactly.",
+  "routine_regex": "(?i)assess(es|ed)? (mobile )?network quality|subscription data|performance indicator report|quarterly highlights|panel of auditors|sitting of hon|non-sitting|internship|research associate|vacancy circular|recruitment|seminar|workshop|\\bTSTL\\b|designat(es|ed)\\b.{0,60}\\blaborator|empanel|certificate and internship",
+  "deadline_regex": "(?i)(comments?|counter[- ]comments?|last date|due).{0,40}?(\\d{1,2}[-./ ](\\d{1,2}|[A-Za-z]+)[-./ ]\\d{2,4})",
+  "memo_types": [
+   "Rules",
+   "Direction",
+   "Order",
+   "Circular",
+   "Notification",
+   "Clarification",
+   "Regulation",
+   "Tariff order",
+   "Exemption",
+   "Manual"
+  ],
+  "memo_note": "A memo is drafted for a new, non-routine item whose type is in memo_types. Drafts, consultations, releases, notices and designations do not trigger a memo."
+ }
+}

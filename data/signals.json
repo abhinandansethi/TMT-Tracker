@@ -1,0 +1,26 @@
+[
+ {
+  "date_reported": "2026-08-20",
+  "issuing_body": "DoT",
+  "title": "Circular directing TSPs to deny new SIMs beyond nine connections per subscriber",
+  "what_happened": "Reported circular directs telcos to block new mobile connections for subscribers already holding nine SIMs, effective 24-08-2026, with Digital Intelligence Platform verification of the existing base by 30-11-2026. Circular text not on any official venue as of 24-08-2026.",
+  "secondary_url": "https://tele.net.in/national-news/dot-directs-telcos-to-block-new-sims-for-subscribers-with-nine-existing-connections-12398069",
+  "official_status": "unpublished"
+ },
+ {
+  "date_reported": "2026-08-03",
+  "issuing_body": "DoT",
+  "title": "Reference letter to TRAI seeking review of the 2017 net neutrality framework",
+  "what_happened": "DoT letter dated 08-07-2026 asks TRAI for recommendations on reviewing net neutrality norms to accommodate 5G network slicing and differentiated services. Reference letters are not published; expect a TRAI consultation paper as the next public artefact.",
+  "secondary_url": "https://www.medianama.com/2026/08/223-dot-trai-net-neutrality-review-jio/",
+  "official_status": "unpublished"
+ },
+ {
+  "date_reported": "2026-07-20",
+  "issuing_body": "Not identified",
+  "title": "Central Delhi mobile internet shutdown with no published suspension order",
+  "what_happened": "No issuing authority named; MHA, GNCTD and DoT all unconfirmed. Mobile internet suspended in parts of Central Delhi on 20-07-2026 during the 'Chalo Sansad' march; no suspension order under the Temporary Suspension of Services Rules, 2024 was made public.",
+  "secondary_url": "https://internetfreedom.in/iff-condemns-the-internet-shutdown-in-parts-of-central-delhi-no-suspension-order-has-been-made-public/",
+  "official_status": "unpublished"
+ }
+]

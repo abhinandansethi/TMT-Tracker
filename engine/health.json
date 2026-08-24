@@ -1,0 +1,266 @@
+{
+ "generated": "2026-08-25T02:41:27+05:30",
+ "sources": {
+  "trai_regulations": {
+   "status": "OK",
+   "rows_seen": 30,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "30 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:38+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_directions": {
+   "status": "OK",
+   "rows_seen": 30,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "29 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:39+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_tariff_telecom": {
+   "status": "OK",
+   "rows_seen": 85,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "84 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:40+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_tariff_broadcasting": {
+   "status": "OK",
+   "rows_seen": 147,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "146 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:42+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_consultations": {
+   "status": "OK",
+   "rows_seen": 30,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "29 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:42+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_open_consultations": {
+   "status": "OK",
+   "rows_seen": 1,
+   "new": 0,
+   "notes": [],
+   "info": [],
+   "checked": "2026-08-25T02:40:43+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_recommendations": {
+   "status": "OK",
+   "rows_seen": 30,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "30 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:45+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_press_releases": {
+   "status": "OK",
+   "rows_seen": 30,
+   "new": 0,
+   "notes": [],
+   "info": [],
+   "checked": "2026-08-25T02:40:46+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_whats_new": {
+   "status": "OK",
+   "rows_seen": 30,
+   "new": 0,
+   "notes": [],
+   "info": [],
+   "checked": "2026-08-25T02:40:47+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_standing_qos": {
+   "status": "OK",
+   "rows_seen": 13,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "13 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:48+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_standing_broadband": {
+   "status": "OK",
+   "rows_seen": 2,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "2 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:49+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_standing_bcs": {
+   "status": "OK",
+   "rows_seen": 7,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "6 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:51+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_standing_fea": {
+   "status": "OK",
+   "rows_seen": 24,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "24 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:52+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_standing_nsl": {
+   "status": "OK",
+   "rows_seen": 12,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "12 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:53+05:30",
+   "consecutive_failures": 0
+  },
+  "dot_eservices_circulars": {
+   "status": "OK",
+   "rows_seen": 15,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "11 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:54+05:30",
+   "consecutive_failures": 0
+  },
+  "dot_eservices_rules": {
+   "status": "OK",
+   "rows_seen": 42,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "33 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:55+05:30",
+   "consecutive_failures": 0
+  },
+  "nccs_latest": {
+   "status": "OK",
+   "rows_seen": 19,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "7 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:55+05:30",
+   "consecutive_failures": 0
+  },
+  "nccs_sas": {
+   "status": "OK",
+   "rows_seen": 5,
+   "new": 0,
+   "notes": [],
+   "info": [],
+   "checked": "2026-08-25T02:40:56+05:30",
+   "consecutive_failures": 0
+  },
+  "nccs_sc": {
+   "status": "OK",
+   "rows_seen": 5,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "4 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:58+05:30",
+   "consecutive_failures": 0
+  },
+  "nccs_itsars": {
+   "status": "OK",
+   "rows_seen": 64,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "64 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:40:59+05:30",
+   "consecutive_failures": 0
+  },
+  "tec_whatsnew": {
+   "status": "OK",
+   "rows_seen": 277,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "269 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:41:01+05:30",
+   "consecutive_failures": 0
+  },
+  "tdsat_notices": {
+   "status": "OK",
+   "rows_seen": 437,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "420 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T02:41:02+05:30",
+   "consecutive_failures": 0
+  },
+  "pib_moc": {
+   "status": "OK",
+   "rows_seen": 20,
+   "new": 0,
+   "notes": [],
+   "info": [],
+   "checked": "2026-08-25T02:41:26+05:30",
+   "consecutive_failures": 0
+  },
+  "egazette_recent": {
+   "status": "OK",
+   "rows_seen": 9,
+   "new": 0,
+   "notes": [],
+   "info": [],
+   "checked": "2026-08-25T02:41:27+05:30",
+   "consecutive_failures": 0
+  },
+  "trai_rss": {
+   "status": "OK",
+   "rows_seen": 10,
+   "new": 0,
+   "notes": [],
+   "info": [],
+   "checked": "2026-08-25T02:41:27+05:30",
+   "consecutive_failures": 0
+  }
+ }
+}

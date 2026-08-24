@@ -1,0 +1,5 @@
+.DS_Store
+engine/.venv/
+instruments/
+__pycache__/
+*.pyc

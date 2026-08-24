@@ -1,0 +1,846 @@
+{
+ "schema_version": "2.0",
+ "updated": "2026-08-25",
+ "scope_note": "Engine v2 registry: per-source adapter configs, fixture-tested. Stratum telecom migrated from v1 (all selectors re-verified against 25-08-2026 fixtures). Strata tech_data/media/perimeter appended after the source-completeness audit.",
+ "validation_gates": {
+  "date": "must parse against the source's declared date formats; undated rows quarantine unless the source declares undated_ok (document shelves)",
+  "url": "item links must sit on the source's allowed_domains; anything else quarantines",
+  "title": "8-300 chars after whitespace collapse",
+  "dedupe": "sha1(normalised_title + date)[:10]; repeat sightings on other venues land in the sightings table, never as duplicate items",
+  "failure_policy": "fetch failure or parse below row_floor = FAILED source; sweep exits non-zero; two consecutive failures = prominent alert"
+ },
+ "classification": {
+  "note": "No tiers. One deterministic split: routine or substantive. Audited by code/audit_routine.py — ledger and regex must agree exactly.",
+  "routine_regex": "(?i)assess(es|ed)? (mobile )?network quality|subscription data|performance indicator report|quarterly highlights|panel of auditors|sitting of hon|non-sitting|internship|research associate|vacancy circular|recruitment|seminar|workshop|\\bTSTL\\b|designat(es|ed)\\b.{0,60}\\blaborator|empanel|certificate and internship|declaration of holiday|tender|walk[- ]in[- ]interview|consumer (outreach|awareness) program|consumer education workshop|engagement of (young )?professional",
+  "deadline_regex": "(?i)(comments?|counter[- ]comments?|last date|due).{0,40}?(\\d{1,2}[-./ ](\\d{1,2}|[A-Za-z]+)[-./ ]\\d{2,4})",
+  "memo_types": [
+   "rules",
+   "direction",
+   "order",
+   "circular",
+   "notification",
+   "clarification",
+   "regulation",
+   "tariff_order",
+   "exemption",
+   "manual",
+   "itsar",
+   "gazette_notification"
+  ],
+  "memo_note": "A memo is drafted for a new, non-routine item whose type is in memo_types. Drafts, consultations, releases, notices and designations do not trigger a memo."
+ },
+ "sources": [
+  {
+   "id": "trai_regulations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Regulations",
+   "url": "https://trai.gov.in/release-publication/regulations",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_views",
+    "row_floor": 10
+   },
+   "date_formats": [
+    "DD/MM/YYYY",
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 12
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "regulation",
+   "quirks": "PDF filenames regular: Regulation_DDMMYYYY.pdf"
+  },
+  {
+   "id": "trai_directions",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Directions & Orders",
+   "url": "https://trai.gov.in/release-publication/directions",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_views",
+    "row_floor": 10
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 12
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "direction",
+   "type_rules": [
+    {
+     "match": "(?i)^order|\\border\\b.{0,20}regarding",
+     "type": "order"
+    }
+   ],
+   "quirks": "Non-tariff orders interleaved here; no separate orders page exists (404)."
+  },
+  {
+   "id": "trai_tariff_telecom",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Telecom Tariff Orders",
+   "url": "https://trai.gov.in/telecom/telecom-tariff",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_views",
+    "row_floor": 5
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 8
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "tariff_order",
+   "type_rules": [
+    {
+     "match": "(?i)^direction",
+     "type": "direction"
+    }
+   ],
+   "quirks": "Directions cross-listed here; dedupe via sightings against trai_directions."
+  },
+  {
+   "id": "trai_tariff_broadcasting",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Broadcasting Tariff Orders",
+   "url": "https://trai.gov.in/broadcasting/tariff-orders",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_views",
+    "row_floor": 5
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 8
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "tariff_order",
+   "quirks": "Low frequency (last item 2024)."
+  },
+  {
+   "id": "trai_consultations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Consultation Papers",
+   "url": "https://trai.gov.in/release-publication/consultation",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_views",
+    "row_floor": 10
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 12
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "consultation_paper",
+   "type_rules": [
+    {
+     "match": "(?i)^notice|extension of (the )?last date",
+     "type": "consultation_notice"
+    }
+   ],
+   "quirks": "Items link to detail pages; PDF one hop deeper."
+  },
+  {
+   "id": "trai_open_consultations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Open Consultations (deadline register)",
+   "url": "https://trai.gov.in/open-consultation",
+   "status": "live",
+   "method": "static_html",
+   "role": "crosscheck",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 1,
+    "undated_ok": true,
+    "date_from_href": true
+   },
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD Month YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "consultation_paper",
+   "quirks": "Single page. Crosscheck only: open CPs must already exist via trai_consultations; a catch here means the category page parser missed one. Closing dates live on CP detail pages."
+  },
+  {
+   "id": "trai_recommendations",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Recommendations",
+   "url": "https://trai.gov.in/release-publication/recommendation",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_views",
+    "row_floor": 10
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 12
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "recommendation"
+  },
+  {
+   "id": "trai_press_releases",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Press Releases",
+   "url": "https://trai.gov.in/notifications/press-release",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "trai_grid",
+    "row_floor": 10
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 20
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "press_release",
+   "type_rules": [
+    {
+     "match": "(?i)clarification",
+     "type": "clarification"
+    }
+   ],
+   "tripwire": {
+    "kind": "sequence"
+   },
+   "quirks": "CRITICAL: ?page=0 can serve a stale cache missing the newest items — page one is ALWAYS the unparameterised URL. PR numbers ride in the download aria-label; numbering gap = missed item. Clarifications with legal effect appear only here."
+  },
+  {
+   "id": "trai_whats_new",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "What's New (cross-check)",
+   "url": "https://trai.gov.in/what-s-new",
+   "status": "live",
+   "method": "static_html",
+   "role": "crosscheck",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "row_floor": 15
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 10
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "notification",
+   "type_rules": [
+    {
+     "match": "(?i)direction",
+     "type": "direction"
+    },
+    {
+     "match": "(?i)regulation",
+     "type": "regulation"
+    },
+    {
+     "match": "(?i)consultation",
+     "type": "consultation_paper"
+    },
+    {
+     "match": "(?i)recommendation",
+     "type": "recommendation"
+    },
+    {
+     "match": "(?i)tariff",
+     "type": "tariff_order"
+    }
+   ],
+   "stale_after_days": 21,
+   "quirks": "Aggregator; a catch here means a category-page parser missed the item."
+  },
+  {
+   "id": "trai_standing_qos",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Standing Directions — Quality of Service",
+   "url": "https://trai.gov.in/release-publication/standing-directions/quality-of-Service",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 5,
+    "undated_ok": true,
+    "date_from_href": true,
+    "href_include": "/sites/default/files/"
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "direction",
+   "quirks": "Only first 13 rows server-rendered (JS load-more) — sufficient for new-item detection. Capital S in URL is the site's own. Rows are Download links; title from aria-label; date from Direction_DDMMYYYY.pdf filename; JS load-more hides older rows (fine for new-item detection).",
+   "tripwire": {
+    "kind": "monotonic"
+   }
+  },
+  {
+   "id": "trai_standing_broadband",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Standing Directions — Broadband & Policy Analysis",
+   "url": "https://trai.gov.in/release-publication/standing-directions/broadband-and-policy-analysis",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 2,
+    "undated_ok": true,
+    "date_from_href": true,
+    "href_include": "/sites/default/files/"
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "direction",
+   "quirks": "v1 swept only the QoS sub-page; all five divisions are now separate sources. Rows are Download links; title from aria-label; date from Direction_DDMMYYYY.pdf filename; JS load-more hides older rows (fine for new-item detection).",
+   "tripwire": {
+    "kind": "monotonic"
+   }
+  },
+  {
+   "id": "trai_standing_bcs",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Standing Directions — Broadcasting & Cable",
+   "url": "https://trai.gov.in/release-publication/standing-directions/broadcasting-and-cable-services",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 5,
+    "undated_ok": true,
+    "date_from_href": true,
+    "href_include": "/sites/default/files/"
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "direction",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Rows are Download links; title from aria-label; date from Direction_DDMMYYYY.pdf filename; JS load-more hides older rows (fine for new-item detection)."
+  },
+  {
+   "id": "trai_standing_fea",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Standing Directions — Financial & Economic Analysis",
+   "url": "https://trai.gov.in/release-publication/standing-directions/financial-and-economic-analysis",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 10,
+    "undated_ok": true,
+    "date_from_href": true,
+    "href_include": "/sites/default/files/"
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "direction",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Rows are Download links; title from aria-label; date from Direction_DDMMYYYY.pdf filename; JS load-more hides older rows (fine for new-item detection)."
+  },
+  {
+   "id": "trai_standing_nsl",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "Standing Directions — Network, Spectrum & Licensing",
+   "url": "https://trai.gov.in/release-publication/standing-directions/network-spectrum-and-licensing",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 8,
+    "undated_ok": true,
+    "date_from_href": true,
+    "href_include": "/sites/default/files/"
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "direction",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Rows are Download links; title from aria-label; date from Direction_DDMMYYYY.pdf filename; JS load-more hides older rows (fine for new-item detection)."
+  },
+  {
+   "id": "dot_eservices_circulars",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices — Circulars/Notifications/Others",
+   "url": "https://eservices.dot.gov.in/circular-notifications-others",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "type_cell": 1,
+    "title_cell": 4,
+    "date_cell": 6,
+    "link_selector": "td a[href]",
+    "row_floor": 10
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 25
+   },
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "dot.gov.in",
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "default_type": "circular",
+   "type_map": {
+    "(?i)notification": "notification",
+    "(?i)press release": "press_release",
+    "(?i)circular": "circular",
+    "(?i)order": "order",
+    "(?i)rule": "rules"
+   },
+   "quirks": "THE machine-readable DoT source (portal notified 23-06-2026). Venue's own type column governs; some rows link out to PIB."
+  },
+  {
+   "id": "dot_eservices_rules",
+   "stratum": "telecom",
+   "regulator": "DoT",
+   "name": "eServices — Act & Rules shelf",
+   "url": "https://eservices.dot.gov.in/act-and-rules",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "href_include": "/circular-notifications/",
+    "row_floor": 20,
+    "undated_ok": true
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "eservices.dot.gov.in",
+    "dot.gov.in"
+   ],
+   "default_type": "rules",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Reference shelf; undated rows keyed by URL+title, dated by first_seen. KNOWN LAG: gazetted rules can be missing for weeks — the gazette lane covers the gap. Shelf shrinkage trips the monotonic wire."
+  },
+  {
+   "id": "nccs_latest",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Latest Updates",
+   "url": "https://nccs.gov.in/home/latestUpdates/1",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 3,
+    "row_floor": 3
+   },
+   "date_formats": [
+    "DD Month YYYY"
+   ],
+   "pagination": {
+    "scheme": "path_page",
+    "template": "https://nccs.gov.in/home/latestUpdates/{page}?rowsPerPage=50",
+    "start": 1,
+    "max_pages": 6
+   },
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "default_type": "notification",
+   "type_rules": [
+    {
+     "match": "(?i)^notice for stakeholder consultation",
+     "type": "consultation_notice"
+    },
+    {
+     "match": "(?i)circular",
+     "type": "circular"
+    }
+   ],
+   "quirks": "PDF filenames contain literal spaces — URL-encode on fetch. Cross-lists with circularsSas/Sc — sightings absorb the dupes."
+  },
+  {
+   "id": "nccs_sas",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Circulars — Security Assurance Standards",
+   "url": "https://nccs.gov.in/home/circularsSas/1",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 3,
+    "row_floor": 3
+   },
+   "date_formats": [
+    "DD Month YYYY"
+   ],
+   "pagination": {
+    "scheme": "path_page",
+    "template": "https://nccs.gov.in/home/circularsSas/{page}",
+    "start": 1,
+    "max_pages": 6
+   },
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "default_type": "circular"
+  },
+  {
+   "id": "nccs_sc",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Circulars — Security Certification (ComSec)",
+   "url": "https://nccs.gov.in/home/circularsSc/1",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 3,
+    "row_floor": 3
+   },
+   "date_formats": [
+    "DD Month YYYY"
+   ],
+   "pagination": {
+    "scheme": "path_page",
+    "template": "https://nccs.gov.in/home/circularsSc/{page}",
+    "start": 1,
+    "max_pages": 6
+   },
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "default_type": "circular",
+   "quirks": "Internship/administrative rows fall to the routine regex."
+  },
+  {
+   "id": "nccs_itsars",
+   "stratum": "telecom",
+   "regulator": "NCCS",
+   "name": "Notified ITSARs",
+   "url": "https://nccs.gov.in/home/itsars",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 3,
+    "link_selector": "td a[href*='itsar']",
+    "row_floor": 40
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "nccs.gov.in"
+   ],
+   "default_type": "itsar",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Binding security standards; a new ITSAR is always substantive."
+  },
+  {
+   "id": "tec_whatsnew",
+   "stratum": "telecom",
+   "regulator": "TEC",
+   "name": "What's New",
+   "url": "https://www.tec.gov.in/whats-new",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "row_floor": 100
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tec.gov.in",
+    "www.tec.gov.in"
+   ],
+   "default_type": "circular",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "ALWAYS the www host — bare tec.gov.in has a broken TLS chain. Dormant since 22-12-2025; watch for MTCTE ER notifications."
+  },
+  {
+   "id": "tdsat_notices",
+   "stratum": "telecom",
+   "regulator": "TDSAT",
+   "name": "Notices / Circulars",
+   "url": "https://tdsat.gov.in/writereaddata/Delhi/docs/notices.php",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "regex_rows",
+    "row_floor": 200,
+    "row_regex": "<a href=\"(?P<href>[^\"]*?\\.pdf[^\"]*)\"[^>]*>(?P<title>.*?)</a>.{0,600}?<p>(?P<date_raw>\\d{1,2}-\\d{1,2}-\\d{4})</p>"
+   },
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tdsat.gov.in"
+   ],
+   "default_type": "court_notice",
+   "type_rules": [
+    {
+     "match": "(?i)practice direction",
+     "type": "direction"
+    }
+   ],
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Malformed HTML: <tr> never re-opens after row 1, so rows are matched on raw bytes (anchor + following date <p>). ~430 rows. Practice directions (rare, substantive) appear among routine sitting notices."
+  },
+  {
+   "id": "pib_moc",
+   "stratum": "telecom",
+   "regulator": "PIB",
+   "name": "PIB releases (all-ministries feed, ministry-filtered)",
+   "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+   "status": "live",
+   "method": "rss",
+   "parser": {
+    "strategy": "rss",
+    "row_floor": 5,
+    "undated_ok": true
+   },
+   "date_formats": [],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "default_type": "press_release",
+   "pib_ministry_filter": [
+    "Ministry of Communications",
+    "Ministry of Electronics",
+    "Ministry of Information and Broadcasting",
+    "Ministry of Information & Broadcasting"
+   ],
+   "quirks": "PIB offers no per-ministry feed; ministry is confirmed by fetching each new release page once (deterministic substring match). Instrument-announcing releases fold into the instrument they announce at curation."
+  },
+  {
+   "id": "egazette_recent",
+   "stratum": "safety_net",
+   "regulator": "e-Gazette",
+   "name": "Recent Extraordinary + Weekly panels",
+   "url": "https://egazette.gov.in/",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "egazette_recent",
+    "row_floor": 5
+   },
+   "date_formats": [
+    "DD-Mon-YYYY",
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "egazette.gov.in"
+   ],
+   "default_type": "gazette_notification",
+   "row_filter": {
+    "field": "extra.ministry",
+    "regex": "Communications|Electronics|Information Technology|Information (and|&) Broadcasting"
+   },
+   "item_flags": [
+    "needs_verification"
+   ],
+   "stale_after_days": 14,
+   "quirks": "Legally authoritative venue; regulator sites lag it. Homepage panels only — full ministry-by-date search is an ASP.NET postback flow (roadmap). Panel has itself gone stale for weeks; the staleness wire fires at 14 days. Rows carry needs_verification until the gazette PDF is pulled."
+  },
+  {
+   "id": "trai_rss",
+   "stratum": "telecom",
+   "regulator": "TRAI",
+   "name": "TRAI sitewide RSS (lag cross-check)",
+   "url": "https://trai.gov.in/rss.xml",
+   "status": "live",
+   "method": "rss",
+   "role": "crosscheck",
+   "parser": {
+    "strategy": "rss",
+    "row_floor": 1
+   },
+   "date_formats": [],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "trai.gov.in"
+   ],
+   "default_type": "notification",
+   "quirks": "VERIFIED LAGGING (~6 weeks behind the site). Never a trigger; a catch here that the HTML listings missed is a parser bug and surfaces as a crosscheck WARN."
+  }
+ ],
+ "window_start": "2026-06-01"
+}
