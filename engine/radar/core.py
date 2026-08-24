@@ -33,8 +33,7 @@ def _page_urls(source: dict, max_pages: int) -> List[str]:
         param, start = pg.get("param", "page"), pg.get("start", 1)
         sep = "&" if "?" in base else "?"
         urls = [base] if pg.get("first_unparameterised", True) else []
-        n0 = start if urls else 0
-        urls += [f"{base}{sep}{param}={n}" for n in range(n0, n0 + max_pages)]
+        urls += [f"{base}{sep}{param}={n}" for n in range(start, start + max_pages)]
         return urls[:max_pages]
     if scheme == "path_page":
         template, start = pg["template"], pg.get("start", 1)
@@ -81,7 +80,8 @@ class Sweeper:
             all_rows: List[dict] = []
             content = b""
             for page_url in _page_urls(source, max_pages):
-                r = get(page_url, tolerant_tls=source.get("tolerant_tls", False))
+                r = get(page_url, tolerant_tls=source.get("tolerant_tls", False),
+                        extra_headers=source.get("http_headers"))
                 content = r.content if not all_rows else content
                 rows = ps.parse(source, r.content, page_url)
                 if not rows and all_rows:

@@ -54,12 +54,18 @@ def selftest() -> int:
     failures = []
     print(f"{'source':<28} {'rows':>5} {'gated':>5}  status")
     for s in [x for x in reg["sources"] if x.get("status") == "live"]:
-        fx = FIXTURES / f"{s['id']}.html"
-        if not fx.exists():
-            for alt in (FIXTURES / f"{s['id']}.xml", FIXTURES / f"{s['id']}_rss.html"):
-                if alt.exists():
-                    fx = alt
-                    break
+        # fixture matching the strategy wins: API sources test their .json capture even
+        # when an .html shell of the same venue sits alongside as evidence
+        json_first = s["parser"]["strategy"] in ("meity_api",)
+        exts = (".json", ".html", ".xml") if json_first else (".html", ".json", ".xml")
+        fx = None
+        for ext in exts:
+            cand = FIXTURES / f"{s['id']}{ext}"
+            if cand.exists():
+                fx = cand
+                break
+        if fx is None:
+            fx = FIXTURES / f"{s['id']}.html"
         if not fx.exists():
             print(f"{s['id']:<28} {'-':>5} {'-':>5}  NO FIXTURE")
             failures.append((s["id"], "no fixture captured"))
@@ -84,6 +90,31 @@ def selftest() -> int:
             print(f"  {sid}: {why}")
         return 1
     print("\nselftest passed: every live source parses its fixture above floor")
+    return 0
+
+
+# ------------------------------------------------------------------------ audit
+def audit() -> int:
+    """No classification drift: every engine-classified row's routine flag must equal
+    what the current regex produces. Curated v1 baseline rows are exempt (their flags
+    were hand-verified against the v1 regex); engine rows must agree exactly."""
+    import re as _re
+    reg = load_registry()
+    rx = _re.compile(reg["classification"]["routine_regex"])
+    led = open_ledger()
+    bad = []
+    for it in led.all_items():
+        if it["status"] in ("baseline", "duplicate"):
+            continue
+        expect = bool(rx.search(it["title"]))
+        if bool(it["routine"]) != expect:
+            bad.append((it["id"], it["routine"], expect, it["title"][:80]))
+    if bad:
+        print(f"AUDIT FAILED: {len(bad)} row(s) disagree with the routine regex")
+        for iid, got, want, t in bad:
+            print(f"  {iid} stored={got} regex={want}  {t}")
+        return 1
+    print("audit passed: every engine row agrees with the classification regex")
     return 0
 
 
@@ -198,7 +229,7 @@ def fetch_pdfs() -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["sweep", "backfill", "selftest", "import-baseline",
-                                    "export", "health", "fetch-pdfs"])
+                                    "export", "health", "fetch-pdfs", "audit"])
     ap.add_argument("--source")
     ap.add_argument("--stratum")
     ap.add_argument("--since")
@@ -206,6 +237,8 @@ def main() -> int:
 
     if a.cmd == "selftest":
         return selftest()
+    if a.cmd == "audit":
+        return audit()
     if a.cmd == "import-baseline":
         return import_baseline()
     if a.cmd == "export":

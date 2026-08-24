@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-25T02:41:27+05:30",
+ "generated": "2026-08-25T03:07:12+05:30",
  "sources": {
   "trai_regulations": {
    "status": "OK",
@@ -9,7 +9,7 @@
    "info": [
     "30 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:38+05:30",
+   "checked": "2026-08-25T03:04:29+05:30",
    "consecutive_failures": 0
   },
   "trai_directions": {
@@ -20,7 +20,7 @@
    "info": [
     "29 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:39+05:30",
+   "checked": "2026-08-25T03:04:30+05:30",
    "consecutive_failures": 0
   },
   "trai_tariff_telecom": {
@@ -31,7 +31,7 @@
    "info": [
     "84 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:40+05:30",
+   "checked": "2026-08-25T03:04:31+05:30",
    "consecutive_failures": 0
   },
   "trai_tariff_broadcasting": {
@@ -42,7 +42,7 @@
    "info": [
     "146 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:42+05:30",
+   "checked": "2026-08-25T03:04:33+05:30",
    "consecutive_failures": 0
   },
   "trai_consultations": {
@@ -53,7 +53,7 @@
    "info": [
     "29 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:42+05:30",
+   "checked": "2026-08-25T03:04:33+05:30",
    "consecutive_failures": 0
   },
   "trai_open_consultations": {
@@ -62,7 +62,7 @@
    "new": 0,
    "notes": [],
    "info": [],
-   "checked": "2026-08-25T02:40:43+05:30",
+   "checked": "2026-08-25T03:04:34+05:30",
    "consecutive_failures": 0
   },
   "trai_recommendations": {
@@ -73,7 +73,7 @@
    "info": [
     "30 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:45+05:30",
+   "checked": "2026-08-25T03:04:36+05:30",
    "consecutive_failures": 0
   },
   "trai_press_releases": {
@@ -82,7 +82,7 @@
    "new": 0,
    "notes": [],
    "info": [],
-   "checked": "2026-08-25T02:40:46+05:30",
+   "checked": "2026-08-25T03:04:38+05:30",
    "consecutive_failures": 0
   },
   "trai_whats_new": {
@@ -91,7 +91,7 @@
    "new": 0,
    "notes": [],
    "info": [],
-   "checked": "2026-08-25T02:40:47+05:30",
+   "checked": "2026-08-25T03:04:38+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_qos": {
@@ -102,7 +102,7 @@
    "info": [
     "13 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:48+05:30",
+   "checked": "2026-08-25T03:04:39+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_broadband": {
@@ -113,7 +113,7 @@
    "info": [
     "2 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:49+05:30",
+   "checked": "2026-08-25T03:04:40+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_bcs": {
@@ -124,7 +124,7 @@
    "info": [
     "6 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:51+05:30",
+   "checked": "2026-08-25T03:04:42+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_fea": {
@@ -135,7 +135,7 @@
    "info": [
     "24 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:52+05:30",
+   "checked": "2026-08-25T03:04:43+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_nsl": {
@@ -146,7 +146,7 @@
    "info": [
     "12 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:53+05:30",
+   "checked": "2026-08-25T03:04:44+05:30",
    "consecutive_failures": 0
   },
   "dot_eservices_circulars": {
@@ -157,7 +157,7 @@
    "info": [
     "11 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:54+05:30",
+   "checked": "2026-08-25T03:04:45+05:30",
    "consecutive_failures": 0
   },
   "dot_eservices_rules": {
@@ -168,7 +168,7 @@
    "info": [
     "33 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:55+05:30",
+   "checked": "2026-08-25T03:04:46+05:30",
    "consecutive_failures": 0
   },
   "nccs_latest": {
@@ -179,7 +179,7 @@
    "info": [
     "7 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:55+05:30",
+   "checked": "2026-08-25T03:04:47+05:30",
    "consecutive_failures": 0
   },
   "nccs_sas": {
@@ -188,7 +188,7 @@
    "new": 0,
    "notes": [],
    "info": [],
-   "checked": "2026-08-25T02:40:56+05:30",
+   "checked": "2026-08-25T03:04:47+05:30",
    "consecutive_failures": 0
   },
   "nccs_sc": {
@@ -199,7 +199,7 @@
    "info": [
     "4 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:58+05:30",
+   "checked": "2026-08-25T03:04:49+05:30",
    "consecutive_failures": 0
   },
   "nccs_itsars": {
@@ -210,7 +210,7 @@
    "info": [
     "64 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:40:59+05:30",
+   "checked": "2026-08-25T03:04:50+05:30",
    "consecutive_failures": 0
   },
   "tec_whatsnew": {
@@ -221,7 +221,7 @@
    "info": [
     "269 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:41:01+05:30",
+   "checked": "2026-08-25T03:04:55+05:30",
    "consecutive_failures": 0
   },
   "tdsat_notices": {
@@ -232,7 +232,7 @@
    "info": [
     "420 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-25T02:41:02+05:30",
+   "checked": "2026-08-25T03:04:56+05:30",
    "consecutive_failures": 0
   },
   "pib_moc": {
@@ -241,7 +241,7 @@
    "new": 0,
    "notes": [],
    "info": [],
-   "checked": "2026-08-25T02:41:26+05:30",
+   "checked": "2026-08-25T03:05:20+05:30",
    "consecutive_failures": 0
   },
   "egazette_recent": {
@@ -250,7 +250,7 @@
    "new": 0,
    "notes": [],
    "info": [],
-   "checked": "2026-08-25T02:41:27+05:30",
+   "checked": "2026-08-25T03:05:24+05:30",
    "consecutive_failures": 0
   },
   "trai_rss": {
@@ -259,7 +259,215 @@
    "new": 0,
    "notes": [],
    "info": [],
-   "checked": "2026-08-25T02:41:27+05:30",
+   "checked": "2026-08-25T03:05:24+05:30",
+   "consecutive_failures": 0
+  },
+  "meity_gazettes": {
+   "status": "OK",
+   "rows_seen": 105,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "105 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:05:32+05:30",
+   "consecutive_failures": 0
+  },
+  "meity_acts_policies": {
+   "status": "OK",
+   "rows_seen": 42,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "42 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:05:35+05:30",
+   "consecutive_failures": 0
+  },
+  "meity_orders_notices": {
+   "status": "OK",
+   "rows_seen": 45,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 5 visible item(s) ledgered as activation_baseline",
+    "40 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:05:35+05:30",
+   "consecutive_failures": 0
+  },
+  "certin_advisories": {
+   "status": "OK",
+   "rows_seen": 15,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 15 visible item(s) ledgered as activation_baseline"
+   ],
+   "checked": "2026-08-25T03:06:15+05:30",
+   "consecutive_failures": 0
+  },
+  "certin_vuln": {
+   "status": "OK",
+   "rows_seen": 20,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 20 visible item(s) ledgered as activation_baseline"
+   ],
+   "checked": "2026-08-25T03:06:16+05:30",
+   "consecutive_failures": 0
+  },
+  "certin_guidelines": {
+   "status": "OK",
+   "rows_seen": 31,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 1 visible item(s) ledgered as activation_baseline",
+    "30 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:06:17+05:30",
+   "consecutive_failures": 0
+  },
+  "certin_directions": {
+   "status": "OK",
+   "rows_seen": 12,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 6 visible item(s) ledgered as activation_baseline"
+   ],
+   "checked": "2026-08-25T03:06:18+05:30",
+   "consecutive_failures": 0
+  },
+  "uidai_circulars": {
+   "status": "OK",
+   "rows_seen": 10,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 1 visible item(s) ledgered as activation_baseline",
+    "9 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:06:18+05:30",
+   "consecutive_failures": 0
+  },
+  "uidai_notifications": {
+   "status": "OK",
+   "rows_seen": 10,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "10 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:06:19+05:30",
+   "consecutive_failures": 0
+  },
+  "uidai_oms": {
+   "status": "OK",
+   "rows_seen": 10,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 1 visible item(s) ledgered as activation_baseline",
+    "9 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:06:21+05:30",
+   "consecutive_failures": 0
+  },
+  "mib_acts_policy": {
+   "status": "OK",
+   "rows_seen": 20,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 5 visible item(s) ledgered as activation_baseline",
+    "15 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:07:04+05:30",
+   "consecutive_failures": 0
+  },
+  "mib_orders_notices": {
+   "status": "OK",
+   "rows_seen": 10,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 4 visible item(s) ledgered as activation_baseline",
+    "6 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:07:05+05:30",
+   "consecutive_failures": 0
+  },
+  "mib_other_comms": {
+   "status": "OK",
+   "rows_seen": 20,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "19 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:07:07+05:30",
+   "consecutive_failures": 0
+  },
+  "mib_digital_media": {
+   "status": "OK",
+   "rows_seen": 35,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 20 visible item(s) ledgered as activation_baseline",
+    "15 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:07:08+05:30",
+   "consecutive_failures": 0
+  },
+  "mib_broadcasting": {
+   "status": "OK",
+   "rows_seen": 63,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 46 visible item(s) ledgered as activation_baseline",
+    "17 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:07:09+05:30",
+   "consecutive_failures": 0
+  },
+  "prgi": {
+   "status": "OK",
+   "rows_seen": 5,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 5 visible item(s) ledgered as activation_baseline"
+   ],
+   "checked": "2026-08-25T03:07:11+05:30",
+   "consecutive_failures": 0
+  },
+  "cbfc": {
+   "status": "OK",
+   "rows_seen": 14,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 11 visible item(s) ledgered as activation_baseline",
+    "2 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:07:12+05:30",
+   "consecutive_failures": 0
+  },
+  "asci": {
+   "status": "OK",
+   "rows_seen": 6,
+   "new": 0,
+   "notes": [],
+   "info": [
+    "first sweep: 1 visible item(s) ledgered as activation_baseline",
+    "5 row(s) predate window_start — not ledgered"
+   ],
+   "checked": "2026-08-25T03:07:12+05:30",
    "consecutive_failures": 0
   }
  }

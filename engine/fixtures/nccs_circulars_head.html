@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+<!--		<title>NCCS</title>-->
+<!--                <title th:text="${#messages.msgOrNull('homepage.header.upperHeader.Title')} ?: _">NCCS</title>-->
+                <title>NCCS - HQ Cirulars</title>
+		<meta name="description" content="National Centre for Communication Security" />
+		<meta name="title" content="National Centre for Communication Security" />
+		<meta name="keywords" content="NCCS, SAS, SC, SLR, National Centre for Communication Security, Security Assurance Standards, Security Lab Recognition/Designation, Security Certification" />
+
+		<!-- Favicons -->
+		<link href="/resources/assets/img/nccslogo2.jpg" rel="icon" />
+		<link href="/resources/assets/img/nccslogo2.jpg" rel="apple-touch-icon" />
+		<link href="/resources/assets/vendor/fonts-googleapis/font1.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/fonts-googleapis/font2.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/fonts-googleapis/font3.css" rel="stylesheet" />
+		<!-- Vendor CSS Files -->
+		<link href="/resources/assets/vendor/animate.css/animate.min.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/aos/aos.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+		<link href="/resources/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+
+		<!-- Template Main CSS file -->
+		<link href="/resources/assets/css/style.css" rel="stylesheet" />
+
+		<!-- Social Media Icons  -->
+		<link href="/resources/assets/vendor/font-awesome/new/css/font-awesome.min.css" rel="stylesheet" />
+
+		<!-- Multi Image Carousel -->
+		<script src="/resources/assets/js/jquery/latest/jquery.min.js"></script>
+
+		<script src="/resources/assets/js/axios/dist/axios.min.js"></script>
+
+    <!-- <script src="/resources/assets/js/jquery/3.2.1/jquery.hero.js"></script> -->
+
+		<!-- =======================================================
+        * Template Name: Company - v4.7.0
+        * Template URL: https://bootstrapmade.com/company-free-html-bootstrap-template/
+        * Author: BootstrapMade.com
+        * License: https://bootstrapmade.com/license/
+        ======================================================== -->
+	</head>
+
+	<body id="mainBody">
+		<div id="container">
+			<div>
+			<header class="header" aria-label="header 1">
+				<div class="flex-container p-0 m-0">
+					<div class="flex-container1">
+						<div id="GOI">
+							<a
+								class="goiHeader externalLink"
+								href="https://www.xn--i1bj3fqcyde.xn--11b7cb3a6a.xn--h2brj9c/"
+								target="_blank"
+								rel="noopener noreferrer"
+								title="भारत सरकार ( बाहरी वेबसाइट जो एक नई विंडो में खुलती है)"
+							>
+								भारत सरकार
+							</a>
+							<br />
+							<strong class="m-0 p-0">
+								<a class="goiHeader externalLink" href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer" title="Government of India (External link that open in a new window)">
+									GOVERNMENT OF INDIA
+								</a>
+							</strong>
+						</div>
+
+						<div class="ministry-name">
+							<a class="goiHeader" href="#">संचार मंत्रालय </a><br />
+							<strong class="m-0 p-0">
+								<a class="goiHeader" href="#">MINISTRY OF COMMUNICATIONS</a>
+							</strong>
+						</div>
+					</div>
+
+					<div class="flex-container1">
+						<div class = "font-links">
+							<a href="#mainContent" class="font-link">Skip To Main Content</a>
+						</div>
+
+						<div class = "font-links">
+							<a id="decrease-size" href="#" title="Decrease Font size" class="font-link decreaseFont">A-</a>
+							<a id="reset-size" href="#" title="Default Font size" class="resetFont font-link">A</a>
+							<a id="increase-size" href="#" title="Increase Font size" class="font-link increaseFont">A+</a>
+							<a href="#" id="toggle-high-contrast" class = "font-link">
+								<img id="material_icon_contrast" src="/resources/assets/vendor/fonts-googleapis/icons/contrast.svg" alt="Contrast Icon" title="Contrast" />
+							</a>
+						</div>
+
+						<div class = "social-links">
+							<a class = "social-link externalLink" href="https://www.facebook.com/DoTIndia/" target="_blank" rel="noopener noreferrer" ><img src="/resources/assets/img/social/facebook-24.png" alt="DOT facebook page" title="DoT facebook link"></a>
+							<a class = "social-link externalLink" href="https://twitter.com/dot_India" target="_blank" rel="noopener noreferrer" ><img src="/resources/assets/img/social/twitter-24.png" alt="DOT twitter page" title="DoT twitter link"></a>
+							<a class = "social-link externalLink" href="https://www.youtube.com/channel/UCCNc_OLa1-_knGHASA1PLkQ" target="_blank" rel="noopener noreferrer" ><img src="/resources/assets/img/social/youtube-24.png" alt="DOT youtube channel" title="DoT youtube link"></a>
+						</div>
+
+						<div class = "font-links">
+							<a class = "font-link" href="/home/sitemap" title="Sitemap"><img id="material_icon_black_lan" src="/resources/assets/vendor/fonts-googleapis/icons/lan.svg" alt="Sitemap"/></a>
+						</div>
+						<div class="font-links"> 
+							<form id="searchForm" action="/home/search" method="get" title="Search" >
+								<input class="inp-search" type="text" name="search" id="searchKeyword" aria-label="Search" placeholder="Search"><i class="bi bi-search"></i>
+							</form>
+						</div>
+						<!-- onClick not allowed-->
+						<!-- <div class="language-switch-container">
+                            <button 
+                                class="language-switch-button"
+                                onclick="confirmAndSwitchLanguage()"
+                                th:data-target-language="${language == 'en' ? 'hi' : 'en'}"
+                                th:text="${#messages.msgOrNull('homepage.header.upperHeader.LanguageButton')} ?: _">
+                            </button>
+                        </div> -->
+						<div>
+							<button
+								id="language-switch-button"
+								data-target-language="hi">Switch to Hindi</button>
+						</div>
+						<div>
+							
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<header class="header" aria-label="header 2">
+				<div class="container d-flex align-items-center justify-content-between">
+					<div class="d-flex" id="clickableSection" data-href="/">
+						<div>
+						<a class="nccsImage" href="/home/index.html"><img alt="Emblem" class="img-fluid" src="/resources/assets/img/gov_ind1.png" title="National Emblem" /> </a>
+						</div>
+						<div>
+						<a class="nccsImage" href="/"><img alt="National Centre for Communication Security (NCCS)" class="img-fluid" src="/resources/assets/img/NCCS.png" title="National Centre for Communication Security" /> </a>
+						</div>
+						<div id="nccsHeading" class="heading me-auto">
+							<h6 id="headingChild1">
+								<a class="goiHeader" href="#">
+								<span>National Centre for</span>
+								<br />
+								<span>Communication Security</span>
+								</a>
+							</h6>
+							<h6 id="headingChild2">
+								<a class="goiHeader" href="#">
+								<span>Department of Telecommunications</span>
+								</a>
+							</h6>
+						</div>
+					</div>
+
+					<div class="logos">
+						
+						<a class="logo headerLogo" href="https://www.delhiwtsa24.in/" rel="noopener noreferrer" target="_blank">
+							<img alt="ITUWTSA" class="img-fluid" src="/resources/assets/img/ITUWTSA_Logo_PNG.png" title="WTSA-2024 (External link that open in a new window)" />
+						</a>
+
+						<a class="logo headerLogo" href="https://amritmahotsav.nic.in/" rel="noopener noreferrer" target="_blank">
+							<img alt="AzadiKaAmritMahotsav" class="img-fluid" src="/resources/assets/img/azadi3.png" title="Azadi ka Amrit Mahotsav ( External link that open in a new window)" />
+						</a>
+
+						<a class="logo headerLogo" href="https://swachhbharatmission.ddws.gov.in/" rel="noopener noreferrer" target="_blank">
+							<img alt="SwacchBharat" class="img-fluid" src="/resources/assets/img/swach-bharat.png" title="Swachh Bharat (External link that open in a new window)" />
+						</a>
+					</div>
+
+					<button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler my-2" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+						<i class="bi bi-list mobile-nav-toggle"></i>
+					</button>
+				</div>
+
+				<div id="header_content" class="d-flex justify-content-center align-items-center">
+					<nav class="navbar navbar-expand-lg">
+						<div class="container-fluid d-flex justify-content-center">
+							<div class="collapse navbar-collapse" id="navbarSupportedContent">
+								<ul class="menu headernav">
+									<li>
+										<a class="navitem" href="/home/index.html">Home</a>
+									</li>
+									<li class="dropdown">
+										<a class="navitem" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+                                                                                    <span>About Us</span><span class="pic arrow-down"></span>
+                                                                                </a>
+										<ul class="submenu">
+											<li class="submenuLink">
+												<a href="/home/about/aboutNccs">About NCCS</a>
+											</li>
+											<li class="submenuLink">
+												<a href="/home/organization/1">Organization Structure</a>
+											</li>
+											<li class="submenuLink">
+												<a href="/home/about/nccsFunctions">NCCS Functions</a>
+											</li>
+											<li class="dropdown">
+												<a  tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+                                                                                                    <span>Divisions</span><span class="pic arrow-right"></span></a>
+												<ul class="submenu">
+													<li class="dropdown">
+														<a href="/home/about/SAS">Security Assurance Standards</a>
+													</li>
+													<li>
+														<a href="/home/about/SLR">Security Lab Recognition</a>
+													</li>
+													<li>
+														<a href="/home/about/SC">Security Certifications &amp; Headquarters</a>
+													</li>
+												</ul>
+											</li>
+
+											<li class="submenuLink submenuOut">
+												<a href="/home/contactList/1">Who&#39;s Who</a>
+											</li>
+										</ul>
+									</li>
+
+									<li class="dropdown">
+										<a class="navitem" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+                                                                                    <span>ITSARs</span><span class="pic arrow-down"></span>
+                                                                                </a>
+										<ul class="submenu">
+											<li class="submenuLink">
+												<a href="/home/itsars">Notified ITSARs</a>
+											</li>
+											<li class="dropdown">
+												<a  tabindex="0"><span>Draft ITSARs</span><span class="pic arrow-right"></span></a>
+												<ul class="submenu">
+													<li class="submenuLink">
+														<a href="/home/itsarUnderFinalization/1">ITSARs Under Finalisation</a>
+													</li>
+													<li class="submenuLink submenuOut">
+														<a href="/home/itsarUnderSC/1">ITSARs Under Stakeholder Consultation</a>
+													</li>
+												</ul>
+											</li>
+											<!--
+                                            <li>
+                                              <a
+                                                th:href="@{/home/bestCurrentPractices}"
+                                                th:text="${#messages.msgOrNull('homepage.navbar.ITSARs.BestCurrentPractices')} ?: _"
+                                              >Best Current Practices</a
+                                              >
+                                            </li>
+                                            -->
+										</ul>
+									</li>
+
+									<li class="dropdown">
+										<a class="navitem" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+                                                                                    <span>TSTL Designation</span><span class="pic arrow-down"></span>
+                                                                                </a>
+										<ul class="submenu">
+											<li class="submenuLink">
+												<a href="#" id="iframeOpenTstl">TSTL Login</a>
+											</li>
+											<li class="submenuLink">
+												<a href="/home/tstlScheme/1">TSTL Designation Scheme</a>
+											</li>
+											<li class="submenuLink">
+												<a href="/home/about/faqs/">FAQs</a>
+											</li>
+											<li class="submenuLink">
+												<a href="/home/userManual/1">User Manuals</a>
+											</li>
+											<li class="submenuLink">
+												<a href="/home/labs">Designated TSTLs</a>
+											</li>
+											<li class="submenuLink submenuOut">
+												<a href="/home/tstlWithdrawn">Suspended TSTLs</a>
+											</li>
+										</ul>
+									</li>
+
+									<li class="dropdown">
+										<a class="navitem" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+                                                                                    <span>Security Certification (SC)</span><span class="pic arrow-down"></span>
+                                                                                </a>
+										<ul class="submenu">
+											<li class="submenuLink">
+												<a href="/home/scProcessDocument/1">SC Process Documents</a>
+											</li>
+											<li class="submenuLink submenuOut">
+												<a href="/home/certificates">Security Certificates Issued</a>
+											</li>
+										</ul>
+									</li>
+
+									<li>
+										<a class="navitem" href="/home/download/1">Downloads</a>
+									</li>
+
+									<li>
+										<a class="navitem" href="/home/vacancies/1">Vacancy</a>
+									</li>
+
+									<li>
+										<a class="navitem" href="/home/gallery/1">Gallery</a>
+									</li>
+
+									<li>
+										<a class="navitem" id="iframeOpenNccs" href="#">Login</a>
+									</li>
+
+									<li>
+										
+									</li>
+								</ul>
+							</div>
+						</div>
+					</nav>
+				</div>
+			</header>
+			<div id="iframeOverlay">
+				<div id="iframeContent">
+					<iframe id="iframe"></iframe>
+					<button class="close-btn" id="iframeClose" tabindex="0">Close</button>
+				</div>
+			</div>
+		</div>
+			<main id="mainContent">
+            <div class="inner-banner-section">
+                <img src="/resources/portal/collage.jpg" alt="nccs-portal" title="NCCS Portal" class="img-fluid" />
+                <div class="container overlap-section">
+                    <div class="row">
+                        <div class="col-md-12 headTitle">
+                            <br />
+                            <h2
+                                >Headquarters Circulars</h2>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a
+                                            href="/home"
+                                            >Home</a
+                                        >
+                                    </li>
+                                    <li
+                                        class="breadcrumb-item active"
+                                        aria-current="page"
+                                        tabindex="0">Headquarters Circulars</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div class="container row" id="tableContent">
+                        <table
+                            aria-describedby="table_info"
+                            class="table table-striped table-bordered"
+                            id="table"
+                            >
+                            <thead>
+                                <tr role="row">
+                                    <th
+                                        class="col-1"
+                                        aria-controls="table"
+                                        aria-sort="ascending"
+                                        colspan="1"
+                                        rowspan="1"
+                                        tabindex="0"
+                                        >
+                                        <span
+                                            >SNo.</span
+                                        >
+                                    </th>
+                                    <th
+                                        class="col-3"
+                                        aria-controls="table"
+                                        colspan="1"
+                                        rowspan="1"
+                                        tabindex="0"
+                                        >
+                                        <span
+                                            >Title</span
+                                        >
+                                    </th>
+                                    
+                                    <th
+                                        class="col-2"
+                                        aria-controls="table"
+                                        colspan="1"
+                                        rowspan="1"
+                                        tabindex="0"
+                                        >
+                                        <span
+                                            >File</span
+                                        >
+                                    </th>
+                                    <th
+                                        class="col-2"
+                                        aria-controls="table"
+                                        colspan="1"
+                                        rowspan="1"
+                                        tabindex="0"
+                                        >
+                                        <span
+                                            >Date</span
+                                        >
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td
+                                        tabindex="0">1</td>
+                                    <td
+                                        tabindex="0">Extension of Last date for receipt of Applications in response to NCCS Notification for Engagement of Research Associates as per NCCS Research Associate Scheme</td>
+                                    
+
+                                    <td>
+                                        <a
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            href="/public/circulars_head/Corrigendum (date of Extension) for Engagement of RAs in NCCS.pdf"
+                                            ><span
+                                                >Download (pdf)</span
+                                            >
+                                            (<span>490.39</span>KB)
+
+                                            <span>
+                                                <img
+                                                    alt="pdf"
+                                                    class="img-fluid"
+                                                    src="/resources/assets/img/application-pdf.png"
+                                                    title="The file opens in a new window"
+                                                    width='16' height='16'
+                                                    />
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                            </span>
+
+                                        </a>
+                                    </td>
+                                    <!--                                    <td
+                                                                            th:text="${#temporals.format(circularsHead?.date, 'dd-MM-yyyy')}"
+                                                                            tabindex="0"></td>-->
+                                    <td tabindex="0">
+                                        <time
+                                            datetime="2026-06-23">23 June 2026</time>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        tabindex="0">2</td>
+                                    <td
+                                        tabindex="0">Engagement of Research Associates as per ‘NCCS Research Associate Scheme’ in NCCS, Bengaluru</td>
+                                    
+
+                                    <td>
+                                        <a
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            href="/public/circulars_head/NCCS RA Notification 21 May 26 signed.pdf"
+                                            ><span
+                                                >Download (pdf)</span
+                                            >
+                                            (<span>974.57</span>KB)
+
+                                            <span>
+                                                <img
+                                                    alt="pdf"
+                                                    class="img-fluid"
+                                                    src="/resources/assets/img/application-pdf.png"
+                                                    title="The file opens in a new window"
+                                                    width='16' height='16'
+                                                    />
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                            </span>
+
+                                        </a>
+                                    </td>
+                                    <!--                                    <td
+                                                                            th:text="${#temporals.format(circularsHead?.date, 'dd-MM-yyyy')}"
+                                                                            tabindex="0"></td>-->
+                                    <td tabindex="0">
+                                        <time
+                                            datetime="2026-05-21">21 May 2026</time>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        tabindex="0">3</td>
+                                    <td
+                                        tabindex="0">Extension of Last date for receipt of Applications in response to NCCS Vacancy Circular for Engagement of consultants against the vacant posts of Telecom Assistant (TA) and Lower Division Clerk (LDC) on temporary and short term contract basis in the Office of Sr DDG, NCCS, Bangalore</td>
+                                    
+
+                                    <td>
+                                        <a
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            href="/public/circulars_head/Corrigendum (date of Extension) for TA and LDC.pdf"
+                                            ><span
+                                                >Download (pdf)</span
+                                            >
+                                            (<span>653.05</span>KB)
+
+                                            <span>
+                                                <img
+                                                    alt="pdf"
+                                                    class="img-fluid"
+                                                    src="/resources/assets/img/application-pdf.png"
+                                                    title="The file opens in a new window"
+                                                    width='16' height='16'
+                                                    />
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                            </span>
+
+                                        </a>
+                                    </td>
+                                    <!--                                    <td
+                                                                            th:text="${#temporals.format(circularsHead?.date, 'dd-MM-yyyy')}"
+                                                                            tabindex="0"></td>-->
+                                    <td tabindex="0">
+                                        <time
+                                            datetime="2026-04-30">30 April 2026</time>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        tabindex="0">4</td>
+                                    <td
+                                        tabindex="0">Calling of applications from Interns willing to join in Q2-2026 (Apr-26 to Jun-26)  in NCCS, Bengaluru as per ‘NCCS Internship Scheme’ – regd</td>
+                                    
+
+                                    <td>
+                                        <a
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            href="/public/circulars_head/NCCS Notification for Interns Q2 of 2026 signed.pdf"
+                                            ><span
+                                                >Download (pdf)</span
+                                            >
+                                            (<span>948.44</span>KB)
+
+                                            <span>
+                                                <img
+                                                    alt="pdf"
+                                                    class="img-fluid"
+                                                    src="/resources/assets/img/application-pdf.png"
+                                                    title="The file opens in a new window"
+                                                    width='16' height='16'
+                                                    />
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                            </span>
+
+                                        </a>
+                                    </td>
+                                    <!--                                    <td
+                                                                            th:text="${#temporals.format(circularsHead?.date, 'dd-MM-yyyy')}"
+                                                                            tabindex="0"></td>-->
+                                    <td tabindex="0">
+                                        <time
+                                            datetime="2026-03-09">09 March 2026</time>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        tabindex="0">5</td>
+                                    <td
+                                        tabindex="0">Engagement of consultants against the vacant posts of Telecom Assistant (TA) and Lower Division Clerk (LDC) on temporary and short term contract basis in the Office of Sr DDG, NCCS, Bangalore</td>
+                                    
+
+                                    <td>
+                                        <a
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            href="/public/circulars_head/NCCS Vacancy Circular for Consultants  TA and LDC (merged).pdf"
+                                            ><span
+                                                >Download (pdf)</span
+                                            >
+                                            (<span>6784.40</span>KB)
+
+                                            <span>
+                                                <img
+                                                    alt="pdf"
+                                                    class="img-fluid"
+                                                    src="/resources/assets/img/application-pdf.png"
+                                                    title="The file opens in a new window"
+                                                    width='16' height='16'
+                                                    />
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                            </span>
+
+                                        </a>
+                                    </td>
+                                    <!--                                    <td
+                                                                            th:text="${#temporals.format(circularsHead?.date, 'dd-MM-yyyy')}"
+                                                                            tabindex="0"></td>-->
+                                    <td tabindex="0">
+                                        <time
+                                            datetime="2026-03-05">05 March 2026</time>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="d-flex justify-content-center">
+                            <div class="row">
+                                <div class="col-12" id="totalItems" tabindex="0">
+                                    <span
+                                        >Total Items :</span>
+
+                                    13
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-evenly align-items-center mt-3"
+                                    >
+                                    <form
+                                        id="paginationForm"
+                                        action="/home/circularsHead/1"
+                                        method="get"
+                                        >
+                                        <select class="btn" id="rowsPerPage" name="rowsPerPage" aria-label="Rows Per Page">
+                                            <option class="dropdown-item" value="0">
+                                            <span
+                                                >Rows Per Page</span
+                                            >
+                                            </option>
+                                            <option class="dropdown-item" value="5">5</option>
+                                            <option class="dropdown-item" value="10">10</option>
+                                            <option class="dropdown-item" value="20">20</option>
+                                            <option class="dropdown-item" value="50">50</option>
+                                        </select>
+                                    </form>
+
+                                    <nav
+                                        aria-label="Page navigation example"
+                                        class="d-flex justify-content-center align-items-center mt-3"
+                                        >
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                
+                                            </li>
+                                            <li
+                                                class="page-item"
+                                                >
+                                                
+                                                <a
+                                                    class="page-link"
+                                                    id="pagesOtherButton"
+                                                    tabindex="0"
+                                                    >
+                                                    &nbsp;&nbsp;1&nbsp;&nbsp;
+                                                </a>
+                                            </li>
+                                            <li
+                                                class="page-item"
+                                                >
+                                                <a
+                                                    class="page-link"
+                                                    id="pagesButton"
+                                                    data-dt-idx="${i}"
+                                                    tabindex="0"
+                                                    href="/home/circularsHead/2?rowsPerPage=10"
+                                                    >
+                                                    2</a
+                                                >
+                                                
+                                            </li>
+                                            <li
+                                                class="page-item"
+                                                >
+                                                <a
+                                                    class="page-link"
+                                                    id="pagesButton"
+                                                    data-dt-idx="${i}"
+                                                    tabindex="0"
+                                                    href="/home/circularsHead/3?rowsPerPage=10"
+                                                    >
+                                                    3</a
+                                                >
+                                                
+                                            </li>
+                                            <li class="page-item">
+                                                <a
+                                                    class="page-link"
+                                                    id="nextButton"
+                                                    tabindex="0"
+                                                    href="/home/circularsHead/2?rowsPerPage=10"
+                                                    >Next</a
+                                                >
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>                       
+                        <div class="mb-3">
+                            <a
+                                class="btn"
+                                id="archiveButton"
+                                href="/home/circularsHead/archive/1"
+                                ><span
+                                    >Archive</span
+                                >
+                                <img
+                                    id="material_icon"
+                                    src="/resources/assets/vendor/fonts-googleapis/icons/chevron_right.svg"
+                                    alt="Chevron Right Icon"
+                                    title="Archive"
+                                    /></a>
+                        </div>
+
+                        
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </main>
+			<footer id="footer">
+      <div class="footer-main">
+        <div class="pb-1">
+          
+        </div>
+
+        <div class="upperfooter">
+          <div class="footer-item1">
+            <a class="footer-item1"
+              href="/home/footer/accessibilityHelp"
+              >Accessibility Help</a
+            >
+          </div>
+          <div class="footer-item1">
+            <a class="footer-item1"
+              href="/home/rti/1"
+              >Right To Information</a
+            >
+          </div>
+          <div class="footer-item1">
+            <a class="footer-item1"
+              href="/home/footer/websitePolicies"
+              >Websites Policies</a
+            >
+          </div>
+          <div class="footer-item1">
+            <a class="footer-item1"
+              href="/home/footer/contactUs"
+              >Contact Us</a
+            >
+          </div>
+          <div class="footer-item1">
+            <a class="footer-item1"
+              href="/home/footer/webInformationManager"
+              >Web Information Manager</a
+            >
+          </div>
+          <div class="footer-item1">
+            <a class="footer-item1"
+              href="/home/feedback/"
+              >Feedback</a
+            >
+          </div>
+          <div class="footer-item1">
+            <a class="footer-item1"
+              href="/home/footer/termsOfUse"
+              >Terms of Use</a
+            >
+          </div>
+        </div>
+
+        <div class="lowerfooter">
+          <a href="#">
+          <img
+            class="logo-cdot"
+            src="/resources/assets/img/cdot-logo.jpg"
+            alt="CDOT"
+            title="C-DOT"
+          />
+          </a>
+          <div class="footer-item2">
+            <a href="#">
+            <span
+              >Website content managed by Department of Telecommunications, Ministry of Communications, GoI</span
+            ><br />
+            <span
+              >Designed, Developed and Hosted by Centre for Development of Telematics (C-DOT)</span
+            ><br />
+            </a>
+            <a href="#">
+            <span
+              >Website best viewed in Chrome 114+ and Firefox 114+</span
+            >
+            </a>
+          </div>
+
+          <div class="footer-item3">
+            <div> 
+              <a href="#">
+              <strong
+                >Visitor Count : </strong>
+                <span id="visitorCountSpan"></span>
+              </a>
+            </div>
+            <div>
+              <a href="#">
+              <strong
+                >Website Last Updated : </strong
+              ><span id="lastUpdatedSpan"></span>
+              </a>
+            </div>
+          </div>
+          <div class="footer-item4">
+              <a target="_BLANK" title="Security Audit Certificate (PDF, opens in a new tab)"
+                 href="/resources/public/NCCS-SecurityAuditCertificate.pdf" aria-label="Security Audit Certificate (PDF, opens in a new tab)">
+                  <img src="/resources/assets/img/security_audit_new.jpg" alt="STQC Certificate" >
+              </a>
+          </div>
+             <div class="footer-item5">
+              <a class="externalLinkWin" target="_BLANK" title="The National Portal of India"
+                 href="https://www.india.gov.in/">
+                  <img src="/resources/assets/img/clients/c1-removebg-preview.png" alt="National Portal" >
+              </a>
+          </div>
+        </div>
+      </div>
+
+      <div id="common">
+        <a
+          class="back-to-top d-flex align-items-center justify-content-center"
+          href="#" title="Back to Top"
+          ><i class="bi bi-arrow-up-short"></i
+        ></a>
+
+      </div>
+    </footer>
+		</div>
+
+		<!-- Vendor JS Files -->
+		<script src="/resources/assets/vendor/aos/aos.js"></script>
+		<script src="/resources/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+		<script src="/resources/assets/vendor/glightbox/js/glightbox.min.js"></script>
+		<script src="/resources/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+		<script src="/resources/assets/vendor/swiper/swiper-bundle.min.js"></script>
+		<script src="/resources/assets/vendor/waypoints/noframework.waypoints.js"></script>
+		<script src="/resources/assets/vendor/php-email-form/validate.js"></script>
+		<script src="/resources/assets/vendor/tinymce/tinymce.min.js"></script>
+
+		<!-- Template Main JS file -->
+		<script src="/resources/assets/js/main.js"></script>
+	</body>
+</html>

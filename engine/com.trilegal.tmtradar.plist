@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- TMT Radar local sweep: every 2 hours. Install:
+       cp engine/com.trilegal.tmtradar.plist ~/Library/LaunchAgents/
+       launchctl load ~/Library/LaunchAgents/com.trilegal.tmtradar.plist
+     Uninstall: launchctl unload ~/Library/LaunchAgents/com.trilegal.tmtradar.plist -->
+<dict>
+  <key>Label</key><string>com.trilegal.tmtradar</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/abhinandansethi/Desktop/TMT Tracker/engine/run_sweep.sh</string>
+  </array>
+  <key>StartInterval</key><integer>7200</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/abhinandansethi/Desktop/TMT Tracker/engine/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/abhinandansethi/Desktop/TMT Tracker/engine/launchd.log</string>
+</dict>
+</plist>

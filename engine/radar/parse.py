@@ -173,9 +173,18 @@ def parse_regex_rows(content: bytes, cfg: dict, base: str) -> List[Row]:
     for m in rx.finditer(html):
         g = m.groupdict()
         title = _clean(re.sub(r"<[^>]+>", " ", g.get("title") or ""))
+        if g.get("title2"):
+            t2 = _clean(re.sub(r"<[^>]+>", " ", g["title2"]))
+            title = f"{title}: {t2}" if title else t2
         date = extract_date(_clean(g.get("date_raw") or ""), cfg["date_formats"]) or \
             extract_date(title, cfg["date_formats"])
-        rows.append({"date": date, "title": title, "url": _abs(base, g.get("href") or "")})
+        extra = {}
+        if g.get("seq"):
+            digits = re.findall(r"\d+", g["seq"])
+            if digits:
+                extra["seq"] = int(digits[-1])
+        rows.append({"date": date, "title": title, "url": _abs(base, g.get("href") or ""),
+                     "extra": extra})
     return rows
 
 
@@ -246,6 +255,57 @@ def parse_rss(content: bytes, cfg: dict, base: str) -> List[Row]:
     return rows
 
 
+# ---------------------------------------------------------------- meity_api
+def parse_meity_api(content: bytes, cfg: dict, base: str) -> List[Row]:
+    """MeitY's Next.js frontend reads a public headless-WordPress API:
+    /cms/wp-json/document/documents?type=...&limit=N&page=N&sort=acf&order=DESC
+    Fully machine-readable JSON — the v1 'headless_required' constraint is obsolete."""
+    import json as _json
+    data = _json.loads(content.decode("utf-8", errors="ignore"))
+    posts = data if isinstance(data, list) else data.get("posts", [])
+    rows: List[Row] = []
+    for post in posts:
+        acf = post.get("acf_data") or {}
+        title = _clean(acf.get("title") or post.get("post_title") or "")
+        date = extract_date(str(acf.get("date") or ""), cfg["date_formats"]) or \
+            extract_date(str(post.get("post_date") or ""), ["YYYY-MM-DD"])
+        url = ""
+        files = acf.get("file") or []
+        if files and isinstance(files, list):
+            f0 = files[0] or {}
+            pdf = f0.get("pdf") or {}
+            url = (pdf.get("url") if isinstance(pdf, dict) else "") or f0.get("external_link") or ""
+        rows.append({"date": date, "title": title, "url": url,
+                     "extra": {"category": acf.get("select_documents_type")}})
+    return rows
+
+
+# ---------------------------------------------------------------- uidai_rsc
+def parse_uidai_rsc(content: bytes, cfg: dict, base: str) -> List[Row]:
+    """UIDAI's Next.js App Router returns its React flight payload to a plain GET with
+    an 'RSC: 1' header; the document list rides inside as "pdfDetails":{"data":[...]}.
+    Deterministic: locate the marker, JSON-decode the array."""
+    import json as _json
+    txt = content.decode("utf-8", errors="ignore")
+    marker = '"pdfDetails":{"data":'
+    i = txt.find(marker)
+    if i < 0:
+        # some renders nest the payload as an escaped JSON string — unescape and retry
+        txt = txt.replace('\\"', '"')
+        i = txt.find(marker)
+    if i < 0:
+        return []
+    docs, _ = _json.JSONDecoder().raw_decode(txt[i + len(marker):])
+    rows: List[Row] = []
+    for d in docs:
+        title = _clean(str(d.get("title") or d.get("name") or ""))
+        date = extract_date(str(d.get("updated_date") or ""), cfg["date_formats"]) or \
+            extract_date(title, cfg["date_formats"])
+        rows.append({"date": date, "title": title, "url": str(d.get("file_url") or ""),
+                     "extra": {"category": d.get("type")}})
+    return rows
+
+
 # ---------------------------------------------------------------- egazette_recent
 def parse_egazette_recent(soup: BeautifulSoup, cfg: dict, base: str) -> List[Row]:
     rows: List[Row] = []
@@ -286,6 +346,10 @@ def parse(source: dict, content: bytes, base: str) -> List[Row]:
         return parse_rss(content, source, base)
     if strategy == "regex_rows":
         return parse_regex_rows(content, source, base)
+    if strategy == "meity_api":
+        return parse_meity_api(content, source, base)
+    if strategy == "uidai_rsc":
+        return parse_uidai_rsc(content, source, base)
     soup = BeautifulSoup(content, "lxml")
     return STRATEGIES[strategy](soup, source, base)
 
@@ -322,7 +386,8 @@ def structure_fingerprint(content: bytes, source: dict) -> str:
     sel = {"trai_views": "ul.item-list > li", "trai_grid": ".views-view-grid__item",
            "html_table": source["parser"].get("row_selector", "table tbody tr"),
            "tr_with_doc": "tr", "link_shelf": "a[href]", "rss": "item",
-           "regex_rows": "table", "egazette_recent": "table"}[source["parser"]["strategy"]]
+           "regex_rows": "table", "meity_api": "body", "uidai_rsc": "body",
+           "egazette_recent": "table"}[source["parser"]["strategy"]]
     first = soup.select_one(sel)
     sig = ""
     if first is not None:

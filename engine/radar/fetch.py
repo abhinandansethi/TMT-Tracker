@@ -29,9 +29,10 @@ def _host(url: str) -> str:
     return url.split("/", 3)[2] if "://" in url else url
 
 
-def get(url: str, tolerant_tls: bool = False) -> requests.Response:
+def get(url: str, tolerant_tls: bool = False, extra_headers: Optional[Dict[str, str]] = None) -> requests.Response:
     """GET with retries. Raises FetchError on final failure."""
     host = _host(url)
+    headers = dict(UA, **(extra_headers or {}))
     last_err: Optional[Exception] = None
     for attempt in range(RETRIES + 1):
         wait = POLITENESS - (time.monotonic() - _last_hit.get(host, 0.0))
@@ -39,7 +40,7 @@ def get(url: str, tolerant_tls: bool = False) -> requests.Response:
             time.sleep(wait)
         try:
             _last_hit[host] = time.monotonic()
-            r = _session.get(url, headers=UA, timeout=TIMEOUT,
+            r = _session.get(url, headers=headers, timeout=TIMEOUT,
                              verify=not tolerant_tls, allow_redirects=True)
             if len(r.content) > MAX_BYTES:
                 raise FetchError(f"response too large ({len(r.content)}b)")

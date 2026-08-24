@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="keywords" content="TDSAT">
+<meta name="description" content="Telecom Disputes Settlement and Appellate Tribunal">
+<meta name="author" content="Telecom Disputes Settlement and Appellate Tribunal">
+<title>TDSAT | Daily Order List</title>
+</head>
+
+<div id="header">
+<h3>
+<table border="0" width="100%"><tr><td width="12%" valign="middle">
+<img src="logo.png"  height="90px" width="70px" /></td>
+<td align="center" valign="middle">
+<span class="style7" ><center><font size="4">||दूरसंचार विवाद समाधान एवं अपील अधिकरण ||</center></span>
+<span class="style7" ><center> <font size="4">Telecom Disputes Settlement and Appellate Tribunal (TDSAT)</center></span>
+<span class="style7" ><center> <font size="4">||सत्यमेव जयते||</center></span>
+</font>
+</td>
+<td>
+<img src="home_logo.png"  height="80px" width="100" align="right"/></td>
+</td>
+</tr>
+<tr>
+<td valign="top" align="right"colspan="7">
+<div align="right" class="style9"><font color="#37372f"><font size="2"><i>NEW DELHI</i></font></div>
+</td>
+</tr>
+</h3>
+</table>
+</div>
+
+
+<style>
+
+
+body {
+    background-color: #8cceff;
+}
+
+</style>
+<script>
+function submitForm()
+{
+ 	 with(document.frm)
+	{
+ 		
+ 	action = "dailyorderlist.php";
+	submit();
+	} 
+}
+
+function goFinal1()
+{
+ 	with(document.frm3)
+	{
+ 		if(from_date1.value == "")
+		{
+	          alert("enter the From date");
+		  from_date1.focus();
+		  return false;
+		}
+
+         if(to_date1.value == "")
+		{
+	          alert("enter the To date");
+		  to_date1.focus();
+		  return false;
+		}
+
+		
+	action="dailyorderlist.php";
+	submit();
+    	document.frm3.submit11.disabled = true;  
+     	document.frm3.submit11.value = 'Please Wait...';  
+     	return true;
+
+
+	}
+}
+
+
+
+
+function goFinal()
+{
+ 	with(document.frm)
+	{
+ 		if($pet_type=='1')
+ 		{
+ 		if(casetype.options[casetype.selectedIndex].value == "")
+ 		{
+ 			alert("Please Select Case Type  ");
+ 			casetype.focus();
+ 			return false;
+ 		}
+ 		if(caseno.value=='')
+			{
+					alert("Please Enter Case No... ");
+					caseno.focus();
+					return false;
+			}
+ 		if(caseyear.value=='')
+			{
+					alert("Please Enter Case Year ... ");
+					caseyear.focus();
+					return false;
+			}
+ 		}
+ 		if($pet_type =='2')
+ 		{
+ 			if(dairyNo.value=='')
+			{
+					alert("Please Enter Dairy No... ");
+					dairyNo.focus();
+					return false;
+			}
+ 		if(dairyyear.value=='')
+			{
+					alert("Please Enter Case Year... ");
+					dairyyear.focus();
+					return false;
+			}
+ 		}
+ 		action="dailyorderlist.php";
+ 		submit();
+ 	     	document.frm.submit.disabled = true;  
+ 	      	document.frm.submit.value = 'Please Wait...';  
+ 	      	return true;
+
+ 	 
+ 		}
+ 	}
+
+function popsurety_pet_adv_name(cfy)
+
+{
+	
+		var url = "daily_order_view.php?filing_no="+cfy;
+		var width = 800;
+	var height = 1300;
+
+	var left = (screen.width-width)/2;
+
+	var top = (screen.height - height)/2;
+
+	var params = 'width='+ width +', height='+ height+', top='+ top +', left='+ left+ ',scrollbars=1'; 
+
+			window.open(url,"print",params);
+}
+
+
+</script>
+<style>
+table, td, th {
+    border: 0px solid #1d99d4;
+}
+
+th {
+    background-color: #074c62;
+    color: white;
+}
+</style>
+
+
+<body onLoad="burstCache();">
+<head>
+<title>
+
+</title>
+
+<link href="./calbi/css/ion.calendar.css" rel="stylesheet" type="text/css">
+</head>
+<table width="99%" border="0" cellspacing="2" cellpadding="2" align="center" >
+  <tr><th colspan="5" align="right" valign="top">
+      <div align="center"><font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+        <u><B>DAILY ORDER DETAIL</B></u>&nbsp;&nbsp;&nbsp;<a href="old_orders.php" style="color: red">OLD ORDERS</a></font></div>
+    </th>
+  </tr>
+</table>
+<form name="frm" method="post" action="dailyorderlist.php">
+
+	<fieldset>
+	<legend><b>CASE WISE</b></legend><br>	
+
+
+<table width="90%" border="0" cellpadding="0" cellspacing="2"  align="center">  
+ 		 
+			
+		Case Type:		 <select id="country" name="casetype" onchange="change_country(this.value)" class="frm-field requiblack">
+            <option value="" >Select Case Type</option>
+                        <option value=10>AERA APPEAL  </option><option value=9>AERA PETITION  </option><option value=3>BROADCASTING APPEAL  </option><option value=1>BROADCASTING PETITION  </option><option value=11>CYBER APPEAL  </option><option value=8>E A  </option><option value=5>MISC APPLICATION  </option><option value=7>REVIEW APPLICATION  </option><option value=4>TELECOM APPEAL  </option><option value=2>TELECOM PETITION  </option>				 </select>
+			&nbsp;
+	
+				  
+			
+             Case No.   <input class="form-control has-dark-background" autocomplete="off" maxlength="7" name="caseno" id="slider-name" placeholder="Case No" type="text" requiblack="requiblack" value="" size="7">
+              &nbsp;
+            Case Year   <input class="form-control has-dark-background" autocomplete="off" maxlength="4" name="caseyear" value="" id="slider-name" placeholder="Case Year" type="text" requiblack="requiblack" size="4">
+             &nbsp;
+		    
+		   	     <input type="submit" name="submit1" value="Go" onchange="javascript:submitForm();">
+
+</br>
+
+</table>
+</fieldset>
+</form>
+
+<table width="95%"   align="center">
+	<tr>
+	<td align="center">
+	<b>OR</b>
+	</td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+<form name="frm1" method="post" action="dailyorderlist.php">
+
+<fieldset>
+<legend><b>DIARY WISE</b></legend><br>	
+<table width="90%" border="0" cellpadding="0" cellspacing="2"  align="center">  
+
+	
+				  
+	<tr>
+		
+             Diary No.   <input class="form-control has-dark-background" autocomplete="off" maxlength="6" name="dno" id="slider-name" placeholder="Diary No" type="text"  value="" size="7" requiblack>
+   
+         
+
+       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      Diary Year   <input class="form-control has-dark-background" autocomplete="off" maxlength="4" name="dyear" value="" id="slider-name" placeholder="Diary Year" type="text"  size="4" requiblack>
+            
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;		    
+		   	     <input type="submit" name="submit1" value="Go" onchange="javascript:submitForm1();">
+
+</br>
+</fieldset>
+</table>
+</fieldset>
+</form>
+
+
+
+
+
+
+
+
+
+
+<table width="95%"   align="center">
+	<tr>
+	<td align="center">
+	<b>OR</b>
+	</td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+<form name="frm3" method="post" action="dailyorderlist.php">
+
+<fieldset>
+<legend><b>DATEWISE</b></legend><br>	
+<table width="90%" border="0" cellpadding="0" cellspacing="2"  align="center">  
+
+       
+From Date:<input type="text" id="mydate" name="from_date1" data-lang="en" data-years="2000-2035" data-format="DD/MM/YYYY" 
+readonly="readonly" size="10" autocomplete="off" value=""/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To Date:
+<input type="text" id="mydate1" name="to_date1" data-lang="en" data-years="2000-2035" data-format="DD/MM/YYYY" 
+readonly="readonly" size="10" value="" />
+   <input type="hidden" name="frm3" autocomplete="off" value="" />  	
+
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+<input type="button" id="submit1" type="button"  name="submit11" value="Go" onClick="return goFinal1();" />
+
+
+
+
+<script src="./calbi/js/jquery.min.js"></script> 
+<script src="./calbi/js/moment.min.js"></script> 
+<script src="./calbi/js/ion.calendar.js"></script> 
+<script>
+$(function(){
+    $("#demo1").ionCalendar({
+        lang: "en",
+        years: "1915-1995",
+        onClick: function(date){
+            $("#result-1").html("onClick:<br/>" + date);
+        }
+    });
+
+
+       $("#mydate").ionDatePicker();
+});
+$(function(){
+    $("#demo1").ionCalendar({
+        lang: "en",
+        years: "1915-1995",
+        onClick: function(date){
+            $("#result-1").html("onClick:<br/>" + date);
+        }
+    });
+
+
+       $("#mydate1").ionDatePicker();
+});
+</script>
+
+</br>
+</fieldset>
+</table>
+</fieldset>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

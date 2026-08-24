@@ -11,7 +11,7 @@
  },
  "classification": {
   "note": "No tiers. One deterministic split: routine or substantive. Audited by code/audit_routine.py — ledger and regex must agree exactly.",
-  "routine_regex": "(?i)assess(es|ed)? (mobile )?network quality|subscription data|performance indicator report|quarterly highlights|panel of auditors|sitting of hon|non-sitting|internship|research associate|vacancy circular|recruitment|seminar|workshop|\\bTSTL\\b|designat(es|ed)\\b.{0,60}\\blaborator|empanel|certificate and internship|declaration of holiday|tender|walk[- ]in[- ]interview|consumer (outreach|awareness) program|consumer education workshop|engagement of (young )?professional",
+  "routine_regex": "(?i)assess(es|ed)? (mobile )?network quality|subscription data|performance indicator report|quarterly highlights|panel of auditors|sitting of hon|non-sitting|internship|research associate|vacancy circular|recruitment|seminar|workshop|\\bTSTL\\b|designat(es|ed)\\b.{0,60}\\blaborator|empanel|certificate and internship|declaration of holiday|tender|walk[- ]in[- ]interview|consumer (outreach|awareness) program|consumer education workshop|engagement of (young )?professional|CERT-In (Advisory|Vulnerability Note) CI",
   "deadline_regex": "(?i)(comments?|counter[- ]comments?|last date|due).{0,40}?(\\d{1,2}[-./ ](\\d{1,2}|[A-Za-z]+)[-./ ]\\d{2,4})",
   "memo_types": [
    "rules",
@@ -840,6 +840,596 @@
    ],
    "default_type": "notification",
    "quirks": "VERIFIED LAGGING (~6 weeks behind the site). Never a trigger; a catch here that the HTML listings missed is a parser bug and surfaces as a crosscheck WARN."
+  },
+  {
+   "status": "live",
+   "method": "json_api",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "date_formats": [
+    "DD.MM.YYYY",
+    "YYYY-MM-DD"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "meity.gov.in",
+    "www.meity.gov.in",
+    "cms-meity.digifootprint.gov.in"
+   ],
+   "id": "meity_gazettes",
+   "name": "Gazette Notifications (WP-JSON API)",
+   "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Gazettes%20Notifications&sort=acf&order=DESC&search=",
+   "parser": {
+    "strategy": "meity_api",
+    "row_floor": 50
+   },
+   "default_type": "gazette_notification",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "page_url": "https://www.meity.gov.in/documents/gazettes-notifications",
+   "quirks": "Public headless-WP API discovered 25-08-2026 — no headless browser needed (v1 'headless_required' obsolete). Full corpus per call; monotonic wire. KNOWN STALE: newest gazette row is 16-12-2025 while 2026 MeitY gazette instruments exist (DPDP Rules phases, s.79A) — the eGazette + PIB lanes are the real-time net for MeitY; this venue is provenance and eventual-posting."
+  },
+  {
+   "status": "live",
+   "method": "json_api",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "date_formats": [
+    "DD.MM.YYYY",
+    "YYYY-MM-DD"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "meity.gov.in",
+    "www.meity.gov.in",
+    "cms-meity.digifootprint.gov.in"
+   ],
+   "id": "meity_acts_policies",
+   "name": "Acts & Policies (WP-JSON API)",
+   "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Act%20and%20policies&sort=acf&order=DESC&search=",
+   "parser": {
+    "strategy": "meity_api",
+    "row_floor": 25
+   },
+   "default_type": "rules",
+   "type_rules": [
+    {
+     "match": "(?i)^draft",
+     "type": "draft_rules"
+    },
+    {
+     "match": "(?i)polic",
+     "type": "policy"
+    },
+    {
+     "match": "(?i)\\bact\\b",
+     "type": "rules"
+    }
+   ],
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "page_url": "https://www.meity.gov.in/documents/act-and-policies",
+   "quirks": "Type string is case-sensitive: 'Act and policies'. Carries DPDP/IT Rules drafts (Mar-2026 draft IT Rules amendments appear here)."
+  },
+  {
+   "status": "live",
+   "method": "json_api",
+   "stratum": "tech_data",
+   "regulator": "MeitY",
+   "date_formats": [
+    "DD.MM.YYYY",
+    "YYYY-MM-DD"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "meity.gov.in",
+    "www.meity.gov.in",
+    "cms-meity.digifootprint.gov.in"
+   ],
+   "id": "meity_orders_notices",
+   "name": "Orders & Notices (WP-JSON API)",
+   "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Orders%20and%20Notices&sort=acf&order=DESC&search=",
+   "parser": {
+    "strategy": "meity_api",
+    "row_floor": 25
+   },
+   "default_type": "order",
+   "type_rules": [
+    {
+     "match": "(?i)notice",
+     "type": "notification"
+    }
+   ],
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "page_url": "https://www.meity.gov.in/documents/orders-and-notices",
+   "quirks": "Mostly internal administration (delegations, work distribution) — routine regex and type rules keep noise down; occasionally carries binding orders."
+  },
+  {
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "Month D, YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cert-in.org.in",
+    "www.cert-in.org.in"
+   ],
+   "id": "certin_advisories",
+   "name": "Advisories (CIAD)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBADVLIST02&year=2026",
+   "parser": {
+    "strategy": "regex_rows",
+    "row_floor": 10,
+    "row_regex": "<a href=[\"'](?P<href>[^\"']*VLCODE=(?P<seq>CIAD-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*20px\">(?P<title2>[^<]+)<)?"
+   },
+   "default_type": "advisory",
+   "tripwire": {
+    "kind": "sequence"
+   },
+   "quirks": "Legacy servlet; rows regex-matched on raw bytes. CIAD numbering sequential per year - gap = missed advisory. Year param must roll over each January."
+  },
+  {
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "Month D, YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cert-in.org.in",
+    "www.cert-in.org.in"
+   ],
+   "id": "certin_vuln",
+   "name": "Vulnerability Notes (CIVN)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=VLNLIST02&year=2026",
+   "parser": {
+    "strategy": "regex_rows",
+    "row_floor": 10,
+    "row_regex": "<a href=[\"'](?P<href>[^\"']*VLCODE=(?P<seq>CIVN-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*20px\">(?P<title2>[^<]+)<)?"
+   },
+   "default_type": "advisory",
+   "tripwire": {
+    "kind": "sequence"
+   },
+   "quirks": "Same servlet family; CIVN numbering sequential per year. Year param rolls over each January."
+  },
+  {
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "Month D, YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cert-in.org.in",
+    "www.cert-in.org.in"
+   ],
+   "id": "certin_guidelines",
+   "name": "Security Guidelines (CISG)",
+   "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW01",
+   "parser": {
+    "strategy": "regex_rows",
+    "row_floor": 5,
+    "row_regex": "<a href=[\"'](?P<href>[^\"']*refcode=(?P<seq>CISG-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*20px\">(?P<title2>[^<]+)<)?"
+   },
+   "default_type": "guideline",
+   "tripwire": {
+    "kind": "sequence"
+   },
+   "quirks": "refcode= instead of VLCODE=. CISG numbering sequential per year."
+  },
+  {
+   "stratum": "tech_data",
+   "regulator": "CERT-In",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD.MM.YYYY",
+    "DD-MM-YYYY",
+    "Month D, YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cert-in.org.in",
+    "www.cert-in.org.in"
+   ],
+   "id": "certin_directions",
+   "name": "s.70B(6) Directions",
+   "url": "https://www.cert-in.org.in/Directions70B.jsp",
+   "parser": {
+    "strategy": "tr_with_doc",
+    "row_floor": 1,
+    "undated_ok": true
+   },
+   "default_type": "direction",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Binding directions under IT Act s.70B(6) (e.g. the 2022 six-hour incident-reporting direction). Rare and always substantive."
+  },
+  {
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "status": "live",
+   "method": "rsc_api",
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in"
+   ],
+   "http_headers": {
+    "RSC": "1"
+   },
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "id": "uidai_circulars",
+   "name": "Circulars",
+   "url": "https://uidai.gov.in/en/circulars",
+   "parser": {
+    "strategy": "uidai_rsc",
+    "row_floor": 5
+   },
+   "default_type": "circular",
+   "quirks": "Site restructured (v1 media-resources URL is 404). Next.js App Router: GET with 'RSC: 1' header returns the flight payload; documents ride in pdfDetails.data. updated_date = upload date; instrument date sits in the title."
+  },
+  {
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "status": "live",
+   "method": "rsc_api",
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in"
+   ],
+   "http_headers": {
+    "RSC": "1"
+   },
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "id": "uidai_notifications",
+   "name": "Notifications",
+   "url": "https://uidai.gov.in/en/notifications",
+   "parser": {
+    "strategy": "uidai_rsc",
+    "row_floor": 3
+   },
+   "default_type": "notification",
+   "quirks": "Statutory Aadhaar notifications; gazette lane cross-covers (Aadhaar regulations are gazetted)."
+  },
+  {
+   "stratum": "tech_data",
+   "regulator": "UIDAI",
+   "status": "live",
+   "method": "rsc_api",
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "uidai.gov.in",
+    "backend.uidai.gov.in"
+   ],
+   "http_headers": {
+    "RSC": "1"
+   },
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "id": "uidai_oms",
+   "name": "Official Memorandums",
+   "url": "https://uidai.gov.in/en/official-memorandums",
+   "parser": {
+    "strategy": "uidai_rsc",
+    "row_floor": 3
+   },
+   "default_type": "circular",
+   "quirks": "OMs on fees, procedures, administration."
+  },
+  {
+   "stratum": "media",
+   "regulator": "MIB",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "allowed_domains": [
+    "mib.gov.in",
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "id": "mib_acts_policy",
+   "name": "Acts/Policies/Guidelines",
+   "url": "https://mib.gov.in/en/documents/notification/acts-policy-guidelines",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "type_cell": 3,
+    "row_floor": 10
+   },
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 15
+   },
+   "default_type": "guideline",
+   "type_map": {
+    "(?i)notification": "notification",
+    "(?i)guideline": "guideline",
+    "(?i)policy": "policy",
+    "(?i)act": "rules",
+    "(?i)rule": "rules"
+   },
+   "quirks": "ALWAYS /en/ prefix (unprefixed serves Hindi). Venue's own type column governs. Drupal; host is slow - retries matter."
+  },
+  {
+   "stratum": "media",
+   "regulator": "MIB",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "allowed_domains": [
+    "mib.gov.in",
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "id": "mib_orders_notices",
+   "name": "Orders & Notices",
+   "url": "https://mib.gov.in/en/documents/notification/notices",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "row_floor": 5
+   },
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 10
+   },
+   "default_type": "notification",
+   "quirks": "/en/ page intermittently times out - fetch retries cover; unprefixed URL serves Hindi titles (valid rows, ugly display)."
+  },
+  {
+   "stratum": "media",
+   "regulator": "MIB",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "allowed_domains": [
+    "mib.gov.in",
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "id": "mib_other_comms",
+   "name": "Other Communications (advisories, OMs)",
+   "url": "https://mib.gov.in/en/documents/notification/Other-communication",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "row_floor": 10
+   },
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 10
+   },
+   "default_type": "advisory",
+   "quirks": "Advisories to broadcasters/OTT, OMs, court-order circulations land here."
+  },
+  {
+   "stratum": "media",
+   "regulator": "MIB",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "allowed_domains": [
+    "mib.gov.in",
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "id": "mib_digital_media",
+   "name": "Digital Media Wing (IT Rules Part III)",
+   "url": "https://mib.gov.in/en/ministry/our-wings/digital-media",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table.cols-4 tbody tr, table.cols-5 tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "row_floor": 3
+   },
+   "pagination": {
+    "scheme": "query_page",
+    "param": "page",
+    "start": 1,
+    "first_unparameterised": true,
+    "max_pages": 15
+   },
+   "default_type": "advisory",
+   "quirks": "IT Rules Part III instruments, OTT/online-curated-content advisories. Docs live in Drupal cols-4/cols-5 tables; classless tables are platform registries, not instruments."
+  },
+  {
+   "stratum": "media",
+   "regulator": "MIB",
+   "status": "live",
+   "method": "static_html",
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "allowed_domains": [
+    "mib.gov.in",
+    "pib.gov.in",
+    "www.pib.gov.in"
+   ],
+   "id": "mib_broadcasting",
+   "name": "Broadcasting Wing documents",
+   "url": "https://mib.gov.in/en/ministry/our-wings/broadcating-wing",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table.cols-4 tbody tr, table.cols-5 tbody tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "row_floor": 30,
+    "undated_ok": true
+   },
+   "pagination": {
+    "scheme": "none"
+   },
+   "default_type": "circular",
+   "quirks": "URL carries MIB's own typo 'broadcating-wing'. Cable TV, uplinking/downlinking, CRS material. Docs live in Drupal cols-4/cols-5 tables; classless tables are platform registries, not instruments. cols-4 tables carry no date column (undated shelf rows, keyed URL+title); cols-5 rows carry dates."
+  },
+  {
+   "id": "prgi",
+   "stratum": "media",
+   "regulator": "PRGI",
+   "name": "Press Registrar General advisories/public notices",
+   "url": "https://prgi.gov.in/",
+   "status": "live",
+   "method": "static_html_tls_tolerant",
+   "tolerant_tls": true,
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 3,
+    "undated_ok": true,
+    "href_include": "advisory|public[_-]notice|notification"
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "prgi.gov.in"
+   ],
+   "default_type": "advisory",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "PRP Act 2023 regime. Intermittent broken TLS chain - fetched tolerant. Advisory PDFs at /sites/default/files/YYYY-MM/advisory_no._*.pdf; undated on the homepage shelf."
+  },
+  {
+   "id": "cbfc",
+   "stratum": "media",
+   "regulator": "CBFC",
+   "name": "Orders and Circulars",
+   "url": "https://cbfcindia.gov.in/cbfcAdmin/orders-and-circular.php",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table tbody tr",
+    "title_cell": 1,
+    "row_floor": 10,
+    "undated_ok": true
+   },
+   "date_formats": [
+    "DD-MM-YYYY",
+    "DD.MM.YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "cbfcindia.gov.in"
+   ],
+   "default_type": "circular",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Undated shelf table (no date column); keyed by URL+title, dated by first_seen or the date inside the title. Statutory Cinematograph instruments surface via MIB/eGazette."
+  },
+  {
+   "id": "asci",
+   "stratum": "media",
+   "regulator": "ASCI",
+   "name": "Advisories (self-regulatory)",
+   "url": "https://www.ascionline.in/advisories/",
+   "status": "live",
+   "method": "static_html",
+   "parser": {
+    "strategy": "link_shelf",
+    "row_floor": 3,
+    "undated_ok": true
+   },
+   "date_formats": [
+    "Month D, YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "ascionline.in",
+    "www.ascionline.in"
+   ],
+   "default_type": "advisory",
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "Self-regulatory but ASCI codes are incorporated by reference in Cable TV Rules ad code. Dates ride in the row text. JS show-more hides older rows (fine for new-item detection)."
   }
  ],
  "window_start": "2026-06-01"
