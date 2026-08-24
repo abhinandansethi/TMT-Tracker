@@ -1,0 +1,485 @@
+<title>TMT Radar Architecture</title>
+
+<style>
+:root{
+  --ground:#EEF1F3; --paper:#FDFEFE; --sunk:#F4F7F8;
+  --ink:#14181B; --body:#2E353A; --mute:#5A646B; --faint:#8A939A;
+  --rule:#D8DEE2; --rule-soft:#E7ECEF;
+  --navy:#00506F; --navy-soft:#E3ECF2;
+  --ochre:#7E6410; --ochre-soft:#F6F0DC;
+  --alarm:#8A2B1C; --alarm-soft:#F7E9E6;
+  --ok:#1B6B4A;
+  /* diagram inks: chosen to clear 3:1 on both grounds */
+  --dg-key:#0F7A90; --dg-warn:#8A6D14; --dg-bad:#A8331F;
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+  --col:68ch;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1216; --paper:#171C21; --sunk:#1E252B;
+    --ink:#E9EDF0; --body:#C4CCD2; --mute:#98A3AB; --faint:#707B83;
+    --rule:#2C353C; --rule-soft:#232B31;
+    --navy:#7FB2D2; --navy-soft:#16262F;
+    --ochre:#D2AE52; --ochre-soft:#2A2415;
+    --alarm:#E08A76; --alarm-soft:#2E1A16;
+    --ok:#5FBE93;
+    --dg-key:#5CBBD2; --dg-warn:#D2AE52; --dg-bad:#E08A76;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1216; --paper:#171C21; --sunk:#1E252B;
+  --ink:#E9EDF0; --body:#C4CCD2; --mute:#98A3AB; --faint:#707B83;
+  --rule:#2C353C; --rule-soft:#232B31;
+  --navy:#7FB2D2; --navy-soft:#16262F;
+  --ochre:#D2AE52; --ochre-soft:#2A2415;
+  --alarm:#E08A76; --alarm-soft:#2E1A16;
+  --ok:#5FBE93;
+  --dg-key:#5CBBD2; --dg-warn:#D2AE52; --dg-bad:#E08A76;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ground); color:var(--body);
+  font-family:var(--sans); font-size:16px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.sheet{max-width:1000px;margin:0 auto;background:var(--paper);min-height:100vh;
+  padding:0 clamp(20px,5vw,72px) 88px}
+
+header{padding:56px 0 0}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--navy);font-weight:600}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5.4vw,46px);line-height:1.12;
+  letter-spacing:-.012em;color:var(--ink);margin:14px 0 0;text-wrap:balance}
+.standfirst{margin:18px 0 0;max-width:var(--col);font-size:17.5px;line-height:1.58;color:var(--mute)}
+.stamp{margin-top:26px;padding-top:14px;border-top:1px solid var(--rule);
+  display:flex;flex-wrap:wrap;gap:8px 26px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--faint)}
+.stamp b{color:var(--body);font-weight:600}
+
+section{margin-top:60px}
+h2{font-family:var(--serif);font-weight:500;font-size:26px;line-height:1.24;color:var(--ink);
+  margin:0;letter-spacing:-.005em;text-wrap:balance}
+.slug{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;margin-bottom:11px;padding-top:13px;border-top:2px solid var(--navy)}
+p{max-width:var(--col);margin:16px 0 0}
+h3{font-family:var(--sans);font-size:13px;font-weight:650;letter-spacing:.03em;color:var(--ink);
+  margin:30px 0 0}
+strong{color:var(--ink);font-weight:640}
+em{font-style:italic;color:var(--ink)}
+code{font-family:var(--mono);font-size:.875em;background:var(--sunk);
+  border:1px solid var(--rule-soft);padding:1px 5px;color:var(--ink)}
+
+figure{margin:32px 0 0;padding:0}
+figure svg{display:block;width:100%;max-width:100%;height:auto;color:var(--body)}
+figcaption{margin-top:14px;font-size:13.5px;line-height:1.5;color:var(--mute);max-width:var(--col)}
+figcaption b{color:var(--ink);font-weight:640}
+
+/* diagram inks, theme-aware */
+svg .s-key{stroke:var(--dg-key)}
+svg .f-key{fill:var(--dg-key)}
+svg .s-bad{stroke:var(--dg-bad)}
+svg .f-bad{fill:var(--dg-bad)}
+svg .s-warn{stroke:var(--dg-warn)}
+svg .f-warn{fill:var(--dg-warn)}
+svg .f-ink{fill:currentColor}
+svg .s-ink{stroke:currentColor}
+svg .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+.tw{margin-top:26px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:580px;font-size:14.5px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--navy);font-weight:600;padding:0 18px 9px 0;border-bottom:2px solid var(--navy);white-space:nowrap}
+td{padding:12px 18px 12px 0;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--body)}
+td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+
+.call{margin-top:28px;background:var(--alarm-soft);border-left:3px solid var(--alarm);
+  padding:20px 24px 22px}
+.call .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--alarm);font-weight:600}
+.call p{margin-top:10px;max-width:62ch;color:var(--body)}
+
+.note{margin-top:26px;background:var(--sunk);border-left:3px solid var(--navy);padding:18px 22px 20px}
+.note .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--navy);font-weight:600}
+.note p{margin-top:8px;max-width:62ch}
+
+.opts{margin-top:24px;border-top:1px solid var(--rule-soft)}
+.opt{padding:18px 0 20px;border-bottom:1px solid var(--rule-soft)}
+.opt .h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.opt .h b{font-size:15.5px;color:var(--ink);font-weight:640}
+.opt .h i{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-style:normal;padding:2px 7px;border:1px solid var(--rule);color:var(--faint)}
+.opt .h i.pick{color:var(--ok);border-color:var(--ok)}
+.opt .h i.test{color:var(--ochre);border-color:var(--ochre)}
+.opt p{margin-top:8px;font-size:14.5px}
+
+.cmds{margin-top:22px;border-top:1px solid var(--rule)}
+.cmd{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:6px 28px;
+  padding:13px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.cmd kbd{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--sunk);
+  border:1px solid var(--rule-soft);padding:3px 8px;justify-self:start;word-break:break-all}
+.cmd span{font-size:14px;color:var(--mute)}
+
+footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+
+@media (max-width:640px){
+  .cmd{grid-template-columns:1fr}
+  body{font-size:15.5px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="sheet">
+
+<header>
+  <div class="eyebrow">Internal engineering note</div>
+  <h1>TMT Radar Architecture</h1>
+  <p class="standfirst">What runs where, what it depends on, and what stands between a working
+  prototype and infrastructure a practice can rely on.</p>
+  <div class="stamp">
+    <span>Measured <b>25 Aug 2026</b></span>
+    <span><b>57</b> live sources</span>
+    <span><b>17</b> hosts</span>
+    <span><b>13</b> adapters</span>
+    <span>Detection LLM use <b>zero</b></span>
+  </div>
+</header>
+
+<section>
+  <div class="slug">The shape of it</div>
+  <h2>Three lanes, and only one of them does the detecting</h2>
+
+  <p>The system exists to answer one question on a schedule: <em>has anything been published
+  that changes a client's obligations?</em> Everything else is plumbing around that question.</p>
+
+  <p>Detection is deliberately the dumbest part. A registry file describes 57 government listing
+  pages across 17 hosts, and a deterministic Python engine visits them every two hours, compares
+  what it sees against a ledger of what it has already seen, and reports the difference. No
+  language model participates in that decision. A model cannot be talked into inventing a
+  notification, and it cannot quietly decide that a page returning zero rows simply had no news.</p>
+
+  <p>Two further lanes sit around it. A scheduled cloud session acts as watchdog and covers the
+  two jobs the local engine structurally cannot do: working the e-Gazette's search flow, and
+  sweeping the trade press for instruments that were never published anywhere. Then a human lane,
+  where an associate turns a detected instrument into a client memo. The model appears only in
+  those outer lanes, and only as transport and drafting, never as the thing that decides whether
+  an instrument exists.</p>
+
+  <figure>
+    <svg viewBox="0 0 900 400" role="img" aria-label="Diagram: 57 government listings feed a deterministic local engine every two hours, which writes to a ledger and rebuilds the partner dashboard, raising a desktop alert on anything new or failed. A scheduled cloud run adds gazette and press signals to the ledger and reads the dashboard timestamp to detect a stalled engine. An associate drafts client memos from detected instruments.">
+      <defs>
+        <marker id="ai" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="f-ink"/>
+        </marker>
+        <marker id="ak" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="f-key"/>
+        </marker>
+      </defs>
+
+      <text x="0" y="16" class="mono f-key" font-size="10.5" letter-spacing="1.8" font-weight="600">LANE A — DETECTION, DETERMINISTIC</text>
+
+      <rect x="0" y="32" width="132" height="78" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="66" y="58" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">57 listings</text>
+      <text x="66" y="76" text-anchor="middle" font-size="11" class="f-ink" opacity=".72">TRAI · DoT · MeitY</text>
+      <text x="66" y="93" text-anchor="middle" font-size="11" class="f-ink" opacity=".72">CERT-In · MIB · …</text>
+
+      <line x1="132" y1="71" x2="196" y2="71" class="s-ink" stroke-width="1.4" marker-end="url(#ai)"/>
+      <text x="164" y="63" text-anchor="middle" font-size="10" class="mono f-ink" opacity=".8">HTTP</text>
+
+      <rect x="198" y="32" width="186" height="78" fill="none" class="s-key" stroke-width="2"/>
+      <text x="291" y="58" text-anchor="middle" font-size="13" font-weight="700" class="f-key">Local engine</text>
+      <text x="291" y="76" text-anchor="middle" font-size="11" class="f-ink" opacity=".78">every 2 h · 10 s CPU</text>
+      <text x="291" y="93" text-anchor="middle" font-size="11" font-weight="650" class="f-key">0% LLM</text>
+
+      <line x1="384" y1="71" x2="448" y2="71" class="s-ink" stroke-width="1.4" marker-end="url(#ai)"/>
+      <text x="416" y="63" text-anchor="middle" font-size="10" class="mono f-ink" opacity=".8">new</text>
+
+      <rect x="450" y="32" width="150" height="78" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="525" y="58" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">Ledger</text>
+      <text x="525" y="76" text-anchor="middle" font-size="11" class="f-ink" opacity=".72">SQLite, append-only</text>
+      <text x="525" y="93" text-anchor="middle" font-size="11" class="f-ink" opacity=".72">397 instruments</text>
+
+      <line x1="600" y1="71" x2="664" y2="71" class="s-ink" stroke-width="1.4" marker-end="url(#ai)"/>
+      <text x="632" y="63" text-anchor="middle" font-size="10" class="mono f-ink" opacity=".8">build</text>
+
+      <rect x="666" y="32" width="150" height="78" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="741" y="58" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">Dashboard</text>
+      <text x="741" y="76" text-anchor="middle" font-size="11" class="f-ink" opacity=".72">one fixed URL</text>
+      <text x="741" y="93" text-anchor="middle" font-size="11" class="f-ink" opacity=".72">the partner reads here</text>
+
+      <path d="M291,110 L291,150" class="s-key" stroke-width="1.5" fill="none" marker-end="url(#ak)"/>
+      <text x="301" y="140" font-size="11.5" font-weight="600" class="f-key">desktop alert on anything new, or any failure</text>
+
+      <line x1="0" y1="180" x2="900" y2="180" class="s-ink" stroke-width="1" opacity=".26" stroke-dasharray="2 4"/>
+
+      <text x="0" y="206" class="mono f-ink" font-size="10.5" letter-spacing="1.8" opacity=".62" font-weight="600">LANE B — CROSS-CHECK, MODEL AS TRANSPORT ONLY</text>
+
+      <text x="0" y="234" font-size="12" class="f-ink" opacity=".8">Covers the two things a scraper cannot:</text>
+      <text x="0" y="252" font-size="12" class="f-ink" opacity=".8">the gazette's search flow, and instruments</text>
+      <text x="0" y="270" font-size="12" class="f-ink" opacity=".8">that were never published at all.</text>
+
+      <rect x="450" y="222" width="366" height="72" fill="none" class="s-ink" stroke-width="1.3" stroke-dasharray="5 3"/>
+      <text x="633" y="250" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">Scheduled cloud run</text>
+      <text x="633" y="270" text-anchor="middle" font-size="11" class="f-ink" opacity=".72">e-Gazette · trade press · freshness watchdog</text>
+
+      <path d="M510,222 L510,116" class="s-ink" stroke-width="1.3" fill="none" stroke-dasharray="5 3" marker-end="url(#ai)"/>
+      <text x="410" y="176" text-anchor="end" font-size="10.5" class="mono f-ink" opacity=".82">adds signals, flagged unofficial</text>
+      <line x1="416" y1="172" x2="502" y2="172" class="s-ink" stroke-width=".8" opacity=".35"/>
+
+      <path d="M756,116 L756,218" class="s-ink" stroke-width="1.3" fill="none" stroke-dasharray="5 3" marker-end="url(#ai)"/>
+      <text x="768" y="176" font-size="10.5" class="mono f-ink" opacity=".82">reads the timestamp,</text>
+      <text x="768" y="191" font-size="10.5" class="mono f-ink" opacity=".82">alerts if it stops moving</text>
+
+      <line x1="0" y1="318" x2="900" y2="318" class="s-ink" stroke-width="1" opacity=".26" stroke-dasharray="2 4"/>
+      <text x="0" y="344" class="mono f-ink" font-size="10.5" letter-spacing="1.8" opacity=".62" font-weight="600">LANE C — JUDGMENT, HUMAN</text>
+
+      <rect x="0" y="356" width="188" height="36" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="94" y="379" text-anchor="middle" font-size="12" font-weight="650" class="f-ink">Associate</text>
+
+      <line x1="188" y1="374" x2="276" y2="374" class="s-ink" stroke-width="1.4" marker-end="url(#ai)"/>
+      <rect x="278" y="356" width="234" height="36" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="395" y="379" text-anchor="middle" font-size="12" class="f-ink">Client memo, template fill</text>
+
+      <line x1="512" y1="374" x2="600" y2="374" class="s-ink" stroke-width="1.4" marker-end="url(#ai)"/>
+      <rect x="602" y="356" width="214" height="36" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="709" y="379" text-anchor="middle" font-size="12" class="f-ink">Client told what changed</text>
+    </svg>
+    <figcaption><b>Only Lane A decides whether an instrument exists.</b> The cloud lane adds what
+    the local engine cannot reach and shouts if the ledger stops moving; the human lane turns a
+    detected instrument into advice. Deleting the model entirely would cost the gazette and press
+    coverage, and nothing else.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="slug">Inside one sweep</div>
+  <h2>Every row ends somewhere you can name</h2>
+
+  <p>The claim worth defending is not that the scrapers work. It is that when they stop working,
+  you find out. A scraper that silently returns nothing looks exactly like a quiet week at the
+  regulator, and that is the failure mode that actually costs a client a deadline.</p>
+
+  <p>So the pipeline has no exit labelled "nothing happened". Every row that enters ends in a
+  named state, and every state that is not <em>ledgered</em> or <em>already known</em> shows up in
+  the health file and on the dashboard.</p>
+
+  <figure>
+    <svg viewBox="0 0 900 302" role="img" aria-label="Diagram: a row moves through fetch, parse, gates, identity and ledger. A fetch error or a parse below the row floor exits as source failure with a non-zero exit code and an alert. A row failing validation exits to quarantine with a written reason. A row already known is recorded as a cross-listing. Only a genuinely new row reaches the ledger and raises a notification. Tripwires watch the whole pipeline for numbering gaps, shrinking shelves, quiet venues and markup drift.">
+      <defs>
+        <marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="f-ink"/>
+        </marker>
+        <marker id="b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="f-bad"/>
+        </marker>
+        <marker id="b3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="f-warn"/>
+        </marker>
+      </defs>
+
+      <rect x="0" y="40" width="150" height="52" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="75" y="64" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">Fetch</text>
+      <text x="75" y="81" text-anchor="middle" font-size="10.5" class="f-ink" opacity=".7">2 retries, backoff</text>
+
+      <line x1="150" y1="66" x2="186" y2="66" class="s-ink" stroke-width="1.4" marker-end="url(#b1)"/>
+
+      <rect x="188" y="40" width="150" height="52" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="263" y="64" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">Parse</text>
+      <text x="263" y="81" text-anchor="middle" font-size="10.5" class="f-ink" opacity=".7">this site's own adapter</text>
+
+      <line x1="338" y1="66" x2="374" y2="66" class="s-ink" stroke-width="1.4" marker-end="url(#b1)"/>
+
+      <rect x="376" y="40" width="150" height="52" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="451" y="64" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">Gates</text>
+      <text x="451" y="81" text-anchor="middle" font-size="10.5" class="f-ink" opacity=".7">date · domain · title</text>
+
+      <line x1="526" y1="66" x2="562" y2="66" class="s-ink" stroke-width="1.4" marker-end="url(#b1)"/>
+
+      <rect x="564" y="40" width="150" height="52" fill="none" class="s-ink" stroke-width="1.3"/>
+      <text x="639" y="64" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink">Identity</text>
+      <text x="639" y="81" text-anchor="middle" font-size="10.5" class="f-ink" opacity=".7">title · URL · number</text>
+
+      <line x1="714" y1="66" x2="750" y2="66" class="s-ink" stroke-width="1.4" marker-end="url(#b1)"/>
+
+      <rect x="752" y="40" width="148" height="52" fill="none" class="s-key" stroke-width="2"/>
+      <text x="826" y="64" text-anchor="middle" font-size="12.5" font-weight="700" class="f-key">Ledger</text>
+      <text x="826" y="81" text-anchor="middle" font-size="10.5" class="f-key">and an alert</text>
+
+      <path d="M75,92 L75,170" class="s-bad" stroke-width="1.3" fill="none" marker-end="url(#b2)"/>
+      <text x="84" y="120" font-size="10.5" class="mono f-bad">error</text>
+
+      <path d="M263,92 L263,170" class="s-bad" stroke-width="1.3" fill="none" marker-end="url(#b2)"/>
+      <text x="272" y="120" font-size="10.5" class="mono f-bad">below floor</text>
+
+      <path d="M451,92 L451,170" class="s-warn" stroke-width="1.3" fill="none" marker-end="url(#b3)"/>
+      <text x="460" y="120" font-size="10.5" class="mono f-warn">invalid</text>
+
+      <path d="M639,92 L639,170" class="s-ink" stroke-width="1.3" fill="none" opacity=".6" marker-end="url(#b1)"/>
+      <text x="648" y="120" font-size="10.5" class="mono f-ink" opacity=".75">seen before</text>
+
+      <rect x="0" y="172" width="338" height="50" fill="none" class="s-bad" stroke-width="1.4"/>
+      <text x="169" y="194" text-anchor="middle" font-size="12.5" font-weight="650" class="f-bad">SOURCE FAILED</text>
+      <text x="169" y="211" text-anchor="middle" font-size="10.5" class="f-bad" opacity=".88">non-zero exit · alert · flagged on the dashboard</text>
+
+      <rect x="376" y="172" width="150" height="50" fill="none" class="s-warn" stroke-width="1.4"/>
+      <text x="451" y="194" text-anchor="middle" font-size="12.5" font-weight="650" class="f-warn">QUARANTINE</text>
+      <text x="451" y="211" text-anchor="middle" font-size="10.5" class="f-warn" opacity=".88">kept, with a reason</text>
+
+      <rect x="564" y="172" width="150" height="50" fill="none" class="s-ink" stroke-width="1.2" opacity=".7"/>
+      <text x="639" y="194" text-anchor="middle" font-size="12.5" font-weight="650" class="f-ink" opacity=".85">CROSS-LISTING</text>
+      <text x="639" y="211" text-anchor="middle" font-size="10.5" class="f-ink" opacity=".65">same instrument, 2nd venue</text>
+
+      <rect x="0" y="248" width="900" height="48" fill="none" class="s-ink" stroke-width="1.2" stroke-dasharray="4 3" opacity=".6"/>
+      <text x="14" y="268" font-size="11.5" font-weight="650" class="f-ink">Tripwires, watching all of it</text>
+      <text x="14" y="285" font-size="10.5" class="f-ink" opacity=".72">numbering gaps · shrinking shelves · venues gone quiet · markup drift · a cross-check catching what a primary page missed</text>
+    </svg>
+    <figcaption><b>The exits are the architecture.</b> A page returning three rows where it
+    normally returns four hundred is a failure, not a quiet week. The tripwires catch the subtler
+    case: every fetch succeeded, and yet press release 115 arrived while 114 was never seen.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="slug">What it takes to run</div>
+  <h2>Measured, not estimated</h2>
+
+  <p>The resource profile is the good news. A full pass over all 57 sources takes four and a half
+  minutes of wall time but under ten seconds of processor time, because nearly all of it is
+  deliberate waiting: the engine paces itself to about one request per second per host, so it
+  never behaves like a load test against a government server.</p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>Resource</th><th>Measured</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>Processor</td><td class="num">10 s per sweep</td><td>Any machine built in the last decade. The work is waiting, not computing.</td></tr>
+      <tr><td>Wall time</td><td class="num">4 min 26 s</td><td>Fits inside a two-hour cycle roughly twenty-five times over.</td></tr>
+      <tr><td>Memory</td><td class="num">53 MB peak</td><td>Measured on the heaviest page. One page is parsed at a time; nothing stays open.</td></tr>
+      <tr><td>Disk</td><td class="num">57 MB today</td><td>32 MB is the Python environment and 16 MB the saved page fixtures. The ledger itself is 328 KB for 397 instruments, so it grows a few megabytes a year.</td></tr>
+      <tr><td>Network</td><td class="num">17 hosts</td><td>Plain outbound HTTPS. <b>The one hard dependency.</b></td></tr>
+      <tr><td>Software</td><td class="num">Python 3.9 + 4 packages</td><td>requests, beautifulsoup4, lxml, feedparser, in a self-contained virtual environment.</td></tr>
+      <tr><td>Credentials</td><td class="num">none</td><td>Every source is public. No API keys, no logins, nothing to rotate or leak.</td></tr>
+      <tr><td>Running cost</td><td class="num">nil</td><td>Detection makes no paid API calls whatsoever. Only the optional cloud cross-check consumes anything.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <div class="k">The dependency that actually matters</div>
+    <p>Not processing, not storage: <strong>an unobstructed network path to Indian government
+    hosts</strong>. That is exactly what a cloud sandbox could not provide, which is why detection
+    was moved onto a local machine in the first place. Any host you migrate to must be tested
+    against the live sources before it is trusted, never assumed to work merely because it has
+    internet.</p>
+  </div>
+</section>
+
+<section>
+  <div class="slug">The weak point</div>
+  <h2>It runs on one laptop, and it is not yet scheduled</h2>
+
+  <div class="call">
+    <div class="k">Two gaps to close before anyone relies on this</div>
+    <p><strong>The schedule is written but not installed.</strong> The launch agent file exists
+    and is correct, but it has not been loaded, so nothing sweeps right now unless a person runs
+    it by hand. One command fixes it, and it is the first thing to do.</p>
+    <p><strong>The host is a personal laptop.</strong> When the lid closes, detection stops. When
+    the laptop leaves the firm, the tracker leaves with it. For a tool whose entire value is that
+    it does not miss things, a host that sleeps is a design flaw rather than a detail.</p>
+  </div>
+
+  <p>The fix is cheap, precisely because the workload is so small. Three options, in the order I
+  would try them.</p>
+
+  <div class="opts">
+    <div class="opt">
+      <div class="h"><b>A dedicated always-on machine at the firm</b><i class="pick">start here</i></div>
+      <p>A Mac mini or any retired desktop, left switched on. It preserves the exact network path
+      already proven to reach all 57 sources, needs no code changes at all, and can be set up in
+      an afternoon. The tracker stops being one person's laptop and becomes a firm asset.</p>
+    </div>
+    <div class="opt">
+      <div class="h"><b>A small Linux virtual machine</b><i class="test">test reachability first</i></div>
+      <p>The cheapest tier from any provider is ample for ten seconds of processing every two
+      hours. But do not commit until you have run a real sweep from that host: whether the earlier
+      cloud blockage was an egress policy or Indian sites refusing foreign traffic is still
+      unestablished, and the answer decides whether the machine has to sit in an India region.</p>
+    </div>
+    <div class="opt">
+      <div class="h"><b>A firm-managed server under IT</b><i>the eventual answer</i></div>
+      <p>The right long-term home for something the practice depends on, with backups and
+      monitoring that outlive whoever built it. Worth doing once the tracker has proved itself
+      over a few weeks, so IT is handed a known quantity rather than an experiment.</p>
+    </div>
+  </div>
+
+  <p>Whichever host it lands on, one requirement is not technical: <strong>somebody has to own
+  it</strong>. Alerts need a person who reads them, and a regulator redesigning their site needs
+  someone to re-capture a page. A tracker nobody watches is worse than no tracker, because it
+  manufactures confidence while quietly going blind.</p>
+</section>
+
+<section>
+  <div class="slug">When something breaks</div>
+  <h2>Failure modes, and what each one does</h2>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>What happens</th><th>How it surfaces</th><th>What to do</th></tr></thead>
+    <tbody>
+      <tr><td>Site unreachable</td><td>Source marked FAILED, sweep exits non-zero, desktop alert. Two runs in a row is flagged prominently.</td><td>Usually transient. If it persists, check whether the URL moved.</td></tr>
+      <tr><td>Site redesigned</td><td>Row count collapses below that source's floor, so it reads as FAILED rather than as an empty week.</td><td>Re-capture the fixture, adjust that one adapter, rerun the selftest.</td></tr>
+      <tr><td>Markup drifts subtly</td><td>The structure fingerprint changes, or the generic fallback parser sees more rows than the adapter does. Raises a warning.</td><td>Inspect before it becomes a silent under-count.</td></tr>
+      <tr><td>An instrument is skipped</td><td>Numbering tripwire fires: press release 115 seen, 114 never was.</td><td>Fetch the missing number directly. It is a real gap.</td></tr>
+      <tr><td>Regulator goes quiet</td><td>Staleness tripwire fires on venues that normally move weekly.</td><td>Confirm the silence is genuine and not a stalled parser.</td></tr>
+      <tr><td>Host asleep</td><td>Missed cycles run on wake, but overnight gaps are real. The cloud watchdog alerts if the ledger is more than six hours stale on a weekday.</td><td>The reason to move off a laptop.</td></tr>
+      <tr><td>Never published at all</td><td>Nothing fires, because there is nothing to detect.</td><td>The honest limit, below.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="call">
+    <div class="k">The limit no architecture removes</div>
+    <p>Between a third and a half of the instruments that actually bind a TMT client are never
+    published on any website: blocking orders, portal notices to intermediaries, licence amendment
+    letters, advisories served on named parties. No crawler reaches a document that sits on no
+    server.</p>
+    <p>The press and NGO sweep is a partial net. The complete one is available only to a law firm:
+    <strong>when a client forwards a government letter, that letter is the instrument</strong>. A
+    disciplined intake log for those would be the single largest coverage gain available, and no
+    amount of engineering substitutes for it.</p>
+  </div>
+</section>
+
+<section>
+  <div class="slug">Operating it</div>
+  <h2>The commands worth knowing</h2>
+
+  <div class="cmds">
+    <div class="cmd"><kbd>launchctl load ~/Library/LaunchAgents/com.trilegal.tmtradar.plist</kbd><span>Install the two-hourly schedule. Do this first, copying the plist out of <code>engine/</code> beforehand.</span></div>
+    <div class="cmd"><kbd>tracker.py selftest</kbd><span>Parse every source against its saved page capture. Must pass before you trust a change. Currently 57 of 57.</span></div>
+    <div class="cmd"><kbd>tracker.py sweep</kbd><span>Run every source now. Exits non-zero if anything failed.</span></div>
+    <div class="cmd"><kbd>tracker.py sweep --source ID</kbd><span>Re-run one source while fixing its adapter.</span></div>
+    <div class="cmd"><kbd>tracker.py audit</kbd><span>Assert that every stored row still agrees with the classification rules. Catches drift.</span></div>
+    <div class="cmd"><kbd>tracker.py backfill --since DATE</kbd><span>Walk a source's pagination back in time. Used when adding a venue.</span></div>
+    <div class="cmd"><kbd>tracker.py fetch-pdfs</kbd><span>Archive instrument PDFs locally, so a memo cites a file that outlives the government link.</span></div>
+    <div class="cmd"><kbd>tracker.py health</kbd><span>Per-source status from the last run.</span></div>
+  </div>
+
+  <h3>Adding a source, which is the routine maintenance task</h3>
+  <p>Describe the venue in the registry, save one live capture of its page as a fixture, and run
+  the selftest until the adapter parses that capture above a floor you set from the real row
+  count. Then backfill, and commit the registry entry and the fixture together, so the repository
+  always holds the evidence that the adapter once worked against real bytes. Thirteen venues found
+  by the last audit are already registered this way, with verified URLs, waiting for adapters.</p>
+</section>
+
+<footer>Internal working tool · every instrument must be verified against the gazette text before client advice</footer>
+
+</div>
