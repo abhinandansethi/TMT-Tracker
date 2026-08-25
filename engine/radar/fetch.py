@@ -3,7 +3,7 @@ Every fetch either returns bytes or raises FetchError — no half-states."""
 from __future__ import annotations
 
 import time
-from typing import Dict, Optional
+from typing import Dict, List, Optional, Tuple
 
 import requests
 import urllib3
@@ -20,18 +20,39 @@ _last_hit: Dict[str, float] = {}
 _session = requests.Session()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# Every request made during a run, as (source_id, host, url). The coverage page claims
+# the tracker fetches from the declared venues and nowhere else; this is the record that
+# makes that claim checkable rather than a promise.
+fetch_log: List[Tuple[str, str, str]] = []
+
 
 class FetchError(Exception):
     pass
+
+
+class UndeclaredHost(FetchError):
+    """A request was attempted against a host the source never declared."""
 
 
 def _host(url: str) -> str:
     return url.split("/", 3)[2] if "://" in url else url
 
 
-def get(url: str, tolerant_tls: bool = False, extra_headers: Optional[Dict[str, str]] = None) -> requests.Response:
-    """GET with retries. Raises FetchError on final failure."""
+def get(url: str, tolerant_tls: bool = False, extra_headers: Optional[Dict[str, str]] = None,
+        source_id: str = "?", allowed_domains: Optional[List[str]] = None) -> requests.Response:
+    """GET with retries. Raises FetchError on final failure.
+
+    Every call is attributed to the source that caused it and checked against that
+    source's declared domains, so no request can be made to a host the coverage page
+    does not disclose."""
     host = _host(url)
+    if allowed_domains is not None:
+        h = host.lower().split(":")[0]
+        if not any(h == d.lower() or h.endswith("." + d.lower()) for d in allowed_domains):
+            raise UndeclaredHost(
+                f"{source_id} tried to fetch {h}, which is not in its declared domains "
+                f"{allowed_domains}")
+    fetch_log.append((source_id, host, url))
     headers = dict(UA, **(extra_headers or {}))
     last_err: Optional[Exception] = None
     for attempt in range(RETRIES + 1):

@@ -28,9 +28,11 @@ CREATE TABLE IF NOT EXISTS items(
   deadline TEXT,
   flags TEXT NOT NULL DEFAULT '[]',
   seq TEXT,
+  lane TEXT NOT NULL DEFAULT 'instruments',
   first_seen TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'new'
 );
+CREATE INDEX IF NOT EXISTS idx_items_lane ON items(lane);
 CREATE INDEX IF NOT EXISTS idx_items_seq ON items(source_id, seq);
 CREATE INDEX IF NOT EXISTS idx_items_date ON items(date);
 CREATE TABLE IF NOT EXISTS sightings(
@@ -48,7 +50,8 @@ CREATE TABLE IF NOT EXISTS source_state(
   consecutive_failures INTEGER NOT NULL DEFAULT 0,
   last_row_count INTEGER,
   fingerprint TEXT,
-  seq_state TEXT NOT NULL DEFAULT '{}'
+  seq_state TEXT NOT NULL DEFAULT '{}',
+  newest_visible TEXT
 );
 CREATE TABLE IF NOT EXISTS quarantine(
   at TEXT NOT NULL,
@@ -75,11 +78,33 @@ def item_id(title: str, date: Optional[str]) -> str:
     return hashlib.sha1((norm_title(title) + (date or "")).encode()).hexdigest()[:10]
 
 
+# Columns added after the first ledgers were created. CREATE TABLE IF NOT EXISTS will not
+# add a column to a table that already exists, so each is applied by hand, additively —
+# history is never rebuilt.
+MIGRATIONS = [
+    ("items", "seq", "TEXT"),
+    ("items", "lane", "TEXT NOT NULL DEFAULT 'instruments'"),
+    ("source_state", "newest_visible", "TEXT"),
+]
+
+
 class Ledger:
     def __init__(self, db_path: Path, jsonl_path: Path):
         self.db = sqlite3.connect(db_path)
+        self._migrate()
         self.db.executescript(SCHEMA)
         self.jsonl = jsonl_path
+
+    def _migrate(self) -> None:
+        for table, column, decl in MIGRATIONS:
+            exists = self.db.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
+            if not exists:
+                continue  # fresh database: SCHEMA creates it complete
+            cols = {r[1] for r in self.db.execute(f"PRAGMA table_info({table})")}
+            if column not in cols:
+                self.db.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
+        self.db.commit()
 
     # ------------------------------------------------------------- items
     def known(self, iid: str) -> bool:
@@ -88,12 +113,13 @@ class Ledger:
     def insert(self, rec: Dict) -> None:
         self.db.execute(
             "INSERT INTO items(id,date,title,url,page_url,source_id,regulator,stratum,type,"
-            "routine,deadline,flags,seq,first_seen,status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "routine,deadline,flags,seq,lane,first_seen,status) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (rec["id"], rec.get("date"), rec["title"], rec.get("url"), rec.get("page_url"),
              rec["source_id"], rec.get("regulator"), rec.get("stratum"), rec.get("type"),
              int(bool(rec.get("routine"))), rec.get("deadline"),
              json.dumps(rec.get("flags", [])), rec.get("seq"),
-             rec["first_seen"], rec.get("status", "new")))
+             rec.get("lane", "instruments"), rec["first_seen"], rec.get("status", "new")))
         self.db.commit()
         with self.jsonl.open("a") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -163,36 +189,49 @@ class Ledger:
         self.db.commit()
 
     # ------------------------------------------------------- source state
+    def sightings_for(self, source_id: str) -> int:
+        return self.db.execute("SELECT COUNT(*) FROM sightings WHERE source_id=?",
+                               (source_id,)).fetchone()[0]
+
+    def count_for(self, source_id: str) -> int:
+        return self.db.execute(
+            "SELECT COUNT(*) FROM items WHERE source_id=? AND status != 'duplicate'",
+            (source_id,)).fetchone()[0]
+
     def get_state(self, source_id: str) -> Dict:
         row = self.db.execute(
             "SELECT last_run,last_status,last_note,consecutive_failures,last_row_count,"
-            "fingerprint,seq_state FROM source_state WHERE source_id=?", (source_id,)).fetchone()
+            "fingerprint,seq_state,newest_visible FROM source_state WHERE source_id=?",
+            (source_id,)).fetchone()
         if row is None:
             return {"consecutive_failures": 0, "seq_state": {}}
         return {"last_run": row[0], "last_status": row[1], "last_note": row[2],
                 "consecutive_failures": row[3], "last_row_count": row[4],
-                "fingerprint": row[5], "seq_state": json.loads(row[6] or "{}")}
+                "fingerprint": row[5], "seq_state": json.loads(row[6] or "{}"),
+                "newest_visible": row[7]}
 
     def set_state(self, source_id: str, **kw) -> None:
         st = self.get_state(source_id)
         st.update(kw)
         self.db.execute(
             "INSERT INTO source_state(source_id,last_run,last_status,last_note,"
-            "consecutive_failures,last_row_count,fingerprint,seq_state) VALUES(?,?,?,?,?,?,?,?) "
+            "consecutive_failures,last_row_count,fingerprint,seq_state,newest_visible) "
+            "VALUES(?,?,?,?,?,?,?,?,?) "
             "ON CONFLICT(source_id) DO UPDATE SET last_run=excluded.last_run,"
             "last_status=excluded.last_status,last_note=excluded.last_note,"
             "consecutive_failures=excluded.consecutive_failures,"
             "last_row_count=excluded.last_row_count,fingerprint=excluded.fingerprint,"
-            "seq_state=excluded.seq_state",
+            "seq_state=excluded.seq_state,newest_visible=excluded.newest_visible",
             (source_id, st.get("last_run"), st.get("last_status"), st.get("last_note"),
              st.get("consecutive_failures", 0), st.get("last_row_count"),
-             st.get("fingerprint"), json.dumps(st.get("seq_state", {}))))
+             st.get("fingerprint"), json.dumps(st.get("seq_state", {})),
+             st.get("newest_visible")))
         self.db.commit()
 
     # ----------------------------------------------------------- queries
     def all_items(self) -> List[Dict]:
         cols = ["id", "date", "title", "url", "page_url", "source_id", "regulator", "stratum",
-                "type", "routine", "deadline", "flags", "seq", "first_seen", "status"]
+                "type", "routine", "deadline", "flags", "seq", "lane", "first_seen", "status"]
         out = []
         for r in self.db.execute(f"SELECT {','.join(cols)} FROM items ORDER BY date, id"):
             d = dict(zip(cols, r))

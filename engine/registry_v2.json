@@ -816,7 +816,8 @@
     "needs_verification"
    ],
    "stale_after_days": 14,
-   "quirks": "Legally authoritative venue; regulator sites lag it. Homepage panels only — full ministry-by-date search is an ASP.NET postback flow (roadmap). Panel has itself gone stale for weeks; the staleness wire fires at 14 days. Rows carry needs_verification until the gazette PDF is pulled."
+   "quirks": "Legally authoritative venue, but the homepage panel carries NO per-item link (the Download column is script-driven) - only a Gazette ID such as CG-DL-E-24082026-275723. Rows are therefore LEADS, not citable instruments, and run in the signals lane: identified by gazette ID, verified by hand against the gazette before any client advice. Full ministry-by-date search is an ASP.NET postback flow, on the roadmap.",
+   "lane": "signals"
   },
   {
    "id": "trai_rss",
@@ -1458,80 +1459,6 @@
    ],
    "default_type": "order",
    "quirks": "Found by the 25-08-2026 audit; corrects the v1 belief that no separate orders listing exists. Host intermittently hangs to timeout - retries cover. Upload-folder month can lag the release date; never date from the path."
-  },
-  {
-   "id": "trai_fd_telecom",
-   "stratum": "telecom",
-   "regulator": "TRAI",
-   "name": "Financial Disincentive orders - Telecom",
-   "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31",
-   "status": "live",
-   "method": "static_html",
-   "parser": {
-    "strategy": "html_table",
-    "row_selector": "table tbody tr",
-    "title_cells": [
-     2,
-     3,
-     4,
-     5
-    ],
-    "date_cell": 1,
-    "row_floor": 300,
-    "linkless": true
-   },
-   "date_formats": [
-    "DD-MM-YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "cogroup.trai.gov.in",
-    "trai.gov.in"
-   ],
-   "default_type": "order",
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "quirks": "FD enforcement app behind an iframe on trai.gov.in - fetch the cogroup URL directly. No per-row links (auth-gated report API); listing page is the citation. Wide from/to window returns full history in one response (verified live 25-08-2026)."
-  },
-  {
-   "id": "trai_fd_broadcasting",
-   "stratum": "telecom",
-   "regulator": "TRAI",
-   "name": "Financial Disincentive orders - Broadcasting",
-   "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31",
-   "status": "live",
-   "method": "static_html",
-   "parser": {
-    "strategy": "html_table",
-    "row_selector": "table tbody tr",
-    "title_cells": [
-     2,
-     3,
-     4,
-     5
-    ],
-    "date_cell": 1,
-    "row_floor": 30,
-    "linkless": true
-   },
-   "date_formats": [
-    "DD-MM-YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "cogroup.trai.gov.in",
-    "trai.gov.in"
-   ],
-   "default_type": "order",
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "quirks": "FD enforcement app behind an iframe on trai.gov.in - fetch the cogroup URL directly. No per-row links (auth-gated report API); listing page is the citation. Wide from/to window returns full history in one response (verified live 25-08-2026)."
   },
   {
    "id": "nccs_circulars_head",
@@ -2210,5 +2137,19 @@
    "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
   }
  ],
- "window_start": "2026-06-01"
+ "window_start": "2026-06-01",
+ "excluded": [
+  {
+   "id": "trai_fd_broadcasting",
+   "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard",
+   "reason": "Register of financial disincentives levied, not an instrument publisher. Rows are records ABOUT enforcement (operator, clause breached, period, amount) with no document behind them; the only link is the dashboard itself. Excluded 25-08-2026 after these rows appeared in the ledger typed as orders.",
+   "revisit": "If the practice wants enforcement tracking, build it as a separate register view with its own schema, never merged into the instruments ledger."
+  },
+  {
+   "id": "trai_fd_telecom",
+   "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard",
+   "reason": "Register of financial disincentives levied, not an instrument publisher. Rows are records ABOUT enforcement (operator, clause breached, period, amount) with no document behind them; the only link is the dashboard itself. Excluded 25-08-2026 after these rows appeared in the ledger typed as orders.",
+   "revisit": "If the practice wants enforcement tracking, build it as a separate register view with its own schema, never merged into the instruments ledger."
+  }
+ ]
 }

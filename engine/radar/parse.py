@@ -196,18 +196,25 @@ DDMMYYYY = re.compile(r"[-_](\d{2})(\d{2})(\d{4})(?:_\d+)?\.pdf$", re.I)
 
 def _date_from_href(href: str, cfg: dict) -> Optional[str]:
     """TRAI PDF filenames embed the date (Regulation_DDMMYYYY.pdf) — a deterministic
-    date for otherwise-undated shelf rows."""
+    date for otherwise-undated shelf rows.
+
+    A filename is not authority. TRAI ships real typos (Standing_Direction_03122028.pdf,
+    uploaded in September 2024), so a date that has not happened yet is treated as no date
+    rather than a wrong one: the instrument still gets tracked, just undated."""
     if not cfg["parser"].get("date_from_href"):
         return None
     m = DDMMYYYY.search(href.split("?")[0])
     if not m:
         return None
     d, mo, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
-    from datetime import date as _d
+    from datetime import date as _d, timedelta as _td
     try:
-        return _d(y, mo, d).isoformat() if 2000 <= y <= 2100 else None
+        got = _d(y, mo, d)
     except ValueError:
         return None
+    if not (2000 <= y <= 2100) or got > _d.today() + _td(days=45):
+        return None
+    return got.isoformat()
 
 
 # ---------------------------------------------------------------- link_shelf

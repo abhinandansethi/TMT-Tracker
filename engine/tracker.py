@@ -164,6 +164,10 @@ def export() -> int:
     for it in led.all_items():
         if it["status"] == "duplicate":
             continue
+        # signals are leads, not instruments: they render in their own tab and must never
+        # appear in the ledger a partner reads as citable
+        if it.get("lane") == "signals":
+            continue
         if it["id"] in curated:
             out_items.append(curated[it["id"]])
             continue

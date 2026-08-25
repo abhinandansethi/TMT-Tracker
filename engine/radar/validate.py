@@ -11,6 +11,19 @@ Row = Dict[str, object]
 TITLE_MIN, TITLE_MAX = 8, 300
 
 
+def _canon(url: str) -> str:
+    u = (url or "").strip().lower()
+    u = re.sub(r"^https?://(www\.)?", "", u)
+    return u.rstrip("/")
+
+
+def _same_page(url: str, listing_url: str) -> bool:
+    """Is this link just the page we scraped it from? Compared whole, query string
+    included: on legacy servlet sites the query IS the document's identity
+    (s2cMainServlet?VLCODE=CIAD-2026-0042), so stripping it would reject every real row."""
+    return _canon(url) == _canon(listing_url)
+
+
 def _domain_ok(url: str, allowed: List[str]) -> bool:
     if not url:
         return False
@@ -28,13 +41,23 @@ def gate(row: Row, source: dict, today: date) -> Tuple[Optional[Row], Optional[s
         return None, f"title length {len(title)} outside [{TITLE_MIN},{TITLE_MAX}]: {title[:80]!r}"
 
     url = str(row.get("url") or "")
-    if source["parser"].get("linkless"):
-        # some venues (TRAI FD dashboard) carry no per-item links; the listing page
-        # itself is the citation
-        url = url or source["url"]
-        row = dict(row, url=url)
     if not _domain_ok(url, source.get("allowed_domains", [])):
         return None, f"link off allowed domains: {url[:120]!r}"
+
+    # Self-citation gate. A row whose only link is the listing page it was scraped from
+    # carries no citation of its own, so it cannot be shown to a partner as an instrument
+    # or cited to a client. This is what let a register of penalties enter the ledger
+    # typed as orders; the listing page is a place, not a document.
+    #
+    # Signals-lane sources are exempt by design: a signal is openly a LEAD, not a citation
+    # (the e-Gazette homepage panel lists gazettes with no per-item link). They pay for the
+    # exemption by having to carry a verifiable identifier instead.
+    if source.get("lane", "instruments") == "signals":
+        ident = (row.get("extra") or {}).get("gazette_id") or (row.get("extra") or {}).get("ref")
+        if not ident:
+            return None, f"signal carries neither a link of its own nor an identifier: {title[:80]!r}"
+    elif _same_page(url, source["url"]):
+        return None, f"row has no citation of its own, only the listing page: {title[:80]!r}"
 
     d = row.get("date")
     undated_ok = source["parser"].get("undated_ok", False)

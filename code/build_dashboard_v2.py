@@ -206,7 +206,17 @@ rows = _dated + _undated
 undated_n = len(_undated)
 
 # ---- coverage: live sources grouped stratum -> regulator -> venue, with health ----
-HEALTH_UI = {"OK": ("OK", "ok"), "WARN": ("Warn", "warn"), "FAILED": ("Failed", "bad")}
+# Green is earned, never assumed. Only a source that has actually produced or confirmed an
+# instrument shows OK; a venue we are getting nothing from must never look the same as one
+# that is working, and "quiet" has to be provable from the newest date the venue displays.
+HEALTH_UI = {
+    "OK": ("OK", "ok"),
+    "QUIET": ("Quiet", "quiet"),
+    "FILTERED": ("Out of scope", "quiet"),
+    "WARN": ("Warn", "warn"),
+    "EMPTY": ("Nothing", "bad"),
+    "FAILED": ("Failed", "bad"),
+}
 
 
 def venue_name(s: dict[str, Any]) -> str:
@@ -219,7 +229,7 @@ def venue_name(s: dict[str, Any]) -> str:
 
 strata_groups: list[dict[str, Any]] = []
 stratum_venue_counts: dict[str, int] = {}
-health_tally: dict[str, int] = {"ok": 0, "warn": 0, "bad": 0, "pending": 0}
+health_tally: dict[str, int] = {"ok": 0, "quiet": 0, "warn": 0, "bad": 0, "pending": 0}
 
 for st in STRATA:
     groups: dict[str, list[dict[str, Any]]] = {}
@@ -246,6 +256,10 @@ for st in STRATA:
             "rows": (h or {}).get("rows_seen"), "new": (h or {}).get("new"),
             "checked": ((h or {}).get("checked") or "")[:16].replace("T", " "),
             "fails": (h or {}).get("consecutive_failures", 0),
+            # the proof that a quiet venue is alive rather than broken
+            "newest": (h or {}).get("newest_visible"),
+            "held": (h or {}).get("ledgered_total"),
+            "lane": s.get("lane", "instruments"),
             "notes": notes, "info": info,
         })
     if not order:
@@ -521,13 +535,17 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
 .stsec:first-of-type{margin-top:0}
 .stsec .sechead{margin-top:0}
 .dot.ok{background:var(--ok)}
+.dot.quiet{background:transparent;border-color:var(--off)}
 .dot.warn{background:var(--ochre)}
 .dot.bad{background:var(--alarm)}
 .dot.pending{background:transparent;border-color:var(--off)}
 .ven .s.ok{color:var(--ok)}
+.ven .s.quiet{color:var(--faint)}
 .ven .s.warn{color:#7A6210}
 .ven .s.bad{color:var(--alarm);font-weight:600}
 .ven .s.pending{color:var(--ghost)}
+/* the newest item a venue is actually showing: what makes "quiet" checkable */
+.ven .ev{font-family:var(--mono);font-size:9.5px;color:var(--ghost);white-space:nowrap}
 .ven.x{cursor:pointer}
 .ven.x:hover{background:var(--navy-wash)}
 .ven.open{background:var(--navy-wash)}
@@ -784,6 +802,11 @@ function venDetail(v) {
   const p = [];
   if (v.checked) p.push(['Last checked', esc(v.checked) + ' IST']);
   if (v.rows != null) p.push(['Rows seen', esc(v.rows) + (v.new != null ? ' · ' + esc(v.new) + ' new' : '')]);
+  // Evidence that a quiet venue is alive rather than silently broken.
+  if (v.newest) p.push(['Newest item on the venue', esc(v.newest)]);
+  else if (v.rows) p.push(['Newest item on the venue', 'venue publishes no dates']);
+  if (v.held != null) p.push(['Instruments held from here', esc(v.held)]);
+  if (v.lane && v.lane !== 'instruments') p.push(['Lane', esc(v.lane) + ' — leads, not citable instruments']);
   if (v.fails) p.push(['Consecutive failures', esc(v.fails)]);
   let h = p.map(x => '<div class="k">' + x[0] + '</div><div class="v">' + x[1] + '</div>').join('');
   if (v.notes && v.notes.length) {
@@ -809,7 +832,8 @@ function renderCoverage() {
           const open = state.ven === v.id;
           return '<div class="ven x' + (open ? ' open' : '') + '" data-id="' + esc(v.id) + '" tabindex="0" role="button" aria-expanded="' + open + '">' +
             '<div class="n" title="' + esc(v.n) + '">' + esc(v.n) + '</div>' +
-            '<div class="t">' + (v.rows != null ? esc(v.rows) + ' rows' : '—') + '</div>' +
+            '<div class="t">' + (v.newest ? esc(v.newest)
+                 : (v.rows != null ? esc(v.rows) + ' rows' : '—')) + '</div>' +
             '<div class="s ' + esc(v.st) + '"' + (tip ? ' title="' + esc(tip) + '"' : '') + '>' +
               '<span>' + esc(v.s) + '</span><span class="dot ' + esc(v.st) + '"></span></div>' +
             venDetail(v) + '</div>';
@@ -817,8 +841,10 @@ function renderCoverage() {
       '</div>' +
     '</div>').join('') +
     '<div class="legend">' +
-      '<span><i class="dot ok"></i>OK</span><span><i class="dot warn"></i>Warn</span>' +
-      '<span><i class="dot bad"></i>Failed</span><span><i class="dot pending"></i>No sweep yet</span>' +
+      '<span><i class="dot ok"></i>Producing instruments</span>' +
+      '<span><i class="dot quiet"></i>Reachable, nothing new (date = newest item there)</span>' +
+      '<span><i class="dot warn"></i>Warn</span>' +
+      '<span><i class="dot bad"></i>Failed or yielding nothing</span>' +
       '<span>' + pl(D.coverage.regs, 'regulator') + ', ' + pl(D.coverage.live, 'venue') + ' live' +
       (D.coverage.healthAt ? ' · health ' + esc(D.coverage.healthAt) + ' IST' : '') + '</span>' +
     '</div>';

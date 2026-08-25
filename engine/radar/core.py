@@ -3,10 +3,18 @@
 Per-source pipeline:
     fetch -> parse (adapter) -> floor check -> tripwires -> gates -> classify -> ledger
 
-Source result statuses:
-    OK      fetched, parsed >= floor, no tripwire noise
-    WARN    parsed fine but a tripwire fired (drift, staleness, sequence, monotonic, crosscheck)
-    FAILED  fetch error or parse below floor — consecutive_failures increments
+Source result statuses. "OK" is never a default: it has to be earned by evidence, because
+a coverage page that shows green for a venue it is silently getting nothing from is worse
+than one that shows red.
+
+    OK      fetched, parsed >= floor, and rows survived the gates
+    QUIET   fetched and parsed fine, but every row predates the tracked window. Provable,
+            not assumed: the source records newest_visible, the date of the newest item
+            actually on the page, so "nothing new" is a claim you can check.
+    EMPTY   fetched, yet nothing survived parsing and gating. Never green: either the
+            venue really is bare or the adapter has quietly stopped matching.
+    WARN    a tripwire fired (drift, staleness, sequence, monotonic, crosscheck catch)
+    FAILED  fetch error, undeclared host, or parse below floor
 """
 from __future__ import annotations
 
@@ -81,7 +89,8 @@ class Sweeper:
             content = b""
             for page_url in _page_urls(source, max_pages):
                 r = get(page_url, tolerant_tls=source.get("tolerant_tls", False),
-                        extra_headers=source.get("http_headers"))
+                        extra_headers=source.get("http_headers"),
+                        source_id=sid, allowed_domains=source.get("allowed_domains"))
                 content = r.content if not all_rows else content
                 rows = ps.parse(source, r.content, page_url)
                 if not rows and all_rows:
@@ -117,22 +126,52 @@ class Sweeper:
             if fp and state.get("fingerprint") and fp != state["fingerprint"]:
                 notes.append(f"structure fingerprint changed {state['fingerprint']} -> {fp}")
 
+            # proof of life: the newest thing this venue is actually showing right now
+            seen_dates = sorted(str(r["date"]) for r in all_rows if r.get("date"))
+            newest_visible = seen_dates[-1] if seen_dates else None
+
             first_run = not state.get("last_run")
-            fresh, activated, pre_window = self._ingest(all_rows, source, backfill_since, first_run)
-            if activated:
-                info.append(f"first sweep: {activated} visible item(s) ledgered as activation_baseline")
-            if pre_window:
-                info.append(f"{pre_window} row(s) predate window_start — not ledgered")
+            ing = self._ingest(all_rows, source, backfill_since, first_run)
+            fresh = ing["fresh"]
+            if ing["activated"]:
+                info.append(f"first sweep: {ing['activated']} visible item(s) ledgered as activation_baseline")
+            if ing["pre_window"]:
+                info.append(f"{ing['pre_window']} row(s) predate window_start — not ledgered")
+            if ing["filtered"]:
+                info.append(f"{ing['filtered']} row(s) outside this source's subject filter")
             if source.get("role") == "crosscheck" and fresh and not backfill_since:
                 notes.append(f"crosscheck caught {fresh} item(s) the primary sources missed")
 
-            if notes:
+            # Earn the status from evidence; never default to OK. "Contributed" means this
+            # source has either ledgered an instrument or confirmed one another source found
+            # (a sighting) — a cross-listing venue that only ever confirms is still working.
+            owned = self.ledger.count_for(sid)
+            sightings = self.ledger.sightings_for(sid)
+            contributed = owned + sightings
+            window_start = self.registry.get("window_start")
+            in_window = bool(newest_visible and window_start and newest_visible >= window_start)
+
+            if rows_total == 0:
+                status = "EMPTY"
+                notes.append("fetched, but the page yielded no rows at all")
+            elif contributed == 0 and ing["filtered"] == rows_total and rows_total:
+                status = "FILTERED"
+                info.append(f"all {rows_total} row(s) belong to other subjects; nothing in scope yet")
+            elif contributed == 0 and not in_window:
+                status = "QUIET"
+                info.append(f"nothing inside the tracked window; newest item this venue shows "
+                            f"is {newest_visible or 'undated'}")
+            elif contributed == 0:
+                status = "EMPTY"
+                notes.append(f"parsed {rows_total} row(s), newest {newest_visible}, which is inside "
+                             f"the window, yet nothing has ever reached the ledger — adapter or gates")
+            if notes and status == "OK":
                 status = "WARN"
             self.ledger.set_state(sid, last_run=now_ist(), last_status=status,
                                   last_note="; ".join(notes)[:500] or None,
                                   consecutive_failures=0, last_row_count=rows_total,
                                   fingerprint=fp or state.get("fingerprint"),
-                                  seq_state=seq_state)
+                                  seq_state=seq_state, newest_visible=newest_visible)
         except (FetchError, Exception) as e:  # noqa: BLE001 — recorded, never swallowed
             status = "FAILED"
             fails = state.get("consecutive_failures", 0) + 1
@@ -142,14 +181,18 @@ class Sweeper:
             self.ledger.set_state(sid, last_run=now_ist(), last_status="FAILED",
                                   last_note="; ".join(notes)[:500],
                                   consecutive_failures=fails)
+        st = self.ledger.get_state(sid)
         self.health[sid] = {"status": status, "rows_seen": rows_total, "new": fresh,
+                            "ledgered_total": self.ledger.count_for(sid),
+                            "newest_visible": st.get("newest_visible"),
                             "notes": notes, "info": info, "checked": now_ist(),
-                            "consecutive_failures": self.ledger.get_state(sid).get("consecutive_failures", 0)}
+                            "consecutive_failures": st.get("consecutive_failures", 0)}
 
     # ---------------------------------------------------------------------- ingest
     def _ingest(self, rows: List[dict], source: dict, backfill_since: Optional[str],
                 first_run: bool = False):
         sid, fresh, activated, pre_window = source["id"], 0, 0, 0
+        filtered = sighted = 0
         window_start = self.registry.get("window_start")
         crosscheck = source.get("role") == "crosscheck"
         # Lagging feeds and aggregators only act on recent rows: their old rows are
@@ -160,6 +203,7 @@ class Sweeper:
             horizon = (self.today - timedelta(days=source.get("crosscheck_horizon_days", 14))).isoformat()
         for row in rows:
             if not _row_included(row, source):
+                filtered += 1  # out of subject scope by design, e.g. another ministry
                 continue
             clean, reason = vl.gate(row, source, self.today)
             if clean is None:
@@ -172,7 +216,8 @@ class Sweeper:
                 url = str(clean.get("url") or "")
                 if self.ledger.known_url(sid, url):
                     continue
-                ok, page_date = self._pib_page_info(url, pib_filter, sid)
+                ok, page_date = self._pib_page_info(url, pib_filter, sid,
+                                                    source.get("allowed_domains"))
                 if not ok:
                     continue
                 if page_date and not clean.get("date"):
@@ -183,13 +228,12 @@ class Sweeper:
                     and str(clean["date"]) < window_start):
                 pre_window += 1  # archive rows visible on page 1 stay out of the tracked window
                 continue
-            if horizon and (not clean.get("date") or str(clean["date"]) < horizon):
-                continue  # crosscheck feeds only act inside their horizon
             seq_key = self._seq_key(clean, source)
             if seq_key:
                 holder = self.ledger.known_seq(sid, seq_key)
                 if holder:
                     self.ledger.sight(holder, sid, str(clean.get("url") or ""))
+                    sighted += 1
                     continue
             norm_key = (norm_title(str(clean["title"])),
                         str(clean["date"]) if clean.get("date") else "")
@@ -198,6 +242,12 @@ class Sweeper:
                 (self._url_idx.get(url_key) if url_key.split("?")[0].endswith(".pdf") else None)
             if holder:
                 self.ledger.sight(holder, sid, str(clean.get("url") or ""))
+                sighted += 1
+                continue
+            # The crosscheck horizon exists to stop a lagging feed from minting stale items,
+            # not to stop it confirming known ones — so it is applied only after the identity
+            # lookup above has had its chance to record a sighting.
+            if horizon and (not clean.get("date") or str(clean["date"]) < horizon):
                 continue
             iid = item_id(str(clean["title"]), clean.get("date") and str(clean["date"]))
             title = str(clean["title"])
@@ -219,6 +269,7 @@ class Sweeper:
                 "deadline": cl.extract_deadline(title, self.deadline_rx, source.get("date_formats", [])),
                 "flags": flags,
                 "seq": seq_key,
+                "lane": source.get("lane", "instruments"),
                 "first_seen": now_ist(),
                 "status": ("backfill" if backfill_since
                            else "activation_baseline" if first_run else "new"),
@@ -232,7 +283,8 @@ class Sweeper:
                 fresh += 1
             else:
                 activated += 1
-        return fresh, activated, pre_window
+        return {"fresh": fresh, "activated": activated, "pre_window": pre_window,
+                "filtered": filtered, "sighted": sighted}
 
     @staticmethod
     def _seq_key(clean: dict, source: dict) -> Optional[str]:
@@ -256,7 +308,8 @@ class Sweeper:
     _MON = {m: i for i, m in enumerate(
         ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
 
-    def _pib_page_info(self, url: str, ministries: List[str], sid: str):
+    def _pib_page_info(self, url: str, ministries: List[str], sid: str,
+                       allowed_domains: Optional[List[str]] = None):
         """PIB's only feed is all-ministries and dateless; both facts live solely on the
         release page. Deterministic: fetch once, substring-match the ministry list and
         regex the Posted-On date. An unreachable page quarantines the row — never a
@@ -265,7 +318,7 @@ class Sweeper:
             return self._pib_cache[url]
         ok, page_date = False, None
         try:
-            text = get(url).text
+            text = get(url, source_id=sid, allowed_domains=allowed_domains).text
             ok = any(m.lower() in text.lower() for m in ministries)
             m = self._PIB_DATE.search(text)
             if m and m.group(2).lower()[:3] in self._MON:
@@ -291,18 +344,52 @@ class Sweeper:
             if stratum and s.get("stratum") != stratum:
                 continue
             self.sweep_source(s, backfill_since)
-        failed = [k for k, h in self.health.items() if h["status"] == "FAILED"]
-        warned = [k for k, h in self.health.items() if h["status"] == "WARN"]
+        by = lambda st: [k for k, h in self.health.items() if h["status"] == st]  # noqa: E731
+        filtered_s = by("FILTERED")
+        failed, empty, warned, quiet = by("FAILED"), by("EMPTY"), by("WARN"), by("QUIET")
         substantive = [i for i in self.new_items if not i["routine"]]
         print(f"sweep: {len(self.health)} sources | {len(self.new_items)} new "
-              f"({len(substantive)} substantive) | {len(failed)} FAILED, {len(warned)} WARN")
+              f"({len(substantive)} substantive) | {len(failed)} FAILED, {len(empty)} EMPTY, "
+              f"{len(warned)} WARN, {len(quiet)} quiet")
         for i in substantive:
             print(f"  NEW   {i['date']}  {i['regulator']:<8} {i['title'][:100]}")
         for k in warned:
             print(f"  WARN  {k}: {'; '.join(self.health[k]['notes'])[:180]}")
+        for k in empty:
+            print(f"  EMPTY {k}: {'; '.join(self.health[k]['notes'])[:180]}")
         for k in failed:
             print(f"  FAIL  {k}: {'; '.join(self.health[k]['notes'])[:180]}")
-        return 1 if failed else 0
+        prov = self.provenance()
+        if prov["undeclared"]:
+            print(f"  PROVENANCE BREACH: {len(prov['undeclared'])} request(s) to undeclared hosts")
+            for u in prov["undeclared"][:5]:
+                print(f"    {u['source_id']} -> {u['host']}")
+        # EMPTY is a failure of evidence, not a quiet week: exit non-zero so it is seen.
+        return 1 if (failed or empty or prov["undeclared"]) else 0
+
+    def provenance(self) -> dict:
+        """Every host contacted this run, attributed to the source that caused it, checked
+        against the registry. The coverage page tells a partner where the tracker looks;
+        this is what makes that statement auditable instead of a claim."""
+        from .fetch import fetch_log
+        declared = set()
+        for s in self.registry["sources"]:
+            for d in s.get("allowed_domains", []):
+                declared.add(d.lower())
+        by_source: Dict[str, dict] = {}
+        undeclared = []
+        for sid, host, url in fetch_log:
+            h = host.lower().split(":")[0]
+            rec = by_source.setdefault(sid, {"hosts": set(), "requests": 0})
+            rec["hosts"].add(h)
+            rec["requests"] += 1
+            if not any(h == d or h.endswith("." + d) for d in declared):
+                undeclared.append({"source_id": sid, "host": h, "url": url})
+        return {"requests": len(fetch_log),
+                "by_source": {k: {"hosts": sorted(v["hosts"]), "requests": v["requests"]}
+                              for k, v in sorted(by_source.items())},
+                "hosts": sorted({h for v in by_source.values() for h in v["hosts"]}),
+                "undeclared": undeclared}
 
     def write_health(self, path: Path) -> None:
         """Merge, never replace: a scoped sweep must not erase the other sources' health,
@@ -315,4 +402,5 @@ class Sweeper:
                 merged = {}
         merged.update(self.health)
         path.write_text(json.dumps(
-            {"generated": now_ist(), "sources": merged}, indent=1, ensure_ascii=False))
+            {"generated": now_ist(), "sources": merged, "provenance": self.provenance()},
+            indent=1, ensure_ascii=False))

@@ -1,0 +1,1552 @@
+[
+ {
+  "id": "trai_regulations",
+  "regulator": "TRAI",
+  "name": "Regulations",
+  "url": "https://trai.gov.in/release-publication/regulations",
+  "stratum": "telecom",
+  "default_type": "regulation",
+  "strategy": "trai_views",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 30,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_directions",
+  "regulator": "TRAI",
+  "name": "Directions & Orders",
+  "url": "https://trai.gov.in/release-publication/directions",
+  "stratum": "telecom",
+  "default_type": "direction",
+  "strategy": "trai_views",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 30,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-08-10",
+    "type": "direction",
+    "title": "Direction on Allocation and operationalization of 1601 numbering series for Service and Transactional Voice Calls by entities in sectors other than BFSI and Government sector, unde",
+    "url": "https://trai.gov.in/sites/default/files/2026-08/Direction_10082026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "trai_tariff_telecom",
+  "regulator": "TRAI",
+  "name": "Telecom Tariff Orders",
+  "url": "https://trai.gov.in/telecom/telecom-tariff",
+  "stratum": "telecom",
+  "default_type": "tariff_order",
+  "strategy": "trai_views",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 85,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_tariff_broadcasting",
+  "regulator": "TRAI",
+  "name": "Broadcasting Tariff Orders",
+  "url": "https://trai.gov.in/broadcasting/tariff-orders",
+  "stratum": "telecom",
+  "default_type": "tariff_order",
+  "strategy": "trai_views",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 147,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_consultations",
+  "regulator": "TRAI",
+  "name": "Consultation Papers",
+  "url": "https://trai.gov.in/release-publication/consultation",
+  "stratum": "telecom",
+  "default_type": "consultation_paper",
+  "strategy": "trai_views",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 30,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-08-05",
+    "type": "consultation_paper",
+    "title": "Consultation Paper on Draft Amendments in The Standards of Quality of Service of Access (Wireline and Wireless) and Broadband (Wireline and Wireless) Service Regulations, 2024",
+    "url": "https://trai.gov.in/sites/default/files/2026-08/CP_05082026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "trai_open_consultations",
+  "regulator": "TRAI",
+  "name": "Open Consultations (deadline register)",
+  "url": "https://trai.gov.in/open-consultation",
+  "stratum": "telecom",
+  "default_type": "consultation_paper",
+  "strategy": "link_shelf",
+  "row_floor": 1,
+  "rows_parsed_last_sweep": 1,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_recommendations",
+  "regulator": "TRAI",
+  "name": "Recommendations",
+  "url": "https://trai.gov.in/release-publication/recommendation",
+  "stratum": "telecom",
+  "default_type": "recommendation",
+  "strategy": "trai_views",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 30,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_press_releases",
+  "regulator": "TRAI",
+  "name": "Press Releases",
+  "url": "https://trai.gov.in/notifications/press-release",
+  "stratum": "telecom",
+  "default_type": "press_release",
+  "strategy": "trai_grid",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 30,
+  "items_in_ledger": 50,
+  "sample_items": [
+   {
+    "date": "2026-08-14",
+    "type": "press_release",
+    "title": "TRAI Assesses Mobile Network Quality Across Shimla & Nearby Areas and Solan & Nearby Areas",
+    "url": "https://trai.gov.in/sites/default/files/2026-08/PR_No114of2026.pdf"
+   },
+   {
+    "date": "2026-08-10",
+    "type": "press_release",
+    "title": "TRAI initiates phase-wise implementation of 1601-series for service and transactional calls by utilities, courier and logistics sectors entities.",
+    "url": "https://trai.gov.in/sites/default/files/2026-08/PR_No113of2026_1.pdf"
+   },
+   {
+    "date": "2026-08-05",
+    "type": "press_release",
+    "title": "TRAI releases consultation paper on draft amendments in The Standards of Quality of Service of Access (Wireline and Wireless) and Broadband (Wireline and Wireless) Service Regulati",
+    "url": "https://trai.gov.in/sites/default/files/2026-08/PR_No112of2026_0.pdf"
+   },
+   {
+    "date": "2026-08-04",
+    "type": "press_release",
+    "title": "TRAI Assesses Mobile Network Quality on Ahmedabad to Gandhidham Rail Route (Gujarat LSA)",
+    "url": "https://trai.gov.in/sites/default/files/2026-08/PR_No109of2026.pdf"
+   },
+   {
+    "date": "2026-08-04",
+    "type": "press_release",
+    "title": "TRAI assessed mobile network quality across Srinagar, Ganderbal, Anantnag, Gulmarg, Pahalgam, and surrounding areas",
+    "url": "https://trai.gov.in/sites/default/files/2026-08/PR_No110of2026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "trai_whats_new",
+  "regulator": "TRAI",
+  "name": "What's New (cross-check)",
+  "url": "https://trai.gov.in/what-s-new",
+  "stratum": "telecom",
+  "default_type": "notification",
+  "strategy": "html_table",
+  "row_floor": 15,
+  "rows_parsed_last_sweep": 30,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-07-10",
+    "type": "administrative",
+    "title": "Panel of Auditors (Updated List) to carry out audit of Digital Addressable Systems (DAS)",
+    "url": ""
+   }
+  ]
+ },
+ {
+  "id": "trai_standing_qos",
+  "regulator": "TRAI",
+  "name": "Standing Directions — Quality of Service",
+  "url": "https://trai.gov.in/release-publication/standing-directions/quality-of-Service",
+  "stratum": "telecom",
+  "default_type": "direction",
+  "strategy": "link_shelf",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 13,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_standing_broadband",
+  "regulator": "TRAI",
+  "name": "Standing Directions — Broadband & Policy Analysis",
+  "url": "https://trai.gov.in/release-publication/standing-directions/broadband-and-policy-analysis",
+  "stratum": "telecom",
+  "default_type": "direction",
+  "strategy": "link_shelf",
+  "row_floor": 2,
+  "rows_parsed_last_sweep": 2,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_standing_bcs",
+  "regulator": "TRAI",
+  "name": "Standing Directions — Broadcasting & Cable",
+  "url": "https://trai.gov.in/release-publication/standing-directions/broadcasting-and-cable-services",
+  "stratum": "telecom",
+  "default_type": "direction",
+  "strategy": "link_shelf",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 7,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_standing_fea",
+  "regulator": "TRAI",
+  "name": "Standing Directions — Financial & Economic Analysis",
+  "url": "https://trai.gov.in/release-publication/standing-directions/financial-and-economic-analysis",
+  "stratum": "telecom",
+  "default_type": "direction",
+  "strategy": "link_shelf",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 24,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_standing_nsl",
+  "regulator": "TRAI",
+  "name": "Standing Directions — Network, Spectrum & Licensing",
+  "url": "https://trai.gov.in/release-publication/standing-directions/network-spectrum-and-licensing",
+  "stratum": "telecom",
+  "default_type": "direction",
+  "strategy": "link_shelf",
+  "row_floor": 8,
+  "rows_parsed_last_sweep": 12,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "dot_eservices_circulars",
+  "regulator": "DoT",
+  "name": "eServices — Circulars/Notifications/Others",
+  "url": "https://eservices.dot.gov.in/circular-notifications-others",
+  "stratum": "telecom",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 15,
+  "items_in_ledger": 5,
+  "sample_items": [
+   {
+    "date": "2026-08-14",
+    "type": "notification",
+    "title": "Instructions to be specified on the portal in accordance with the Telecommunications (User Identification) Rules, 2026",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/instruction-of-user-identification-rules-2026.pdf"
+   },
+   {
+    "date": "2026-08-12",
+    "type": "circular",
+    "title": "Use of ICDR portal under the Telecom Cyber Security Rules",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/use-of-icdr-portal-under-the-telecom-cyber-security-rules.pdf"
+   },
+   {
+    "date": "2026-08-12",
+    "type": "press_release",
+    "title": "DoT Cautions Manufacturers, Importers and Resellers about Mandatory IMEI Registration and Consequences of IMEI Tampering",
+    "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2190763"
+   },
+   {
+    "date": "2026-08-12",
+    "type": "press_release",
+    "title": "Department of Telecommunications Cautions Manufacturers, Importers and Resellers about Mandatory IMEI Registration and Consequences of IMEI Tampering",
+    "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2190763"
+   },
+   {
+    "date": "2026-08-09",
+    "type": "notification",
+    "title": "User Identifications Notifications List",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/user-identification-notifications.pdf"
+   }
+  ]
+ },
+ {
+  "id": "dot_eservices_rules",
+  "regulator": "DoT",
+  "name": "eServices — Act & Rules shelf",
+  "url": "https://eservices.dot.gov.in/act-and-rules",
+  "stratum": "telecom",
+  "default_type": "rules",
+  "strategy": "link_shelf",
+  "row_floor": 20,
+  "rows_parsed_last_sweep": 42,
+  "items_in_ledger": 6,
+  "sample_items": [
+   {
+    "date": "2026-07-08",
+    "type": "rules",
+    "title": "Telecommunications (Radio Equipment Possession Authorisation) Rules, 2026",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/telecommunications-radio-equipment-possession-authorisation-rules-2026.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "type": "notification",
+    "title": "Notification of Telecom eServices Portal",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/notification-of-portal.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "type": "rules",
+    "title": "Telecommunications (Authorisation for Captive Telecommunication Services) Rules, 2026",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/captive-telecom-services-rules-2026.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "type": "rules",
+    "title": "Telecommunications (Authorisation for Provision of Miscellaneous Telecommunication Services) Rules, 2026",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/misc-telecom-services-rules-2026.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "type": "rules",
+    "title": "Telecommunications (Terms and Conditions for Migration) Rules, 2026",
+    "url": "https://eservices.dot.gov.in/sites/default/files/circular-notifications/migration-rules-2026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "nccs_latest",
+  "regulator": "NCCS",
+  "name": "Latest Updates",
+  "url": "https://nccs.gov.in/home/latestUpdates/1",
+  "stratum": "telecom",
+  "default_type": "notification",
+  "strategy": "html_table",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 19,
+  "items_in_ledger": 12,
+  "sample_items": [
+   {
+    "date": "2026-08-20",
+    "type": "consultation_notice",
+    "title": "Notice for stakeholder consultation on Draft for Comments – Test Cases for Unified Data Repository (UDR) of 5G",
+    "url": "https://nccs.gov.in/public/latest_updates/Consultation%20notice_UDR.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "consultation_notice",
+    "title": "Notice for stakeholder consultation on Draft for Comments – Test Cases for Binding Support Function (BSF) of 5G",
+    "url": "https://nccs.gov.in/public/latest_updates/Consultation%20notice_BSF.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "consultation_notice",
+    "title": "Notice for stakeholder consultation on Draft for Comments – Test Cases for Unstructured Data Storage Function (UDSF) of 5G",
+    "url": "https://nccs.gov.in/public/latest_updates/Consultation%20notice_UDSF.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "consultation_notice",
+    "title": "Notice for stakeholder consultation on Draft for Comments – Test Cases for Short Message Service Function (SMSF) of 5G",
+    "url": "https://nccs.gov.in/public/latest_updates/Consultation%20notice_SMSF.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "consultation_notice",
+    "title": "Notice for stakeholder consultation on Draft for Comments – Test Cases for Network Slice Admission Control Function (NSACF) of 5G",
+    "url": "https://nccs.gov.in/public/latest_updates/Consultation%20notice_NSACF.pdf"
+   }
+  ]
+ },
+ {
+  "id": "nccs_sas",
+  "regulator": "NCCS",
+  "name": "Circulars — Security Assurance Standards",
+  "url": "https://nccs.gov.in/home/circularsSas/1",
+  "stratum": "telecom",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 5,
+  "items_in_ledger": 6,
+  "sample_items": [
+   {
+    "date": "2026-08-20",
+    "type": "draft_test_cases",
+    "title": "Draft Generic Test Cases for Unified Data Repository (UDR) of 5G",
+    "url": "https://nccs.gov.in/public/circulars_sas/test_cases_UDR.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "draft_test_cases",
+    "title": "Draft Generic Test Cases for Binding Support Function (BSF) of 5G",
+    "url": "https://nccs.gov.in/public/circulars_sas/test_cases_BSF.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "draft_test_cases",
+    "title": "Draft Generic Test Cases for Unstructured Data Storage Function (UDSF) of 5G",
+    "url": "https://nccs.gov.in/public/circulars_sas/test_cases_UDSF.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "draft_test_cases",
+    "title": "Draft Generic Test Cases for Short Message Service Function (SMSF) of 5G",
+    "url": "https://nccs.gov.in/public/circulars_sas/test_cases_SMSF.pdf"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "draft_test_cases",
+    "title": "Draft Generic Test Cases for Network Slice Admission Control Function (NSACF) of 5G",
+    "url": "https://nccs.gov.in/public/circulars_sas/test_cases_NSACF.pdf"
+   }
+  ]
+ },
+ {
+  "id": "nccs_sc",
+  "regulator": "NCCS",
+  "name": "Circulars — Security Certification (ComSec)",
+  "url": "https://nccs.gov.in/home/circularsSc/1",
+  "stratum": "telecom",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 5,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-08-13",
+    "type": "exemption_circular",
+    "title": "Exemption of Cloud implemented IP Routers and Wi-Fi CPEs from Security Certification",
+    "url": "https://nccs.gov.in/public/circulars_sc/Extension%20of%20cloud%20exemeption%20till%2031st%20Dec%202026%20_NCCS%20letter%20dated%2013.08.2026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "nccs_itsars",
+  "regulator": "NCCS",
+  "name": "Notified ITSARs",
+  "url": "https://nccs.gov.in/home/itsars",
+  "stratum": "telecom",
+  "default_type": "itsar",
+  "strategy": "html_table",
+  "row_floor": 40,
+  "rows_parsed_last_sweep": 64,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "tec_whatsnew",
+  "regulator": "TEC",
+  "name": "What's New",
+  "url": "https://www.tec.gov.in/whats-new",
+  "stratum": "telecom",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 100,
+  "rows_parsed_last_sweep": 277,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "tdsat_notices",
+  "regulator": "TDSAT",
+  "name": "Notices / Circulars",
+  "url": "https://tdsat.gov.in/writereaddata/Delhi/docs/notices.php",
+  "stratum": "telecom",
+  "default_type": "court_notice",
+  "strategy": "regex_rows",
+  "row_floor": 200,
+  "rows_parsed_last_sweep": 437,
+  "items_in_ledger": 16,
+  "sample_items": [
+   {
+    "date": "2026-08-20",
+    "type": "court_notice",
+    "title": "Notice dated 20.08.2026 regarding sitting of Hon'ble Court No. 1",
+    "url": "https://tdsat.gov.in/admin/notice/uploads/NOTICE%2020082026.pdf"
+   },
+   {
+    "date": "2026-08-19",
+    "type": "court_notice",
+    "title": "Notice dt. 19.8.2026 — court sitting of Hon. Tribunal on 27.08.2026 (Milad-un-Nabi adjustment)",
+    "url": "https://tdsat.gov.in/admin/notice/uploads/NOTICE%20MILAD%20UN%20NABI.pdf"
+   },
+   {
+    "date": "2026-08-14",
+    "type": "court_notice",
+    "title": "Notice dated 14.08.2026 regarding sitting of Hon'ble Court No. 1",
+    "url": "https://tdsat.gov.in/admin/notice/uploads/Notice%20dated%2014082026.pdf"
+   },
+   {
+    "date": "2026-08-13",
+    "type": "court_notice",
+    "title": "Notice dated 13.08.2026 regarding sitting of Hon'ble Court No. 1",
+    "url": "https://tdsat.gov.in/admin/notice/uploads/Notice%20dated%2013082026.pdf"
+   },
+   {
+    "date": "2026-08-11",
+    "type": "court_notice",
+    "title": "Notice dated 11.08.26 regarding sitting of Hon'ble Court No. 1",
+    "url": "https://tdsat.gov.in/admin/notice/uploads/Notice%2011082026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "pib_moc",
+  "regulator": "PIB",
+  "name": "PIB releases (all-ministries feed, ministry-filtered)",
+  "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+  "stratum": "telecom",
+  "default_type": "press_release",
+  "strategy": "rss",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 20,
+  "items_in_ledger": 3,
+  "sample_items": [
+   {
+    "date": "2026-07-22",
+    "type": "pib_release",
+    "title": "Draft Telecommunications (Television, Radio and Associated Services) Rules, 2026 to Simplify Regulatory Framework — follow-up release",
+    "url": ""
+   },
+   {
+    "date": "2026-06-25",
+    "type": "pib_release",
+    "title": "DoT Opens Online Portal for Telecommunication Service Authorisations and License Migration under Telecommunications Act, 2023",
+    "url": ""
+   },
+   {
+    "date": "2026-06-12",
+    "type": "draft_rules",
+    "title": "Draft Telecommunications (Television, Radio and Associated Services) Rules, 2026 — published for public consultation",
+    "url": ""
+   }
+  ]
+ },
+ {
+  "id": "egazette_recent",
+  "regulator": "e-Gazette",
+  "name": "Recent Extraordinary + Weekly panels",
+  "url": "https://egazette.gov.in/",
+  "stratum": "safety_net",
+  "default_type": "gazette_notification",
+  "strategy": "egazette_recent",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 9,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "trai_rss",
+  "regulator": "TRAI",
+  "name": "TRAI sitewide RSS (lag cross-check)",
+  "url": "https://trai.gov.in/rss.xml",
+  "stratum": "telecom",
+  "default_type": "notification",
+  "strategy": "rss",
+  "row_floor": 1,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 9,
+  "sample_items": [
+   {
+    "date": "2026-08-24",
+    "type": "notification",
+    "title": "Consumer Outreach Program at Kasaragod (Kerala) by RO BENGALURU",
+    "url": "http://trai.gov.in/consumer/events/consumer-outreach-program-kasaragod-kerala-ro-bengaluru"
+   },
+   {
+    "date": "2026-08-24",
+    "type": "notification",
+    "title": "Consumer Education Workshop at Gangapur City (Rajasthan) by Vodafone Idea Limited",
+    "url": "http://trai.gov.in/consumer/events/consumer-education-workshop-gangapur-city-rajasthan-vodafone-idea-limited"
+   },
+   {
+    "date": "2026-08-24",
+    "type": "notification",
+    "title": "Consumer Awareness Program at East Delhi (Delhi) by Indian Institute of Technology & Entrepreneur Development (IITED), Delhi",
+    "url": "http://trai.gov.in/consumer/events/consumer-awareness-program-east-delhi-delhi-indian-institute-technology"
+   },
+   {
+    "date": "2026-08-24",
+    "type": "notification",
+    "title": "Consumer Education Workshop at Siwan (Bihar) by Bharti Airtel Limited",
+    "url": "http://trai.gov.in/consumer/events/consumer-education-workshop-siwan-bihar-bharti-airtel-limited-0"
+   },
+   {
+    "date": "2026-08-24",
+    "type": "notification",
+    "title": "Consumer Awareness Program at Baksa (Assam) by Gram Vikas Parishad",
+    "url": "http://trai.gov.in/consumer/events/consumer-awareness-program-baksa-assam-gram-vikas-parishad"
+   }
+  ]
+ },
+ {
+  "id": "meity_gazettes",
+  "regulator": "MeitY",
+  "name": "Gazette Notifications (WP-JSON API)",
+  "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Gazettes%20Notifications&sort=acf&order=DESC&search=",
+  "stratum": "tech_data",
+  "default_type": "gazette_notification",
+  "strategy": "meity_api",
+  "row_floor": 50,
+  "rows_parsed_last_sweep": 105,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "meity_acts_policies",
+  "regulator": "MeitY",
+  "name": "Acts & Policies (WP-JSON API)",
+  "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Act%20and%20policies&sort=acf&order=DESC&search=",
+  "stratum": "tech_data",
+  "default_type": "rules",
+  "strategy": "meity_api",
+  "row_floor": 25,
+  "rows_parsed_last_sweep": 42,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "meity_orders_notices",
+  "regulator": "MeitY",
+  "name": "Orders & Notices (WP-JSON API)",
+  "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Orders%20and%20Notices&sort=acf&order=DESC&search=",
+  "stratum": "tech_data",
+  "default_type": "order",
+  "strategy": "meity_api",
+  "row_floor": 25,
+  "rows_parsed_last_sweep": 45,
+  "items_in_ledger": 5,
+  "sample_items": [
+   {
+    "date": "2026-08-13",
+    "type": "order",
+    "title": "Appointment of Chief of Media & Communications for MeitY",
+    "url": "https://www.meity.gov.in/static/uploads/2026/08/a2a0e44f5f0898052874755c5aef73b4.pdf"
+   },
+   {
+    "date": "2026-08-12",
+    "type": "order",
+    "title": "Special Campaign 6.0 for Institutionalizing Swachhata and Minimizing Pendency in Government Offices during 2nd October 2026 to 31st October2026 – Advancement of Preparatory action ",
+    "url": "https://www.meity.gov.in/static/uploads/2026/08/edf3c03985635c9a4acbb76d40c77172.pdf"
+   },
+   {
+    "date": "2026-07-16",
+    "type": "order",
+    "title": "Delegation of Powers dtd. 16-07-2026",
+    "url": "https://www.meity.gov.in/static/uploads/2026/07/c9b573f3d1ebc80cdec172a338416e7f.pdf"
+   },
+   {
+    "date": "2026-06-18",
+    "type": "order",
+    "title": "Revised work distribution amongst Group Coordinators/HAG level officers in MeitY & Link Officer arrangement 18.06.2026",
+    "url": "https://www.meity.gov.in/static/uploads/2026/06/984469d1008b98cdb58f16e4f2329912.pdf"
+   },
+   {
+    "date": "2026-06-17",
+    "type": "order",
+    "title": "Delegation of Financial Power of ICERT",
+    "url": "https://www.meity.gov.in/static/uploads/2026/06/e17e4324c7cca217f0e4090ccb5824e8.pdf"
+   }
+  ]
+ },
+ {
+  "id": "certin_advisories",
+  "regulator": "CERT-In",
+  "name": "Advisories (CIAD)",
+  "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBADVLIST02&year=2026",
+  "stratum": "tech_data",
+  "default_type": "advisory",
+  "strategy": "regex_rows",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 15,
+  "items_in_ledger": 15,
+  "sample_items": [
+   {
+    "date": "2026-08-20",
+    "type": "advisory",
+    "title": "CERT-In Advisory CIAD-2026-0042: A End of Mainstream for Windows Server 2022",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0042"
+   },
+   {
+    "date": "2026-08-19",
+    "type": "advisory",
+    "title": "CERT-In Advisory CIAD-2026-0041: Multiple Vulnerabilities in Apple Products",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0041"
+   },
+   {
+    "date": "2026-08-18",
+    "type": "advisory",
+    "title": "CERT-In Advisory CIAD-2026-0040: Multiple Vulnerabilities in SAP Products",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0040"
+   },
+   {
+    "date": "2026-08-14",
+    "type": "advisory",
+    "title": "CERT-In Advisory CIAD-2026-0039: Reports on Apple Threat Notifications",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0039"
+   },
+   {
+    "date": "2026-08-12",
+    "type": "advisory",
+    "title": "CERT-In Advisory CIAD-2026-0038: Multiple Vulnerabilities in Microsoft Products",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0038"
+   }
+  ]
+ },
+ {
+  "id": "certin_vuln",
+  "regulator": "CERT-In",
+  "name": "Vulnerability Notes (CIVN)",
+  "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=VLNLIST02&year=2026",
+  "stratum": "tech_data",
+  "default_type": "advisory",
+  "strategy": "regex_rows",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 20,
+  "items_in_ledger": 20,
+  "sample_items": [
+   {
+    "date": "2026-08-24",
+    "type": "advisory",
+    "title": "CERT-In Vulnerability Note CIVN-2026-0418",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0418"
+   },
+   {
+    "date": "2026-08-24",
+    "type": "advisory",
+    "title": "CERT-In Vulnerability Note CIVN-2026-0419",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0419"
+   },
+   {
+    "date": "2026-08-24",
+    "type": "advisory",
+    "title": "CERT-In Vulnerability Note CIVN-2026-0420",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0420"
+   },
+   {
+    "date": "2026-08-21",
+    "type": "advisory",
+    "title": "CERT-In Vulnerability Note CIVN-2026-0417",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0417"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "advisory",
+    "title": "CERT-In Vulnerability Note CIVN-2026-0416",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES01&VLCODE=CIVN-2026-0416"
+   }
+  ]
+ },
+ {
+  "id": "certin_guidelines",
+  "regulator": "CERT-In",
+  "name": "Security Guidelines (CISG)",
+  "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW01",
+  "stratum": "tech_data",
+  "default_type": "guideline",
+  "strategy": "regex_rows",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 31,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-06-10",
+    "type": "guideline",
+    "title": "CERT-In Security Guidelines CISG-2026-03",
+    "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW02&refcode=CISG-2026-03"
+   }
+  ]
+ },
+ {
+  "id": "certin_directions",
+  "regulator": "CERT-In",
+  "name": "s.70B(6) Directions",
+  "url": "https://www.cert-in.org.in/Directions70B.jsp",
+  "stratum": "tech_data",
+  "default_type": "direction",
+  "strategy": "tr_with_doc",
+  "row_floor": 1,
+  "rows_parsed_last_sweep": 12,
+  "items_in_ledger": 6,
+  "sample_items": [
+   {
+    "date": null,
+    "type": "direction",
+    "title": "Blueprint for Reducing Exposure and Defending against AI-Assisted Vulnerabilities Exploitation in Digital Infrastructure",
+    "url": "https://www.cert-in.org.in/PDF/Blueprint_for_Defending_against_AI_Assisted_Exploitataion.pdf"
+   },
+   {
+    "date": null,
+    "type": "direction",
+    "title": "Elemental Cyber Defense Controls for Micro, Small, and Medium Enterprises (MSMEs)",
+    "url": "https://www.cert-in.org.in/PDF/Elemental_Cyber_Defense_Controls_for_MSME.pdf"
+   },
+   {
+    "date": null,
+    "type": "direction",
+    "title": "Technical Guidelines on SBOM, QBOM & CBOM, AIBOM and HBOM Version 2.0",
+    "url": "https://www.cert-in.org.in/PDF/TechnicalGuidelines-on-SBOM,QBOM&CBOM,AIBOM_and_HBOM_ver2.0.pdf"
+   },
+   {
+    "date": null,
+    "type": "direction",
+    "title": "Cyber Security Guidelines for Smart City Infrastructure",
+    "url": "https://www.cert-in.org.in/PDF/Guidelines_for_Smart_City_Infrastructure.pdf"
+   },
+   {
+    "date": null,
+    "type": "direction",
+    "title": "Cyber Security Framework and Guidelines for Space including Satellite Communication",
+    "url": "https://www.cert-in.org.in/PDF/CyberSecurityFrameworkGuideline_for_space.pdf"
+   }
+  ]
+ },
+ {
+  "id": "uidai_circulars",
+  "regulator": "UIDAI",
+  "name": "Circulars",
+  "url": "https://uidai.gov.in/en/circulars",
+  "stratum": "tech_data",
+  "default_type": "circular",
+  "strategy": "uidai_rsc",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-06-04",
+    "type": "circular",
+    "title": "Circular 30.04.2026 - Validity of Aadhaar Verifiable Credential shown, shared and/or verified through Aadhaar Application.",
+    "url": "https://backend.uidai.gov.in/get/files/media/document/2026-07/Circular_30_04_2026_Validity_of_Aadhaar_Verifiable_Credential_shown_shared_andor_verified_through_Aadhaar_Application.pdf"
+   }
+  ]
+ },
+ {
+  "id": "uidai_notifications",
+  "regulator": "UIDAI",
+  "name": "Notifications",
+  "url": "https://uidai.gov.in/en/notifications",
+  "stratum": "tech_data",
+  "default_type": "notification",
+  "strategy": "uidai_rsc",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "uidai_oms",
+  "regulator": "UIDAI",
+  "name": "Official Memorandums",
+  "url": "https://uidai.gov.in/en/official-memorandums",
+  "stratum": "tech_data",
+  "default_type": "circular",
+  "strategy": "uidai_rsc",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-06-19",
+    "type": "circular",
+    "title": "OM waiver of charges payable by an ANH for updating email address through Aadhaar mobile application",
+    "url": "https://backend.uidai.gov.in/get/files/media/document/2026-06/OM_dated_18-06-2026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "mib_acts_policy",
+  "regulator": "MIB",
+  "name": "Acts/Policies/Guidelines",
+  "url": "https://mib.gov.in/en/documents/notification/acts-policy-guidelines",
+  "stratum": "media",
+  "default_type": "guideline",
+  "strategy": "html_table",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 20,
+  "items_in_ledger": 5,
+  "sample_items": [
+   {
+    "date": "2026-08-07",
+    "type": "guideline",
+    "title": "Clarification regarding exhibition of Public Service Awareness (PSA) Films in Cinema Theatres under Guidelines dated 30.11.2023 issued by Ministry of Information & Broadcasting - r",
+    "url": "https://mib.gov.in/sites/default/files/2026-08/clarification-reg-exhibition-of-psa-films.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "type": "notification",
+    "title": "Inviting comments from stakeholders on the draft Recruitment Rules in respect of the CCW Engineering Cadre of Prasar Bharati-reg.",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/circular_inviting-comments-from-stakeholders-on-draft-rrs.pdf"
+   },
+   {
+    "date": "2026-06-24",
+    "type": "notification",
+    "title": "Corrigendum to notification for notifying sporting events of national importance under Sports Broadcasting Signals (Mandatory Sharing with Prasar Bharati) Act, 2007",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/corrigendum-and-original-notification.pdf"
+   },
+   {
+    "date": "2026-06-12",
+    "type": "guideline",
+    "title": "Notification for notifying sporting events of national importance under Sports Broadcasting Signals (Mandatory Sharing with Prasar Bharati) Act, 2007",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/notification-sports.pdf"
+   },
+   {
+    "date": "2026-06-03",
+    "type": "guideline",
+    "title": "Advisory on monitoring of the broadcast content and technical parameters & standards",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/advisory-on-monitoring-of-the-broadcast-content-and-technical-parameters-standards.pdf"
+   }
+  ]
+ },
+ {
+  "id": "mib_orders_notices",
+  "regulator": "MIB",
+  "name": "Orders & Notices",
+  "url": "https://mib.gov.in/en/documents/notification/notices",
+  "stratum": "media",
+  "default_type": "notification",
+  "strategy": "html_table",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 4,
+  "sample_items": [
+   {
+    "date": "2026-08-05",
+    "type": "notification",
+    "title": "Details of operational Pvt FM Radio channels - 31.07.2026",
+    "url": "https://mib.gov.in/sites/default/files/2026-08/386-pvt-fm-channels-operational-as-on-31.07.2026.pdf"
+   },
+   {
+    "date": "2026-07-15",
+    "type": "notification",
+    "title": "Inter-Ministerial Committee (IMC) to examine Complaints/Grievances related to Private FM Radio and Community Radio Stations",
+    "url": "https://mib.gov.in/sites/default/files/2026-07/doc03665520260715204500.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "type": "notification",
+    "title": "Notification dated 22.06.2026 in compliance with Order dated 19.06.2026 passed by Hon’ble High Court of Delhi in W.P.(C) No. 8284 of 2026 – Badminton Association Of India Vs. Union",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/notification_22062026_with-annexure-i_1.pdf"
+   },
+   {
+    "date": "2026-06-12",
+    "type": "notification",
+    "title": "Draft Telecommunications (Television, Radio and Associated Services) Rules, 2026 for public and inter-ministerial consultation",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/draft-rules-for-consultation-dated-12th-june-2026_0.pdf"
+   }
+  ]
+ },
+ {
+  "id": "mib_other_comms",
+  "regulator": "MIB",
+  "name": "Other Communications (advisories, OMs)",
+  "url": "https://mib.gov.in/en/documents/notification/Other-communication",
+  "stratum": "media",
+  "default_type": "advisory",
+  "strategy": "html_table",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 20,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "mib_digital_media",
+  "regulator": "MIB",
+  "name": "Digital Media Wing (IT Rules Part III)",
+  "url": "https://mib.gov.in/en/ministry/our-wings/digital-media",
+  "stratum": "media",
+  "default_type": "advisory",
+  "strategy": "html_table",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 35,
+  "items_in_ledger": 20,
+  "sample_items": [
+   {
+    "date": "2026-08-22",
+    "type": "advisory",
+    "title": "First Steering Committee Meeting For 57th IFFI Held Under Chairmanship of MoS Dr. L. Murugan to Review Festival Preparations",
+    "url": "https://www.pib.gov.in/PressReleaseDetail.aspx?PRID=2302236&reg=3&lang=1"
+   },
+   {
+    "date": "2026-08-20",
+    "type": "advisory",
+    "title": "Display of Disclaimer relating to the Harmful Effects of Drug Abuse on Private Satellite Television Channels - reg.",
+    "url": "https://mib.gov.in/sites/default/files/2026-08/narcotics-advisory-dated-20.08.2026_repaired.pdf"
+   },
+   {
+    "date": "2026-08-14",
+    "type": "advisory",
+    "title": "Government Removes 12-Minute Advertisement Duration Cap for Television Channels",
+    "url": "https://www.pib.gov.in/PressReleaseDetail.aspx?PRID=2299626&reg=3&lang=1"
+   },
+   {
+    "date": "2026-08-13",
+    "type": "advisory",
+    "title": "Advisory dated 13.08.2025 for carriage of sign language Interpretation of Independence Day 2026 Commentary/ Ceremony by Private Satellite TV channels.",
+    "url": "https://mib.gov.in/sites/default/files/2026-08/independence-day-advisory.pdf"
+   },
+   {
+    "date": "2026-08-12",
+    "type": "advisory",
+    "title": "Government Endeavours to Strengthen Credible Information Dissemination through PIB Fact-Checking, Public Service Broadcasting and Digital Media Regulations",
+    "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2298189&reg=3&lang=1"
+   }
+  ]
+ },
+ {
+  "id": "mib_broadcasting",
+  "regulator": "MIB",
+  "name": "Broadcasting Wing documents",
+  "url": "https://mib.gov.in/en/ministry/our-wings/broadcating-wing",
+  "stratum": "media",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 30,
+  "rows_parsed_last_sweep": 63,
+  "items_in_ledger": 46,
+  "sample_items": [
+   {
+    "date": "2026-08-19",
+    "type": "circular",
+    "title": "List of Commissioned Community Radio Stations in India as on 31.07.2026",
+    "url": "https://mib.gov.in/sites/default/files/2026-08/commissioned-crs-as-on-31.07.2026_0.pdf"
+   },
+   {
+    "date": "2026-08-03",
+    "type": "circular",
+    "title": "DETAILS OF GRANT RELEASED TO COMMUNITY RADIO STATIONS UNDER THE SCHEME \"SUPPORTING COMMUNITY RADIO MOVEMENT IN INDIA\" FROM FINANCIAL YEAR 2021-2022 TO 2025-26",
+    "url": "https://mib.gov.in/sites/default/files/2026-08/grant-data-for-uploading-in-website.pdf"
+   },
+   {
+    "date": "2026-07-28",
+    "type": "circular",
+    "title": "Guidelines for implementation of the Central Sector Scheme \"Supporting Community Radio Movement in India\" 2026-31",
+    "url": "https://mib.gov.in/sites/default/files/2026-07/scheme-guidelines-2026-31.pdf"
+   },
+   {
+    "date": null,
+    "type": "circular",
+    "title": "Uplinking and Downlinking Guidelines 2022-English",
+    "url": "https://mib.gov.in/sites/default/files/2024-06/uplinking-and-downlinking-guidelines-2022-english.pdf"
+   },
+   {
+    "date": null,
+    "type": "circular",
+    "title": "FAQS on Uplinking and Downlinking Guidelines 2022",
+    "url": "https://mib.gov.in/sites/default/files/2024-06/faqs-on-uplinking-and-downlinking-guidelines-2022.pdf"
+   }
+  ]
+ },
+ {
+  "id": "prgi",
+  "regulator": "PRGI",
+  "name": "Press Registrar General advisories/public notices",
+  "url": "https://prgi.gov.in/",
+  "stratum": "media",
+  "default_type": "advisory",
+  "strategy": "link_shelf",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 5,
+  "items_in_ledger": 5,
+  "sample_items": [
+   {
+    "date": null,
+    "type": "advisory",
+    "title": "Advisory for registration of periodicals (PDF",
+    "url": "https://prgi.gov.in/sites/default/files/2024-03/advisory_no_3_of_2024_for_publishers_owners_of_periodicals.pdf"
+   },
+   {
+    "date": null,
+    "type": "advisory",
+    "title": "Advisory for creation of Printing Press Profile (PDF",
+    "url": "https://prgi.gov.in/sites/default/files/2024-03/advisory_no_4of_2024_for_printers_owners_keepers_of_printing_presses.pdf"
+   },
+   {
+    "date": null,
+    "type": "advisory",
+    "title": "Advisory no. 20 of 2026 - Time-bound compliance with Deficiency Communication issued in respect of applications for Circulation Verification through Desk Audit. — Download",
+    "url": "https://prgi.gov.in/sites/default/files/2026-08/advisory_20.pdf"
+   },
+   {
+    "date": null,
+    "type": "advisory",
+    "title": "Advisory no. 19 of 2026 - Extension of Last Date for e-Filing of Annual Statements for FY 2025-26 on Press Sewa Portal -REG. — Download",
+    "url": "https://prgi.gov.in/sites/default/files/2026-07/advisory_no._19_of_2026_0001.pdf"
+   },
+   {
+    "date": null,
+    "type": "advisory",
+    "title": "Advisory no. 18 of 2026 - Online Correction of Annual Statement for the Financial Year 2025–26 on Press Sewa Portal. — Download",
+    "url": "https://prgi.gov.in/sites/default/files/2026-07/advisory_no_18_of_2026.pdf"
+   }
+  ]
+ },
+ {
+  "id": "cbfc",
+  "regulator": "CBFC",
+  "name": "Orders and Circulars",
+  "url": "https://cbfcindia.gov.in/cbfcAdmin/orders-and-circular.php",
+  "stratum": "media",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 10,
+  "rows_parsed_last_sweep": 14,
+  "items_in_ledger": 11,
+  "sample_items": [
+   {
+    "date": null,
+    "type": "circular",
+    "title": "Amendment in Recruitment Rules (RRs) for the post of MTS in Central Board of Film Certification-reg.",
+    "url": "https://cbfcindia.gov.in/cbfcAdmin/assets/pdf/Amendment_of_RRs_post_of_MTS_English.pdf"
+   },
+   {
+    "date": null,
+    "type": "circular",
+    "title": "During the 2024 Maharashtra assembly elections, the central government offices will remain closed.",
+    "url": "https://cbfcindia.gov.in/cbfcAdmin/assets/pdf/Maharashtra_assembly_elections.pdf"
+   },
+   {
+    "date": null,
+    "type": "circular",
+    "title": "Visiting hours to RO, Mumbai",
+    "url": "https://cbfcindia.gov.in/cbfcAdmin/assets/pdf/Visiting_hours_RO_Mumbai_Eng.pdf"
+   },
+   {
+    "date": null,
+    "type": "circular",
+    "title": "Nomination of Chief Information Security Officer and Dy. Chief Information Security Officer",
+    "url": "https://cbfcindia.gov.in/cbfcAdmin/assets/pdf/Nomination_CIO_English.pdf"
+   },
+   {
+    "date": null,
+    "type": "circular",
+    "title": "Nodal Officers for issues of notifications to intermediaries for removing internet links showing pirated films under the Cinematograph Act 1952",
+    "url": "https://cbfcindia.gov.in/cbfcAdmin/assets/pdf/Nodal_Officers_Act_1952_Accessible.pdf"
+   }
+  ]
+ },
+ {
+  "id": "asci",
+  "regulator": "ASCI",
+  "name": "Advisories (self-regulatory)",
+  "url": "https://www.ascionline.in/advisories/",
+  "stratum": "media",
+  "default_type": "advisory",
+  "strategy": "link_shelf",
+  "row_floor": 3,
+  "rows_parsed_last_sweep": 6,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": null,
+    "type": "advisory",
+    "title": "Prohibition of Advertising, Promotion & Endorsement of unlawful activities prohibited under various laws – CCPA – 6th March, 2024",
+    "url": "https://www.ascionline.in/wp-content/uploads/2024/03/6-03.24.-CCPA.-Prohibition-of-Advertising-Promotion-Endorsement-of-unlawful-activities-brihibited-under-various-laws.pdf"
+   }
+  ]
+ },
+ {
+  "id": "trai_miscellaneous",
+  "regulator": "TRAI",
+  "name": "Miscellaneous releases (orders, debarments)",
+  "url": "https://trai.gov.in/release-publication/miscellaneous",
+  "stratum": "telecom",
+  "default_type": "order",
+  "strategy": "trai_views",
+  "row_floor": 25,
+  "rows_parsed_last_sweep": 30,
+  "items_in_ledger": 3,
+  "sample_items": [
+   {
+    "date": "2026-07-20",
+    "type": "order",
+    "title": "Debarment Order - M/s Shiv Shutra Enterprises (GeM Contract No. GEMC-511687755697904)",
+    "url": "https://trai.gov.in/sites/default/files/2026-07/SSE_20072026.pdf"
+   },
+   {
+    "date": "2026-07-16",
+    "type": "order",
+    "title": "Debarment Order – M/s MI2C Business Enterprises Private Limited (GeM Contract No. GEMC-511687781019390)",
+    "url": "https://trai.gov.in/sites/default/files/2026-07/MI2C_16072026.pdf"
+   },
+   {
+    "date": "2026-06-24",
+    "type": "order",
+    "title": "Debarment Order – M/s MI2C Business Enterprises Private Limited (Valid for Two Years)",
+    "url": "https://trai.gov.in/sites/default/files/2026-06/BID_24062026_0.pdf"
+   }
+  ]
+ },
+ {
+  "id": "trai_fd_telecom",
+  "regulator": "TRAI",
+  "name": "Financial Disincentive orders - Telecom",
+  "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31",
+  "stratum": "telecom",
+  "default_type": "order",
+  "strategy": "html_table",
+  "row_floor": 300,
+  "rows_parsed_last_sweep": 412,
+  "items_in_ledger": 30,
+  "sample_items": [
+   {
+    "date": "2026-08-17",
+    "type": "order",
+    "title": "Bharat Sanchar Nigam Ltd. (BSNL) - QoS Regulations dated 02.08.2024 - 10 - Jan 2026 - Mar 2026",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-08-17",
+    "type": "order",
+    "title": "Mahanagar Telephone Nigam Limited (MTNL) - QoS Regulations dated 02.08.2024 - 4&10 - Jan 2026 - Mar 2026",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-08-04",
+    "type": "order",
+    "title": "Mahanagar Telephone Nigam Limited (MTNL) - QoS Regulations dated 02.08.2024 - 4&10 - Oct 2025 - Dec 2025",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-08-04",
+    "type": "order",
+    "title": "Bharti Airtel Limited - QoS Regulations dated 02.08.2024 - 13 - Dec 2025 - Dec 2025",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-06-08",
+    "type": "order",
+    "title": "Kerala Fibre Optic Network Ltd. - QoS Regulations dated 02.08.2024 - 9&10 - Apr 2025 - Jun 2025",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Telecom&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   }
+  ]
+ },
+ {
+  "id": "trai_fd_broadcasting",
+  "regulator": "TRAI",
+  "name": "Financial Disincentive orders - Broadcasting",
+  "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31",
+  "stratum": "telecom",
+  "default_type": "order",
+  "strategy": "html_table",
+  "row_floor": 30,
+  "rows_parsed_last_sweep": 48,
+  "items_in_ledger": 15,
+  "sample_items": [
+   {
+    "date": "2026-07-21",
+    "type": "order",
+    "title": "Akshaya Diginet Cable Vision Pvt. Limited. - Interconnection Regulation 2017 - 15(1) - Jan 2024 - Dec 2024",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-07-21",
+    "type": "order",
+    "title": "M/s LPS Vision Production - Interconnection Regulation 2017 - 15(1) - Jan 2024 - Dec 2024",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-07-21",
+    "type": "order",
+    "title": "AJK TV - Interconnection Regulation 2017 - 15(1) - Jan 2024 - Dec 2024",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-07-21",
+    "type": "order",
+    "title": "Satellite Cable Communication - Interconnection Regulation 2017 - 15(1) - Jan 2024 - Dec 2024",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   },
+   {
+    "date": "2026-07-21",
+    "type": "order",
+    "title": "M/s The Nandyal Communications - Interconnection Regulation 2017 - 15(1) - Jan 2024 - Dec 2024",
+    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard?category=Broadcasting&period=CUSTOM&from=2000-01-01&to=2030-12-31"
+   }
+  ]
+ },
+ {
+  "id": "nccs_circulars_head",
+  "regulator": "NCCS",
+  "name": "Circulars - Headquarters",
+  "url": "https://nccs.gov.in/home/circularsHead/1?rowsPerPage=50",
+  "stratum": "telecom",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 5,
+  "rows_parsed_last_sweep": 13,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-06-23",
+    "type": "circular",
+    "title": "Extension of Last date for receipt of Applications in response to NCCS Notification for Engagement of Research Associates as per NCCS Research Associate Scheme",
+    "url": "https://nccs.gov.in/public/circulars_head/Corrigendum (date of Extension) for Engagement of RAs in NCCS.pdf"
+   }
+  ]
+ },
+ {
+  "id": "tec_circulars",
+  "regulator": "TEC",
+  "name": "Circulars",
+  "url": "https://www.tec.gov.in/circulars",
+  "stratum": "telecom",
+  "default_type": "circular",
+  "strategy": "html_table",
+  "row_floor": 100,
+  "rows_parsed_last_sweep": 127,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "tec_gazette_standards",
+  "regulator": "TEC",
+  "name": "Gazette-notified standards",
+  "url": "https://www.tec.gov.in/gazette-notified-standards",
+  "stratum": "telecom",
+  "default_type": "gazette_notification",
+  "strategy": "html_table",
+  "row_floor": 60,
+  "rows_parsed_last_sweep": 73,
+  "items_in_ledger": 36,
+  "sample_items": [
+   {
+    "date": "2026-08-06",
+    "type": "gazette_notification",
+    "title": "Test Guide IoT Gateway",
+    "url": "https://www.tec.gov.in/pdf/SD_DIV/06-AUG-2026_2.pdf"
+   },
+   {
+    "date": "2026-08-06",
+    "type": "gazette_notification",
+    "title": "Generic Requirements Solid Polythene Insulated Fully Jelly Filled, Polythene Sheathed Underground Telecom Cables",
+    "url": "https://www.tec.gov.in/pdf/GRs/FA_GR_PIJF_TEC68090_2026.pdf"
+   },
+   {
+    "date": "2026-08-06",
+    "type": "gazette_notification",
+    "title": "Generic Requirements Valve Regulated Lead Acid (VRLA) Batteries",
+    "url": "https://www.tec.gov.in/pdf/GRs/FA_GR_VRLA_TEC67010_2026.pdf"
+   },
+   {
+    "date": "2026-07-30",
+    "type": "gazette_notification",
+    "title": "Essential Requirements Session border controller",
+    "url": "https://www.tec.gov.in/pdf/GRs/TEC67222606.pdf"
+   },
+   {
+    "date": "2026-07-30",
+    "type": "gazette_notification",
+    "title": "Essential Requirements VHF UHF Radio System Equipment",
+    "url": "https://www.tec.gov.in/pdf/GRs/TEC58432606.pdf"
+   }
+  ]
+ },
+ {
+  "id": "tec_essential_requirements",
+  "regulator": "TEC",
+  "name": "MTCTE Essential Requirements (ER list API)",
+  "url": "https://www.mtcte.tec.gov.in/get_er_list",
+  "stratum": "telecom",
+  "default_type": "notification",
+  "strategy": "tec_er_api",
+  "row_floor": 120,
+  "rows_parsed_last_sweep": 138,
+  "items_in_ledger": 10,
+  "sample_items": [
+   {
+    "date": "2026-09-01",
+    "type": "notification",
+    "title": "E-band Fixed Radio Relay Systems (TEC56432609)",
+    "url": "https://www.mtcte.tec.gov.in/filedownload?name=TEC56432609.pdf"
+   },
+   {
+    "date": "2026-07-30",
+    "type": "notification",
+    "title": "VHF UHF Radio System Equipment (TEC58432606)",
+    "url": "https://www.mtcte.tec.gov.in/filedownload?name=TEC58432606.pdf"
+   },
+   {
+    "date": "2026-07-30",
+    "type": "notification",
+    "title": "Session Border Controller (TEC67222606)",
+    "url": "https://www.mtcte.tec.gov.in/filedownload?name=TEC67222606.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "type": "notification",
+    "title": "Feedback Device (TEC23232607)",
+    "url": "https://www.mtcte.tec.gov.in/filedownload?name=TEC23232607.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "type": "notification",
+    "title": "End Point Device for Environmental Monitoring (TEC23732607)",
+    "url": "https://www.mtcte.tec.gov.in/filedownload?name=TEC23732607.pdf"
+   }
+  ]
+ },
+ {
+  "id": "dot_eservices_row",
+  "regulator": "DoT",
+  "name": "eServices - Right of Way",
+  "url": "https://eservices.dot.gov.in/right-of-way-permissions",
+  "stratum": "telecom",
+  "default_type": "order",
+  "strategy": "psn_rows",
+  "row_floor": 8,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "dot_eservices_satellite",
+  "regulator": "DoT",
+  "name": "eServices - Satellite/GMPCS authorisation",
+  "url": "https://eservices.dot.gov.in/satellite-license",
+  "stratum": "telecom",
+  "default_type": "order",
+  "strategy": "psn_rows",
+  "row_floor": 1,
+  "rows_parsed_last_sweep": 1,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "inspace_publications",
+  "regulator": "IN-SPACe",
+  "name": "Publications (NGP, guidelines, advisories)",
+  "url": "https://www.inspace.gov.in/api/now/sp/page?id=inspace_publications",
+  "stratum": "telecom",
+  "default_type": "guideline",
+  "strategy": "inspace_api",
+  "row_floor": 30,
+  "rows_parsed_last_sweep": 42,
+  "items_in_ledger": 41,
+  "sample_items": [
+   {
+    "date": null,
+    "type": "guideline",
+    "title": "EoI for establishment and operation of ground stations by Indian private operators at NRSC/ISRO, Shadnagar",
+    "url": "https://www.inspace.gov.in/sys_attachment.do?sys_id=0ac09d842b0d0fd0e95ef17b6e91bf5f"
+   },
+   {
+    "date": null,
+    "type": "guideline",
+    "title": "L1 Overview of BIS Process of Standards development",
+    "url": "https://www.inspace.gov.in/inspace/sys_attachment.do?sys_id=0c7dcefe2b000390e95ef17b6e91bfab"
+   },
+   {
+    "date": null,
+    "type": "guideline",
+    "title": "L2 Systems Engineering Standards",
+    "url": "https://www.inspace.gov.in/inspace/sys_attachment.do?sys_id=047dcefe2b000390e95ef17b6e91bfaf"
+   },
+   {
+    "date": null,
+    "type": "guideline",
+    "title": "L3 Quality Assurance Standards",
+    "url": "https://www.inspace.gov.in/inspace/sys_attachment.do?sys_id=847dcefe2b000390e95ef17b6e91bfb2"
+   },
+   {
+    "date": null,
+    "type": "guideline",
+    "title": "L4 Testing Operations Standards",
+    "url": "https://www.inspace.gov.in/inspace/sys_attachment.do?sys_id=447d02322b400390e95ef17b6e91bfd4"
+   }
+  ]
+ },
+ {
+  "id": "mib_advisories",
+  "regulator": "MIB",
+  "name": "Advisories",
+  "url": "https://mib.gov.in/en/documents/notification/advisories",
+  "stratum": "media",
+  "default_type": "advisory",
+  "strategy": "html_table",
+  "row_floor": 15,
+  "rows_parsed_last_sweep": 20,
+  "items_in_ledger": 4,
+  "sample_items": [
+   {
+    "date": "2026-06-05",
+    "type": "advisory",
+    "title": "Advisory on adherence of Indian Laws and the Code of Ethics prescribed under the Information Technology (Intermediary Guidelines and Digital Media, Ethics Code) Rules, 2021 - reg.",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/advisory-22.04.2025.pdf"
+   },
+   {
+    "date": "2026-06-05",
+    "type": "advisory",
+    "title": "Inclusion of classification rating in promotional and publicity material-reg.",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/advisory-18.07.2023.pdf"
+   },
+   {
+    "date": "2026-06-05",
+    "type": "advisory",
+    "title": "Advisory for OTT Platforms on Streaming Content Related to Narcotic Drugs and Psychotropic Substances - reg",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/advisory-26.11.2024.pdf"
+   },
+   {
+    "date": "2026-06-05",
+    "type": "advisory",
+    "title": "Advisory on Celebrity/Influencer Endorsements and Advertisements, including Surrogate Advertisements, of Offshore Online Betting/Gambling Platformsreg.",
+    "url": "https://mib.gov.in/sites/default/files/2026-06/advisory-21.03.2024_0.pdf"
+   }
+  ]
+ },
+ {
+  "id": "meity_guidelines",
+  "regulator": "MeitY",
+  "name": "Guidelines (WP-JSON API)",
+  "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Guideline&limit=50&sort=date&order=DESC&search=",
+  "stratum": "tech_data",
+  "default_type": "guideline",
+  "strategy": "meity_api",
+  "row_floor": 15,
+  "rows_parsed_last_sweep": 23,
+  "items_in_ledger": 0,
+  "sample_items": []
+ },
+ {
+  "id": "uidai_regulations",
+  "regulator": "UIDAI",
+  "name": "Updated (consolidated) Regulations",
+  "url": "https://uidai.gov.in/en/updated-regulations",
+  "stratum": "tech_data",
+  "default_type": "regulation",
+  "strategy": "uidai_rsc",
+  "row_floor": 8,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 1,
+  "sample_items": [
+   {
+    "date": "2026-06-16",
+    "type": "regulation",
+    "title": "Aadhaar (Enrolment and Update) Regulations, 2016",
+    "url": "https://backend.uidai.gov.in/get/files/media/document/2026-06/Aadhaar_Enrolment_and_Update_First_Amendment_Regulations_2026_pdf_0.pdf"
+   }
+  ]
+ },
+ {
+  "id": "uidai_gazetted",
+  "regulator": "UIDAI",
+  "name": "Gazetted notifications (amendment instruments)",
+  "url": "https://uidai.gov.in/en/gazetted-notifications",
+  "stratum": "tech_data",
+  "default_type": "gazette_notification",
+  "strategy": "uidai_rsc",
+  "row_floor": 8,
+  "rows_parsed_last_sweep": 10,
+  "items_in_ledger": 0,
+  "sample_items": []
+ }
+]
