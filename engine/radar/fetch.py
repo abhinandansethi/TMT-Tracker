@@ -2,14 +2,20 @@
 Every fetch either returns bytes or raises FetchError — no half-states."""
 from __future__ import annotations
 
+import os
 import time
 from typing import Dict, List, Optional, Tuple
 
 import requests
 import urllib3
 
-UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
+# Identify honestly. A spoofed consumer-browser string is poor practice anywhere, and on a
+# host that has expressed non-consent it turns an arguable technical breach into an
+# evidential one, because unattended collection wearing a Chrome badge is indistinguishable
+# from deliberate concealment. Set CONTACT before deploying.
+CONTACT = os.environ.get("TMT_RADAR_CONTACT", "compliance@trilegal.com")
+UA = {"User-Agent": f"TMT-Regulatory-Radar/2.0 (Trilegal internal regulatory monitoring; "
+                    f"+mailto:{CONTACT}) python-requests"}
 TIMEOUT = 40
 RETRIES = 2
 BACKOFF = 3.0
@@ -42,16 +48,19 @@ def get(url: str, tolerant_tls: bool = False, extra_headers: Optional[Dict[str, 
         source_id: str = "?", allowed_domains: Optional[List[str]] = None) -> requests.Response:
     """GET with retries. Raises FetchError on final failure.
 
-    Every call is attributed to the source that caused it and checked against that
-    source's declared domains, so no request can be made to a host the coverage page
-    does not disclose."""
+    Every call is attributed to the source that caused it, checked against that source's
+    declared domains so no request reaches a host the coverage page does not disclose, and
+    checked against the site's own robots.txt before it is made."""
     host = _host(url)
     if allowed_domains is not None:
         h = host.lower().split(":")[0]
         if not any(h == d.lower() or h.endswith("." + d.lower()) for d in allowed_domains):
             raise UndeclaredHost(
-                f"{source_id} tried to fetch {h}, which is not in its declared domains "
-                f"{allowed_domains}")
+                f"{source_id} tried to fetch {h}, not in its declared domains {allowed_domains}")
+    # The site's own published crawl policy is enforced on every request, rather than
+    # trusted to have been read once by whoever added the source.
+    from .robots import check as robots_check
+    robots_check(url)
     fetch_log.append((source_id, host, url))
     headers = dict(UA, **(extra_headers or {}))
     last_err: Optional[Exception] = None

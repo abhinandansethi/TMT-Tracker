@@ -494,7 +494,7 @@
    "regulator": "DoT",
    "name": "eServices — Circulars/Notifications/Others",
    "url": "https://eservices.dot.gov.in/circular-notifications-others",
-   "status": "live",
+   "status": "suspended",
    "method": "static_html",
    "parser": {
     "strategy": "html_table",
@@ -529,7 +529,9 @@
     "(?i)order": "order",
     "(?i)rule": "rules"
    },
-   "quirks": "THE machine-readable DoT source (portal notified 23-06-2026). Venue's own type column governs; some rows link out to PIB."
+   "quirks": "THE machine-readable DoT source (portal notified 23-06-2026). Venue's own type column governs; some rows link out to PIB.",
+   "suspended_reason": "The Telecom eServices Portal User Agreement at /terms-use defines 'Unauthorised activities' to include 'any activity which is punishable under section 43 (for eg web scraping, altering source code, hacking, introducing viruses etc.)', states the portal 'shall not in any manner be used for any unauthorized activity', and requires that services 'be accessed only through the interfaces expressly authorised by DoT'. Verified verbatim 25-08-2026. Suspended. The same agreement contemplates 'activity authorised in writing by DoT', so written authorisation is the route to restoring it.",
+   "blind_reason": "Suspended: terms name web scraping as unauthorised"
   },
   {
    "id": "dot_eservices_rules",
@@ -537,7 +539,7 @@
    "regulator": "DoT",
    "name": "eServices — Act & Rules shelf",
    "url": "https://eservices.dot.gov.in/act-and-rules",
-   "status": "live",
+   "status": "suspended",
    "method": "static_html",
    "parser": {
     "strategy": "link_shelf",
@@ -559,7 +561,9 @@
    "tripwire": {
     "kind": "monotonic"
    },
-   "quirks": "Reference shelf; undated rows keyed by URL+title, dated by first_seen. KNOWN LAG: gazetted rules can be missing for weeks — the gazette lane covers the gap. Shelf shrinkage trips the monotonic wire."
+   "quirks": "Reference shelf; undated rows keyed by URL+title, dated by first_seen. KNOWN LAG: gazetted rules can be missing for weeks — the gazette lane covers the gap. Shelf shrinkage trips the monotonic wire.",
+   "suspended_reason": "The Telecom eServices Portal User Agreement at /terms-use defines 'Unauthorised activities' to include 'any activity which is punishable under section 43 (for eg web scraping, altering source code, hacking, introducing viruses etc.)', states the portal 'shall not in any manner be used for any unauthorized activity', and requires that services 'be accessed only through the interfaces expressly authorised by DoT'. Verified verbatim 25-08-2026. Suspended. The same agreement contemplates 'activity authorised in writing by DoT', so written authorisation is the route to restoring it.",
+   "blind_reason": "Suspended: terms name web scraping as unauthorised"
   },
   {
    "id": "nccs_latest",
@@ -767,7 +771,7 @@
    "regulator": "PIB",
    "name": "PIB releases (all-ministries feed, ministry-filtered)",
    "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
-   "status": "live",
+   "status": "needs_decision",
    "method": "rss",
    "parser": {
     "strategy": "rss",
@@ -791,7 +795,9 @@
    ],
    "quirks": "PIB offers no per-ministry feed; ministry is confirmed by fetching each new release page once (deterministic substring match). Instrument-announcing releases fold into the instrument they announce at curation.",
    "lane": "signals",
-   "lane_reason": "The press bureau publishes releases ABOUT instruments, never the instrument. A release reporting that the 12-minute ad cap was removed is not the order that removed it."
+   "lane_reason": "The press bureau publishes releases ABOUT instruments, never the instrument. A release reporting that the 12-minute ad cap was removed is not the order that removed it.",
+   "decision_reason": "pib.gov.in has no robots.txt restriction on this feed, but its edge returns 403 to any User-Agent that identifies itself as a bot; only a consumer-browser string is served (verified 25-08-2026). Same choice as MeitY: reaching it means presenting a browser string. Paused for a partner decision. PIB is in the signals lane anyway, since it publishes releases about instruments rather than instruments.",
+   "blind_reason": "Paused: no robots restriction, but edge blocks identified agents"
   },
   {
    "id": "egazette_recent",
@@ -853,7 +859,7 @@
    "lane_reason": "10 of 10 entries are consumer outreach, education and awareness events. Announcements, not documents."
   },
   {
-   "status": "live",
+   "status": "needs_decision",
    "method": "json_api",
    "stratum": "tech_data",
    "regulator": "MeitY",
@@ -881,10 +887,12 @@
     "kind": "monotonic"
    },
    "page_url": "https://www.meity.gov.in/documents/gazettes-notifications",
-   "quirks": "Public headless-WP API discovered 25-08-2026 — no headless browser needed (v1 'headless_required' obsolete). Full corpus per call; monotonic wire. KNOWN STALE: newest gazette row is 16-12-2025 while 2026 MeitY gazette instruments exist (DPDP Rules phases, s.79A) — the eGazette + PIB lanes are the real-time net for MeitY; this venue is provenance and eventual-posting."
+   "quirks": "Public headless-WP API discovered 25-08-2026 — no headless browser needed (v1 'headless_required' obsolete). Full corpus per call; monotonic wire. KNOWN STALE: newest gazette row is 16-12-2025 while 2026 MeitY gazette instruments exist (DPDP Rules phases, s.79A) — the eGazette + PIB lanes are the real-time net for MeitY; this venue is provenance and eventual-posting.",
+   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
+   "blind_reason": "Paused: site permits crawling but blocks identified agents"
   },
   {
-   "status": "live",
+   "status": "needs_decision",
    "method": "json_api",
    "stratum": "tech_data",
    "regulator": "MeitY",
@@ -926,10 +934,12 @@
     "kind": "monotonic"
    },
    "page_url": "https://www.meity.gov.in/documents/act-and-policies",
-   "quirks": "Type string is case-sensitive: 'Act and policies'. Carries DPDP/IT Rules drafts (Mar-2026 draft IT Rules amendments appear here)."
+   "quirks": "Type string is case-sensitive: 'Act and policies'. Carries DPDP/IT Rules drafts (Mar-2026 draft IT Rules amendments appear here).",
+   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
+   "blind_reason": "Paused: site permits crawling but blocks identified agents"
   },
   {
-   "status": "live",
+   "status": "needs_decision",
    "method": "json_api",
    "stratum": "tech_data",
    "regulator": "MeitY",
@@ -963,7 +973,9 @@
     "kind": "monotonic"
    },
    "page_url": "https://www.meity.gov.in/documents/orders-and-notices",
-   "quirks": "Mostly internal administration (delegations, work distribution) — routine regex and type rules keep noise down; occasionally carries binding orders."
+   "quirks": "Mostly internal administration (delegations, work distribution) — routine regex and type rules keep noise down; occasionally carries binding orders.",
+   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
+   "blind_reason": "Paused: site permits crawling but blocks identified agents"
   },
   {
    "stratum": "tech_data",
@@ -1093,7 +1105,7 @@
   {
    "stratum": "tech_data",
    "regulator": "UIDAI",
-   "status": "live",
+   "status": "suspended",
    "method": "rsc_api",
    "date_formats": [
     "DD-MM-YYYY",
@@ -1120,12 +1132,14 @@
     "row_floor": 5
    },
    "default_type": "circular",
-   "quirks": "Site restructured (v1 media-resources URL is 404). Next.js App Router: GET with 'RSC: 1' header returns the flight payload; documents ride in pdfDetails.data. updated_date = upload date; instrument date sits in the title."
+   "quirks": "Site restructured (v1 media-resources URL is 404). Next.js App Router: GET with 'RSC: 1' header returns the flight payload; documents ride in pdfDetails.data. updated_date = upload date; instrument date sits in the title.",
+   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
+   "blind_reason": "Suspended: site-wide robots.txt exclusion"
   },
   {
    "stratum": "tech_data",
    "regulator": "UIDAI",
-   "status": "live",
+   "status": "suspended",
    "method": "rsc_api",
    "date_formats": [
     "DD-MM-YYYY",
@@ -1152,12 +1166,14 @@
     "row_floor": 3
    },
    "default_type": "notification",
-   "quirks": "Statutory Aadhaar notifications; gazette lane cross-covers (Aadhaar regulations are gazetted)."
+   "quirks": "Statutory Aadhaar notifications; gazette lane cross-covers (Aadhaar regulations are gazetted).",
+   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
+   "blind_reason": "Suspended: site-wide robots.txt exclusion"
   },
   {
    "stratum": "tech_data",
    "regulator": "UIDAI",
-   "status": "live",
+   "status": "suspended",
    "method": "rsc_api",
    "date_formats": [
     "DD-MM-YYYY",
@@ -1184,7 +1200,9 @@
     "row_floor": 3
    },
    "default_type": "circular",
-   "quirks": "OMs on fees, procedures, administration."
+   "quirks": "OMs on fees, procedures, administration.",
+   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
+   "blind_reason": "Suspended: site-wide robots.txt exclusion"
   },
   {
    "stratum": "media",
@@ -1577,7 +1595,7 @@
    "regulator": "DoT",
    "name": "eServices - Right of Way",
    "url": "https://eservices.dot.gov.in/right-of-way-permissions",
-   "status": "live",
+   "status": "suspended",
    "method": "static_html",
    "parser": {
     "strategy": "psn_rows",
@@ -1599,7 +1617,9 @@
     "dot.gov.in"
    ],
    "default_type": "order",
-   "quirks": "RoW Rules 2024 + state/UT implementation orders. Scope strictly to #Policy - a sitewide What's-New ticker mimics the row shape."
+   "quirks": "RoW Rules 2024 + state/UT implementation orders. Scope strictly to #Policy - a sitewide What's-New ticker mimics the row shape.",
+   "suspended_reason": "The Telecom eServices Portal User Agreement at /terms-use defines 'Unauthorised activities' to include 'any activity which is punishable under section 43 (for eg web scraping, altering source code, hacking, introducing viruses etc.)', states the portal 'shall not in any manner be used for any unauthorized activity', and requires that services 'be accessed only through the interfaces expressly authorised by DoT'. Verified verbatim 25-08-2026. Suspended. The same agreement contemplates 'activity authorised in writing by DoT', so written authorisation is the route to restoring it.",
+   "blind_reason": "Suspended: terms name web scraping as unauthorised"
   },
   {
    "id": "inspace_publications",
@@ -1668,7 +1688,7 @@
    "regulator": "MeitY",
    "name": "Guidelines (WP-JSON API)",
    "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Guideline&limit=50&sort=date&order=DESC&search=",
-   "status": "live",
+   "status": "needs_decision",
    "method": "json_api",
    "parser": {
     "strategy": "meity_api",
@@ -1692,7 +1712,9 @@
    },
    "quirks": "CRITICAL: type value is SINGULAR 'Guideline' - MeitY's own UI requests the plural and renders 'No Data Available'. sort=date, not sort=year (year field mostly empty).",
    "lane": "signals",
-   "lane_reason": "MeitY's grants-and-schemes administration library: proformas, annexures, DPR templates. Not an instrument venue."
+   "lane_reason": "MeitY's grants-and-schemes administration library: proformas, annexures, DPR templates. Not an instrument venue.",
+   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
+   "blind_reason": "Paused: site permits crawling but blocks identified agents"
   },
   {
    "id": "uidai_regulations",
@@ -1700,7 +1722,7 @@
    "regulator": "UIDAI",
    "name": "Updated (consolidated) Regulations",
    "url": "https://uidai.gov.in/en/updated-regulations",
-   "status": "live",
+   "status": "suspended",
    "method": "rsc_api",
    "http_headers": {
     "RSC": "1"
@@ -1723,7 +1745,9 @@
    "tripwire": {
     "kind": "monotonic"
    },
-   "quirks": "Amendments are NOT new rows here - the consolidated row's updated_date and file change in place; a changed date creates a new ledger item. Companion gazette listing carries the amendment instruments themselves."
+   "quirks": "Amendments are NOT new rows here - the consolidated row's updated_date and file change in place; a changed date creates a new ledger item. Companion gazette listing carries the amendment instruments themselves.",
+   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
+   "blind_reason": "Suspended: site-wide robots.txt exclusion"
   },
   {
    "id": "uidai_gazetted",
@@ -1731,7 +1755,7 @@
    "regulator": "UIDAI",
    "name": "Gazetted notifications (amendment instruments)",
    "url": "https://uidai.gov.in/en/gazetted-notifications",
-   "status": "live",
+   "status": "suspended",
    "method": "rsc_api",
    "http_headers": {
     "RSC": "1"
@@ -1755,7 +1779,9 @@
     "backend.uidai.gov.in"
    ],
    "default_type": "gazette_notification",
-   "quirks": "39 gazette/amendment PDFs over 4 pages, 1-indexed ?page=N. HEAD lies on backend PDFs (200 text/html) - verify with ranged GET."
+   "quirks": "39 gazette/amendment PDFs over 4 pages, 1-indexed ?page=N. HEAD lies on backend PDFs (200 text/html) - verify with ranged GET.",
+   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
+   "blind_reason": "Suspended: site-wide robots.txt exclusion"
   },
   {
    "id": "mib_engage",
@@ -2130,5 +2156,12 @@
  "lanes": {
   "instruments": "Documents that bind a client. Every row must carry its own citation and may trigger a memo.",
   "signals": "Real, useful information that is not itself a binding instrument: announcements, registers, court diaries, security bulletins, mirrors. Shown in its own tab, never in the instruments ledger, never memo-triggering."
+ },
+ "compliance": {
+  "reviewed": "2026-08-25",
+  "policy": "The tracker fetches only hosts whose robots.txt permits the paths concerned and whose published terms contain no prohibition on automated access. A host that excludes crawlers or names scraping as unauthorised is suspended, not worked around, and the suspension is shown on the coverage page rather than hidden.",
+  "user_agent": "Identifies the firm and a contact address. The tracker does not impersonate a consumer browser.",
+  "rate": "About one request per second per host; roughly 53 requests per full run.",
+  "reuse": "Metadata and links only on the dashboard. The optional PDF archive is internal to the firm and is not redistributed. Reproduction clauses on TRAI, CERT-In, MTCTE, MIB, CBFC and TEC require prior permission or restrict reuse, and bite the archive rather than the dashboard."
  }
 }

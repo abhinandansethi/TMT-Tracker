@@ -1,6 +1,6 @@
 {
  "schema_version": "3.1",
- "generated": "2026-08-25T12:46:00+05:30",
+ "generated": "2026-08-25T13:22:10+05:30",
  "window": {
   "from": "2026-06-02",
   "to": "2026-09-01"
@@ -9,7 +9,7 @@
   "total": 219,
   "substantive": 219,
   "routine": 0,
-  "quarantined": 1969,
+  "quarantined": 4447,
   "open_deadlines": 2
  },
  "items": [

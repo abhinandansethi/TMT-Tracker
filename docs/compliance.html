@@ -1,0 +1,383 @@
+<title>Scraping Compliance Review</title>
+
+<style>
+:root{
+  --ground:#EEF1F3; --paper:#FDFEFE; --sunk:#F4F7F8;
+  --ink:#14181B; --body:#2E353A; --mute:#5A646B; --faint:#8A939A;
+  --rule:#D8DEE2; --rule-soft:#E7ECEF;
+  --navy:#00506F; --navy-soft:#E3ECF2;
+  --ochre:#7E6410; --ochre-soft:#F6F0DC;
+  --alarm:#8A2B1C; --alarm-soft:#F7E9E6;
+  --ok:#1B6B4A;
+  /* diagram inks: chosen to clear 3:1 on both grounds */
+  --dg-key:#0F7A90; --dg-warn:#8A6D14; --dg-bad:#A8331F;
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+  --col:68ch;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1216; --paper:#171C21; --sunk:#1E252B;
+    --ink:#E9EDF0; --body:#C4CCD2; --mute:#98A3AB; --faint:#707B83;
+    --rule:#2C353C; --rule-soft:#232B31;
+    --navy:#7FB2D2; --navy-soft:#16262F;
+    --ochre:#D2AE52; --ochre-soft:#2A2415;
+    --alarm:#E08A76; --alarm-soft:#2E1A16;
+    --ok:#5FBE93;
+    --dg-key:#5CBBD2; --dg-warn:#D2AE52; --dg-bad:#E08A76;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1216; --paper:#171C21; --sunk:#1E252B;
+  --ink:#E9EDF0; --body:#C4CCD2; --mute:#98A3AB; --faint:#707B83;
+  --rule:#2C353C; --rule-soft:#232B31;
+  --navy:#7FB2D2; --navy-soft:#16262F;
+  --ochre:#D2AE52; --ochre-soft:#2A2415;
+  --alarm:#E08A76; --alarm-soft:#2E1A16;
+  --ok:#5FBE93;
+  --dg-key:#5CBBD2; --dg-warn:#D2AE52; --dg-bad:#E08A76;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ground); color:var(--body);
+  font-family:var(--sans); font-size:16px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.sheet{max-width:1000px;margin:0 auto;background:var(--paper);min-height:100vh;
+  padding:0 clamp(20px,5vw,72px) 88px}
+
+header{padding:56px 0 0}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--navy);font-weight:600}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5.4vw,46px);line-height:1.12;
+  letter-spacing:-.012em;color:var(--ink);margin:14px 0 0;text-wrap:balance}
+.standfirst{margin:18px 0 0;max-width:var(--col);font-size:17.5px;line-height:1.58;color:var(--mute)}
+.stamp{margin-top:26px;padding-top:14px;border-top:1px solid var(--rule);
+  display:flex;flex-wrap:wrap;gap:8px 26px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--faint)}
+.stamp b{color:var(--body);font-weight:600}
+
+section{margin-top:60px}
+h2{font-family:var(--serif);font-weight:500;font-size:26px;line-height:1.24;color:var(--ink);
+  margin:0;letter-spacing:-.005em;text-wrap:balance}
+.slug{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;margin-bottom:11px;padding-top:13px;border-top:2px solid var(--navy)}
+p{max-width:var(--col);margin:16px 0 0}
+h3{font-family:var(--sans);font-size:13px;font-weight:650;letter-spacing:.03em;color:var(--ink);
+  margin:30px 0 0}
+strong{color:var(--ink);font-weight:640}
+em{font-style:italic;color:var(--ink)}
+code{font-family:var(--mono);font-size:.875em;background:var(--sunk);
+  border:1px solid var(--rule-soft);padding:1px 5px;color:var(--ink)}
+
+figure{margin:32px 0 0;padding:0}
+figure svg{display:block;width:100%;max-width:100%;height:auto;color:var(--body)}
+figcaption{margin-top:14px;font-size:13.5px;line-height:1.5;color:var(--mute);max-width:var(--col)}
+figcaption b{color:var(--ink);font-weight:640}
+
+/* diagram inks, theme-aware */
+svg .s-key{stroke:var(--dg-key)}
+svg .f-key{fill:var(--dg-key)}
+svg .s-bad{stroke:var(--dg-bad)}
+svg .f-bad{fill:var(--dg-bad)}
+svg .s-warn{stroke:var(--dg-warn)}
+svg .f-warn{fill:var(--dg-warn)}
+svg .f-ink{fill:currentColor}
+svg .s-ink{stroke:currentColor}
+svg .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+.tw{margin-top:26px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:580px;font-size:14.5px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--navy);font-weight:600;padding:0 18px 9px 0;border-bottom:2px solid var(--navy);white-space:nowrap}
+td{padding:12px 18px 12px 0;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--body)}
+td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+
+.call{margin-top:28px;background:var(--alarm-soft);border-left:3px solid var(--alarm);
+  padding:20px 24px 22px}
+.call .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--alarm);font-weight:600}
+.call p{margin-top:10px;max-width:62ch;color:var(--body)}
+
+.note{margin-top:26px;background:var(--sunk);border-left:3px solid var(--navy);padding:18px 22px 20px}
+.note .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--navy);font-weight:600}
+.note p{margin-top:8px;max-width:62ch}
+
+.opts{margin-top:24px;border-top:1px solid var(--rule-soft)}
+.opt{padding:18px 0 20px;border-bottom:1px solid var(--rule-soft)}
+.opt .h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.opt .h b{font-size:15.5px;color:var(--ink);font-weight:640}
+.opt .h i{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-style:normal;padding:2px 7px;border:1px solid var(--rule);color:var(--faint)}
+.opt .h i.pick{color:var(--ok);border-color:var(--ok)}
+.opt .h i.test{color:var(--ochre);border-color:var(--ochre)}
+.opt p{margin-top:8px;font-size:14.5px}
+
+.cmds{margin-top:22px;border-top:1px solid var(--rule)}
+.cmd{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:6px 28px;
+  padding:13px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.cmd kbd{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--sunk);
+  border:1px solid var(--rule-soft);padding:3px 8px;justify-self:start;word-break:break-all}
+.cmd span{font-size:14px;color:var(--mute)}
+
+footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+
+@media (max-width:640px){
+  .cmd{grid-template-columns:1fr}
+  body{font-size:15.5px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+.pill{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 8px;border:1px solid var(--rule);white-space:nowrap}
+.pill.ok{color:var(--ok);border-color:var(--ok)}
+.pill.bad{color:var(--alarm);border-color:var(--alarm);font-weight:600}
+.pill.warn{color:var(--ochre);border-color:var(--ochre)}
+.pill.quiet{color:var(--faint)}
+.stopcard{margin-top:24px;border:1px solid var(--alarm);border-left-width:3px;padding:20px 24px 22px;background:var(--alarm-soft)}
+.stopcard h3{margin:0;font-family:var(--serif);font-size:19px;font-weight:500;color:var(--ink)}
+.stopcard .q{margin-top:12px;font-family:var(--mono);font-size:12.5px;line-height:1.6;color:var(--ink);
+  background:var(--paper);border:1px solid var(--rule);padding:12px 14px;overflow-x:auto}
+.stopcard p{margin-top:12px;max-width:62ch}
+.did{margin-top:26px;border-left:3px solid var(--ok);background:var(--sunk);padding:18px 22px 20px}
+.did .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ok);font-weight:600}
+.did ul{margin:10px 0 0;padding-left:20px;max-width:64ch}
+.did li{margin-top:7px}
+ol.steps{margin-top:18px;padding-left:22px;max-width:64ch}
+ol.steps li{margin-top:12px}
+ul.plain{margin-top:14px;padding-left:20px;max-width:64ch}
+ul.plain li{margin-top:8px}
+</style>
+
+<div class="sheet">
+<header>
+  <div class="eyebrow">Compliance review &middot; internal</div>
+  <h1>Is our own scraping lawful?</h1>
+  <p class="standfirst">Every host the regulatory tracker fetches, checked against its
+  robots.txt, its terms of use and its copyright policy, and analysed under Indian law.</p>
+  <div class="stamp">
+    <span>Reviewed <b>25 Aug 2026</b></span>
+    <span><b>17</b> hosts examined</span>
+    <span><b>2</b> stopped</span>
+    <span><b>5</b> paused for decision</span>
+    <span>Now fetching <b>12</b></span>
+  </div>
+</header>
+
+<section>
+  <div class="slug">Bottom line</div>
+  <h2>Two hosts had to stop today; the rest are defensible</h2>
+  <p>On fifteen of seventeen hosts there is no robots rule covering the paths we fetch and
+  no clause anywhere restricting automated access. The residual exposure on those is not
+  <em>access</em> but <em>reproduction</em>, and it lands almost entirely on the optional PDF
+  archive rather than on the dashboard, which stores bibliographic facts that attract no
+  copyright at all.</p>
+  <p>Two hosts are different in kind, and I have stopped the tracker on both rather than
+  leave them running while you decide. On these the objection is to the collection itself,
+  not to what we do with the result.</p>
+
+  <div class="stopcard">
+    <h3>uidai.gov.in &mdash; excludes every crawler</h3>
+    <div class="q">User-Agent: *<br>Disallow: /</div>
+    <p>That is the entire file. It is the strongest exclusion the protocol can express, it
+    admits no exception, and it does not vary by user agent &mdash; I verified both. Sending a
+    browser string would not take us outside it; it would make unattended collection look
+    like concealment. UIDAI's copyright policy separately permits reproduction
+    <em>&ldquo;for research or private study but not for sale or for use in conjunction with
+    commercial purposes&rdquo;</em>, which is the only clause in the survey that reaches a
+    commercial firm directly.</p>
+  </div>
+
+  <div class="stopcard">
+    <h3>eservices.dot.gov.in &mdash; names web scraping as unauthorised</h3>
+    <div class="q">&ldquo;Unauthorised activities: The term Unauthorised activities includes any
+    activity which is punishable under section 43 (for eg web scraping, altering source code,
+    hacking, introducing viruses etc.) and Section 45 of the Information Technology Act,
+    2000&hellip;&rdquo;</div>
+    <p>The same agreement adds that the portal <em>&ldquo;shall not in any manner be used for
+    any unauthorized activity&rdquo;</em> and that services <em>&ldquo;shall be accessed only
+    through the interfaces expressly authorised by DoT&rdquo;</em>. It names the exact activity
+    on the exact host, and it is not qualified by volume, harm or purpose, so none of our
+    proportionality facts take us outside its literal words. The permissive copyright policy
+    on the same site does not cure this: that clause licenses reuse, this one restricts the
+    method of collection.</p>
+    <p><strong>This is the costly one.</strong> DoT circulars and the Act-and-Rules shelf were
+    core telecom coverage. The remedy is in the agreement itself, which contemplates
+    &ldquo;activity authorised in writing by DoT&rdquo;: a letter seeking written authorisation
+    is the route back, and worth sending this week.</p>
+  </div>
+</section>
+
+<section>
+  <div class="slug">Paused, not stopped</div>
+  <h2>Three sites consent in their crawl policy but block identified agents</h2>
+  <p>MeitY publishes <code>User-agent: * / Allow: /</code>, which expressly permits crawling of
+  every path, while its edge returns 403 to any user agent that identifies itself as a bot.
+  Only an exact consumer-browser string is served. PIB behaves the same way. So the site
+  consents in the document written for crawlers and refuses in the layer that enforces it.</p>
+  <p>Reaching either means presenting a browser string, which is precisely the practice this
+  review otherwise recommends against. That is a judgment call about the firm's own posture
+  rather than a technical question, so I have paused the four MeitY sources and PIB for your
+  decision instead of resolving it silently in either direction. The coverage cost is smaller
+  than it looks: gazetted MeitY instruments are still reachable through the e-Gazette lane,
+  and MeitY's own gazette listing has not moved since 16 December 2025.</p>
+</section>
+
+<section>
+  <div class="slug">What changed in the code</div>
+  <h2>Compliance is now enforced, not promised</h2>
+  <div class="did">
+    <div class="k">Already done</div>
+    <ul>
+      <li><strong>robots.txt is a hard pre-flight gate.</strong> Every request is checked
+      against the origin's own robots.txt before it is made, evaluated under RFC 9309. A
+      disallowed path is refused by the engine regardless of what the registry says.</li>
+      <li><strong>The spoofed Chrome user agent is gone.</strong> The tracker now identifies
+      itself as <code>TMT-Regulatory-Radar/2.0</code> with a contact mailbox. Set
+      <code>TMT_RADAR_CONTACT</code> to a real monitored address before the next run.</li>
+      <li><strong>Suspensions are visible, not hidden.</strong> The eight stopped and five
+      paused sources appear on the coverage page with their reason, so the tracker never
+      overstates what it is watching.</li>
+      <li><strong>Every request is attributed and logged</strong> to the source that caused
+      it, with a per-run provenance record: this run made 40 requests across 12 hosts, none
+      to an undeclared host.</li>
+    </ul>
+  </div>
+  <p>Writing that gate immediately proved its worth, and in an instructive way. My first
+  implementation used Python's standard robots parser and wrongly blocked all of MIB and ASCI:
+  MIB's robots.txt itself returns 403, which the legacy parser treats as a blanket deny
+  although RFC 9309 treats an unavailable file as no restriction, and ASCI's disallow lines
+  sit above any <code>User-agent</code> line, so they bind nobody &mdash; its only real group is
+  <code>Disallow:</code>, meaning allow everything. Both were caught by testing the gate
+  against the live sites rather than trusting it.</p>
+</section>
+
+<section>
+  <div class="slug">Host by host</div>
+  <h2>Where we look, and on what footing</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Host</th><th>robots.txt</th><th>Reproduction terms</th><th>Status now</th></tr></thead>
+      <tbody>
+<tr><td><code>eservices.dot.gov.in</code></td><td>No robots.txt</td><td>Free reuse, attribution</td><td><span class="pill bad">Suspended</span></td></tr>
+<tr><td><code>uidai.gov.in</code></td><td>Disallows everything</td><td>Conditional / prior permission</td><td><span class="pill bad">Suspended</span></td></tr>
+<tr><td><code>backend.uidai.gov.in</code></td><td>No robots.txt</td><td>Silent</td><td><span class="pill bad">Suspended</span></td></tr>
+<tr><td><code>cbfcindia.gov.in</code></td><td>No robots.txt</td><td>Restricted</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>egazette.gov.in</code></td><td>No robots.txt</td><td>Conditional / prior permission</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>mib.gov.in</code></td><td>No robots.txt</td><td>Restricted</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>nccs.gov.in</code></td><td>No robots.txt</td><td>Conditional / prior permission</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>pib.gov.in</code></td><td>No robots.txt</td><td>Free reuse, attribution</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>prgi.gov.in</code></td><td>Permits our paths</td><td>Conditional / prior permission</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>tdsat.gov.in</code></td><td>No robots.txt</td><td>Silent</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>trai.gov.in</code></td><td>Permits our paths</td><td>Conditional / prior permission</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>www.ascionline.in</code></td><td>Permits our paths</td><td>Restricted</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>www.cert-in.org.in</code></td><td>No robots.txt</td><td>Conditional / prior permission</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>www.inspace.gov.in</code></td><td>Ambiguous</td><td>Free reuse, attribution</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>www.meity.gov.in</code></td><td>Permits our paths</td><td>Free reuse, attribution</td><td><span class="pill warn">Paused</span></td></tr>
+<tr><td><code>www.mtcte.tec.gov.in</code></td><td>No robots.txt</td><td>Conditional / prior permission</td><td><span class="pill ok">Fetching</span></td></tr>
+<tr><td><code>www.tec.gov.in</code></td><td>Permits our paths</td><td>Restricted</td><td><span class="pill ok">Fetching</span></td></tr>
+
+      </tbody>
+    </table>
+  </div>
+  <p>Restrictive or prior-permission reproduction clauses sit on eight hosts &mdash; TRAI,
+  CERT-In and MTCTE each require permission &ldquo;by sending a mail&rdquo;; TEC, MIB and CBFC
+  use flat no-reproduction-without-permission wording. Every one of them bites the PDF archive
+  and none bites the metadata dashboard. Each is curable by one email.</p>
+  <p>One host deserves separate mention. <code>ascionline.in</code> is a private
+  self-regulatory body, not a government one. It grants no reuse licence, its only copyright
+  statement is &ldquo;All Rights Reserved&rdquo;, and no limb of s.52(1)(q) is available to it
+  because there is no gazette, Act, judgment or order involved. It is the one host where
+  losing metadata-only discipline would create real and unmitigated exposure.</p>
+</section>
+
+<section>
+  <div class="slug">The legal footing</div>
+  <h2>Why the dashboard is near-unassailable and the archive needs discipline</h2>
+  <p>The instinct that government material is simply free is wrong. Under s.2(k) read with
+  s.17(d) of the Copyright Act 1957, the Government is first owner of copyright in government
+  works. What actually protects us is narrower and more specific.</p>
+  <ul class="plain">
+    <li><strong>The dashboard stores facts, not expression.</strong> Copyright subsists only in
+    original works, and in <em>Eastern Book Company v. D.B. Modak</em> the Supreme Court
+    rejected sweat-of-the-brow in favour of skill and judgment. A title, a date, a document
+    type and a URL are bibliographic facts. This is the strongest part of our position.</li>
+    <li><strong>s.52(1)(q)(i)</strong> permits reproduction of matter published in an Official
+    Gazette, except an Act. It should not be overclaimed: it covers the gazetted instrument,
+    not every page of a regulator's website. <strong>s.52(1)(q)(ii)</strong> is a trap that
+    cuts against us &mdash; an Act may be reproduced only together with commentary or other
+    original matter, so archiving a clean PDF of an Act falls outside it.</li>
+    <li><strong>s.52(1)(a) fair dealing</strong> is the operative safe harbour for the archive,
+    and the 2012 Explanation expressly covers electronic storage for those purposes. The
+    position improved materially last month: in <em>ANI Media v. OpenAI</em> (Delhi HC,
+    24 July 2026) the court held prima facie that no non-commercial limitation can be read
+    into s.52(1)(a), that &ldquo;private&rdquo; extends to a closed corporate group, and
+    approved the Canadian <em>CCH</em> holding that lawyers researching to advise clients for
+    profit are engaged in research. That is this use case. It is, however, an interim ruling
+    of a single judge refusing an injunction.</li>
+    <li><strong>IT Act s.43 and s.66.</strong> s.43 turns on access &ldquo;without permission&rdquo;,
+    which is exactly why robots.txt matters evidentially even though it is not law. s.66
+    additionally requires dishonesty or fraud, and an openly identified crawler running at one
+    request per second and honouring exclusions is the opposite of that.</li>
+    <li><strong>There is no text-and-data-mining exception in Indian law</strong>, unlike the
+    EU, Singapore or Japan. We cannot lean on one.</li>
+  </ul>
+  <p>Two questions here are genuinely unsettled and should not be reported upward as clean:
+  whether fetching a page served openly at HTTP 200 is &ldquo;without permission&rdquo; for
+  s.43, and whether browsewrap terms bind a party who never assented to them.</p>
+</section>
+
+<section>
+  <div class="slug">What to do</div>
+  <h2>Recommended next steps</h2>
+  <ol class="steps">
+    <li><strong>Decide on MeitY and PIB.</strong> Either accept a browser user agent for those
+    two hosts on the footing that their robots.txt expressly permits crawling, and record that
+    reasoning in a file note, or leave them paused and rely on the e-Gazette lane.</li>
+    <li><strong>Write to DoT</strong> seeking written authorisation for the Telecom eServices
+    Portal, which its own user agreement contemplates. This restores the most valuable
+    suspended source.</li>
+    <li><strong>Set a real contact mailbox</strong> in <code>TMT_RADAR_CONTACT</code>, monitored
+    by someone who would notice a request to stop.</li>
+    <li><strong>Keep the PDF archive off by default</strong> for the eight hosts with
+    restrictive reproduction terms, and send the one-line permission emails where the archive
+    is actually wanted.</li>
+    <li><strong>Keep the archive internal.</strong> No circulation to clients, no external
+    distribution, no outward-facing work product without separate clearance.</li>
+    <li><strong>Never frame these pages.</strong> TRAI, MTCTE, MeitY, CERT-In, UIDAI, IN-SPACe
+    and PRGI all expressly prohibit loading their pages into frames. Link out, always.</li>
+    <li><strong>Record a dated file note</strong> of the firm's considered position, so that if
+    anyone ever asks, the answer is a contemporaneous document rather than a reconstruction.</li>
+  </ol>
+</section>
+
+<section>
+  <div class="slug">Limits of this review</div>
+  <h2>What this does not establish</h2>
+  <ul class="plain">
+    <li>This is a compliance review of publicly stated terms observed on 25 August 2026. It is
+    not a legal opinion, it has not been settled by counsel, and you are the lawyers.</li>
+    <li>Terms change without notice, and several of these hosts are demonstrably unstable.
+    The review should be repeated periodically.</li>
+    <li>One real gap: MIB's separate Terms and Conditions tab could not be retrieved &mdash; its
+    AJAX endpoints returned empty shells and a 500. MIB's clean position on automated access is
+    therefore provisional until that tab is read.</li>
+    <li>Documents were not classified individually against s.52(1)(q). Whether a given
+    instrument is gazette matter, an Act, or an order of a judicial authority is a
+    document-by-document question. In particular the TDSAT path we fetch is an administrative
+    notices listing rather than judgments, and a CBFC order is an administrative order of a
+    statutory board, so neither is automatically within limb (iv).</li>
+    <li>Absence of a restriction is not permission. On TDSAT, IN-SPACe and the e-Gazette the
+    finding is silence, which supports an implied-permission argument but is not a grant.</li>
+  </ul>
+</section>
+
+<footer>Compliance review, not legal advice &middot; observed 25 August 2026 &middot; repeat before relying on it again</footer>
+</div>
