@@ -1,0 +1,35 @@
+Sitemap: https://www.ascionline.in/wp-sitemap.xml
+
+# Custom Rules added via filter
+Allow: /?display=wide
+Allow: /wp-admin/admin-ajax.php
+Disallow: /asciacademy/
+Disallow: /academy/category/workshop/
+Disallow: /ascipodcast/
+Disallow: /ascimedia/
+Disallow: /asciblogs/
+Disallow: /authoredarticles/
+Disallow: /asci-events/
+Disallow: /latest-news/
+Disallow: /homepage-banner/
+Disallow: /media_slider/
+Disallow: /history-keymilestone/
+Disallow: /advice-resource/
+Disallow: /code-cases/
+Disallow: /non-compliance/
+Disallow: /asci-reports/
+Disallow: /people-page/
+Disallow: /parliament-question/
+Disallow: /media-coverages/
+Disallow: /current-members/
+Disallow: /asci-ad-campaigns/
+Disallow: /gallery/
+Sitemap: https://www.ascionline.in/sitemap.html
+
+# START YOAST BLOCK
+# ---------------------------
+User-agent: *
+Disallow:
+
+# ---------------------------
+# END YOAST BLOCK

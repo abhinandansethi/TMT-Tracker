@@ -118,6 +118,31 @@ def audit() -> int:
     return 0
 
 
+# ------------------------------------------------------------------- compliance
+def compliance() -> int:
+    """Snapshot every host's robots.txt as dated evidence, and report the verdict for the
+    exact paths we fetch. Exits non-zero if any host now refuses a path we are live on."""
+    from radar.compliance import snapshot
+    res = snapshot(load_registry(), HERE / "audit")
+    rep = res["report"]
+    refused = []
+    print(f"robots.txt snapshot  {rep['taken']}\n")
+    print(f"{'host':<30} {'HTTP':<6} {'bytes':>7}  paths we fetch")
+    print("-" * 78)
+    for origin, e in rep["hosts"].items():
+        host = origin.split("//")[1]
+        bad = [k for k, v in e["paths"].items() if v != "allowed"]
+        refused += bad
+        verdict = "all allowed" if not bad else f"REFUSED: {', '.join(bad)}"
+        print(f"{host:<30} {str(e.get('status') or e.get('error','?'))[:6]:<6} "
+              f"{e.get('bytes', 0):>7}  {verdict}")
+    print(f"\nsaved: {res['json']}")
+    print(f"raw files: {res['raw']}")
+    if refused:
+        print(f"\n{len(refused)} source path(s) refused by their site's own robots.txt")
+    return 1 if refused else 0
+
+
 # ---------------------------------------------------------------- import-baseline
 def import_baseline() -> int:
     """One-off: seed the ledger with the verified v1 baseline so the first sweep does not
@@ -234,7 +259,7 @@ def fetch_pdfs() -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["sweep", "backfill", "selftest", "import-baseline",
-                                    "export", "health", "fetch-pdfs", "audit"])
+                                    "export", "health", "fetch-pdfs", "audit", "compliance"])
     ap.add_argument("--source")
     ap.add_argument("--stratum")
     ap.add_argument("--since")
@@ -244,6 +269,8 @@ def main() -> int:
         return selftest()
     if a.cmd == "audit":
         return audit()
+    if a.cmd == "compliance":
+        return compliance()
     if a.cmd == "import-baseline":
         return import_baseline()
     if a.cmd == "export":

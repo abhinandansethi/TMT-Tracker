@@ -1,0 +1,39 @@
+User-agent: *
+Allow:  /inspace
+Allow:  /inspace?id=inspace_index
+Allow:  /inspace?id=inspace_about_inspace
+Allow:  /inspace?id=inspace_vision
+Allow:  /inspace?id=inspace_orgstruct
+Allow:  /inspace?id=inspace_board
+Allow:  /inspace?id=inspace_chairman
+Allow:  /inspace?id=inspace_team
+Allow:  /inspace?id=inspace_chairman_message
+Allow:  /inspace?id=inspace_contact_us
+Allow:  /inspace?id=inspace_rellinks
+Allow:  /inspace?id=inspace_citizen_charter
+Allow:  /inspace?id=inspace_media
+Allow:  /inspace?id=inspace_intl_coop
+Allow:  /inspace?id=inspace_space_ind
+Allow:  /inspace?id=announcement_for_opportunities
+Allow:  /inspace?id=inspaceh_board
+
+Allow:  /inspace_hin
+Allow:  /inspace_hin?id=inspaceh_index
+Allow:  /inspace_hin?id=inspaceh_about_inspace
+Allow:  /inspace_hin?id=inspaceh_vision
+Allow:  /inspace_hin?id=inspaceh_orgstruct
+Allow:  /inspace_hin?id=inspaceh_chairman
+Allow:  /inspace_hin?id=inspaceh_team
+Allow:  /inspace_hin?id=inspaceh_chairman_message
+Allow:  /inspace_hin?id=inspaceh_contact_us
+Allow:  /inspace_hin?id=inspaceh_rellinks
+Allow:  /inspace_hin?id=inspaceh_citizen_charter
+Allow:  /inspace_hin?id=inspaceh_media
+Allow:  /inspace_hin?id=inspaceh_intl_coop
+
+Allow: /sitemap.do
+
+Sitemap: https://www.inspace.gov.in/sitemap.do
+
+Disallow: /$pwd_reset.do?sysparm_url=ss_default
+
