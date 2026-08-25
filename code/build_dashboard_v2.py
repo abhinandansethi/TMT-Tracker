@@ -306,6 +306,10 @@ payload: dict[str, Any] = {
     # Real build time. Never hardcode this: a stated sweep time that did not happen
     # is a false claim about how fresh the ledger is.
     "updated": NOW.strftime("%d %b %Y, %H:%M IST"),
+    # The page computes its own age from this at open time. A dashboard that has quietly
+    # stopped being swept must announce it rather than look identical to a fresh one.
+    "updatedISO": NOW.isoformat(timespec="seconds"),
+    "staleAfterHours": 26,
     "today": NOW.strftime("%Y-%m-%d"),
     "rows": rows,
     "signals": signals,
@@ -551,6 +555,14 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
   .bl{grid-template-columns:1fr;row-gap:4px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* staleness banner: only rendered when the ledger has stopped being swept */
+.stale-bar{display:none;background:var(--alarm);color:#fff;padding:11px 64px;
+  font-size:13px;line-height:1.45}
+.stale-bar.on{display:block}
+.stale-bar b{font-weight:700}
+.stale-bar span{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;opacity:.9}
+@media (max-width:760px){.stale-bar{padding-left:22px;padding-right:22px}}
 </style>
 
 <div class="sheet">
@@ -558,6 +570,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     <div class="wordmark">TMT <b>Regulatory Radar</b></div>
     <div class="updated">Last updated <span id="upd"></span></div>
   </div>
+  <div class="stale-bar" id="stalebar"></div>
 
   <nav class="tabs">
     <button class="on" data-v="instruments">Instruments</button>
@@ -628,6 +641,20 @@ const days = iso => Math.round((new Date(iso) - new Date(D.today)) / 86400000);
 const pl = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 
 $('#upd').textContent = D.updated;
+
+// Age is computed when the page opens, not when it was built: a tab left open for a
+// week, or a link opened months later, must still tell the truth about freshness.
+(function(){
+  if (!D.updatedISO) return;
+  const hrs = (Date.now() - new Date(D.updatedISO).getTime()) / 3.6e6;
+  if (!(hrs > (D.staleAfterHours || 26))) return;
+  const bar = $('#stalebar');
+  const age = hrs < 48 ? Math.round(hrs) + ' hours' : Math.floor(hrs / 24) + ' days';
+  bar.innerHTML = '<b>Not checked for ' + age + '.</b> '
+    + 'Instruments published since then will not appear below. '
+    + '<span>Ask for a sweep before relying on this page.</span>';
+  bar.classList.add('on');
+})();
 const state = { q: '', reg: 'All', stratum: 'All', dates: 'all', routine: false, open: null, ven: null };
 
 /* Date buckets are anchored to the last sweep date, not the viewer's clock, so the

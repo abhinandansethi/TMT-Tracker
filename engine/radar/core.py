@@ -305,5 +305,14 @@ class Sweeper:
         return 1 if failed else 0
 
     def write_health(self, path: Path) -> None:
+        """Merge, never replace: a scoped sweep must not erase the other sources' health,
+        which would read as 56 venues having silently disappeared."""
+        merged = {}
+        if path.exists():
+            try:
+                merged = json.loads(path.read_text()).get("sources", {})
+            except (ValueError, OSError):
+                merged = {}
+        merged.update(self.health)
         path.write_text(json.dumps(
-            {"generated": now_ist(), "sources": self.health}, indent=1, ensure_ascii=False))
+            {"generated": now_ist(), "sources": merged}, indent=1, ensure_ascii=False))
