@@ -611,7 +611,6 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
         </select>
       </div>
       <div class="togs">
-        <div class="tog" id="routine" role="checkbox" aria-checked="false" tabindex="0"><i></i><span>Routine</span></div>
       </div>
     </div>
     <div class="tablewrap"><div class="tbl">
@@ -673,7 +672,7 @@ $('#upd').textContent = D.updated;
     + '<span>Ask for a sweep before relying on this page.</span>';
   bar.classList.add('on');
 })();
-const state = { q: '', reg: 'All', stratum: 'All', dates: 'all', routine: false, open: null, ven: null };
+const state = { q: '', reg: 'All', stratum: 'All', dates: 'all', open: null, ven: null };
 
 /* Date buckets are anchored to the last sweep date, not the viewer's clock, so the
    filter always agrees with the deadline colouring. Week runs Monday to that date. */
@@ -736,7 +735,6 @@ function render() {
   const b = dateBounds(state.dates);
   const list = D.rows.filter(r =>
     (!b || (r.date && r.date >= b[0] && r.date <= b[1])) &&
-    (state.routine || !r.routine) &&
     (state.stratum === 'All' || r.stratum === state.stratum) &&
     (state.reg === 'All' || r.reg === state.reg) &&
     (!q || (r.short + ' ' + r.line + ' ' + r.official + ' ' + r.reg + ' ' + r.type + ' ' + r.gist).toLowerCase().includes(q))
@@ -786,15 +784,6 @@ $('#q').addEventListener('input', e => { state.q = e.target.value; render(); });
 $('#stratum').addEventListener('change', e => { state.stratum = e.target.value; fillRegs(); render(); });
 $('#reg').addEventListener('change', e => { state.reg = e.target.value; render(); });
 $('#dates').addEventListener('change', e => { state.dates = e.target.value; render(); });
-const rtog = $('#routine');
-const flipRoutine = () => {
-  state.routine = !state.routine;
-  rtog.classList.toggle('on', state.routine);
-  rtog.setAttribute('aria-checked', String(state.routine));
-  render();
-};
-rtog.addEventListener('click', flipRoutine);
-rtog.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipRoutine(); } });
 render();
 
 /* coverage: stratum -> regulator -> venue, with per-source health */

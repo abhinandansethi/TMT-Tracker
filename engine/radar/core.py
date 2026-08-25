@@ -271,7 +271,12 @@ class Sweeper:
                 "deadline": cl.extract_deadline(title, self.deadline_rx, source.get("date_formats", [])),
                 "flags": flags,
                 "seq": seq_key,
-                "lane": source.get("lane", "instruments"),
+                # Routine means recurring administrative output: drive tests, lab
+                # designations, statistics releases. That is the signals definition, so it
+                # belongs there rather than sitting in the instruments ledger behind a
+                # toggle the reader has to know to distrust.
+                "lane": "signals" if cl.is_routine(title, self.routine_rx)
+                        else source.get("lane", "instruments"),
                 "first_seen": now_ist(),
                 "status": ("backfill" if backfill_since
                            else "activation_baseline" if first_run else "new"),
