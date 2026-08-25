@@ -74,6 +74,20 @@ def norm_title(t: str) -> str:
     return re.sub(r"\s+", " ", t).strip()
 
 
+GENERIC_STEMS = {"notice", "notices", "order", "orders", "circular", "circulars",
+                 "document", "doc", "file", "pdf", "advisory", "notification", "letter",
+                 "download", "attachment", "public notice", "press release"}
+
+
+def is_generic_doc_url(canon: str) -> bool:
+    """Is this link's filename too generic to identify a document? Registries that upload
+    every notice as NOTICE.pdf make the URL a location, not an identity."""
+    stem = canon.split("?")[0].rstrip("/").rsplit("/", 1)[-1]
+    stem = re.sub(r"\.(pdf|docx?|xlsx?|zip)$", "", stem, flags=re.I)
+    stem = re.sub(r"[_\-]+", " ", stem).strip().lower()
+    return stem in GENERIC_STEMS or len(stem) < 8
+
+
 def item_id(title: str, date: Optional[str]) -> str:
     return hashlib.sha1((norm_title(title) + (date or "")).encode()).hexdigest()[:10]
 
@@ -157,13 +171,25 @@ class Ledger:
         return u.rstrip("/").lower()
 
     def url_index(self) -> Dict:
-        """{canonical_url: id} — the same document linked from two venues is one item."""
-        idx = {}
-        for iid, u in self.db.execute("SELECT id, url FROM items WHERE url != ''"):
+        """{canonical_url: id} for URLs specific enough to BE an identity.
+
+        A shared PDF link usually means one document listed at two venues, which is exactly
+        the cross-listing we want to collapse. But some registries reuse a filename for
+        unrelated documents: TDSAT serves 14 different notices as 'NOTICE.pdf'. Treating
+        that as identity silently swallows genuinely new instruments, the worst failure this
+        tracker can have. So a URL is admitted as an identity only when it is unambiguous:
+        it must not already point at two differently-titled documents, and its filename must
+        not be a bare generic word."""
+        seen: Dict[str, set] = {}
+        first: Dict[str, str] = {}
+        for iid, u, title in self.db.execute(
+                "SELECT id, url, title FROM items WHERE url != ''"):
             cu = self.canon_url(u)
-            if cu and cu not in idx:
-                idx[cu] = iid
-        return idx
+            if not cu or is_generic_doc_url(cu):
+                continue
+            seen.setdefault(cu, set()).add(norm_title(title))
+            first.setdefault(cu, iid)
+        return {cu: first[cu] for cu, titles in seen.items() if len(titles) == 1}
 
     def known_url(self, source_id: str, url: str) -> bool:
         """Has this exact link already been ledgered or sighted for this source? Used to

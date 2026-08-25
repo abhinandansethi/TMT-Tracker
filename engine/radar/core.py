@@ -238,8 +238,10 @@ class Sweeper:
             norm_key = (norm_title(str(clean["title"])),
                         str(clean["date"]) if clean.get("date") else "")
             url_key = self.ledger.canon_url(str(clean.get("url") or ""))
-            holder = self._idx.get(norm_key) or \
-                (self._url_idx.get(url_key) if url_key.split("?")[0].endswith(".pdf") else None)
+            holder = self._idx.get(norm_key)
+            if holder is None and url_key.split("?")[0].endswith(".pdf"):
+                # only URLs specific enough to be an identity (see Ledger.url_index)
+                holder = self._url_idx.get(url_key)
             if holder:
                 self.ledger.sight(holder, sid, str(clean.get("url") or ""))
                 sighted += 1
@@ -276,7 +278,8 @@ class Sweeper:
             }
             self.ledger.insert(rec)
             self._idx[norm_key] = iid
-            if url_key:
+            from .ledger import is_generic_doc_url
+            if url_key and not is_generic_doc_url(url_key):
                 self._url_idx.setdefault(url_key, iid)
             if rec["status"] == "new":
                 self.new_items.append(rec)

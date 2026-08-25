@@ -334,7 +334,9 @@
     }
    ],
    "stale_after_days": 21,
-   "quirks": "Aggregator; a catch here means a category-page parser missed the item."
+   "quirks": "Aggregator; a catch here means a category-page parser missed the item.",
+   "lane": "signals",
+   "lane_reason": "Mirror, not a publisher: 29 of 30 rows are press releases already carried by their own venues. Retained as a crosscheck (its sightings still confirm primary sources) but its own catches are leads, not instruments."
   },
   {
    "id": "trai_standing_qos",
@@ -718,7 +720,9 @@
    "tripwire": {
     "kind": "monotonic"
    },
-   "quirks": "ALWAYS the www host — bare tec.gov.in has a broken TLS chain. Dormant since 22-12-2025; watch for MTCTE ER notifications."
+   "quirks": "ALWAYS the www host — bare tec.gov.in has a broken TLS chain. Dormant since 22-12-2025; watch for MTCTE ER notifications.",
+   "lane": "signals",
+   "lane_reason": "TEC's general noticeboard: webinars, MoU announcements, tenders, vacancies. Instrument-bearing TEC material lives on tec_circulars and tec_gazette_standards."
   },
   {
    "id": "tdsat_notices",
@@ -753,7 +757,9 @@
    "tripwire": {
     "kind": "monotonic"
    },
-   "quirks": "Malformed HTML: <tr> never re-opens after row 1, so rows are matched on raw bytes (anchor + following date <p>). ~430 rows. Practice directions (rare, substantive) appear among routine sitting notices."
+   "quirks": "Malformed HTML: <tr> never re-opens after row 1, so rows are matched on raw bytes (anchor + following date <p>). ~430 rows. Practice directions (rare, substantive) appear among routine sitting notices.",
+   "lane": "signals",
+   "lane_reason": "Court diary and registry noticeboard: sitting and non-sitting notices, holidays, room reallocations. Useful to a disputes team, but it changes no client obligation. Practice directions remain rare exceptions to lift by hand."
   },
   {
    "id": "pib_moc",
@@ -783,7 +789,9 @@
     "Ministry of Information and Broadcasting",
     "Ministry of Information & Broadcasting"
    ],
-   "quirks": "PIB offers no per-ministry feed; ministry is confirmed by fetching each new release page once (deterministic substring match). Instrument-announcing releases fold into the instrument they announce at curation."
+   "quirks": "PIB offers no per-ministry feed; ministry is confirmed by fetching each new release page once (deterministic substring match). Instrument-announcing releases fold into the instrument they announce at curation.",
+   "lane": "signals",
+   "lane_reason": "The press bureau publishes releases ABOUT instruments, never the instrument. A release reporting that the 12-minute ad cap was removed is not the order that removed it."
   },
   {
    "id": "egazette_recent",
@@ -840,7 +848,9 @@
     "trai.gov.in"
    ],
    "default_type": "notification",
-   "quirks": "VERIFIED LAGGING (~6 weeks behind the site). Never a trigger; a catch here that the HTML listings missed is a parser bug and surfaces as a crosscheck WARN."
+   "quirks": "VERIFIED LAGGING (~6 weeks behind the site). Never a trigger; a catch here that the HTML listings missed is a parser bug and surfaces as a crosscheck WARN.",
+   "lane": "signals",
+   "lane_reason": "10 of 10 entries are consumer outreach, education and awareness events. Announcements, not documents."
   },
   {
    "status": "live",
@@ -977,13 +987,15 @@
    "parser": {
     "strategy": "regex_rows",
     "row_floor": 10,
-    "row_regex": "<a href=[\"'](?P<href>[^\"']*VLCODE=(?P<seq>CIAD-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*20px\">(?P<title2>[^<]+)<)?"
+    "row_regex": "<a href=[\"'](?P<href>[^\"']*VLCODE=(?P<seq>CIAD-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*\\d+px\">(?P<title2>[^<]+)<)?"
    },
    "default_type": "advisory",
    "tripwire": {
     "kind": "sequence"
    },
-   "quirks": "Legacy servlet; rows regex-matched on raw bytes. CIAD numbering sequential per year - gap = missed advisory. Year param must roll over each January."
+   "quirks": "Legacy servlet; rows regex-matched on raw bytes. CIAD numbering sequential per year - gap = missed advisory. Year param must roll over each January.",
+   "lane": "signals",
+   "lane_reason": "Third-party vendor patch bulletins (Apple, SAP, Oracle). Issued under s.70B(4)(d) IT Act, which makes them statutory outputs but expressly non-binding. The binding CERT-In material is s.70B(6) Directions and CISG guidelines, both separately tracked."
   },
   {
    "stratum": "tech_data",
@@ -1007,13 +1019,15 @@
    "parser": {
     "strategy": "regex_rows",
     "row_floor": 10,
-    "row_regex": "<a href=[\"'](?P<href>[^\"']*VLCODE=(?P<seq>CIVN-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*20px\">(?P<title2>[^<]+)<)?"
+    "row_regex": "<a href=[\"'](?P<href>[^\"']*VLCODE=(?P<seq>CIVN-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*\\d+px\">(?P<title2>[^<]+)<)?"
    },
    "default_type": "advisory",
    "tripwire": {
     "kind": "sequence"
    },
-   "quirks": "Same servlet family; CIVN numbering sequential per year. Year param rolls over each January."
+   "quirks": "Same servlet family; CIVN numbering sequential per year. Year param rolls over each January.",
+   "lane": "signals",
+   "lane_reason": "CVE bulletins about Chrome, Mozilla, Cisco and the like. Advisory outputs under s.70B(4)(d); bind no one. By volume the loudest CERT-In feed and by content the least legally meaningful."
   },
   {
    "stratum": "tech_data",
@@ -1037,7 +1051,7 @@
    "parser": {
     "strategy": "regex_rows",
     "row_floor": 5,
-    "row_regex": "<a href=[\"'](?P<href>[^\"']*refcode=(?P<seq>CISG-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*20px\">(?P<title2>[^<]+)<)?"
+    "row_regex": "<a href=[\"'](?P<href>[^\"']*refcode=(?P<seq>CISG-\\d{4}-\\d+))[\"']>(?P<title>.*?)</a>.*?\\((?P<date_raw>[A-Za-z]+\\s+\\d{1,2},?\\s*\\d{4})\\)(?:.*?padding-left:\\s*\\d+px\">(?P<title2>[^<]+)<)?"
    },
    "default_type": "guideline",
    "tripwire": {
@@ -1310,7 +1324,9 @@
     "max_pages": 15
    },
    "default_type": "advisory",
-   "quirks": "IT Rules Part III instruments, OTT/online-curated-content advisories. Docs live in Drupal cols-4/cols-5 tables; classless tables are platform registries, not instruments."
+   "quirks": "IT Rules Part III instruments, OTT/online-curated-content advisories. Docs live in Drupal cols-4/cols-5 tables; classless tables are platform registries, not instruments.",
+   "lane": "signals",
+   "lane_reason": "18 of the 20 items it contributed are PIB press releases typed as advisories: event announcements, parliamentary answers and statistics. Its two genuine advisories are already carried by mib_advisories with identical hrefs."
   },
   {
    "stratum": "media",
@@ -1430,7 +1446,9 @@
    "tripwire": {
     "kind": "monotonic"
    },
-   "quirks": "Self-regulatory but ASCI codes are incorporated by reference in Cable TV Rules ad code. Dates ride in the row text. JS show-more hides older rows (fine for new-item detection)."
+   "quirks": "Self-regulatory but ASCI codes are incorporated by reference in Cable TV Rules ad code. Dates ride in the row text. JS show-more hides older rows (fine for new-item detection).",
+   "lane": "signals",
+   "lane_reason": "Self-regulatory mirror shelf: 5 of 6 rows are republished copies of other regulators' documents, better tracked at their primary venue, and two are not instruments at all. ASCI's own advisories bind members contractually, not by law."
   },
   {
    "id": "trai_miscellaneous",
@@ -1459,34 +1477,6 @@
    ],
    "default_type": "order",
    "quirks": "Found by the 25-08-2026 audit; corrects the v1 belief that no separate orders listing exists. Host intermittently hangs to timeout - retries cover. Upload-folder month can lag the release date; never date from the path."
-  },
-  {
-   "id": "nccs_circulars_head",
-   "stratum": "telecom",
-   "regulator": "NCCS",
-   "name": "Circulars - Headquarters",
-   "url": "https://nccs.gov.in/home/circularsHead/1?rowsPerPage=50",
-   "status": "live",
-   "method": "static_html",
-   "parser": {
-    "strategy": "html_table",
-    "row_selector": "table tbody tr",
-    "title_cell": 1,
-    "date_cell": 3,
-    "row_floor": 5
-   },
-   "date_formats": [
-    "DD Month YYYY",
-    "YYYY-MM-DD"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "nccs.gov.in"
-   ],
-   "default_type": "circular",
-   "quirks": "Third NCCS division listing (registry had only SAS + SC). Always rowsPerPage=50: the rendered pager hardcodes rowsPerPage=10 while the default is 5, silently skipping serials 6-10 for anyone mixing them."
   },
   {
    "id": "tec_circulars",
@@ -1532,7 +1522,9 @@
     "strategy": "html_table",
     "row_selector": "table tr",
     "title_cell": 1,
-    "row_floor": 60
+    "row_floor": 60,
+    "link_selector": "td:nth-of-type(3) a[href]",
+    "date_cell": 3
    },
    "date_formats": [
     "DD-Mon-YYYY"
@@ -1548,7 +1540,7 @@
    "tripwire": {
     "kind": "monotonic"
    },
-   "quirks": "Standards become mandatory on gazette notification (Telecom Act standards framework). CMS-pasted table, no class/id; malformed pre-doctype head. Dates only from the Notification Date column, never filenames."
+   "quirks": "Standards become mandatory on gazette notification (Telecom Act standards framework). CMS-pasted table, no class/id; malformed pre-doctype head. Dates only from the Notification Date column, never filenames. Each row carries TWO links: the standard's own PDF in td[2] and the gazette notification in td[4]. The gazette link is shared by every standard notified together, so the standard's own PDF is the citation."
   },
   {
    "id": "tec_essential_requirements",
@@ -1608,33 +1600,6 @@
    ],
    "default_type": "order",
    "quirks": "RoW Rules 2024 + state/UT implementation orders. Scope strictly to #Policy - a sitewide What's-New ticker mimics the row shape."
-  },
-  {
-   "id": "dot_eservices_satellite",
-   "stratum": "telecom",
-   "regulator": "DoT",
-   "name": "eServices - Satellite/GMPCS authorisation",
-   "url": "https://eservices.dot.gov.in/satellite-license",
-   "status": "live",
-   "method": "static_html",
-   "parser": {
-    "strategy": "psn_rows",
-    "scope_selector": ".view-id-services.view-display-id-block_1",
-    "row_floor": 1
-   },
-   "date_formats": [
-    "DD/MM/YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "eservices.dot.gov.in",
-    "saralsanchar.gov.in",
-    "dot.gov.in"
-   ],
-   "default_type": "order",
-   "quirks": "Hottest current licensing area (GMPCS/satcom). Only 1 row today - floor honestly 1; 0 rows = FAILED. Same ticker trap as RoW page."
   },
   {
    "id": "inspace_publications",
@@ -1725,7 +1690,9 @@
    "tripwire": {
     "kind": "monotonic"
    },
-   "quirks": "CRITICAL: type value is SINGULAR 'Guideline' - MeitY's own UI requests the plural and renders 'No Data Available'. sort=date, not sort=year (year field mostly empty)."
+   "quirks": "CRITICAL: type value is SINGULAR 'Guideline' - MeitY's own UI requests the plural and renders 'No Data Available'. sort=date, not sort=year (year field mostly empty).",
+   "lane": "signals",
+   "lane_reason": "MeitY's grants-and-schemes administration library: proformas, annexures, DPR templates. Not an instrument venue."
   },
   {
    "id": "uidai_regulations",
@@ -2150,6 +2117,18 @@
    "url": "https://cogroup.trai.gov.in/fdapp/public/dashboard",
    "reason": "Register of financial disincentives levied, not an instrument publisher. Rows are records ABOUT enforcement (operator, clause breached, period, amount) with no document behind them; the only link is the dashboard itself. Excluded 25-08-2026 after these rows appeared in the ledger typed as orders.",
    "revisit": "If the practice wants enforcement tracking, build it as a separate register view with its own schema, never merged into the instruments ledger."
+  },
+  {
+   "id": "dot_eservices_satellite",
+   "reason": "WPC service-description page, not a publishing venue: its entire instrument yield is one order of 11-12-2023 that actually lives in the shared circular-notifications corpus. Audited 25-08-2026."
+  },
+  {
+   "id": "nccs_circulars_head",
+   "reason": "13 of 13 rows are recruitment notices, vacancy circulars, internships, deputations and a logo competition. Nothing here binds a client. Audited 25-08-2026."
   }
- ]
+ ],
+ "lanes": {
+  "instruments": "Documents that bind a client. Every row must carry its own citation and may trigger a memo.",
+  "signals": "Real, useful information that is not itself a binding instrument: announcements, registers, court diaries, security bulletins, mirrors. Shown in its own tab, never in the instruments ledger, never memo-triggering."
+ }
 }
