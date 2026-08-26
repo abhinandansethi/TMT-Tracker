@@ -489,83 +489,6 @@
    "quirks": "Rows are Download links; title from aria-label; date from Direction_DDMMYYYY.pdf filename; JS load-more hides older rows (fine for new-item detection)."
   },
   {
-   "id": "dot_eservices_circulars",
-   "stratum": "telecom",
-   "regulator": "DoT",
-   "name": "eServices — Circulars/Notifications/Others",
-   "url": "https://eservices.dot.gov.in/circular-notifications-others",
-   "status": "suspended",
-   "method": "static_html",
-   "parser": {
-    "strategy": "html_table",
-    "row_selector": "table tbody tr",
-    "type_cell": 1,
-    "title_cell": 4,
-    "date_cell": 6,
-    "link_selector": "td a[href]",
-    "row_floor": 10
-   },
-   "date_formats": [
-    "DD/MM/YYYY"
-   ],
-   "pagination": {
-    "scheme": "query_page",
-    "param": "page",
-    "start": 1,
-    "first_unparameterised": true,
-    "max_pages": 25
-   },
-   "allowed_domains": [
-    "eservices.dot.gov.in",
-    "dot.gov.in",
-    "pib.gov.in",
-    "www.pib.gov.in"
-   ],
-   "default_type": "circular",
-   "type_map": {
-    "(?i)notification": "notification",
-    "(?i)press release": "press_release",
-    "(?i)circular": "circular",
-    "(?i)order": "order",
-    "(?i)rule": "rules"
-   },
-   "quirks": "THE machine-readable DoT source (portal notified 23-06-2026). Venue's own type column governs; some rows link out to PIB.",
-   "suspended_reason": "The Telecom eServices Portal User Agreement at /terms-use defines 'Unauthorised activities' to include 'any activity which is punishable under section 43 (for eg web scraping, altering source code, hacking, introducing viruses etc.)', states the portal 'shall not in any manner be used for any unauthorized activity', and requires that services 'be accessed only through the interfaces expressly authorised by DoT'. Verified verbatim 25-08-2026. Suspended. The same agreement contemplates 'activity authorised in writing by DoT', so written authorisation is the route to restoring it.",
-   "blind_reason": "Suspended: terms name web scraping as unauthorised"
-  },
-  {
-   "id": "dot_eservices_rules",
-   "stratum": "telecom",
-   "regulator": "DoT",
-   "name": "eServices — Act & Rules shelf",
-   "url": "https://eservices.dot.gov.in/act-and-rules",
-   "status": "suspended",
-   "method": "static_html",
-   "parser": {
-    "strategy": "link_shelf",
-    "href_include": "/circular-notifications/",
-    "row_floor": 20,
-    "undated_ok": true
-   },
-   "date_formats": [
-    "DD/MM/YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "eservices.dot.gov.in",
-    "dot.gov.in"
-   ],
-   "default_type": "rules",
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "quirks": "Reference shelf; undated rows keyed by URL+title, dated by first_seen. KNOWN LAG: gazetted rules can be missing for weeks — the gazette lane covers the gap. Shelf shrinkage trips the monotonic wire.",
-   "suspended_reason": "The Telecom eServices Portal User Agreement at /terms-use defines 'Unauthorised activities' to include 'any activity which is punishable under section 43 (for eg web scraping, altering source code, hacking, introducing viruses etc.)', states the portal 'shall not in any manner be used for any unauthorized activity', and requires that services 'be accessed only through the interfaces expressly authorised by DoT'. Verified verbatim 25-08-2026. Suspended. The same agreement contemplates 'activity authorised in writing by DoT', so written authorisation is the route to restoring it.",
-   "blind_reason": "Suspended: terms name web scraping as unauthorised"
-  },
-  {
    "id": "nccs_latest",
    "stratum": "telecom",
    "regulator": "NCCS",
@@ -1069,108 +992,6 @@
    "quirks": "Binding directions under IT Act s.70B(6) (e.g. the 2022 six-hour incident-reporting direction). Rare and always substantive."
   },
   {
-   "stratum": "tech_data",
-   "regulator": "UIDAI",
-   "status": "suspended",
-   "method": "rsc_api",
-   "date_formats": [
-    "DD-MM-YYYY",
-    "DD.MM.YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "uidai.gov.in",
-    "backend.uidai.gov.in"
-   ],
-   "http_headers": {
-    "RSC": "1"
-   },
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "id": "uidai_circulars",
-   "name": "Circulars",
-   "url": "https://uidai.gov.in/en/circulars",
-   "parser": {
-    "strategy": "uidai_rsc",
-    "row_floor": 5
-   },
-   "default_type": "circular",
-   "quirks": "Site restructured (v1 media-resources URL is 404). Next.js App Router: GET with 'RSC: 1' header returns the flight payload; documents ride in pdfDetails.data. updated_date = upload date; instrument date sits in the title.",
-   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
-   "blind_reason": "Suspended: site-wide robots.txt exclusion"
-  },
-  {
-   "stratum": "tech_data",
-   "regulator": "UIDAI",
-   "status": "suspended",
-   "method": "rsc_api",
-   "date_formats": [
-    "DD-MM-YYYY",
-    "DD.MM.YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "uidai.gov.in",
-    "backend.uidai.gov.in"
-   ],
-   "http_headers": {
-    "RSC": "1"
-   },
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "id": "uidai_notifications",
-   "name": "Notifications",
-   "url": "https://uidai.gov.in/en/notifications",
-   "parser": {
-    "strategy": "uidai_rsc",
-    "row_floor": 3
-   },
-   "default_type": "notification",
-   "quirks": "Statutory Aadhaar notifications; gazette lane cross-covers (Aadhaar regulations are gazetted).",
-   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
-   "blind_reason": "Suspended: site-wide robots.txt exclusion"
-  },
-  {
-   "stratum": "tech_data",
-   "regulator": "UIDAI",
-   "status": "suspended",
-   "method": "rsc_api",
-   "date_formats": [
-    "DD-MM-YYYY",
-    "DD.MM.YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "uidai.gov.in",
-    "backend.uidai.gov.in"
-   ],
-   "http_headers": {
-    "RSC": "1"
-   },
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "id": "uidai_oms",
-   "name": "Official Memorandums",
-   "url": "https://uidai.gov.in/en/official-memorandums",
-   "parser": {
-    "strategy": "uidai_rsc",
-    "row_floor": 3
-   },
-   "default_type": "circular",
-   "quirks": "OMs on fees, procedures, administration.",
-   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
-   "blind_reason": "Suspended: site-wide robots.txt exclusion"
-  },
-  {
    "stratum": "media",
    "regulator": "MIB",
    "status": "live",
@@ -1556,38 +1377,6 @@
    "quirks": "tec.gov.in/essential-requirements is DEAD (empty 200 since ~Apr 2026); the MTCTE portal API serves the full dataset (828 elements = 138 records, stride 6). PDFs need GET - HEAD 403s."
   },
   {
-   "id": "dot_eservices_row",
-   "stratum": "telecom",
-   "regulator": "DoT",
-   "name": "eServices - Right of Way",
-   "url": "https://eservices.dot.gov.in/right-of-way-permissions",
-   "status": "suspended",
-   "method": "static_html",
-   "parser": {
-    "strategy": "psn_rows",
-    "scope_selector": "#Policy",
-    "row_floor": 8
-   },
-   "date_formats": [
-    "DD/MM/YYYY"
-   ],
-   "pagination": {
-    "scheme": "query_page",
-    "param": "page",
-    "start": 1,
-    "first_unparameterised": true,
-    "max_pages": 6
-   },
-   "allowed_domains": [
-    "eservices.dot.gov.in",
-    "dot.gov.in"
-   ],
-   "default_type": "order",
-   "quirks": "RoW Rules 2024 + state/UT implementation orders. Scope strictly to #Policy - a sitewide What's-New ticker mimics the row shape.",
-   "suspended_reason": "The Telecom eServices Portal User Agreement at /terms-use defines 'Unauthorised activities' to include 'any activity which is punishable under section 43 (for eg web scraping, altering source code, hacking, introducing viruses etc.)', states the portal 'shall not in any manner be used for any unauthorized activity', and requires that services 'be accessed only through the interfaces expressly authorised by DoT'. Verified verbatim 25-08-2026. Suspended. The same agreement contemplates 'activity authorised in writing by DoT', so written authorisation is the route to restoring it.",
-   "blind_reason": "Suspended: terms name web scraping as unauthorised"
-  },
-  {
    "id": "inspace_publications",
    "stratum": "telecom",
    "regulator": "IN-SPACe",
@@ -1681,73 +1470,6 @@
    "lane_reason": "MeitY's grants-and-schemes administration library: proformas, annexures, DPR templates. Not an instrument venue.",
    "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
    "blind_reason": "Paused: site permits crawling but blocks identified agents"
-  },
-  {
-   "id": "uidai_regulations",
-   "stratum": "tech_data",
-   "regulator": "UIDAI",
-   "name": "Updated (consolidated) Regulations",
-   "url": "https://uidai.gov.in/en/updated-regulations",
-   "status": "suspended",
-   "method": "rsc_api",
-   "http_headers": {
-    "RSC": "1"
-   },
-   "parser": {
-    "strategy": "uidai_rsc",
-    "row_floor": 8
-   },
-   "date_formats": [
-    "DD-MM-YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "uidai.gov.in",
-    "backend.uidai.gov.in"
-   ],
-   "default_type": "regulation",
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "quirks": "Amendments are NOT new rows here - the consolidated row's updated_date and file change in place; a changed date creates a new ledger item. Companion gazette listing carries the amendment instruments themselves.",
-   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
-   "blind_reason": "Suspended: site-wide robots.txt exclusion"
-  },
-  {
-   "id": "uidai_gazetted",
-   "stratum": "tech_data",
-   "regulator": "UIDAI",
-   "name": "Gazetted notifications (amendment instruments)",
-   "url": "https://uidai.gov.in/en/gazetted-notifications",
-   "status": "suspended",
-   "method": "rsc_api",
-   "http_headers": {
-    "RSC": "1"
-   },
-   "parser": {
-    "strategy": "uidai_rsc",
-    "row_floor": 8
-   },
-   "date_formats": [
-    "DD-MM-YYYY"
-   ],
-   "pagination": {
-    "scheme": "query_page",
-    "param": "page",
-    "start": 2,
-    "first_unparameterised": true,
-    "max_pages": 5
-   },
-   "allowed_domains": [
-    "uidai.gov.in",
-    "backend.uidai.gov.in"
-   ],
-   "default_type": "gazette_notification",
-   "quirks": "39 gazette/amendment PDFs over 4 pages, 1-indexed ?page=N. HEAD lies on backend PDFs (200 text/html) - verify with ranged GET.",
-   "suspended_reason": "robots.txt at uidai.gov.in is 'User-Agent: *' / 'Disallow: /', a site-wide exclusion of every crawler, verified 25-08-2026 and not User-Agent dependent. UIDAI's copyright policy separately permits reproduction 'for research or private study but not for sale or for use in conjunction with commercial purposes'. Suspended pending a written approach to UIDAI. Aadhaar instruments are gazetted, so the e-Gazette lane retains partial cover.",
-   "blind_reason": "Suspended: site-wide robots.txt exclusion"
   },
   {
    "id": "mib_engage",
@@ -2288,6 +2010,62 @@
   {
    "id": "nccs_circulars_head",
    "reason": "13 of 13 rows are recruitment notices, vacancy circulars, internships, deputations and a logo competition. Nothing here binds a client. Audited 25-08-2026."
+  },
+  {
+   "id": "dot_eservices_circulars",
+   "url": "https://eservices.dot.gov.in/circular-notifications-others",
+   "removed": "2026-08-27",
+   "ground": "eservices.dot.gov.in terms name web scraping as an unauthorised activity (s.43 IT Act)",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "dot_eservices_rules",
+   "url": "https://eservices.dot.gov.in/act-and-rules",
+   "removed": "2026-08-27",
+   "ground": "eservices.dot.gov.in terms name web scraping as an unauthorised activity (s.43 IT Act)",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "uidai_circulars",
+   "url": "https://uidai.gov.in/en/circulars",
+   "removed": "2026-08-27",
+   "ground": "uidai.gov.in robots.txt is 'Disallow: /'",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "uidai_notifications",
+   "url": "https://uidai.gov.in/en/notifications",
+   "removed": "2026-08-27",
+   "ground": "uidai.gov.in robots.txt is 'Disallow: /'",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "uidai_oms",
+   "url": "https://uidai.gov.in/en/official-memorandums",
+   "removed": "2026-08-27",
+   "ground": "uidai.gov.in robots.txt is 'Disallow: /'",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "dot_eservices_row",
+   "url": "https://eservices.dot.gov.in/right-of-way-permissions",
+   "removed": "2026-08-27",
+   "ground": "eservices.dot.gov.in terms name web scraping as an unauthorised activity (s.43 IT Act)",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "uidai_regulations",
+   "url": "https://uidai.gov.in/en/updated-regulations",
+   "removed": "2026-08-27",
+   "ground": "uidai.gov.in robots.txt is 'Disallow: /'",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "uidai_gazetted",
+   "url": "https://uidai.gov.in/en/gazetted-notifications",
+   "removed": "2026-08-27",
+   "ground": "uidai.gov.in robots.txt is 'Disallow: /'",
+   "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
   }
  ],
  "lanes": {

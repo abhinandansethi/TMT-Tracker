@@ -1,0 +1,260 @@
+[
+ {
+  "id": "trai_regulations",
+  "regulator": "TRAI",
+  "name": "Regulations",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_directions",
+  "regulator": "TRAI",
+  "name": "Directions & Orders",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_tariff_telecom",
+  "regulator": "TRAI",
+  "name": "Telecom Tariff Orders",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_tariff_broadcasting",
+  "regulator": "TRAI",
+  "name": "Broadcasting Tariff Orders",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_consultations",
+  "regulator": "TRAI",
+  "name": "Consultation Papers",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_open_consultations",
+  "regulator": "TRAI",
+  "name": "Open Consultations (deadline register)",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_recommendations",
+  "regulator": "TRAI",
+  "name": "Recommendations",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_press_releases",
+  "regulator": "TRAI",
+  "name": "Press Releases",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_whats_new",
+  "regulator": "TRAI",
+  "name": "What's New (cross-check)",
+  "lane": "signals"
+ },
+ {
+  "id": "trai_standing_qos",
+  "regulator": "TRAI",
+  "name": "Standing Directions \u2014 Quality of Service",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_standing_broadband",
+  "regulator": "TRAI",
+  "name": "Standing Directions \u2014 Broadband & Policy Analysis",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_standing_bcs",
+  "regulator": "TRAI",
+  "name": "Standing Directions \u2014 Broadcasting & Cable",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_standing_fea",
+  "regulator": "TRAI",
+  "name": "Standing Directions \u2014 Financial & Economic Analysis",
+  "lane": "instruments"
+ },
+ {
+  "id": "trai_standing_nsl",
+  "regulator": "TRAI",
+  "name": "Standing Directions \u2014 Network, Spectrum & Licensing",
+  "lane": "instruments"
+ },
+ {
+  "id": "nccs_latest",
+  "regulator": "NCCS",
+  "name": "Latest Updates",
+  "lane": "instruments"
+ },
+ {
+  "id": "nccs_sas",
+  "regulator": "NCCS",
+  "name": "Circulars \u2014 Security Assurance Standards",
+  "lane": "instruments"
+ },
+ {
+  "id": "nccs_sc",
+  "regulator": "NCCS",
+  "name": "Circulars \u2014 Security Certification (ComSec)",
+  "lane": "instruments"
+ },
+ {
+  "id": "nccs_itsars",
+  "regulator": "NCCS",
+  "name": "Notified ITSARs",
+  "lane": "instruments"
+ },
+ {
+  "id": "tec_whatsnew",
+  "regulator": "TEC",
+  "name": "What's New",
+  "lane": "signals"
+ },
+ {
+  "id": "tdsat_notices",
+  "regulator": "TDSAT",
+  "name": "Notices / Circulars",
+  "lane": "signals"
+ },
+ {
+  "id": "trai_rss",
+  "regulator": "TRAI",
+  "name": "TRAI sitewide RSS (lag cross-check)",
+  "lane": "signals"
+ },
+ {
+  "id": "certin_advisories",
+  "regulator": "CERT-In",
+  "name": "Advisories (CIAD)",
+  "lane": "signals"
+ },
+ {
+  "id": "certin_vuln",
+  "regulator": "CERT-In",
+  "name": "Vulnerability Notes (CIVN)",
+  "lane": "signals"
+ },
+ {
+  "id": "certin_guidelines",
+  "regulator": "CERT-In",
+  "name": "Security Guidelines (CISG)",
+  "lane": "instruments"
+ },
+ {
+  "id": "certin_directions",
+  "regulator": "CERT-In",
+  "name": "s.70B(6) Directions",
+  "lane": "instruments"
+ },
+ {
+  "id": "mib_acts_policy",
+  "regulator": "MIB",
+  "name": "Acts/Policies/Guidelines",
+  "lane": "instruments"
+ },
+ {
+  "id": "mib_orders_notices",
+  "regulator": "MIB",
+  "name": "Orders & Notices",
+  "lane": "instruments"
+ },
+ {
+  "id": "mib_other_comms",
+  "regulator": "MIB",
+  "name": "Other Communications (advisories, OMs)",
+  "lane": "instruments"
+ },
+ {
+  "id": "mib_digital_media",
+  "regulator": "MIB",
+  "name": "Digital Media Wing (IT Rules Part III)",
+  "lane": "signals"
+ },
+ {
+  "id": "mib_broadcasting",
+  "regulator": "MIB",
+  "name": "Broadcasting Wing documents",
+  "lane": "instruments"
+ },
+ {
+  "id": "prgi",
+  "regulator": "PRGI",
+  "name": "Press Registrar General advisories/public notices",
+  "lane": "instruments"
+ },
+ {
+  "id": "cbfc",
+  "regulator": "CBFC",
+  "name": "Orders and Circulars",
+  "lane": "instruments"
+ },
+ {
+  "id": "asci",
+  "regulator": "ASCI",
+  "name": "Advisories (self-regulatory)",
+  "lane": "signals"
+ },
+ {
+  "id": "trai_miscellaneous",
+  "regulator": "TRAI",
+  "name": "Miscellaneous releases (orders, debarments)",
+  "lane": "instruments"
+ },
+ {
+  "id": "tec_circulars",
+  "regulator": "TEC",
+  "name": "Circulars",
+  "lane": "instruments"
+ },
+ {
+  "id": "tec_gazette_standards",
+  "regulator": "TEC",
+  "name": "Gazette-notified standards",
+  "lane": "instruments"
+ },
+ {
+  "id": "tec_essential_requirements",
+  "regulator": "TEC",
+  "name": "MTCTE Essential Requirements (ER list API)",
+  "lane": "instruments"
+ },
+ {
+  "id": "inspace_publications",
+  "regulator": "IN-SPACe",
+  "name": "Publications (NGP, guidelines, advisories)",
+  "lane": "instruments"
+ },
+ {
+  "id": "mib_advisories",
+  "regulator": "MIB",
+  "name": "Advisories",
+  "lane": "instruments"
+ },
+ {
+  "id": "gazette_communications",
+  "regulator": "e-Gazette",
+  "name": "Gazette \u2014 Ministry of Communications (DoT, TRAI)",
+  "lane": "instruments"
+ },
+ {
+  "id": "gazette_meity",
+  "regulator": "e-Gazette",
+  "name": "Gazette \u2014 Ministry of Electronics and IT",
+  "lane": "instruments"
+ },
+ {
+  "id": "gazette_mib",
+  "regulator": "e-Gazette",
+  "name": "Gazette \u2014 Ministry of Information and Broadcasting",
+  "lane": "instruments"
+ },
+ {
+  "id": "tdsat_orders",
+  "regulator": "TDSAT",
+  "name": "Judgments and daily orders",
+  "lane": "judgments"
+ }
+]

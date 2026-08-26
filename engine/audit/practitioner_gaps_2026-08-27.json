@@ -1,0 +1,1078 @@
+{
+ "authorities": [
+  {
+   "authority": "DoT \u2014 Department of Telecommunications (own website: licensing/circulars/OMs, non-Gazette stream)",
+   "url": "https://www.dot.gov.in/whatsnew (also /circulars, /access-services licensing pages; instrument PDFs at /static/uploads/ and /sites/default/files/)",
+   "instrument_types": "Licence amendments (Unified Licence / UL-VNO / access / ISP / ILD), amendments to licence conditions, office memoranda, circulars, clarifications, public notices, LoIs, M&A/transfer approvals, press releases",
+   "binds_whom": "All licensed telcos, ISPs, VNOs, ILDOs, infra providers \u2014 i.e. the core of the telecom client base",
+   "covered_by_us": "partial",
+   "importance": "critical",
+   "instrument_types_note": "",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "This is the single biggest hole in my slice. We catch DoT ONLY via ministry-wise Gazette (Communications). A large share of obligation-changing DoT output \u2014 licence-condition amendments, OMs, clarifications, LoIs, procedural circulars \u2014 is published on dot.gov.in and NOT gazetted, or lands on the site days/weeks before the Gazette catches up. Site is a Next.js SPA so the listing needs a headless render / backend-API discovery, but the actual PDFs are static and directly fetchable (verified HTTP 200, 4MB PDF at /static/uploads/2025/07/\u2026). robots.txt = 'Allow: /'. Recent proof: July 2025 NSDTS Annexure-A PDF; the rolling Telecom Act 2023 rule/clarification drafts posted for comment. A telecom partner would be embarrassed to learn of a UL amendment from a client rather than from the tracker."
+  },
+  {
+   "authority": "WPC \u2014 Wireless Planning & Coordination Wing (incl. ETA / import licensing / frequency / NFAP)",
+   "url": "https://www.dot.gov.in/spectrummanagement ; ETA & licences transacted at https://eservices.dot.gov.in/equipment-type-approval-eta",
+   "instrument_types": "Equipment Type Approval (ETA, incl. self-declaration), import licences, frequency assignment / NOCs, dealer possession licences, de-licensing notifications, National Frequency Allocation Plan (NFAP), amateur/experimental licences",
+   "binds_whom": "Device/handset/IoT/short-range-device makers and importers, telcos, tower cos, satcom earth-station operators \u2014 anyone importing or radiating RF",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Not in the source list and a genuine miss for a broad TMT practice with device/OEM clients. WPC governs whether hardware can lawfully be imported or sold. ETA now largely self-declaration on the DoT eServices/Saral Sanchar portal (Rs 10,000/model via Bharatkosh); de-licensing decisions (e.g. lower-6 GHz Wi-Fi delicensing consultation, low-power/very-low-power device bands) and NFAP revisions are the obligation-movers. De-licensing notifications also hit the Gazette (so partially gazette-recoverable), but ETA lists, import-licence procedure and WPC notices are website/portal-only. wpc.dot.gov.in itself now times out \u2014 the function has migrated into dot.gov.in + eservices.dot.gov.in."
+  },
+  {
+   "authority": "DoT Spectrum Management \u2014 auction NIAs & spectrum administration",
+   "url": "https://www.dot.gov.in/spectrum",
+   "instrument_types": "Notice Inviting Applications (NIA) for auctions + corrigenda, auction rules/reserve prices/pre-qualification, spectrum trading / sharing / surrender / harmonisation approvals, backhaul & administrative-assignment orders (incl. satcom spectrum)",
+   "binds_whom": "All telcos and new entrants; satcom operators once satellite spectrum is assigned administratively",
+   "covered_by_us": "partial",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Final allotments are gazetted (caught), but the NIA itself, its corrigenda, and pre-bid clarifications live on dot.gov.in/spectrum and PIB, not the Gazette \u2014 and these set the terms clients bid on. Recent proof: NIA of 08-Mar-2024 (10,523 MHz, reserve ~Rs 96,317 cr, auction 25-Jun-2024) published on dot.gov.in/spectrum with deadline extensions issued as web corrigenda. The live satcom-spectrum pricing question (TRAI recommendations -> DoT administrative assignment) will surface here first. PIB (Ministry of Communications) is the fastest signal but not itself a binding-instrument issuer."
+  },
+  {
+   "authority": "Trusted Telecom Portal / National Security Directive on Telecom Sector (NCSC + DoT)",
+   "url": "https://trustedtelecom.gov.in/",
+   "instrument_types": "Trusted-source / trusted-product designations, designated-source (no-procurement) lists, portal instructions and licence-condition amendments giving the NSDTS effect",
+   "binds_whom": "All TSPs \u2014 mandatory to procure only trusted products for network expansion/upgrades",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "Distinct from NCCS (which we cover for MTCTE/ITSAR security testing). This is supply-chain trust: TSPs must connect only 'trusted products' designated via this portal. The specific source/product designations are largely login-gated and the sensitive no-procurement decisions are effectively unpublished/confidential \u2014 a partner learns of them via portal notices, licence-amendment OMs on dot.gov.in, and client channels, not a clean public feed. What IS trackable: the public brief and the periodic DoT amendments operationalising it (e.g. July 2025 NSDTS Annexure-A PDF on dot.gov.in). Worth adding for the public layer; flag the designation lists as genuinely unpublished."
+  },
+  {
+   "authority": "Digital Bharat Nidhi (DBN) \u2014 formerly USOF",
+   "url": "https://dbn.gov.in/ (usof.gov.in now 301-redirects here)",
+   "instrument_types": "DBN scheme guidelines, funding/subsidy notices, bidding documents (BharatNet, mobile-coverage schemes), administrator circulars",
+   "binds_whom": "TSPs / infra providers / BharatNet contractors bidding for or receiving rural-connectivity support",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Now a statutory fund under the Telecommunications Act 2023 (ss.24-26), rebranded from USOF to Digital Bharat Nidhi \u2014 a live 2024-2025 event that itself proves the source moved and matters. Site is clean static HTML (~221KB, verified 200) so easily harvestable \u2014 no JS barrier, unlike dot.gov.in. Scheme guidelines and bidding terms directly set obligations for anyone touching BharatNet / rural rollout. Missing entirely."
+  },
+  {
+   "authority": "SACFA \u2014 Standing Advisory Committee on Frequency Allocation (WPC sub-committee)",
+   "url": "https://www.dot.gov.in/spectrummanagement (guidelines); clearances transacted via https://eservices.dot.gov.in/ (Saral Sanchar)",
+   "instrument_types": "SACFA siting clearances, clearance procedure/guideline circulars, height/EMI-EMC and location conditions",
+   "binds_whom": "Tower companies, telcos, satcom earth-station and VSAT operators, large private-network/CUG deployers",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The gating clearance for physically installing antennae/towers/earth stations. Individual clearances are transactional (per-site, via portal), so the trackable layer is the procedure/guideline circulars and any streamlining notices (relevant to 5G small-cells and street-furniture deployment). Folds operationally into WPC/DoT but a practitioner names it separately because infra clients ask about it by name."
+  },
+  {
+   "authority": "Right of Way (RoW) / GatiShakti Sanchar portal (DoT)",
+   "url": "RoW Rules via Gazette; DoT RoW circulars at dot.gov.in; portal at https://eservices.dot.gov.in/gss",
+   "instrument_types": "RoW Rules (now under Telecom Act 2023) and amendments, RoW clarificatory circulars/OMs, dispute-resolution and fee/timeline notifications; GatiShakti Sanchar single-window portal (transactional)",
+   "binds_whom": "TSPs and infrastructure providers laying OFC / erecting towers; state RoW nodal officers",
+   "covered_by_us": "partial",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The RoW Rules themselves are gazetted (caught via gazette_communications), but DoT's RoW clarificatory circulars, model-timeline OMs and portal-integration notices are website-only and are the practical obligation-movers for rollout. The GatiShakti Sanchar portal (eservices.dot.gov.in/gss, Jan Parichay SSO) is transactional, not an instrument feed. New Telecom-Act RoW rules and the drive to make all states live on the portal by 2025 are the current activity. Add the DoT RoW-circulars layer; the portal itself is not a harvest target."
+  },
+  {
+   "authority": "DoT eServices / Saral Sanchar \u2014 registrations (OSP, M2M/WPAN, ISP, ILD, PM-WANI)",
+   "url": "https://eservices.dot.gov.in/ (saralsanchar.gov.in redirects here)",
+   "instrument_types": "OSP (Other Service Provider / BPO) registration terms & revised guidelines, M2M service-provider & WPAN/WLAN registration, ISP/ILD/CUG registration conditions, public notices attached to the portal",
+   "binds_whom": "BPO/ITES and shared-services OSPs, M2M/IoT and telematics providers, ISPs \u2014 a big slice of a broad TMT client roster",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Registration is transactional, but the guidelines governing it change obligations for whole client classes (the 2020-2022 OSP liberalisation is the archetype; M2M/embedded-SIM registration is the live one). Guideline revisions usually also appear as DoT circulars/Gazette, so partly caught upstream \u2014 but the eServices portal is where the operative terms and public notices actually surface. Lower rank than WPC/spectrum but a real gap for the enterprise/BPO side of the practice."
+  },
+  {
+   "authority": "PM-WANI (Public Wi-Fi framework; DoT / C-DOT central registry)",
+   "url": "https://pmwani.gov.in/ (framework instruments on dot.gov.in / Gazette; registration via Saral Sanchar)",
+   "instrument_types": "PM-WANI framework amendments, PDO/PDOA/App-Provider registration terms, central-registry app-provider approvals",
+   "binds_whom": "Public Data Office Aggregators, PDOs, PM-WANI app providers; ISPs supplying bandwidth",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Niche-to-moderate: matters to public-Wi-Fi and aggregator clients. Framework changes ride TRAI recommendations + DoT notifications (partly caught upstream via TRAI/Gazette), so the standalone registry adds mainly registration terms and app-provider approvals. Track only if the practice has public-Wi-Fi clients; otherwise low priority."
+  },
+  {
+   "authority": "Digital Communications Commission (DCC) \u2014 apex DoT body (ex-Telecom Commission)",
+   "url": "No standalone site; decisions surface via dot.gov.in press releases / notifications",
+   "instrument_types": "Policy and spectrum-pricing approvals, licence-framework decisions (announced, then executed as DoT notifications)",
+   "binds_whom": "All telecom licensees (indirectly, through the DoT instruments that implement DCC decisions)",
+   "covered_by_us": "partial",
+   "importance": "moderate",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Not a separate feed \u2014 the DCC decides, then DoT/the Gazette issues the operative instrument. Adequately captured once the DoT own-website stream (row 1) is added; no independent harvest target. Listed so it is not mistaken for an uncovered authority."
+  },
+  {
+   "authority": "Department of Space / Indian Space Policy (DoS) \u2014 satcom policy layer above IN-SPACe",
+   "url": "https://www.isro.gov.in/ ; policy at https://www.indiancst.in / dos.gov.in",
+   "instrument_types": "Indian Space Policy 2023 and successor policy documents, DoS/IN-SPACe overarching guidelines feeding satcom authorisation",
+   "binds_whom": "Satellite operators, NGSO/GSO constellation applicants, satcom service providers (via IN-SPACe authorisation + DoT/WPC spectrum)",
+   "covered_by_us": "partial",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The operative satcom authoriser \u2014 IN-SPACe \u2014 is already covered, and DoT/WPC handle spectrum. DoS/ISRO add the policy backdrop (Indian Space Policy 2023) rather than client-binding instruments, so this is a moderate/niche top-up, not a core gap. Track the policy page only if the satcom practice needs the upstream signal."
+  },
+  {
+   "authority": "C-DOT / NTIPRIT / TERM cells (DoT field & attached units)",
+   "url": "https://www.cdot.in/ ; TERM cells operate internally under DoT LSAs",
+   "instrument_types": "C-DOT standards/reference designs (PM-WANI, interception), NTIPRIT training notes, TERM-cell EMF-compliance and enforcement actions",
+   "binds_whom": "Vendors interfacing with C-DOT standards; licensees on EMF/enforcement (TERM)",
+   "covered_by_us": "gap",
+   "importance": "niche",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Genuinely low priority. TERM-cell enforcement (EMF self-certification, subscriber-verification audits) can change a licensee's operational obligations, but the instruments are internal/LSA-level and effectively unpublished \u2014 a partner learns of them via client notices and DoT circulars, not a public feed. C-DOT is R&D, not a regulator. Note for completeness; do not build a scraper for it."
+  },
+  {
+   "authority": "MeitY \u2014 Ministry of Electronics and IT (direct site: Orders & Notices, Gazette Notifications, Acts & Policies, Guidelines via meity.gov.in WP-JSON API)",
+   "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Orders%20and%20Notices&sort=acf&order=DESC&search=",
+   "instrument_types": "IT Rules 2021 Part II amendments, SSMI additional due-diligence notifications, s.79 due-diligence advisories, deepfake/synthetic-media & GenAI advisories, GAC constitution/reconstitution notifications, draft rules issued for consultation, office memoranda, press notes",
+   "binds_whom": "all intermediaries incl. Significant Social Media Intermediaries (social platforms, messaging), and via advisories AI/GenAI platforms and app stores",
+   "covered_by_us": "partial",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The single highest-value gap in this slice and the most embarrassing to miss. e-Gazette (gazette_meity, live) catches the FINAL notified rule \u2014 e.g. the IT (Intermediary Guidelines) Amendment Rules 2026 on synthetically generated information, in force 20 Feb 2026 \u2014 so notified rules are not lost. What is lost is everything MeitY posts on its own site but never gazettes: the pre-notification SGI DRAFT (22 Oct 2025), the Nov-2023/Mar-2024 deepfake advisories, GenAI advisories, s.79 letters, and GAC/blocking administrative notices, which live only under meity.gov.in 'Orders & Notices' / PIB. Verified: the WP-JSON API returns clean JSON and robots is 'Allow: /'. Crucially the 4 meity_* endpoints are ALREADY discovered in registry_v2.json but parked at status 'needs_decision' (not live) \u2014 promoting them to live is the top action."
+  },
+  {
+   "authority": "MHA / I4C \u2014 Sahyog portal (s.79(3)(b) content-removal notices)",
+   "url": "https://sahyog.mha.gov.in/",
+   "instrument_types": "s.79(3)(b) takedown/removal notices routed from authorized central/state agencies and police to intermediaries; onboarding and nodal-officer directions",
+   "binds_whom": "every intermediary onboarded to Sahyog (X/Twitter, Meta, Google/YouTube, and all notified platforms)",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "unpublished",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "THE live intermediary-liability battleground of 2025. Karnataka HC (Nagaprasanna J.), X Corp v Union of India, 24 Sept 2025 (351 pp), UPHELD the Sahyog portal, Rule 3(1)(d) and the s.79(3)(b) blocking power against X's argument that only s.69A can block; X Corp filed a writ appeal on 14 Nov 2025. The notices themselves are structurally untrackable \u2014 sahyog.mha.gov.in returned http 000 (closed to non-onboarded), notices are visible only to the served intermediary. Trackable proxies only: the enabling Rule 3(1)(d) (gazette-recoverable), MHA/PIB press, and the client being served. Flag as a monitored blind spot, not a scrapeable feed."
+  },
+  {
+   "authority": "Grievance Appellate Committee(s) (GAC) \u2014 MeitY (Rule 3A, IT Rules 2021)",
+   "url": "https://gac.gov.in/",
+   "instrument_types": "appellate orders reviewing intermediary grievance-officer decisions (content takedown/retention, account suspension/removal)",
+   "binds_whom": "all intermediaries \u2014 statutorily bound to comply with GAC orders under Rule 3A",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "unpublished",
+   "legal_to_fetch": "check_robots",
+   "notes": "Three GACs, constituted by the Oct-2022 amendment, operational since 1 Mar 2023 \u2014 a large and growing body of de facto content-moderation precedent that binds every intermediary. Portal shows 60,147 appeals received / 11,197 disposed (fetched 27 Aug 2026). But there is NO public orders repository: each order is visible only to the appellant behind OTP + captcha login (bot-detection \u2014 must not be bypassed). No robots.txt, but a Terms of Service gate applies. The only public artefacts are the aggregate counters and the MeitY constitution/reconstitution notifications (gazette-recoverable). Genuine high-severity gap with no clean instrument feed; a partner learns of GAC reasoning from the client's own appeals and occasional press."
+  },
+  {
+   "authority": "MeitY Designated Officer + Inter-departmental Committee (s.69A blocking; IT Procedure and Safeguards for Blocking Rules 2009)",
+   "url": "",
+   "instrument_types": "s.69A blocking directions to intermediaries/ISPs; Review Committee decisions; emergency blocking orders",
+   "binds_whom": "intermediaries, ISPs and telcos served with blocking directions",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "unpublished",
+   "legal_to_fetch": "unknown",
+   "notes": "Confidential by design \u2014 Rule 16 of the 2009 Blocking Rules imposes strict confidentiality on requests and actions, so individual orders are published nowhere. This is central to the practice but is not a wireable web source: a partner learns of orders from the served client, from litigation (Shreya Singhal 2015; the Twitter/X v Union of India s.69A challenge, Karnataka HC 2023), from RTI, and from aggregate figures in Parliament answers and MeitY press. The 2009 Blocking Rules text is gazette-recoverable; the orders are not. Record explicitly as a known structural blind spot so it is not mistaken for coverage."
+  },
+  {
+   "authority": "Indian Cyber Crime Coordination Centre (I4C) / Ministry of Home Affairs",
+   "url": "https://i4c.mha.gov.in/",
+   "instrument_types": "cyber advisories/alerts, blocking recommendations that feed s.69A app/URL bans, SOPs and directions to intermediaries, mule-account / 'digital arrest' / betting-&-loan-app advisories",
+   "binds_whom": "intermediaries, payment & UPI intermediaries, and app stores \u2014 indirectly via notices, blocking recommendations and onboarding demands",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "I4C is the operational engine behind Sahyog and much of the s.69A app-blocking wave (it drove blocking of thousands of URLs and betting/loan apps across 2024-25). i4c.mha.gov.in is reachable static HTML but thin on instruments; the sister citizen portal cybercrime.gov.in returned an 'Unauthorised Access' wall to non-browser requests, so treat it as terms-restricted. Most of I4C's client-relevant output actually surfaces through PIB rather than its own sites, which argues for capturing it via the PIB signal lane."
+  },
+  {
+   "authority": "Press Information Bureau (PIB) \u2014 MeitY / MHA releases feed",
+   "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+   "instrument_types": "government press releases announcing app bans, s.69A blocking counts, advisories and rule notifications (signal source, not a primary instrument publisher)",
+   "binds_whom": "no direct binding effect \u2014 the tripwire that surfaces MeitY/MHA/I4C action affecting intermediaries before or instead of any published instrument",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Frequently the ONLY public trace of a s.69A blocking action or app ban, and the first surfacing of drafts (e.g. the Oct-2025 SGI draft press note). Already discovered in registry_v2.json as pib_moc but parked at status 'needs_decision' (not live). pib.gov.in is already in the robots snapshot and the RSS feed is clean \u2014 a low-cost, high-value signal lane. Decide and enable; pair it with the MeitY-direct promotion to close most of the non-gazetted-advisory gap."
+  },
+  {
+   "authority": "PIB Fact Check Unit (FCU) \u2014 Rule 3(1)(b)(v), IT Rules 2021 (MeitY notified, MIB/PIB operated)",
+   "url": "",
+   "instrument_types": "fact-check flags deeming government-related content 'fake/false/misleading' (mechanism struck down)",
+   "binds_whom": "intermediaries \u2014 would have lost safe harbour over FCU-flagged content; now moot",
+   "covered_by_us": "gap",
+   "importance": "niche",
+   "reachable": "not_online",
+   "legal_to_fetch": "unknown",
+   "notes": "Included only to close the loop and prevent a false 'we should add this' impulse: the Rule 3(1)(b)(v) FCU amendment was struck down as unconstitutional by the Bombay High Court (Kunal Kamra v Union of India, tie-breaker judgment 20 Sept 2024). There is no live binding mechanism \u2014 do NOT wire a source. Keep only a watch note in case of legislative revival or a Digital India Act successor provision."
+  },
+  {
+   "authority": "MeitY (Ministry of Electronics & IT) \u2014 own website publications (advisories, AI guidelines, draft-rule consultations, office memoranda, press notes)",
+   "url": "https://www.meity.gov.in/",
+   "instrument_types": "IT Act rules & amendments (gazetted), plus the non-gazetted layer that actually moves first: AI/due-diligence advisories, the India AI Governance Guidelines, draft rules put out for consultation, office memoranda, sectoral directions and press notes",
+   "binds_whom": "Every intermediary, social media intermediary, SSMI, OTT/streaming, gaming, e-commerce and AI/GenAI deployer; and via DPDP, every data fiduciary",
+   "covered_by_us": "partial",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "This is the #1 embarrassing gap. We only have the Gazette-MeitY route, which catches gazetted rules (DPDP Rules notified 14 Nov 2025; IT Rules synthetic-content/deepfake 'SGI labelling' amendment notified 10 Feb 2026) \u2014 but MISSES the instruments that hit clients first and never touch the Gazette: the India AI Governance Guidelines (released 5 Nov 2025), the March 2024 GenAI due-diligence advisories, and consultation drafts (e.g. the Oct 2025 draft AI/deepfake rules, comments to 13 Nov 2025). Those are letters/guidelines/OMs on the MeitY site only. Site is a Next.js SPA (__NEXT_DATA__ JSON in-page; PDFs served static at /static/uploads/...); robots is 'Allow: /'. Scrape whats-new + document/notification listings and the PDF store. Highest-value add in this slice."
+  },
+  {
+   "authority": "Data Protection Board of India (DPBI)",
+   "url": "https://www.meity.gov.in/ (Board has no standalone portal live yet \u2014 dpb.gov.in / dpbi.gov.in do not resolve)",
+   "instrument_types": "Adjudication orders, directions to remediate/mitigate breaches, monetary penalties, and interim directions under the DPDP Act 2023 / DPDP Rules 2025",
+   "binds_whom": "Every data fiduciary and Significant Data Fiduciary \u2014 i.e. effectively every TMT client processing personal data (platforms, telcos, adtech, SaaS, fintech, consent managers)",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "not_online",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "No longer hypothetical: Board constituted 13 Nov 2025; Chairperson and Members appointed 6 June 2026, so first inquiries/penalties are imminent. This is the enforcement engine of DPDP and the single biggest FUTURE gap. The Rules make it 'digital by design', so a dedicated e-adjudication portal is expected \u2014 set a watch for it. Until then, constitution/appointments come via Gazette-MeitY and MeitY press; early orders will surface through MeitY and press before any portal. Track proactively; do not wait for the portal to appear."
+  },
+  {
+   "authority": "NCIIPC (National Critical Information Infrastructure Protection Centre), s.70A IT Act",
+   "url": "https://nciipc.gov.in/ (unreachable externally \u2014 ECONNREFUSED / walled to gov networks)",
+   "instrument_types": "s.70 'protected system' designations (Gazette-notified), CII protection guidelines, sectoral advisories/vulnerability disclosures, and compliance under the IT (Information Security Practices for Protected System) Rules 2018",
+   "binds_whom": "Any TMT entity whose infrastructure is designated CII \u2014 large telcos, data centres, cloud/hosting, submarine-cable and IXP operators, digital-payment rails",
+   "covered_by_us": "partial",
+   "importance": "high",
+   "reachable": "gazette_only",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "Split source. The binding act \u2014 a s.70(1) protected-system designation \u2014 is a Gazette notification, so Gazette-MeitY partially catches it (worth an explicit NCIIPC/protected-system keyword filter on the Gazette feed). The NCIIPC site itself (its CII guidelines, RVDP advisories, threat notes) actively refuses external connections from our vantage \u2014 treat as not_online for crawling. A designation converts a client into a s.70-protected-system operator with audit/reporting duties, so missing one is material even though volume is low."
+  },
+  {
+   "authority": "UIDAI (Unique Identification Authority of India) \u2014 Aadhaar",
+   "url": "https://uidai.gov.in/",
+   "instrument_types": "Aadhaar (Authentication & Offline Verification) Regulations and amendments, circulars/directions to AUAs/KUAs/ASAs/Sub-AUAs, and eKYC/face-auth operational directions",
+   "binds_whom": "Every Aadhaar-authentication user \u2014 telecom SIM onboarding, fintech/banking eKYC, DigiLocker-adjacent platforms, any TMT client doing Aadhaar-based verification",
+   "covered_by_us": "partial",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "As the practice already treats it, gazette-only for us: gazetted Aadhaar regulation amendments are recoverable via Gazette-MeitY (partial), but the UIDAI website's circulars/OMs to the auth ecosystem are missed \u2014 and the site is robots 'Disallow: /', so polite crawling is off-limits; the Gazette is the clean route. Recent proof it moves obligations: the 2025-26 face-authentication push and the revamped Aadhaar app / Good-Governance Aadhaar-sharing rules changed onboarding duties for AUAs. Keep on the gazette-recoverable watch with UIDAI/Aadhaar keyword filters."
+  },
+  {
+   "authority": "s.69A blocking regime \u2014 MeitY blocking committee under the IT (Blocking) Rules 2009",
+   "url": "https://www.meity.gov.in/ (orders themselves not published)",
+   "instrument_types": "Content/URL/app blocking directions to intermediaries and telcos under s.69A",
+   "binds_whom": "Social media intermediaries, ISPs/telcos, app stores, streaming and hosting providers",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "unpublished",
+   "legal_to_fetch": "unknown",
+   "notes": "Structurally untrackable at source: Rule 16 of the Blocking Rules 2009 makes these directions confidential, so there is no feed to scrape and no honest way to 'cover' them directly. Say so plainly. A partner actually learns of them from (a) the client intermediary that receives the order, (b) litigation \u2014 the X Corp v Union of India challenge in the Karnataka High Court (2025) to the s.79(3)(b)/Sahyog blocking practice is the live proof \u2014 and (c) platform transparency reports (X/Google) and press. Recommend a litigation/press signal rather than a source crawler."
+  },
+  {
+   "authority": "CCA (Controller of Certifying Authorities), s.17 IT Act",
+   "url": "https://cca.gov.in/guidelines.html",
+   "instrument_types": "Interoperability Guidelines for DSC, Certificate Policy, Identity Verification Guidelines, SSL/e-Sign framework, PKI and CA-licensing/audit guidelines",
+   "binds_whom": "Licensed Certifying Authorities, eSign ASPs/ESPs, trust-service and eKYC providers, and any TMT/fintech client relying on DSC/eSign for onboarding or document execution",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Clean and easy to add: plain static HTML, no robots.txt (404), PDFs at /sites/files/pdf/guidelines/. Actively maintained \u2014 Interoperability Guidelines for DSC (CCA-IOG), Identity Verification (CCA-IVG) and SSL-issuance (CCA-SSL) guidelines carry 2026 revision dates. Moderate rather than high for a broad TMT partner (matters most to fintech onboarding, eSign vendors and CAs), but it is a low-effort, defensible catch that rounds out the digital-trust corner of the slice."
+  },
+  {
+   "authority": "I4C (Indian Cyber Crime Coordination Centre), MHA",
+   "url": "https://i4c.mha.gov.in/ / https://cybercrime.gov.in/",
+   "instrument_types": "Advisories and directions on mule accounts, app/URL/website blocking, SIM/handset actions, and the 'Suspect Registry' \u2014 largely via letter-directions to intermediaries, telcos and banks",
+   "binds_whom": "Social media and payment intermediaries, telcos, fintech/UPI players, app stores",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "Boundary item (MHA, not MeitY) but rising fast and a broad TMT partner feels it \u2014 I4C is the operational hub behind mass app/URL blocking and mule-account/telecom actions (Sanchar Saathi/Chakshu adjacency). Much of what binds clients arrives as non-public letter-directions, so like s.69A it is only partly trackable; the site carries advisories/press worth a light crawl. Flag as an awareness/press signal, not a comprehensive source. Note also the DoT Telecom (Telecom Cyber Security) Rules 2024 sit at this boundary \u2014 likely the telecom analyst's lane, but confirm it is owned somewhere."
+  },
+  {
+   "authority": "CERT-In (Indian Computer Emergency Response Team), s.70B IT Act",
+   "url": "https://www.cert-in.org.in/",
+   "instrument_types": "s.70B(6) Directions, security guidelines (CISG), advisories (CIAD), vulnerability notes (CIVN)",
+   "binds_whom": "All body corporates, intermediaries, data centres, VPN/cloud providers, VDA exchanges \u2014 near-universal TMT reach",
+   "covered_by_us": "covered",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Already fully covered across all four lanes (directions, CISG, CIAD, CIVN) \u2014 restated here as the anchor of the cyber corner so the map is complete. The load-bearing instrument remains the 28 Apr 2022 s.70B(6) Directions (6-hour incident reporting, 180-day log retention). No gap; keep the existing crawlers. Confirm the s.70B(6) directions lane keeps catching any fresh directions/FAQs, since new directions arrive irregularly and out of the advisory cadence."
+  },
+  {
+   "authority": "STQC (Standardisation Testing & Quality Certification Directorate), MeitY",
+   "url": "https://www.stqc.gov.in/",
+   "instrument_types": "Empanelment of information-security auditors, audit standards/GIGW conformity, and eSign/data-centre audit criteria",
+   "binds_whom": "CII operators and data fiduciaries needing empanelled audits; eSign/ASP infrastructure; e-gov service providers",
+   "covered_by_us": "gap",
+   "importance": "niche",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "Genuinely niche \u2014 STQC sets who can audit (empanelled auditor lists) and the conformity criteria that CII/DPDP/eSign audits are measured against, rather than issuing obligations directly. Relevant when advising on audit-vendor selection or GIGW conformance. Low priority; list it for completeness but do not prioritise over MeitY/DPBI/NCIIPC. (For context: there is still no statutory AI regulator \u2014 AI in this slice lives inside MeitY via advisories and the AI Governance Guidelines; the IndiaAI Mission / AI Safety Institute are capacity bodies, not rule-issuers, so nothing to crawl there yet.)"
+  },
+  {
+   "authority": "CCPA \u2014 Central Consumer Protection Authority (Dept of Consumer Affairs)",
+   "url": "https://ccpa.doca.gov.in/",
+   "instrument_types": "Guidelines (Prevention of Misleading Advertisements & Endorsements 2022; Dark Patterns 2023), advisories, safety notices, and final orders/penalties under the Consumer Protection Act 2019",
+   "binds_whom": "Every advertiser, manufacturer, service provider, endorser/influencer, ad agency, e-commerce platform, and any broadcaster/OTT/print outlet carrying the ad \u2014 the single broadest advertising-conduct regulator in the slice",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The biggest embarrassment gap. This is the statutory teeth behind advertising that ASCI (self-reg) lacks. Extremely live: June 2025 self-audit advisory on dark patterns (in force to 31 Dec 2026); nine platforms penalised over 2025-26 (Zepto, BookMyShow, IndiGo, PhysicsWallah, FirstCry, SpiceJet); new misleading-advertisement/endorsement guidelines flagged Mar 2026. Orders live at ccpa-orders.php and doca.gov.in/ccpa/orders-advisories.php; final-orders PDF served directly. Sits under DoCA \u2014 NOT captured by our Communications/MeitY/MIB gazette lanes, so genuinely invisible to us today."
+  },
+  {
+   "authority": "DPCGC \u2014 Digital Publisher Content Grievances Council (IAMAI Level-II SRB)",
+   "url": "https://www.dpcgc.in/",
+   "instrument_types": "Level-II self-regulatory advisories, grievance/appeal decisions, and Code-of-Ethics guidance issued under IT (Intermediary Guidelines & Digital Media Ethics Code) Rules 2021, Part III",
+   "binds_whom": "OTT / online curated-content publishers and digital news publishers that are IAMAI members \u2014 the SRB tier every OTT client answers to before MIB's Level-III steps in",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "Critical for any OTT client but genuinely awkward to reach: dpcgc.in is a Squarespace 'Private Site' (meta noindex), and dpcgc.org returned HTTP 509 (bandwidth exceeded) \u2014 i.e. content is only semi-published, usually surfacing via press releases and PDF advisories rather than a clean index. Feb 2025 advisory told all OTTs to comply with the Code of Ethics and obscenity law; the July 2025 MIB blocking of 25 OTT apps is the enforcement backdrop that makes the SRB tier matter. A partner realistically tracks this via IAMAI press + trade media, not the site."
+  },
+  {
+   "authority": "NBDSA \u2014 News Broadcasting & Digital Standards Authority (NBDA)",
+   "url": "https://www.nbdanewdelhi.com/decisions/orders",
+   "instrument_types": "Adjudicatory orders (with fines), advisories, and the NBDA's own News Broadcasting & Digital Standards Regulations/Guidelines",
+   "binds_whom": "News-TV broadcasters that are NBDA members and \u2014 since the June 2025 Regulations amendment \u2014 their digital news operations",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Every news-broadcaster client tracks NBDSA orders closely; they set de-facto content standards ahead of any MIB action. 2025 run is heavy: nine orders on communal reporting/privacy (Zee News fined Rs 25,000); 9 Jun 2025 advisory on misleading tickers/thumbnails directing Times Now Navbharat to edit; NBDA amended its Regulations Jun 2025 to fold digital news under NBDSA. Orders index is clean static HTML; robots.txt blocks only /admin/ and /beta/."
+  },
+  {
+   "authority": "BCCC / IBDF \u2014 Broadcasting Content Complaints Council + Digital Media Content Regulatory Council (DMCRC)",
+   "url": "https://ibdf.com/bccc-decisions/",
+   "instrument_types": "BCCC decisions/orders and IBDF self-regulatory content guidelines for non-news TV; DMCRC (IBDF's Level-II OTT SRB) grievance decisions",
+   "binds_whom": "General-entertainment (non-news) TV broadcasters that are IBDF members via BCCC; IBDF-member OTT platforms via DMCRC",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The GEC-TV counterpart to NBDSA and the IBDF-side OTT SRB \u2014 completes the self-reg map (NBDSA=news, BCCC=GEC TV, DPCGC/DMCRC=OTT). Live domain is ibdf.com (ibdf.org.in is dead); BCCC has published decisions since 2011 and the decisions page is public. bcccindia.org also resolves (robots fully permissive). Note the correction to the partner's shorthand: DPCGC is IAMAI's body, while IBDF's own OTT SRB is DMCRC \u2014 both are MIB-recognised Level-II bodies."
+  },
+  {
+   "authority": "MIB \u2014 IT Rules Part III Level-III / Inter-Departmental Committee + IT Act s.69A blocking orders",
+   "url": "https://mib.gov.in/",
+   "instrument_types": "Inter-Departmental Committee recommendations, MIB Level-III oversight directions, and content-blocking orders under IT Act s.69A read with the Blocking Rules 2009",
+   "binds_whom": "OTT / digital-news publishers and intermediaries \u2014 the government tier above the SRBs",
+   "covered_by_us": "partial",
+   "importance": "high",
+   "reachable": "unpublished",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "We capture MIB's public face (mib_orders_notices, mib_digital_media, gazette_mib), but the operative s.69A/Blocking orders are confidential under Rule 16 and are NOT published. The July 2025 blocking of 25 OTT apps is the live example: the order itself never surfaced \u2014 a partner learns of these only via MIB press release, the platform's own takedown notice, or a court record when litigated. Worth an explicit 'unpublished \u2014 track via press/litigation' note in the tracker so the gap is acknowledged rather than silently missed."
+  },
+  {
+   "authority": "CBC \u2014 Central Bureau of Communication (formerly DAVP)",
+   "url": "https://cbcindia.gov.in/",
+   "instrument_types": "Empanelment policy, advertising rate cards / periodic rate revisions, New Media advertising policy, and guidelines for release of government advertisements",
+   "binds_whom": "Newspapers/periodicals, TV & radio channels, and digital/web media (and their agencies) that want to carry government advertising",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Procurement-side, not conduct regulation \u2014 but it does change client obligations: empanelment criteria and rate/circulation-verification rules bind any media outlet seeking govt ad revenue, and the partner's slice explicitly names it. gov.in, static; robots blocks only /cbc/public/uploads/mandate/. Lower priority than the SRBs/CCPA because it binds a narrower set and only when a client opts into govt advertising."
+  },
+  {
+   "authority": "GAC \u2014 Grievance Appellate Committee(s) (MeitY)",
+   "url": "https://gac.gov.in/",
+   "instrument_types": "Appellate orders reviewing intermediary grievance-officer decisions under IT Rules 2021, Rule 3A",
+   "binds_whom": "Social-media and other intermediaries \u2014 cross-slice, but its content-restoration/removal orders can reach digital publishers and OTT",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "Sits more in the intermediary/social-media slice than broadcast, but flagged for completeness because GAC orders can force content restoration or takedown that a media/OTT client cares about. Constituted 2022-23; orders exposed via the gac.gov.in portal (JS front-end \u2014 verify extraction path). Recommend it be owned by the social-media/intermediary slice rather than this one, but it should not fall through the cracks."
+  },
+  {
+   "authority": "MIB \u2014 Broadcasting/Cable/Uplinking-Downlinking + Broadcasting Bill",
+   "url": "https://mib.gov.in/",
+   "instrument_types": "Acts/policies/guidelines (Uplinking & Downlinking Guidelines 2022, Cable TV Networks Rules incl. Advertising & Programme Codes), orders, advisories, and any Broadcasting Services (Regulation) Bill drafts",
+   "binds_whom": "TV broadcasters, teleports/uplinking licensees, MSOs/LCOs/DTH, and (via draft Bill) potentially OTT/digital news",
+   "covered_by_us": "covered",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Already covered via mib_acts_policy, mib_broadcasting, mib_orders_notices, mib_advisories and gazette_mib. No new source needed \u2014 but confirm the broadcasting-wing scrape actually lands the Uplinking/Downlinking guideline PDFs and any re-tabled Broadcasting Bill, since those are the highest-value MIB instruments for this slice."
+  },
+  {
+   "authority": "CBFC \u2014 Central Board of Film Certification",
+   "url": "https://www.cbfcindia.gov.in/",
+   "instrument_types": "Certification orders, circulars, and certification guidelines",
+   "binds_whom": "Film producers/distributors and theatrical/streaming release of certified films",
+   "covered_by_us": "covered",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Covered. No gap. Post-Cinematograph (Amendment) Act 2023 the age-based categories (UA 7+/13+/16+) circulars flow through here \u2014 confirm the circulars lane catches them."
+  },
+  {
+   "authority": "PRGI \u2014 Press Registrar General of India (formerly RNI)",
+   "url": "https://prgi.gov.in/",
+   "instrument_types": "Advisories, public notices, registration rules under the Press and Registration of Periodicals Act 2023",
+   "binds_whom": "Newspaper/periodical publishers",
+   "covered_by_us": "covered",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Covered as PRGI. No gap \u2014 confirm coverage reflects the PRP Act 2023 regime (RNI superseded), which changed registration obligations for print clients."
+  },
+  {
+   "authority": "ASCI \u2014 Advertising Standards Council of India",
+   "url": "https://www.ascionline.in/",
+   "instrument_types": "Code, guidelines (influencer/'Guidelines for Influencer Advertising in Digital Media', greenwashing, etc.) and complaint outcomes/advisories",
+   "binds_whom": "Advertisers, agencies, endorsers/influencers, and media carrying ads (self-reg, but referenced by CCPA/sector regulators)",
+   "covered_by_us": "covered",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Covered. Note it is the self-reg twin of CCPA \u2014 keeping ASCI without CCPA is exactly the asymmetry to fix, since CCPA carries the statutory penalty power ASCI lacks."
+  },
+  {
+   "authority": "Online Gaming Authority of India (OGAI)",
+   "url": "https://www.meity.gov.in/ministry/our-organisation/details/online-gaming-authority-of-india-ogai-MzNxgjMtQWa",
+   "instrument_types": "The published list/blacklist of 'online money games'; codes of practice; directions and orders (s.9); registration decisions for e-sports and online social games; grievance-appeal decisions; enforcement/coordination directions to financial institutions and law enforcement",
+   "binds_whom": "Every online gaming platform, e-sports operator and online social-game operator offering to Indian users; indirectly the payment intermediaries and hosting/app-store intermediaries that carry them",
+   "covered_by_us": "partial",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "THE new central regulator for this whole slice, constituted under s.8 of PROGA 2025 as a digital-first attached office of MeitY (chaired by Addl. Secy MeitY, with JS-level members from MHA, DFS, MIB, MYAS, Legal Affairs). Act + Promotion and Regulation of Online Gaming Rules, 2026 notified 22 Apr 2026, in force 1 May 2026. gazette_meity catches the foundational notifications (the Act, the Rules, the s.8 constitution and s.15 investigation-officer notifications all hit the Gazette), which is why this is 'partial' not 'gap' \u2014 but OGAI's live operational stream (the codes of practice, the running list of banned money games, s.9 directions, registration grants/refusals, appeal outcomes) is digital-first on the MeitY/OGAI pages and is NOT reliably gazetted. That stream is the gap. Page confirmed HTTP 200, static template (~3KB), robots Allow:/. Note also: takedown of banned money-game apps runs through confidential MeitY s.69A blocking orders (Rule 16 IT Blocking Rules 2009) which are genuinely unpublished \u2014 a partner learns of those via client takedown/app-store delisting notices, press and IFF's blocking tracker, not from any portal."
+  },
+  {
+   "authority": "MeitY (nodal ministry \u2014 direct site, meity.gov.in)",
+   "url": "https://www.meity.gov.in/",
+   "instrument_types": "Online Gaming Rules 2026 and amendments; commencement/enforcement notifications; draft rules for consultation; office memoranda, clarifications, press notes and 'what's new'; the earlier (now overtaken) 2023 IT Rules online-gaming amendment",
+   "binds_whom": "All online gaming, platform and intermediary clients; the ministry that both writes the rules and hosts OGAI",
+   "covered_by_us": "partial",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "We hold gazette_meity, so gazette-notified rules are caught \u2014 but MeitY's own site is where the draft Rules 2025 (public-feedback version), OMs, clarifications and press notes land first, and sometimes only. A broad TMT partner cannot run gaming advice off the Gazette alone during a live rule-rollout. Concrete proof it matters: the draft Rules went up for consultation on meity.gov.in before the 22 Apr 2026 final; MeitY's 'banks as frontline gatekeepers' framing (Aug 2026) and the single-stage e-sports determination change surfaced via ministry communications, not the Gazette. Site HTTP 200, robots Allow:/. Recommend monitoring meity.gov.in notifications/whats-new as a distinct source, same way we treat other regulators directly rather than only via Gazette."
+  },
+  {
+   "authority": "State online gaming authorities \u2014 Tamil Nadu Online Gaming Authority (TNOGA) and peer state regimes (Karnataka, Telangana, AP; legacy skill-licence states Nagaland/Sikkim/Meghalaya)",
+   "url": "https://www.tn.gov.in/",
+   "instrument_types": "State RMG regulations (TNOGA: blackout/'blank' hours, Aadhaar-OTP KYC, deposit/time limits, addiction warnings); state gaming/gambling prohibition Acts and ordinances; historical skill-game licences",
+   "binds_whom": "Gaming operators serving residents of the relevant state",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "Recent concrete instrument: TNOGA (Real Money Games) Regulations, 2025 notified 12 Feb 2025 (midnight-5AM curfew, mandatory Aadhaar KYC, spend limits), upheld by the Madras HC. Practitioner caveat that drives the ranking: PROGA s.18 gives the central Act overriding effect and s.5 bans ALL online money games regardless of skill/chance, so the state RMG layer is now largely superseded for live business \u2014 Karnataka is preparing an SC challenge alleging federal overreach, and the Act itself is under challenge in the Supreme Court. So track this layer for the federalism litigation, transition/legacy exposure, and residual/offline gambling powers (e.g. the Bihar Gambling Act vs PROGA conflict flagged Aug 2026), not because states still license RMG. Authoritative text sits in each State Gazette; state portals (tn.gov.in HTTP 200) carry republications."
+  },
+  {
+   "authority": "RBI / NPCI (payment-rail gatekeeping for gaming)",
+   "url": "https://www.rbi.org.in/",
+   "instrument_types": "RBI circulars/directions to banks, PA-PGs and PSPs; NPCI/UPI operational circulars blocking or restricting money-game merchant categories; KYC and merchant-onboarding directions",
+   "binds_whom": "Payment-intermediary clients directly; gaming/platform clients indirectly through their payment rails",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "PROGA s.5 plus the 2026 Rules make banks and payment intermediaries 'frontline gatekeepers' \u2014 they must verify a game's legal classification before processing user funds (MeitY, Aug 2026). This is the actual enforcement chokepoint for the money-game ban, so it binds our gaming clients' cashflows even though RBI/NPCI are strictly the fintech desk's regulators. Flagging as a cross-slice touchpoint: if a fintech colleague already monitors RBI/NPCI, coordinate rather than duplicate; if not, the gaming-payment circulars are a genuine gap. rbi.org.in reachable; check robots for the notifications directory before crawling."
+  },
+  {
+   "authority": "FIU-IND / Enforcement Directorate (PMLA + offshore/crypto overlap)",
+   "url": "https://fiuindia.gov.in/",
+   "instrument_types": "PMLA directions and advisories to reporting entities; reporting-entity registration obligations; ED/FIU enforcement and show-cause actions against offshore money-gaming operators and VDA (crypto) exchanges",
+   "binds_whom": "Gaming platforms and PA-CBs as PMLA reporting entities; crypto exchanges (VDA reporting entities); offshore operators targeting Indian users",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "This is the fintech-crypto touchpoint the brief flags: PA-CBs must register with FIU-IND as a reporting entity before RBI authorisation, and the offshore-gaming/crypto nexus is live (ED/CBI/Interpol PIL alleging >Rs 2 lakh crore evasion via offshore operators; VDA reporting-entity regime since Mar 2023). Relevant to gaming clients running real-money or crypto-settled products and to any platform with an offshore arm. Caveat: many FIU directions to individual reporting entities are not publicly posted (effectively unpublished) \u2014 a partner learns of them via the client's own compliance notices, ED press releases and litigation, so treat the public site as partial signal only."
+  },
+  {
+   "authority": "Ministry of Youth Affairs and Sports / Department of Sports (e-sports nodal ministry)",
+   "url": "https://yas.gov.in/",
+   "instrument_types": "E-sports recognition and promotion notifications; the multi-sport-event recognition; e-sports eligibility/registration framework operated jointly with OGAI",
+   "binds_whom": "E-sports operators, organisers and leagues \u2014 the promoted/permitted category left standing after the money-game ban",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The Act splits administration: MeitY/OGAI for gaming generally, MIB for online social games, and MYAS/Department of Sports as the e-sports nodal ministry (building on the Dec 2022 President's amendment recognising e-sports as a multi-sport event). E-sports registration itself now runs under OGAI per the 2026 Rules, but eligibility and promotion flow through MYAS. Smaller client base than RMG, but e-sports is the one growth lane a gaming client can still legally pursue, so a broad TMT partner tracks it. yas.gov.in HTTP 200, static, likely clean."
+  },
+  {
+   "authority": "CBIC / GST Council (28% GST on online money gaming)",
+   "url": "https://cbic-gst.gov.in/",
+   "instrument_types": "CBIC rate notifications and circulars; GST Council decisions on valuation of online gaming supplies",
+   "binds_whom": "Online money-gaming operators (historically) and surviving permitted categories; a live retro-demand exposure for legacy operators",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "28% GST on full face value of bets (effective Oct 2023) was the sector's existential tax issue and the retrospective show-cause demands are still in Supreme Court litigation. Squarely the tax team's source, not a TMT regulator \u2014 flag it so the gaming-practice partner knows the exposure exists and routes it, rather than owning it. Forward relevance narrows post-ban (money games gone), but legacy demands persist. cbic-gst.gov.in publishes notifications as static PDFs."
+  },
+  {
+   "authority": "Industry self-regulatory / federation bodies (AIGF, E-Gaming Federation, FIFS) and the never-notified MeitY SRB mechanism",
+   "url": "https://www.aigf.in/",
+   "instrument_types": "Voluntary codes of ethics/conduct binding members only; the 2023 IT-Rules 'online gaming self-regulatory body' framework that was never operationalised",
+   "binds_whom": "Only voluntary members; no statutory reach",
+   "covered_by_us": "gap",
+   "importance": "niche",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "Included so the partner knows this is dead, not missing. MeitY's 2023 online-gaming SRB scheme never had a single SRB notified and is now overtaken by OGAI, which is a statutory regulator rather than an industry SRO. AIGF/EGF/FIFS are lobbying/standard-setting associations, not regulators \u2014 worth a light watch for industry-position signals (esp. around the SC challenge) but they issue nothing that binds a non-member client. Distinct from PRGI, which we already cover for press/media."
+  },
+  {
+   "authority": "ASCI (gaming advertising self-regulation) \u2014 already covered",
+   "url": "https://www.ascionline.in/",
+   "instrument_types": "Guidelines for advertising of online real-money gaming (mandatory disclaimers, restrictions); advisories against surrogate/illegal betting ads",
+   "binds_whom": "Gaming and platform advertisers (self-regulatory, with MIB backstop)",
+   "covered_by_us": "covered",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Listed for slice completeness: the gaming-advertising dimension is already caught via our ASCI source. With the money-game ban, ASCI's RMG-ad guidelines shift toward policing surrogate/offshore betting ads. The statutory ad-ban enforcement (PROGA prohibits advertising online money games) flows through OGAI/MIB, which our OGAI-gap and existing MIB coverage address \u2014 no new source needed here beyond confirming ASCI stays in scope."
+  },
+  {
+   "authority": "MIB (online social games administration + betting-ad advisories) \u2014 already covered",
+   "url": "https://mib.gov.in/",
+   "instrument_types": "Administration of 'online social games' category under the Act; advisories to media/OTT/social platforms against betting and money-game advertising/surrogates",
+   "binds_whom": "Broadcasters, OTT and social-media intermediaries carrying gaming/betting content and ads",
+   "covered_by_us": "covered",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Listed for completeness: the Act names MIB as administering authority for online social games, and MIB is our existing source (mib_advisories, mib_orders_notices, mib_digital_media). Its recurring betting/surrogate-ad advisories to broadcasters and platforms are the gaming-relevant output and are already in-tracker. No gap \u2014 but worth a note that MIB's role now carries a specific gaming mandate, so the gaming partner should read MIB output through that lens."
+  },
+  {
+   "authority": "CCI \u2014 Competition Commission of India",
+   "url": "https://www.cci.gov.in/combination",
+   "instrument_types": "Combination approval/rejection orders (s.31), abuse-of-dominance & anti-competitive-agreement orders (s.27), regulations (CCI (Combination) Regs 2024, Settlement Regs 2024, Commitment Regs 2024, Determination of Turnover/Income Regs 2024, General Regs), guidance notes, market study reports, weekly register of notified combinations",
+   "binds_whom": "Every TMT client doing M&A/JV/investment needing merger clearance (telecom, OTT/platforms, media, e-commerce, gaming, device makers) and any dominant digital platform facing abuse cases",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The single most embarrassing gap for a deals partner. Deal Value Threshold (INR 2,000 cr + 'substantial business operations in India') live since 10 Sep 2024 under CCI (Combination) Regs 2024 \u2014 now catches sub-threshold tech/digital acquisitions that used to escape review. Proof it bites: CCI's INR 213.14 cr penalty on Meta/WhatsApp (18 Nov 2024) over the 2021 privacy-policy data-sharing, plus ongoing Google Play/Android matters. robots.txt blocks only some /images/ dirs (pre-filing consultations are confidential by design); published orders and the weekly combination register are fully open. /antitrust/orders and /combination both show live 2025-2026 orders."
+  },
+  {
+   "authority": "DPIIT \u2014 Dept for Promotion of Industry & Internal Trade (Min. of Commerce & Industry)",
+   "url": "https://www.dpiit.gov.in/policies-rules-and-acts/press-notes-fdi-circular",
+   "instrument_types": "FDI Press Notes, annual Consolidated FDI Policy Circular, sectoral clarifications and Office Memoranda",
+   "binds_whom": "Any TMT client taking foreign investment: telecom (100%, security-conditioned), broadcasting/DTH/cable/FM/uplink-downlink caps, digital news media (26%), e-commerce marketplace (100% with inventory barred and Press Note 2/2018 conditions), satellite/space comms",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "robots is 'Allow: /' but the relaunched DPIIT site is an SPA shell (7KB, no press-note text in raw HTML) \u2014 the PN PDFs load via API; the same press notes are also gazette_recoverable and republished as standalone PDFs. Recent proof: Press Note 1 of 2024 liberalised space-sector FDI (satellites/launch vehicles/components) \u2014 direct to satellite-comms clients. IMPORTANT nuance for the pipeline: our existing e-Gazette lanes are ministry-scoped to Communications/MeitY/MIB and do NOT capture DPIIT (Commerce) notifications, so 'gazette is covered' does not close this gap. The enforceable cap ultimately lives in the FEMA NDI Rules (see RBI/DEA row); the press note is policy until the rule amendment lands."
+  },
+  {
+   "authority": "MCA \u2014 Ministry of Corporate Affairs",
+   "url": "https://www.mca.gov.in/",
+   "instrument_types": "Notifications commencing Competition (Amendment) Act 2023 provisions, exemption notifications (de-minimis/small-target, target exemption), Competition Act rules; Companies Act notifications/rules on schemes and compliance; custodian of the draft Digital Competition Bill",
+   "binds_whom": "Sets the merger-control perimeter for all TMT dealmakers (thresholds, exemptions, DVT/global-turnover commencement); Companies Act reaches every incorporated TMT client",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "mca.gov.in returns HTTP 403 to non-browser clients (bot-protected), so a scraper needs a headless browser OR should recover MCA notifications from the Gazette \u2014 but note again our Gazette lanes stop at Communications/MeitY/MIB and do not include Corporate Affairs. Concrete: the Sep 2024 MCA notification that commenced the Deal Value Threshold and the de-minimis/target exemption is what actually switched the CCI regime on. This is where the perimeter changes are notified, upstream of CCI itself."
+  },
+  {
+   "authority": "DGFT \u2014 Directorate General of Foreign Trade (Min. of Commerce & Industry)",
+   "url": "https://www.dgft.gov.in/CP/?opt=notification",
+   "instrument_types": "Foreign Trade Policy, Notifications (import policy / HS-code restrictions), Public Notices (procedure), Trade Notices, import authorisation / import management systems",
+   "binds_whom": "Device makers, telecom-gear importers, OEMs, data-centre/server importers, CCTV/IP-camera vendors",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The /CP portal serves full HTML notification and public-notice lists with 2025 and 2026 entries present (no robots.txt at all \u2014 public govt portal). Concrete proof: the IT-Hardware Import Management System for HSN 8471 (laptops/tablets/servers), originating in Notification 23/2023, was continued/extended into 2025 requiring import authorisation \u2014 a direct on/off switch for hardware clients' ability to import. Recurring restrictions also hit telecom/CCTV items. Like DPIIT, DGFT is Commerce-ministry and not caught by our current gazette lanes."
+  },
+  {
+   "authority": "NCLAT \u2014 National Company Law Appellate Tribunal",
+   "url": "https://nclat.nic.in/",
+   "instrument_types": "Appellate judgments and daily orders on CCI decisions (and Companies Act / IBC appeals)",
+   "binds_whom": "Any TMT client appealing or affected by a CCI combination or abuse order \u2014 a CCI order is not settled law until NCLAT (then Supreme Court)",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Drupal site; robots is standard (only admin/user/search paths disallowed), judgment/order pages open. This is the sister of our existing TDSAT coverage: we track the telecom tribunal but not the competition appellate tier. Proof it changes the client's actual obligation: NCLAT (23 Jan 2025) stayed CCI's 5-year data-sharing ban on Meta/WhatsApp pending appeal \u2014 the operative restraint on the client moved at the appellate stage, not the CCI stage."
+  },
+  {
+   "authority": "RBI / FEMA Non-Debt Instruments Rules (rule-maker: MoF \u2014 Dept of Economic Affairs)",
+   "url": "https://www.rbi.org.in/Scripts/BS_FemaNotifications.aspx",
+   "instrument_types": "FEMA (Non-Debt Instruments) Rules amendments (DEA), RBI A.P. (DIR Series) circulars, Master Direction on Foreign Investment, FEMA notifications; FDI reporting via FIRMS/SMF",
+   "binds_whom": "Every TMT client receiving FDI \u2014 the NDI Rules are where the DPIIT sector caps/conditions become enforceable law; entry route, pricing, reporting all sit here",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "rbi.org.in ASPX notification pages return full HTML (113KB). The practitioner point: a DPIIT press note only bites once mirrored into the NDI Rules by a DEA amendment (e.g., space-sector liberalisation had to be carried into the NDI Rules). A partner tracks the rule/circular, not just the press note \u2014 so this pairs with the DPIIT row rather than duplicating it. RBI has site terms/copyright; verify before bulk fetch."
+  },
+  {
+   "authority": "BIS \u2014 Bureau of Indian Standards (Compulsory Registration Scheme)",
+   "url": "https://www.crsbis.in/BIS/",
+   "instrument_types": "CRS orders/notifications, product-inclusion notifications, Quality Control Orders bringing electronics/telecom goods under mandatory registration",
+   "binds_whom": "Device makers and importers \u2014 phones, laptops, wireless gear, IoT, adapters must be BIS-registered to be sold or imported in India",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "crsbis.in/BIS returns a 62-byte JS shell (portal is app-rendered); the CRS product list and orders are PDFs on bis.gov.in / the CRS portal. Adjacency to note: some standards flow via the MeitY gazette (partially covered), but the CRS inclusion orders themselves are BIS instruments and are a genuine gap. Matters because a hardware client's ability to import/sell turns on the current CRS product list, which keeps expanding to new electronics/telecom categories."
+  },
+  {
+   "authority": "Digital Competition Bill / Committee on Digital Competition Law (MCA)",
+   "url": "https://www.mca.gov.in/",
+   "instrument_types": "Draft Digital Competition Bill, CDCL committee report, and the future ex-ante regulations that would designate Systemically Significant Digital Enterprises (SSDEs) with pre-emptive do's/don'ts",
+   "binds_whom": "Large digital platforms (search, social, ad-tech, app stores, e-commerce, cloud) that would face ex-ante obligations instead of ex-post CCI cases",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "not_online",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "Distinct watch-item stream (kept separate from the MCA row because it is a pipeline of consultation drafts, not yet an operative instrument). MCA released the draft Bill and CDCL report in Mar 2024; not yet enacted. A platform partner tracks its progress because it would flip platform obligations from ex-post enforcement to ex-ante compliance \u2014 importance jumps to high the moment it is notified. Until then it is a consultation/press item, not law online."
+  },
+  {
+   "authority": "NCLT \u2014 National Company Law Tribunal",
+   "url": "https://www.nclt.gov.in/",
+   "instrument_types": "Orders sanctioning schemes of arrangement/amalgamation (Companies Act s.230-232), oppression & mismanagement orders, cause lists",
+   "binds_whom": "TMT clients executing mergers/demergers by court-approved scheme \u2014 deal structure and timing, separate from CCI clearance",
+   "covered_by_us": "gap",
+   "importance": "niche",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "nclt.gov.in rejects plain curl (HTTP 400 \u2014 needs browser headers). Relevant to deal-execution mechanics rather than obligation-changing rule-making, so lower priority than NCLAT for this competition/FDI slice. Include only if the tracker wants deal-plumbing coverage; a broad TMT partner would rarely be embarrassed to miss a specific NCLT scheme order compared to a CCI/DPIIT change."
+  },
+  {
+   "authority": "CBIC / Customs \u2014 tariff on telecom & electronics",
+   "url": "https://www.cbic.gov.in/",
+   "instrument_types": "Customs tariff notifications, IGCR rules, exemptions/PMP duty changes on telecom & electronics inputs",
+   "binds_whom": "Device makers and importers \u2014 affects duty/landed cost of phones, components, telecom gear",
+   "covered_by_us": "gap",
+   "importance": "niche",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "Lowest priority in this slice: changes hardware economics (e.g., annual Budget duty tweaks on phone components / phased-manufacturing programme) but rarely changes a client's core legal obligation to operate. Flag as a candidate only if the practice wants cost/trade-duty signal; otherwise DGFT + BIS carry the import-side obligations that actually gate market access."
+  },
+  {
+   "authority": "Central Consumer Protection Authority (CCPA), Department of Consumer Affairs \u2014 consumer-protection wing (dark patterns, e-commerce rules, endorsement/influencer guidance, drip pricing)",
+   "url": "https://doca.gov.in/",
+   "instrument_types": "CCPA guidelines (dark patterns, misleading-advertisement & endorsement), safety notices, penalty/discontinuation orders, self-audit advisories; DoCA rules & draft rules (Consumer Protection (E-Commerce) Rules); PIB press releases carry most CCPA orders",
+   "binds_whom": "e-commerce platforms & marketplaces, social-media & search intermediaries carrying paid promotions, D2C/online sellers, celebrity/influencer endorsers and virtual influencers, device & electronics sellers making performance claims",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "Single biggest hole in the slice \u2014 reaches nearly every e-commerce/platform/influencer client. Concrete 2025 instrument: CCPA advisory of 5 June 2025 directing all e-commerce platforms to self-audit for dark patterns within 3 months and file self-declarations, on top of the Guidelines for Prevention and Regulation of Dark Patterns, 2023 (13 specified patterns \u2014 drip pricing, basket-sneaking, false urgency, subscription traps). Endorsement 'Know-hows' (2023) + health/wellness influencer guidance also live here. OPERATIONAL WARNING: the old host consumeraffairs.nic.in now times out entirely; DoCA has migrated to doca.gov.in (TLS cert expired \u2014 fetch with -k). Content is a JS/portal shell with guidelines/orders as PDFs; many CCPA orders surface first via PIB, so pair the site with a PIB Consumer Affairs feed. ASCI (covered) is only the self-regulatory mirror of this \u2014 it is not a substitute for the statutory CCPA."
+  },
+  {
+   "authority": "Legal Metrology Division, Department of Consumer Affairs (Directorate of Legal Metrology + state controllers)",
+   "url": "https://doca.gov.in/",
+   "instrument_types": "Legal Metrology (Packaged Commodities) Rules amendments, mandatory-declaration notifications, exemptions, clarificatory circulars/OMs; gazetted under Ministry of Consumer Affairs",
+   "binds_whom": "e-commerce platforms & marketplaces (Rule-6 pre-purchase declarations on listings), device & electronics makers/importers (MRP, net quantity, country-of-origin, importer details), packaged-goods D2C sellers, quick-commerce",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "Directly binds every product listing and every device box. Recent driver: Legal Metrology (Packaged Commodities) Amendment Rules mandating unit-sale-price declarations (phased in 2024) and tightened e-commerce/quick-commerce declaration enforcement through 2025; per-unit and QR-declaration proposals still moving. Instruments gazette under the Ministry of Consumer Affairs, which is NOT one of our three tracked Gazette ministries (Communications/MeitY/MIB) \u2014 so nothing in the current tracker catches these. Same doca.gov.in portal caveat (expired cert, PDF-driven)."
+  },
+  {
+   "authority": "Bureau of Indian Standards (BIS) \u2014 Compulsory Registration Scheme (CRS) for electronics/IT hardware + Quality Control Orders",
+   "url": "https://www.bis.gov.in/",
+   "instrument_types": "CRS registration mandates & product-category additions, Quality Control Orders (QCOs), Indian Standards, laboratory/registration circulars; the triggering 'Electronics & IT Goods (Requirement of Compulsory Registration) Order' is a MeitY gazette notification",
+   "binds_whom": "device makers & importers (mobile phones, laptops/tablets, wearables, power banks, chargers, LED/IT hardware, IoT), e-commerce sellers of electronics (cannot list uncertified goods), component & accessory suppliers",
+   "covered_by_us": "partial",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Critical for every hardware client. PARTIAL only by accident: the covered-goods list is set by MeitY's Compulsory Registration Order, whose amendments gazette under MeitY and would be caught by our gazette_meity lane \u2014 but BIS's own CRS product additions, QCO timelines, extension OMs and the registered-products database are administrative and untracked. 2025 momentum: continued CRS category expansion (new IoT/wearable and power-bank/charger lines), USB-C common-charger standardisation, smart-meter QCOs. bis.gov.in is clean WordPress (robots blocks only /wp-admin/) = easy scrape; the live registration list sits on the separate CRS portal crsbis.in (JSP, no robots.txt, session-driven)."
+  },
+  {
+   "authority": "Wireless Planning & Coordination Wing (WPC), Department of Telecommunications \u2014 Equipment Type Approval (ETA) & frequency de-licensing",
+   "url": "https://www.dot.gov.in/spectrum-management",
+   "instrument_types": "ETA (self-declaration) mandate & exemption notices, de-licensing/low-power-equipment notifications, spectrum/import-clearance circulars; radio-equipment notifications gazette under Ministry of Communications",
+   "binds_whom": "makers & importers of any radio-frequency device (Wi-Fi/Bluetooth/NFC/UWB gear, phones, routers, wearables, IoT modules, drones), e-commerce sellers of wireless devices",
+   "covered_by_us": "partial",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "Distinct from TEC/MTCTE (which we cover) \u2014 TEC certifies telecom equipment, WPC approves radio devices; do not conflate them. PARTIAL: WPC de-licensing/ETA-mandate notifications gazette under Ministry of Communications, so gazette_communications may catch the formal notifications, but WPC circulars/OMs and the ETA database are untracked. 2025 driver: continued frequency de-licensing (indoor 6 GHz Wi-Fi delicensing debate; low-power/very-low-power device notifications) and mandatory ETA self-declaration for de-licensed-band devices. WPC pages sit on dot.gov.in (static, fetchable); the ETA self-declaration portal on eservices.dot.gov.in/saral-sanchar is login-gated and returns 403 on robots \u2014 treat as blocked/JS."
+  },
+  {
+   "authority": "Central Pollution Control Board (CPCB) \u2014 E-Waste (Management) Rules / EPR for electronics producers",
+   "url": "https://eprewastecpcb.in/",
+   "instrument_types": "EPR registration mandates, EPR target/floor-price notifications, producer compliance directions and enforcement/show-cause orders; the E-Waste (Management) Rules gazette under MoEFCC",
+   "binds_whom": "producers/importers/brand-owners of electronics & IT hardware (EEE), device makers, and increasingly online sellers of electronics with EPR obligations",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "gazette_recoverable",
+   "notes": "Every electronics/device 'producer' carries EPR registration + annual targets \u2014 a live compliance and litigation front. Concrete recent instrument: CPCB EPR floor-price notification under the E-Waste (Management) Rules, 2022, challenged by producers in the Delhi High Court through 2024-2025. Rules themselves gazette under MoEFCC (not a tracked ministry). cpcb.gov.in robots is Disallow:/ except /web/ (so most of the main site is off-limits to a compliant crawler); the operative EPR registration/notice portal is eprewastecpcb.in (Cloudflare, JS/portal). Best clean path is the MoEFCC Gazette for the rules + PDFs served off /web/."
+  },
+  {
+   "authority": "MeitY \u2014 as issuer of the electronics CRS Order, QCOs and consumer-/device-tech notifications (beyond the Gazette lane)",
+   "url": "https://www.meity.gov.in/",
+   "instrument_types": "Compulsory Registration Orders & amendments, QCOs, IT-hardware/electronics notifications, press notes, office memoranda",
+   "binds_whom": "device & electronics makers/importers (via CRS scope), IT-hardware manufacturers, semiconductor/component players",
+   "covered_by_us": "partial",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "We already run gazette_meity, which catches MeitY's gazetted notifications \u2014 the main CRS/QCO triggers land there. The seam is MeitY's own notifications/press-note pages (office memoranda, deadline extensions, scheme circulars) that never hit the Gazette. meity.gov.in robots is 'Allow: /' (clean) but the site is now a JS/React shell \u2014 needs a rendered/API fetch, not raw HTML. Flagged 'partial' so the CRS/QCO story isn't assumed fully covered by the gazette lane alone."
+  },
+  {
+   "authority": "India Semiconductor Mission (ISM), Digital India Corporation / MeitY",
+   "url": "https://ism.gov.in/",
+   "instrument_types": "Scheme guidelines & amendments (Semicon India / Modified schemes, DLI, ATMP/OSAT), fiscal-support approvals, application notices \u2014 incentive/approval instruments, not obligation-imposing regulation",
+   "binds_whom": "semiconductor fab/ATMP/OSAT and design (DLI) applicants and hardware clients seeking incentives; not a broad obligation source",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Named in the brief, but be honest about altitude: ISM is an incentive/approvals office, not a regulator that changes client obligations day-to-day. Matters to hardware clients for scheme eligibility and approvals \u2014 e.g., 2025 ISM unit approvals (HCL-Foxconn OSAT JV cleared May 2025; further units under discussion) and Modified Semicon scheme terms. ism.gov.in is static HTML with no robots.txt (permissive by default) = trivially fetchable. Rank below the true obligation sources (CCPA/BIS/Legal Metrology); track for scheme-guideline changes, not for binding directions."
+  },
+  {
+   "authority": "Bureau of Energy Efficiency (BEE), Ministry of Power \u2014 Standards & Labelling (star-rating) programme",
+   "url": "https://beeindia.gov.in/",
+   "instrument_types": "Mandatory/voluntary star-labelling notifications, product-category inclusions, testing & labelling schedules",
+   "binds_whom": "makers/importers of covered electronics & appliances (some IT/AV/display and consumer-electronics categories), e-commerce sellers of labelled goods",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "Relevant to device/consumer-electronics clients as categories move from voluntary to mandatory labelling (ongoing expansion through 2025). Narrower than BIS/Legal Metrology for a pure TMT book, hence moderate. beeindia.gov.in serves large static HTML (fetchable); the S&L operational portal beestarlabel.com is ASP.NET/session-driven. Track for new mandatory-labelling notifications affecting electronics."
+  },
+  {
+   "authority": "National / State Consumer Disputes Redressal Commissions (NCDRC and CPA-2019 fora)",
+   "url": "https://ncdrc.nic.in/",
+   "instrument_types": "Adjudicatory orders/judgments (platform liability, deficiency-of-service, unfair-trade-practice) \u2014 precedent, not standing obligations",
+   "binds_whom": "e-commerce marketplaces/platforms, service providers, device sellers named as opposite parties; shapes platform-liability exposure sector-wide",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "Case-law lane rather than instrument lane \u2014 a broad TMT partner watches it for evolving platform-liability and 'intermediary vs seller' precedent under the Consumer Protection Act, 2019, not for rule changes. ncdrc.nic.in is a slow NIC host (timed out on test); the current live path is the e-Jagriti portal (e-jagriti.gov.in, JS-driven). Lower priority than the obligation-issuing bodies above; include if the tracker is meant to catch precedent, otherwise defer."
+  },
+  {
+   "authority": "MeitY \u2014 Section 69A blocking orders (IT Blocking Rules 2009, Rule 16 confidentiality)",
+   "url": "https://www.meity.gov.in/ (orders NOT published; confidential under Rule 16)",
+   "instrument_types": "Blocking orders/directions to intermediaries and licensees; interim + final directions of the Designated Officer; emergency blocking under Rule 9",
+   "binds_whom": "Social-media intermediaries, ISPs/telcos, app stores, OTT/video platforms, DNS/hosting \u2014 anyone directed to disable access to content, URLs, accounts or apps",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "unpublished",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "The single most embarrassing thing to miss: these change a client's obligations directly yet NEVER appear on any official venue \u2014 Rule 16 makes them confidential; no gazette, no website. 2025 proof: the reported bulk order to block ~8,000 X accounts (Feb 2025) and the running s.69A account/app blocks became public ONLY through X Corp's litigation filings and press. A partner learns of them via (a) the client's own receipt of the order, (b) litigation disclosures (Shreya Singhal, Twitter/X v. UOI record), (c) RTI, and (d) trackers \u2014 MediaNama, IFF (they RTI and litigate these), SFLC.in (maintains a blocking tracker). Practical tracker design: you cannot fetch the order; you monitor the press/IFF/SFLC layer and the court dockets where they surface. Not gazette-recoverable."
+  },
+  {
+   "authority": "MHA / I4C \u2014 Sahyog portal notices (s.79(3)(b) IT Act r/w Rule 3(1)(d) IT Rules 2021)",
+   "url": "https://sahyog.mha.gov.in/ (access-controlled: agencies + registered intermediaries only)",
+   "instrument_types": "Takedown/removal notices to intermediaries channelled through a govt portal; nodal-officer notifications; s.79(3)(b) 'actual knowledge' notices",
+   "binds_whom": "Every significant social-media intermediary and platform operating in India (the loss-of-safe-harbour trigger); e-commerce and UGC hosts",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "unpublished",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "The live 2025 obligation-changer. Launched by MHA/I4C in 2024 as the notice-routing mechanism the govt is now using in preference to s.69A. Karnataka HC in X Corp v. Union of India (WP 7405/2025, judgment 24 Sep 2025) UPHELD its validity, held s.79(3)(b) grounds a takedown power distinct from s.69A, and denied X foreign-entity Art.19 standing; X has filed a writ appeal to the Division Bench. Notices themselves are portal-internal and unpublished. A partner tracks this through: the litigation (Karnataka HC docket), IFF (published the Union's submissions), SFLC.in (judgment analysis), MediaNama, and Bar & Bench/LiveLaw order reporting. The portal login page is fetchable but content is gated \u2014 monitor the case + press layer, not the portal."
+  },
+  {
+   "authority": "Supreme Court of India \u2014 TMT judgments and pending constitutional matters",
+   "url": "https://www.sci.gov.in/judgements-judgement-date/",
+   "instrument_types": "Judgments, interim orders, directions to the Union to frame rules, transfer/tag orders consolidating HC challenges; constitution-bench references",
+   "binds_whom": "All TMT clients \u2014 sets the binding law on intermediary liability, blocking, privacy, net neutrality, free speech; directions to MeitY/MIB that become clients' future obligations",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "TDSAT is covered but the apex court is not. Date-wise judgment lists on www.sci.gov.in render server-side (200, ~139KB, scrapeable); case-status/pending-matter lookup is form-driven. robots.txt disallows only /wp-admin/. 2025 proof: Ranveer Allahbadia v. UOI (Feb-Mar 2025) \u2014 SC granted interim protection AND directed the Centre to frame a 'limited regulatory measure' for online/social-media content (Justices Surya Kant, Kotiswar Singh); plus a stream of deepfake/obscene-content PILs the SC is fielding. These orders pre-figure the next round of MeitY rulemaking, so a broad TMT partner must catch them at source. Supplement with SCObserver for pending-matter tracking. Retrieve full text via the SCI portal or IndianKanoon."
+  },
+  {
+   "authority": "Delhi High Court \u2014 TMT judgments/orders (intermediary liability, blocking, IP-blocking, deepfakes)",
+   "url": "https://delhihighcourt.nic.in/",
+   "instrument_types": "Judgments, interim injunctions, John Doe / 'Ashok Kumar' and dynamic+ website-blocking orders, ISP/DoT/MeitY blocking directions, personality-rights injunctions",
+   "binds_whom": "ISPs/telcos and DoT (blocking compliance), social-media & UGC intermediaries, OTT/streaming, AI platforms, ad-tech, e-commerce",
+   "covered_by_us": "gap",
+   "importance": "critical",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The most prolific TMT bench in India \u2014 where dynamic injunctions were born and where blocking, personality-rights and now AI-copyright law is being made. No robots.txt (404 = unrestricted); the new /web/ portal serves static daily-order and judgment index pages, but filtered case/judgment search is form+captcha. 2025 proof: ANI Media v. Wikimedia Foundation (takedown + contempt over a Wikipedia page); ANI v. OpenAI (Delhi HC jurisdiction/training-data suit, 2024-25); continuing dynamic+ rogue-site blocking orders for live-sports/OTT piracy that bind every ISP; and the Chaitanya Rohilla deepfake PIL pushing MeitY toward a deepfake framework. Fastest catch is LiveLaw/Bar & Bench (they publish the order copies same day) cross-checked against the HC portal / IndianKanoon."
+  },
+  {
+   "authority": "Karnataka High Court \u2014 TMT judgments (blocking transparency, Sahyog, s.69A/s.79)",
+   "url": "https://karnatakajudiciary.kar.nic.in/",
+   "instrument_types": "Judgments and interim orders on platform takedowns, blocking-order transparency, safe-harbour scope",
+   "binds_whom": "Social-media intermediaries and platforms; DoT/ISPs on blocking compliance; sets precedent on the s.69A-vs-s.79(3)(b) blocking architecture",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The court that owns the blocking-law line: Twitter v. UOI (2023, dismissed with Rs.50L costs \u2014 the seminal s.69A blocking-transparency loss) and now X Corp v. UOI (WP 7405/2025, 24 Sep 2025) upholding the Sahyog portal \u2014 the single most important intermediary judgment of 2025, now under writ appeal. Direct site was unreachable from here (SSL/anti-bot, returned 000), so this court is best pulled via the eCourts judgment portal and IndianKanoon rather than the HC site itself; order copies land first on LiveLaw/Bar & Bench and analysis on SFLC.in/IFF."
+  },
+  {
+   "authority": "Bombay High Court \u2014 TMT judgments (IT Rules challenges, OTT, Fact Check Unit)",
+   "url": "https://bombayhighcourt.nic.in/",
+   "instrument_types": "Judgments, interim orders, constitutional rulings striking/upholding IT Rules provisions",
+   "binds_whom": "Social-media intermediaries, digital news publishers, OTT/streaming; shapes IT Rules 2021/2023 obligations nationally",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Where the IT Rules get constitutionally tested. Kunal Kamra v. UOI: Bombay HC struck down the Fact Check Unit amendment (Rule 3(1)(b)(v), IT Amendment Rules 2023) as unconstitutional via the Sept 2024 tie-breaker judgment (J. Chandurkar) \u2014 directly removed a compliance obligation from every intermediary, with 2025 follow-on. Also active on OTT/obscenity and digital-news matters. Direct HC site failed to connect from here (SSL/000); retrieve via eCourts + IndianKanoon, with same-day order copies from LiveLaw/Bar & Bench."
+  },
+  {
+   "authority": "Madras High Court \u2014 TMT judgments (online gaming, blocking, VPN)",
+   "url": "https://www.mhc.tn.gov.in/judis/",
+   "instrument_types": "Judgments and interim orders on real-money-gaming regulation, website/app blocking, platform compliance",
+   "binds_whom": "Real-money/online-gaming operators, payment and platform intermediaries, ISPs; increasingly OTT and app stores",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The gaming-regulation battleground. 2025 proof: challenges by Head Digital Works (A23), Junglee Games and others to the Tamil Nadu Online Gaming Authority regulations (Oct 2024) \u2014 'blank hours' (12am-5am) and Aadhaar/KYC mandates \u2014 heard through 2025; these directly set operating obligations for every RMG client and feed into the national online-gaming debate. The /judis/ portal serves static judgment pages (200) and has no restrictive robots; cross-check eCourts/IndianKanoon. Relevant given the practice's gaming exposure."
+  },
+  {
+   "authority": "DoT / MeitY / MHA \u2014 letter-form and executive directions (unpublished)",
+   "url": "not published centrally (licence-condition letters, ministry advisories/letters)",
+   "instrument_types": "Licence-amendment letters, DoT directions to TSPs, MeitY advisories/letters to intermediaries, state/MHA blocking or lawful-intercept letters",
+   "binds_whom": "Telcos/ISPs (licence conditions), social-media & AI intermediaries (advisory-driven obligations e.g. deepfake labelling), device makers",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "unpublished",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "The 'letter layer' that changes obligations without a gazette: DoT amends licence terms and issues directions by letter to operators; MeitY issues advisories/letters to intermediaries (e.g. the 2024-25 deepfake/synthetic-media labelling advisories that pushed platforms to act ahead of any rule). Some MeitY advisories surface on meity.gov.in, but most letters reach the public only when a recipient or a reporter publishes them. A partner catches these via the client, MediaNama and ET Telecom (which routinely obtain and publish DoT/MeitY letters), and IFF. Treat as a press-monitored signal, not a fetchable official source."
+  },
+  {
+   "authority": "LiveLaw \u2014 litigation reporting (SC + HC order/judgment copies)",
+   "url": "https://www.livelaw.in/",
+   "instrument_types": "Same-day reporting of court orders and judgments, with linked PDF copies; case-filing and hearing updates",
+   "binds_whom": "Indirect \u2014 the acquisition channel through which TMT clients' court-driven obligations first become knowable",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "The fastest reliable feed for court output across SC and all four HCs \u2014 usually publishes the order copy the same day, ahead of the court portals. robots.txt is Allow: / (blocks only search/preview/admin paths). This is the realistic primary sensor for the judicial layer: filter its tech/media beat for X Corp, Sahyog, blocking, IT Rules, deepfake, gaming and net-neutrality tags, then pull the underlying order. Pair with Bar & Bench for redundancy."
+  },
+  {
+   "authority": "Bar & Bench \u2014 litigation reporting (SC + HC)",
+   "url": "https://www.barandbench.com/",
+   "instrument_types": "Court-order and judgment reporting with PDF copies; hearing/filing updates; interviews signalling pending matters",
+   "binds_whom": "Indirect \u2014 court-driven obligation channel for all TMT clients",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Co-equal to LiveLaw as a litigation tracker; frequently first on interim orders. It carried the Karnataka HC 'X Corp denied interim relief / Sahyog' reporting and the subsequent appeal. robots.txt is Allow: / with sitemaps exposed \u2014 clean to monitor. Running both LiveLaw and Bar & Bench de-risks single-source lag on the fast-moving judicial layer."
+  },
+  {
+   "authority": "MediaNama \u2014 tech-policy tracker (blocking, s.69A, Sahyog, IT Rules)",
+   "url": "https://www.medianama.com/",
+   "instrument_types": "Investigative/explanatory reporting on blocking orders, takedown notices, consultations, licence and rule changes; often reproduces the underlying document",
+   "binds_whom": "Indirect \u2014 the best single sensor for the unpublished executive layer that binds intermediaries, telcos and platforms",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "The premier India digital-policy tracker and, in practice, the earliest public signal for s.69A/Sahyog/blocking events that have no official venue. robots.txt now carries a Cloudflare Content-Signal (search=yes, ai-train=no, use=reference) \u2014 a rights reservation aimed at AI training; a monitoring tracker that stores headlines/links for reference sits in a grey zone and some depth is paywalled, so flag for a terms check before automated ingestion. Even if only headline-monitored, it is the highest-yield gap-filler for the unpublished layer."
+  },
+  {
+   "authority": "Internet Freedom Foundation (IFF) \u2014 digital-rights litigation & RTI tracker",
+   "url": "https://internetfreedom.in/",
+   "instrument_types": "Litigation trackers, RTI-obtained blocking data, case documents (petitions, govt submissions), explainers",
+   "binds_whom": "Indirect \u2014 surfaces the blocking/Sahyog/deepfake instruments that bind intermediaries and ISPs",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "blocked_or_terms",
+   "notes": "IFF is often a party or intervenor and publishes primary documents others don't \u2014 e.g. it posted the Union's submissions in X Corp v. UOI and maintains blocking/censorship trackers built on RTI. High practitioner value, BUT robots.txt explicitly Disallows ClaudeBot and Claude-Web (and most bots) across the whole site \u2014 automated fetching is off-limits. Treat as a manual/newsletter-monitored source, or reach the same documents through the court record and secondary coverage."
+  },
+  {
+   "authority": "eCourts \u2014 unified judgment & case-status portal (SC + High Courts)",
+   "url": "https://judgments.ecourts.gov.in/ ; https://hcservices.ecourts.gov.in/",
+   "instrument_types": "Full-text judgment/order search and case-status across the SC and all HCs (Delhi/Karnataka/Bombay/Madras)",
+   "binds_whom": "Indirect \u2014 the canonical retrieval backbone for the judicial layer, especially the two HCs whose own sites are hard to fetch",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "js_or_api",
+   "legal_to_fetch": "check_robots",
+   "notes": "The official free aggregator that reaches Karnataka and Bombay HC (whose direct sites failed to connect here) plus Delhi, Madras and the SC from one place. Both endpoints return 200 but search is captcha-gated and session-driven (no clean API; no meaningful robots.txt), so ingestion needs a headless/captcha path \u2014 a build cost, not a legal blocker per se, but automated access terms are unclear, hence check_robots. Best used as the authoritative back-fill once a press signal names a case."
+  },
+  {
+   "authority": "IndianKanoon \u2014 free full-text judgment search (SC + HC)",
+   "url": "https://indiankanoon.org/",
+   "instrument_types": "Indexed, searchable full text of SC and HC judgments/orders; citation graph",
+   "binds_whom": "Indirect \u2014 the practitioner-default retrieval layer for judgments across all four HCs and the SC",
+   "covered_by_us": "gap",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "The fastest way to pull and keyword-monitor TMT judgments \u2014 plain static HTML doc pages (200), full-text search, better indexed than the court portals for tags like 'Section 69A', 'intermediary', 'Section 79'. Third-party (not official), and robots.txt disallows /cached/ and a list of specific doc IDs while allowing general crawl \u2014 so respect those and rate-limit. Ideal companion to eCourts: search here, cite the official copy."
+  },
+  {
+   "authority": "SFLC.in (Software Freedom Law Centre) \u2014 blocking/legal-analysis tracker",
+   "url": "https://sflc.in/",
+   "instrument_types": "Blocking-order and internet-shutdown trackers, RTI data, judgment analyses, legal explainers",
+   "binds_whom": "Indirect \u2014 documents the s.69A/blocking and platform-liability instruments that bind intermediaries and ISPs",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Maintains long-running blocking/shutdown trackers and publishes close analyses \u2014 e.g. its detailed breakdown of the X Corp v. UOI (Sahyog) judgment. robots.txt is standard-clean (only /wp-admin/ disallowed) with sitemap + RSS exposed, so it is straightforward to monitor. Overlaps with IFF but is legally fetchable where IFF is not, making it the more ingestible of the two civil-society trackers."
+  },
+  {
+   "authority": "Storyboard18 \u2014 media/broadcast/advertising & OTT policy tracker",
+   "url": "https://www.storyboard18.com/",
+   "instrument_types": "Reporting on MIB/broadcast orders, ASCI actions, OTT and advertising regulation, gaming-ad rules, TMT litigation",
+   "binds_whom": "Indirect \u2014 surfaces broadcaster, OTT, advertiser and gaming obligations from the MIB/ASCI/court side",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "Strong on the media/advertising/broadcast slice a broad TMT partner also carries \u2014 MIB advisories, self-regulation, surrogate/real-money-gaming ad crackdowns, OTT content disputes. robots.txt Allows general crawling but blocks named AI bots (GPTBot/CCBot etc.) and has news sitemaps; a general monitor is fine but flag the AI-bot carve-outs before ingestion. Complements the litigation trackers on the content/broadcast axis rather than the blocking axis."
+  },
+  {
+   "authority": "ET Telecom (ETTelecom) \u2014 telecom/DoT policy news",
+   "url": "https://telecom.economictimes.indiatimes.com/",
+   "instrument_types": "Reporting on DoT directions, licence changes, TRAI actions, spectrum/telecom-policy letters, often reproducing letters",
+   "binds_whom": "Indirect \u2014 earliest public signal for DoT/telecom licence-letter obligations binding telcos and ISPs",
+   "covered_by_us": "gap",
+   "importance": "moderate",
+   "reachable": "static_html",
+   "legal_to_fetch": "check_robots",
+   "notes": "The go-to feed for the telecom-executive layer \u2014 DoT licence-amendment letters and directions frequently break here before (or instead of) any official posting, filling the 'letter directions' gap on the telco side. robots.txt is Allow: / with several disallowed paths, but some content sits behind the ETPrime paywall and Times-group ToS apply, so check terms before automated ingestion. Headline-monitor for DoT/MeitY letter events, then chase the primary document."
+  },
+  {
+   "authority": "TDSAT \u2014 Telecom Disputes Settlement and Appellate Tribunal",
+   "url": "https://tdsat.gov.in/",
+   "instrument_types": "Judgments and daily orders; notices/circulars",
+   "binds_whom": "Telcos/ISPs, broadcasters/DTH, and appeals from TRAI \u2014 binding on the telecom & broadcasting client base",
+   "covered_by_us": "covered",
+   "importance": "high",
+   "reachable": "static_html",
+   "legal_to_fetch": "likely_clean",
+   "notes": "Already in the tracker (tdsat_orders = judgments/daily orders; tdsat_notices = notices/circulars) \u2014 logged here only to close the ledger for the judicial slice. No action needed; it is the one covered node in this slice, and the four HCs + SC + the unpublished executive layer are the real gaps around it."
+  }
+ ],
+ "plan": {
+  "verdict": "Yes \u2014 and the gaps are serious for a broad practice. The 43 live sources plus the three-ministry Gazette are a strong spine for TRAI/TEC/CERT-In/MIB and for GAZETTED media-telecom law, but they systematically miss the two layers where TMT obligations actually move first: (a) the non-gazetted 'own-website' output of the biggest regulators (MeitY advisories/AI guidelines/draft rules/OMs; DoT licence amendments/OMs/spectrum NIAs; CCPA dark-pattern orders; OGAI's operational stream), and (b) the entire competition/FDI and judicial layer (CCI, DPIIT, the Supreme Court and the four most active High Courts) \u2014 of which only TDSAT is covered. Four of these are the classic 'embarrassing to learn from the client' regulators. The single highest-leverage fact: the registry already holds five discovered-but-parked endpoints at status needs_decision \u2014 meity_gazettes, meity_acts_policies, meity_orders_notices, meity_guidelines and pib_moc \u2014 so the top MeitY gap can be closed by a promote decision, not a build. A distinct blind spot (s.69A blocking, Sahyog notices, GAC orders, licence letters) cannot be fixed by adding sources at all and must be handled honestly as a client-intake/litigation-watch limit.",
+  "must_add": [
+   {
+    "authority": "MeitY \u2014 own website (meity.gov.in) non-gazetted layer + PIB (MeitY/MHA) RSS signal lane",
+    "why": "The #1 and most embarrassing gap. gazette_meity (live) catches the FINAL notified rule (DPDP Rules 14 Nov 2025; IT synthetic-content/SGI-labelling amendment Feb 2026) but misses everything that hits clients first and never gazettes: the India AI Governance Guidelines (5 Nov 2025), the 2023-24 deepfake/GenAI due-diligence advisories, consultation drafts (Oct 2025 SGI/AI-deepfake draft), s.79 letters and GAC/blocking administrative notices. Binds every intermediary, SSMI, OTT, gaming and AI/GenAI deployer and \u2014 via DPDP \u2014 every data fiduciary. CRITICAL EFFICIENCY POINT: the 4 meity_* endpoints AND pib_moc are already discovered in registry_v2.json but parked at status needs_decision \u2014 promoting them (PIB is the fastest public trace of s.69A/app-ban actions and draft press notes) is a decision, not a build, and closes most of the non-gazetted-advisory gap in this whole slice.",
+    "reachable": "js_or_api \u2014 Next.js SPA with __NEXT_DATA__/WP-JSON returning clean JSON; instrument PDFs served static at /static/uploads/; PIB is a clean RSS feed already in the robots snapshot",
+    "legal": "likely_clean \u2014 robots 'Allow: /' for both meity.gov.in and pib.gov.in; endpoints already scoped in-registry"
+   },
+   {
+    "authority": "DoT \u2014 own website (dot.gov.in): licensing/circulars/OMs stream + /spectrum auction NIAs",
+    "why": "The single biggest telecom hole. We catch DoT ONLY via ministry-wise Gazette (Communications); a large share of obligation-changing output is never gazetted or lands days/weeks earlier on-site: Unified Licence / UL-VNO / ISP / ILD licence-condition amendments, OMs, clarifications, LoIs, M&A/transfer approvals, procedural circulars, RoW clarificatory circulars, and spectrum-auction NIAs + corrigenda + pre-bid clarifications (e.g. the 8 Mar 2024 NIA, ~Rs 96,317 cr reserve \u2014 terms clients bid on). Binds the core telco/ISP/VNO/ILDO/infra base; a telecom partner would be embarrassed to learn of a UL amendment or NIA corrigendum from the client. Not in the registry at all (only dot_eservices_import is scaffolded/planned).",
+    "reachable": "js_or_api \u2014 SPA listing needs a headless render / backend-API discovery, but the actual instrument PDFs are static and directly fetchable (verified 200) at /static/uploads/ and /sites/default/files/",
+    "legal": "likely_clean \u2014 robots 'Allow: /'"
+   },
+   {
+    "authority": "CCPA \u2014 Central Consumer Protection Authority (Dept of Consumer Affairs, doca.gov.in)",
+    "why": "The biggest advertising/consumer gap and the statutory teeth that ASCI (which we cover) lacks \u2014 keeping ASCI without CCPA is exactly the asymmetry to fix. Reaches nearly every advertiser, e-commerce/marketplace, influencer/endorser, D2C seller and any broadcaster/OTT carrying ads. Very live: Dark Patterns Guidelines 2023 (13 specified patterns); 5 Jun 2025 self-audit advisory in force to 31 Dec 2026; ~9 platforms penalised 2025-26 (Zepto, BookMyShow, IndiGo, PhysicsWallah, FirstCry, SpiceJet). Sits under DoCA \u2014 NOT one of our three tracked Gazette ministries, so genuinely invisible to the tracker today.",
+    "reachable": "static_html / js-portal \u2014 orders at ccpa-orders.php and doca.gov.in/ccpa/orders-advisories.php as PDFs; many CCPA orders surface first via PIB, so pair with a PIB Consumer Affairs feed",
+    "legal": "likely_clean, BUT the host migrated from consumeraffairs.nic.in to doca.gov.in and the TLS cert is expired \u2014 fetch with -k"
+   },
+   {
+    "authority": "CCI \u2014 Competition Commission of India (cci.gov.in)",
+    "why": "The most embarrassing gap for a deals partner. The Deal Value Threshold (Rs 2,000 cr + 'substantial business operations in India') live since 10 Sep 2024 now catches sub-threshold tech/digital acquisitions that used to escape review \u2014 it bites every TMT M&A/JV/investment. Enforcement is real: Rs 213.14 cr Meta/WhatsApp penalty (18 Nov 2024); ongoing Google Play/Android matters. Published combination and abuse orders plus the weekly combination register are fully open. Not in the registry.",
+    "reachable": "static_html \u2014 /combination and /antitrust/orders show live 2025-26 orders and the weekly register",
+    "legal": "likely_clean \u2014 robots blocks only some /images/ dirs; pre-filing consultations are confidential by design, published orders are open"
+   },
+   {
+    "authority": "Judicial layer \u2014 Supreme Court + Delhi / Karnataka / Bombay / Madras High Courts (via SCI & Delhi portals + eCourts/IndianKanoon, fastest via LiveLaw + Bar & Bench)",
+    "why": "TDSAT is the ONLY covered judicial node; the apex court and the four most active TMT benches make the binding law on intermediary liability, blocking, privacy, gaming and IP/AI-copyright, and issue directions to MeitY/MIB that become clients' next obligations. 2025 proof: SC Ranveer Allahbadia (directed the Centre to frame content regulation); Karnataka HC X Corp v UOI upholding Sahyog (24 Sep 2025, under writ appeal); Bombay HC striking the Fact Check Unit (Kunal Kamra, Sep 2024); Delhi HC dynamic+ blocking, ANI v OpenAI and ANI v Wikimedia; Madras HC TNOGA gaming challenges. A broad TMT partner must catch these at source.",
+    "reachable": "static_html for SCI judgment-date lists and the Delhi HC /web/ index; Karnataka/Bombay HC direct sites are anti-bot (HTTP 000) so pull via eCourts + IndianKanoon; same-day order copies via LiveLaw/Bar & Bench",
+    "legal": "likely_clean for SCI/Delhi/IndianKanoon plain fetch (respect IndianKanoon /cached/ disallows); eCourts is captcha-gated \u2014 a build cost, not a legal blocker"
+   },
+   {
+    "authority": "OGAI \u2014 Online Gaming Authority of India, operational instrument stream (MeitY/OGAI pages)",
+    "why": "THE new central regulator for the entire gaming slice, constituted under PROGA 2025 (Rules notified 22 Apr 2026, in force 1 May 2026). gazette_meity catches the foundational notifications (Act, Rules, s.8 constitution) \u2014 hence 'partial' \u2014 but OGAI's live stream (codes of practice, the running list of banned 'online money games', s.9 directions, registration grants/refusals, appeal outcomes) is digital-first and NOT reliably gazetted. A partner cannot run gaming advice off the Gazette alone during the live rollout.",
+    "reachable": "static_html \u2014 OGAI page HTTP 200, static template; pairs directly with the MeitY-own-site promotion above",
+    "legal": "likely_clean \u2014 robots 'Allow: /'"
+   },
+   {
+    "authority": "DPIIT \u2014 FDI Press Notes + annual Consolidated FDI Policy (Dept for Promotion of Industry & Internal Trade, Commerce)",
+    "why": "Every TMT client taking foreign investment lives under DPIIT sector caps/conditions \u2014 telecom (100%, security-conditioned), broadcasting caps, digital news (26%), e-commerce marketplace (Press Note 2/2018), space/satcom (Press Note 1/2024 liberalisation). Decisive nuance: our e-Gazette lanes are scoped to Communications/MeitY/MIB and do NOT capture DPIIT (Commerce) notifications, so 'the Gazette covers it' is FALSE here. The enforceable cap ultimately lands in the FEMA NDI Rules (pair with RBI/DEA).",
+    "reachable": "js_or_api \u2014 relaunched SPA shell, PN PDFs load via API and are also republished as standalone PDFs",
+    "legal": "likely_clean \u2014 robots 'Allow: /'; also gazette_recoverable via the Commerce Gazette, which is not currently a tracked lane"
+   },
+   {
+    "authority": "WPC \u2014 Wireless Planning & Coordination Wing, DoT (ETA / import licensing / frequency de-licensing / NFAP)",
+    "why": "Governs whether device/handset/IoT/short-range-RF hardware can lawfully be imported or sold in India \u2014 binds every OEM/importer/e-commerce seller of wireless devices plus satcom earth-station operators. Distinct from covered TEC/MTCTE (TEC certifies telecom equipment; WPC approves radio devices \u2014 do not conflate). Live movers: ETA now self-declaration on DoT eServices/Saral Sanchar; 6 GHz Wi-Fi de-licensing debate; low-power/very-low-power device notifications; NFAP revisions. De-licensing notifications partly gazette (Communications), but ETA lists, import-licence procedure and WPC circulars are portal-only. Registry has only dot_eservices_import at 'planned'.",
+    "reachable": "js_or_api \u2014 function migrated into dot.gov.in/spectrum-management + eservices.dot.gov.in (wpc.dot.gov.in itself times out); the ETA self-declaration portal is login-gated/403",
+    "legal": "likely_clean for the dot.gov.in pages; the ETA portal is blocked/JS-gated"
+   }
+  ],
+  "should_add": [
+   {
+    "authority": "Legal Metrology Division (Dept of Consumer Affairs, doca.gov.in)",
+    "why": "Packaged Commodities Rules bind every product listing (Rule 6 pre-purchase declarations on e-commerce) and every device box (MRP, net quantity, country-of-origin, importer). Unit-sale-price declarations phased in 2024; quick-commerce/e-commerce enforcement tightened through 2025. Gazettes under the Ministry of Consumer Affairs \u2014 not one of our three tracked ministries, so nothing catches it today. Same doca.gov.in caveat (expired cert, PDF-driven)."
+   },
+   {
+    "authority": "BIS \u2014 Compulsory Registration Scheme (bis.gov.in + crsbis.in)",
+    "why": "Critical for every hardware client \u2014 a device cannot be listed/imported/sold without CRS registration. gazette_meity catches the MeitY Compulsory Registration Order amendments (hence only 'partial'), but BIS's own CRS product-category additions, QCO timelines, extension OMs and the registered-products database are administrative and untracked (new IoT/wearable/power-bank/charger lines; USB-C common charger). bis.gov.in is clean WordPress (blocks only /wp-admin/); live list on crsbis.in (JSP, session-driven)."
+   },
+   {
+    "authority": "DGFT \u2014 Directorate General of Foreign Trade (dgft.gov.in /CP portal)",
+    "why": "The import on/off switch for device/hardware clients: the IT-Hardware Import Management System for HSN 8471 (laptops/tablets/servers) requiring import authorisation is the archetype, with recurring telecom/CCTV restrictions. Commerce ministry \u2014 again NOT in our gazette lanes. The /CP portal serves full HTML notification and public-notice lists with 2025-26 entries; no robots.txt."
+   },
+   {
+    "authority": "NBDSA \u2014 News Broadcasting & Digital Standards Authority (nbdanewdelhi.com)",
+    "why": "Every news-broadcaster client tracks its orders as de-facto content standards ahead of any MIB action. 2025 was heavy: nine communal-reporting/privacy orders (Zee News fined Rs 25,000); 9 Jun 2025 misleading-ticker advisory to Times Now Navbharat; Jun 2025 Regulations amendment folding digital news under NBDSA. Orders index is clean static HTML; robots blocks only /admin/ and /beta/."
+   },
+   {
+    "authority": "BCCC / IBDF (+ DMCRC) \u2014 GEC-TV self-reg and IBDF's OTT SRB (ibdf.com)",
+    "why": "The general-entertainment-TV counterpart to NBDSA plus IBDF's own OTT SRB (DMCRC) \u2014 completes the self-reg map (NBDSA=news, BCCC=GEC TV, DPCGC/DMCRC=OTT). Correct the common shorthand: DPCGC is IAMAI's body, DMCRC is IBDF's. Decisions public since 2011; live domain ibdf.com (ibdf.org.in is dead); robots permissive."
+   },
+   {
+    "authority": "DPCGC \u2014 Digital Publisher Content Grievances Council (IAMAI Level-II OTT SRB)",
+    "why": "Critical for any OTT client (the SRB tier answered to before MIB's Level-III), but only semi-published: dpcgc.in is a Squarespace 'Private Site' (noindex) and dpcgc.org returned 509. Realistically tracked via IAMAI press + trade media (Feb 2025 OTT Code-of-Ethics advisory; backdrop of MIB's Jul 2025 blocking of 25 OTT apps). Add as a press/trade-monitored node, not a clean index."
+   },
+   {
+    "authority": "NCLAT \u2014 National Company Law Appellate Tribunal (nclat.nic.in)",
+    "why": "The competition appellate tier and the sister of our covered TDSAT: a CCI order is not settled law until NCLAT (then the Supreme Court). Proof the operative restraint moves here: NCLAT stayed CCI's 5-year Meta/WhatsApp data-sharing ban (23 Jan 2025). Drupal site; judgment/order pages open (robots blocks only admin/user/search)."
+   },
+   {
+    "authority": "MCA \u2014 Ministry of Corporate Affairs (mca.gov.in)",
+    "why": "Where the merger-control PERIMETER is set upstream of CCI: the Sep 2024 notifications commencing the Deal Value Threshold and the de-minimis/target exemptions switched the regime on; MCA is also custodian of the draft Digital Competition Bill. mca.gov.in returns HTTP 403 to non-browser clients (needs a headless browser) or recover from the Commerce/MCA Gazette \u2014 which is outside our current three-ministry lanes."
+   },
+   {
+    "authority": "RBI / FEMA (Non-Debt Instruments) Rules + A.P. (DIR) circulars (rbi.org.in)",
+    "why": "Where DPIIT sector caps become enforceable law (entry route, pricing, reporting) \u2014 a partner tracks the rule/circular, not just the press note (space-sector liberalisation had to be carried into the NDI Rules). Also the gaming payment-rail chokepoint: PROGA + the 2026 Rules make banks/PA-PGs 'frontline gatekeepers' that must verify a game's legality before processing funds. Coordinate with the fintech desk to avoid duplication. ASPX notification pages return full HTML; RBI site terms apply \u2014 verify before bulk fetch."
+   },
+   {
+    "authority": "Digital Bharat Nidhi (DBN, formerly USOF \u2014 dbn.gov.in)",
+    "why": "Now a statutory fund under the Telecommunications Act 2023 (ss.24-26); scheme guidelines and BharatNet/rural-connectivity bidding terms directly bind any TSP/infra/BharatNet contractor. Clean static HTML (~221KB, verified 200) \u2014 trivial to harvest, no JS barrier. Missing entirely from the registry."
+   },
+   {
+    "authority": "DoT ancillary telecom-infra streams \u2014 RoW clarificatory circulars, Trusted Telecom / NSDTS public amendments, SACFA siting-clearance circulars",
+    "why": "The rollout/supply-chain/siting layer that folds operationally into the dot.gov.in crawl but partners name separately. RoW model-timeline OMs are the practical obligation-movers for OFC/tower rollout (RoW Rules gazetted, circulars website-only); NSDTS public amendments operationalise trusted-source procurement (July 2025 Annexure-A PDF); SACFA procedure circulars gate 5G small-cell/street-furniture antenna siting. The sensitive Trusted-Telecom no-procurement lists stay unpublished (see unpublished_layer)."
+   },
+   {
+    "authority": "Gazette keyword-filters for gazette-recoverable authorities \u2014 NCIIPC (s.70 protected-system designations) + UIDAI (Aadhaar authentication regulation amendments)",
+    "why": "Near-zero-cost catch: both binding acts land in the Gazette even though the source sites are unusable (nciipc.gov.in refuses external connections; uidai.gov.in robots is Disallow:/). A s.70(1) designation converts a client into a protected-system operator with audit/reporting duties; UIDAI regulation amendments changed AUA/KUA onboarding (2025-26 face-auth push). Add explicit NCIIPC/'protected system' and UIDAI/Aadhaar keyword filters to the existing MeitY Gazette lane."
+   },
+   {
+    "authority": "CCA (Controller of Certifying Authorities, cca.gov.in) and I4C/MHA-via-PIB + CPCB E-Waste EPR",
+    "why": "Three lower-cost rounders. CCA is ALREADY in the registry as planned (cca_acts, cca_guidelines) \u2014 promote it: clean static HTML, PDFs at /sites/files/pdf/guidelines/, live 2026 DSC/eSign/SSL guideline revisions for fintech-onboarding clients. I4C/MHA is the operational hub behind Sahyog and the s.69A app/URL blocking wave but binds mostly via non-public letter-directions, so capture it through the PIB signal lane, not a comprehensive crawler. CPCB E-Waste EPR binds every electronics 'producer' (registration + annual targets; live floor-price litigation 2024-25) but the Rules gazette under MoEFCC (untracked), so use the MoEFCC Gazette + the eprewastecpcb.in portal."
+   }
+  ],
+  "watch": [
+   "Data Protection Board of India (DPBI) \u2014 constituted 13 Nov 2025, Chairperson and Members appointed 6 Jun 2026, so first inquiries/penalties are imminent; the Rules make it 'digital by design' so a dedicated e-adjudication portal is expected. No portal resolves yet (dpb.gov.in/dpbi.gov.in dead). Track proactively via gazette_meity + MeitY/PIB press; set a watch for the portal the moment it appears \u2014 do NOT wait for it.",
+   "Digital Competition Bill / SSDE ex-ante regime (MCA / Committee on Digital Competition Law) \u2014 draft Bill + CDCL report released Mar 2024, not yet enacted; importance jumps to high the moment notified because it flips large-platform obligations from ex-post CCI enforcement to ex-ante compliance. Consultation/press item until then.",
+   "Digital India Act \u2014 the mooted successor to the IT Act 2000; would reshape the intermediary/AI/blocking regime wholesale. No instrument yet; monitor MeitY consultation drafts.",
+   "Broadcasting Services (Regulation) Bill \u2014 a re-tabled draft would fold OTT and digital news under a statutory MIB Level-III regime; watch MIB/PIB for re-introduction.",
+   "PIB Fact Check Unit (Rule 3(1)(b)(v)) \u2014 struck down as unconstitutional (Kunal Kamra v UOI, Bombay HC tie-breaker 20 Sep 2024). No live binding mechanism \u2014 do NOT wire a source; keep a watch note only for legislative revival or a Digital India Act successor provision.",
+   "MeitY 2023 online-gaming SRB scheme \u2014 dead, not missing: no SRB was ever notified and it is overtaken by the statutory OGAI. Industry bodies (AIGF/EGF/FIFS) are lobbying associations, not regulators \u2014 light watch for position signals only."
+  ],
+  "unpublished_layer": "A real slice of what binds TMT clients never appears on any official venue, and no crawler can fix that \u2014 it must be stated as a limit, not hidden as coverage. The confidential-by-design instruments: s.69A blocking orders (MeitY Designated Officer / IT Blocking Rules 2009, Rule 16 confidentiality \u2014 never gazetted or posted; the ~8,000-account X order of Feb 2025 surfaced only via litigation); Sahyog s.79(3)(b) takedown notices (MHA/I4C \u2014 portal-internal, visible only to the served intermediary; sahyog.mha.gov.in returns HTTP 000 to non-onboarded); GAC appellate orders under Rule 3A (60,147 appeals received / 11,197 disposed as of 27 Aug 2026, but NO public orders repository \u2014 each order behind OTP+captcha, which must not be bypassed; only the aggregate counters and the constitution/reconstitution notifications are public); the DoT/MeitY/MHA 'letter layer' (licence-amendment letters, ministry advisories/letters to intermediaries, lawful-intercept/blocking letters); the Trusted-Telecom no-procurement designation lists; FIU-IND directions to individual reporting entities; and TERM-cell EMF/enforcement actions. The ONLY nets: (1) client intake \u2014 the served client tells you, which is why an intake trigger is the real primary sensor; (2) litigation watch \u2014 court dockets and filings (X Corp v UOI Karnataka HC; Shreya Singhal; Kunal Kamra) pulled same-day from LiveLaw and Bar & Bench and back-filled via eCourts/IndianKanoon; (3) specialist press and civil-society trackers \u2014 MediaNama and ET Telecom (which routinely obtain and publish DoT/MeitY letters), SFLC.in (legally fetchable, maintains blocking trackers), platform transparency reports, and IFF (high value but robots explicitly disallows ClaudeBot/Claude-Web \u2014 manual/newsletter only, or reach the same documents via the court record); and (4) RTI + Parliament answers + PIB aggregate figures. The enabling rule/constitution TEXT underneath each of these is gazette-recoverable even when the orders are not, so track the perimeter and treat the orders as a monitored blind spot.",
+  "out_of_scope_decisions": [
+   "State-level breadth: whether \u2014 and how deep \u2014 to track state online-gaming/gambling regimes (TNOGA and peers) and state RoW nodal regimes. PROGA s.18 gives the central Act overriding effect and s.5 bans all online money games regardless of skill, so the state RMG layer is largely superseded for live business; it now matters chiefly for federalism litigation (Karnataka's mooted SC challenge), transition/legacy exposure, and residual/offline gambling powers (e.g. the Bihar Gambling Act vs PROGA conflict). Authoritative text sits in each State Gazette, which is a large breadth-vs-cost call only the partner can make.",
+   "Fintech depth and desk boundary: how far to go on RBI / NPCI / FEMA NDI Rules / FIU-IND \u2014 whether the TMT tracker OWNS the gaming payment-rail and VDA/PMLA circulars or coordinates with a fintech desk that may already monitor rbi.org.in, to avoid duplication.",
+   "Judicial breadth and depth: which High Courts beyond Delhi to ingest directly, whether to add deal-plumbing (NCLT scheme orders) and consumer precedent (NCDRC / e-Jagriti), and how much to rely on LiveLaw/Bar & Bench headline monitoring versus building captcha-gated primary-portal ingestion.",
+   "Terms/ToS risk appetite for automated ingestion: MediaNama's Cloudflare Content-Signal (ai-train=no), IFF's robots disallowing ClaudeBot, ETPrime/Times-group ToS, eCourts captcha, and the UIDAI / cybercrime.gov.in access walls \u2014 a legal call on exactly where to draw the automated-fetch line versus manual/newsletter monitoring.",
+   "Product-regulatory scope: whether device/hardware market-access sources (BIS CRS, Legal Metrology, DGFT, CPCB E-Waste, BEE star-labelling, BIS QCOs) belong in this TMT book or a separate product-regulatory desk \u2014 they gate market access but sit at the edge of a pure TMT practice.",
+   "Tax-adjacent exposure routing: CBIC 28%-GST-on-gaming and Customs tariff on electronics change client economics and carry live retro-demand litigation, but are the tax team's sources \u2014 flag-and-route, or own them?",
+   "Cross-desk ownership of shared nodes so nothing double-runs or falls through: GAC (intermediary slice), CCI/NCLAT/MCA (deals desk), CCPA/Legal Metrology (advertising/consumer desk). Decide who owns each.",
+   "Whether to track incentive/scheme bodies that do not impose day-to-day obligations \u2014 ISM (already planned as ism_notices) and DBN scheme guidelines \u2014 for eligibility/approvals signal, or exclude them as non-regulatory."
+  ],
+  "summary": "The tracker's 43 live sources plus the three-ministry Gazette are a solid spine for gazetted media-telecom law, but they miss the two layers where TMT obligations actually move first \u2014 the non-gazetted 'own-website' output of MeitY, DoT, CCPA and OGAI, and the whole competition/FDI and judicial layer (CCI, DPIIT, the Supreme Court and four High Courts), of which only TDSAT is covered. The cheapest high-value move is already sitting in the registry: promote the five parked needs_decision endpoints (meity_gazettes, meity_acts_policies, meity_orders_notices, meity_guidelines, pib_moc), which closes most of the top MeitY gap by decision rather than build. Beyond those, the genuine criticals are CCPA, CCI, DPIIT, WPC, the DoT licensing stream and the judicial layer; a strong second tier covers device market-access (BIS/DGFT/Legal Metrology), the broadcast SRBs (NBDSA/BCCC/DPCGC) and the competition-perimeter bodies (NCLAT/MCA/RBI-FEMA). Finally, be honest that s.69A blocking, Sahyog notices, GAC orders and the licence-letter layer are structurally unpublished and reachable only through client intake, litigation watch and specialist press \u2014 a limit to state plainly, not a coverage line to fake."
+ }
+}
