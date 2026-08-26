@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-27T04:12:30+05:30",
+ "generated": "2026-08-27T05:05:27+05:30",
  "sources": {
   "trai_regulations": {
    "status": "QUIET",
@@ -509,7 +509,7 @@
     "first sweep: 16 item(s) ledgered as activation_baseline",
     "5 row(s) outside this source's subject filter"
    ],
-   "checked": "2026-08-27T04:12:27+05:30",
+   "checked": "2026-08-27T05:05:24+05:30",
    "consecutive_failures": 0
   },
   "gazette_meity": {
@@ -522,7 +522,7 @@
    "info": [
     "first sweep: 11 item(s) ledgered as activation_baseline"
    ],
-   "checked": "2026-08-27T04:12:28+05:30",
+   "checked": "2026-08-27T05:05:25+05:30",
    "consecutive_failures": 0
   },
   "gazette_mib": {
@@ -535,296 +535,36 @@
    "info": [
     "first sweep: 1 item(s) ledgered as activation_baseline"
    ],
-   "checked": "2026-08-27T04:12:29+05:30",
+   "checked": "2026-08-27T05:05:27+05:30",
    "consecutive_failures": 0
   },
   "tdsat_orders": {
    "status": "OK",
    "rows_seen": 124,
    "new": 0,
-   "ledgered_total": 124,
+   "ledgered_total": 120,
    "newest_visible": "2026-08-24",
    "notes": [],
-   "info": [],
-   "checked": "2026-08-27T04:12:30+05:30",
+   "info": [
+    "first sweep: 120 item(s) ledgered as activation_baseline",
+    "4 row(s) outside this source's subject filter"
+   ],
+   "checked": "2026-08-27T05:04:28+05:30",
    "consecutive_failures": 0
   }
  },
  "provenance": {
-  "requests": 55,
+  "requests": 5,
   "by_source": {
-   "asci": {
-    "hosts": [
-     "www.ascionline.in"
-    ],
-    "requests": 1
-   },
-   "cbfc": {
-    "hosts": [
-     "cbfcindia.gov.in"
-    ],
-    "requests": 1
-   },
-   "certin_advisories": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "certin_directions": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "certin_guidelines": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "certin_vuln": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "gazette_communications": {
-    "hosts": [
-     "egazette.gov.in"
-    ],
-    "requests": 5
-   },
-   "gazette_meity": {
-    "hosts": [
-     "egazette.gov.in"
-    ],
-    "requests": 5
-   },
    "gazette_mib": {
     "hosts": [
      "egazette.gov.in"
     ],
     "requests": 5
-   },
-   "inspace_publications": {
-    "hosts": [
-     "www.inspace.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_acts_policy": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_advisories": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_broadcasting": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_digital_media": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_orders_notices": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_other_comms": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_itsars": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_latest": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_sas": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_sc": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "prgi": {
-    "hosts": [
-     "prgi.gov.in"
-    ],
-    "requests": 1
-   },
-   "tdsat_notices": {
-    "hosts": [
-     "tdsat.gov.in"
-    ],
-    "requests": 1
-   },
-   "tdsat_orders": {
-    "hosts": [
-     "tdsat.gov.in"
-    ],
-    "requests": 1
-   },
-   "tec_circulars": {
-    "hosts": [
-     "www.tec.gov.in"
-    ],
-    "requests": 1
-   },
-   "tec_essential_requirements": {
-    "hosts": [
-     "www.mtcte.tec.gov.in"
-    ],
-    "requests": 1
-   },
-   "tec_gazette_standards": {
-    "hosts": [
-     "www.tec.gov.in"
-    ],
-    "requests": 1
-   },
-   "tec_whatsnew": {
-    "hosts": [
-     "www.tec.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_consultations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_directions": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_miscellaneous": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_open_consultations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_press_releases": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_recommendations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_regulations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_rss": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_bcs": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_broadband": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_fea": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_nsl": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_qos": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_tariff_broadcasting": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_tariff_telecom": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_whats_new": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
    }
   },
   "hosts": [
-   "cbfcindia.gov.in",
-   "egazette.gov.in",
-   "mib.gov.in",
-   "nccs.gov.in",
-   "prgi.gov.in",
-   "tdsat.gov.in",
-   "trai.gov.in",
-   "www.ascionline.in",
-   "www.cert-in.org.in",
-   "www.inspace.gov.in",
-   "www.mtcte.tec.gov.in",
-   "www.tec.gov.in"
+   "egazette.gov.in"
   ],
   "undeclared": []
  }

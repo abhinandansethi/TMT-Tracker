@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS items(
   flags TEXT NOT NULL DEFAULT '[]',
   seq TEXT,
   lane TEXT NOT NULL DEFAULT 'instruments',
+  meta TEXT NOT NULL DEFAULT '{}',
   first_seen TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'new'
 );
@@ -98,6 +99,7 @@ def item_id(title: str, date: Optional[str]) -> str:
 MIGRATIONS = [
     ("items", "seq", "TEXT"),
     ("items", "lane", "TEXT NOT NULL DEFAULT 'instruments'"),
+    ("items", "meta", "TEXT NOT NULL DEFAULT '{}'"),
     ("source_state", "newest_visible", "TEXT"),
 ]
 
@@ -127,13 +129,14 @@ class Ledger:
     def insert(self, rec: Dict) -> None:
         self.db.execute(
             "INSERT INTO items(id,date,title,url,page_url,source_id,regulator,stratum,type,"
-            "routine,deadline,flags,seq,lane,first_seen,status) "
-            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "routine,deadline,flags,seq,lane,meta,first_seen,status) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (rec["id"], rec.get("date"), rec["title"], rec.get("url"), rec.get("page_url"),
              rec["source_id"], rec.get("regulator"), rec.get("stratum"), rec.get("type"),
              int(bool(rec.get("routine"))), rec.get("deadline"),
              json.dumps(rec.get("flags", [])), rec.get("seq"),
-             rec.get("lane", "instruments"), rec["first_seen"], rec.get("status", "new")))
+             rec.get("lane", "instruments"), json.dumps(rec.get("meta") or {}, ensure_ascii=False),
+             rec["first_seen"], rec.get("status", "new")))
         self.db.commit()
         with self.jsonl.open("a") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -257,12 +260,13 @@ class Ledger:
     # ----------------------------------------------------------- queries
     def all_items(self) -> List[Dict]:
         cols = ["id", "date", "title", "url", "page_url", "source_id", "regulator", "stratum",
-                "type", "routine", "deadline", "flags", "seq", "lane", "first_seen", "status"]
+                "type", "routine", "deadline", "flags", "seq", "lane", "meta", "first_seen", "status"]
         out = []
         for r in self.db.execute(f"SELECT {','.join(cols)} FROM items ORDER BY date, id"):
             d = dict(zip(cols, r))
             d["routine"] = bool(d["routine"])
             d["flags"] = json.loads(d["flags"])
+            d["meta"] = json.loads(d.get("meta") or "{}")
             out.append(d)
         return out
 

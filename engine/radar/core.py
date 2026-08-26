@@ -49,6 +49,15 @@ def _page_urls(source: dict, max_pages: int) -> List[str]:
     return [base]
 
 
+# parser 'extra' keys worth persisting to the ledger and exposing to the partner's pipeline
+_META_KEYS = frozenset({
+    "gazette_id", "impacted_rule", "effective_date", "impact", "part_section", "category",
+    "department", "ministry", "office", "publish_date",           # gazette
+    "case_no", "parties", "filing_token",                          # tribunal / court
+    "seq", "src_type",                                             # sequence, venue's own type
+})
+
+
 def _field(row: dict, field: str) -> str:
     if field.startswith("extra."):
         return str((row.get("extra") or {}).get(field[6:], ""))
@@ -328,8 +337,13 @@ class Sweeper:
                 "id": iid,
                 "date": clean.get("date") and str(clean["date"]),
                 "title": title,
-                "url": str(clean.get("url") or ""),
-                "page_url": clean.get("page_url"),
+                # Dual-link: every item carries a document link AND a landing page. The
+                # landing page is the detail page a parser found, else the source's own
+                # listing page — so a partner (and their pipeline) always has both the
+                # instrument itself and the official page it was published on. Where a row
+                # has only one real link, the two fields coincide (best effort, no gap flag).
+                "url": str(clean.get("url") or "") or (source.get("page_url") or source["url"]),
+                "page_url": (clean.get("page_url") or source.get("page_url") or source["url"]),
                 "source_id": sid,
                 "regulator": source.get("regulator"),
                 "stratum": source.get("stratum"),
@@ -342,6 +356,10 @@ class Sweeper:
                              or cl.extract_deadline(title, self.deadline_rx, source.get("date_formats", []))),
                 "flags": flags,
                 "seq": seq_key,
+                # structured metadata a partner (and their pipeline) can use: the gazette's
+                # impacted rule / impact flag / part-section, a tribunal matter's parties, etc.
+                "meta": {k: v for k, v in (clean.get("extra") or {}).items()
+                         if k in _META_KEYS and v not in (None, "")},
                 # Routine means recurring administrative output: drive tests, lab
                 # designations, statistics releases. That is the signals definition, so it
                 # belongs there rather than sitting in the instruments ledger behind a

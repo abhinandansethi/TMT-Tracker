@@ -200,19 +200,24 @@ def export() -> int:
     for it in led.all_items():
         if it["status"] == "duplicate":
             continue
-        # signals are leads, not instruments: they render in their own tab and must never
-        # appear in the ledger a partner reads as citable
-        if it.get("lane") == "signals":
-            continue
-        if it["id"] in curated:
-            out_items.append(curated[it["id"]])
-            continue
+        url = str(it["url"] or "")
+        is_pdf = url.lower().split("?")[0].endswith((".pdf", ".doc", ".docx"))
+        meta = it.get("meta") or {}
         rec = {
             "date": it["date"], "source_id": it["source_id"], "regulator": it["regulator"],
             "type": it["type"], "routine": it["routine"], "title": it["title"],
-            "pdf_url": it["url"] if str(it["url"]).lower().split("?")[0].endswith(".pdf") else None,
-            "page_url": it.get("page_url") or (None if str(it["url"]).lower().split("?")[0].endswith(".pdf") else it["url"]),
-            "deadline": it["deadline"], "gist": "", "id": it["id"], "status": it["status"],
+            "lane": it.get("lane", "instruments"),
+            # dual links, every item: the document itself and the official landing page it
+            # was published on. A gazette entry has no direct PDF (postback), so its citation
+            # is the permanent Gazette ID carried in meta.
+            "doc_url": url or None,
+            "page_url": it.get("page_url") or None,
+            "pdf_url": url if is_pdf else None,   # kept for backward compatibility
+            "deadline": it["deadline"], "id": it["id"], "status": it["status"],
+            "meta": meta,
+            # preserve a hand-written gist from the v1 baseline (curated prose), but never let
+            # a stale exported entry freeze fresh engine metadata like the impacted rule
+            "gist": (curated.get(it["id"], {}) or {}).get("gist", "") or "",
         }
         if it.get("flags"):
             rec["flags"] = it["flags"]
@@ -220,16 +225,23 @@ def export() -> int:
             rec["stratum"] = it["stratum"]
         out_items.append(rec)
     dates = sorted(d for d in (i.get("date") for i in out_items) if d)
+
+    def lane_of(i: dict) -> str:
+        return i.get("lane", "instruments")
+    inst = [i for i in out_items if lane_of(i) == "instruments"]
     payload = {
-        "schema_version": "3.1",
+        "schema_version": "3.2",
         "generated": now_ist(),
         "window": {"from": dates[0] if dates else None, "to": dates[-1] if dates else None},
         "stats": {
             "total": len(out_items),
-            "substantive": sum(1 for i in out_items if not i.get("routine")),
+            "instruments": len(inst),
+            "judgments": sum(1 for i in out_items if lane_of(i) == "judgments"),
+            "signals": sum(1 for i in out_items if lane_of(i) == "signals"),
+            "substantive": sum(1 for i in inst if not i.get("routine")),
             "routine": sum(1 for i in out_items if i.get("routine")),
             "quarantined": led.db.execute("SELECT COUNT(*) FROM quarantine").fetchone()[0],
-            "open_deadlines": sum(1 for i in out_items
+            "open_deadlines": sum(1 for i in inst
                                   if i.get("deadline") and str(i["deadline"]) >= date.today().isoformat()),
         },
         # newest first; undated rows (document shelves) fall to the end

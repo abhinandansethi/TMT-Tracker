@@ -1958,7 +1958,7 @@
    "id": "tdsat_orders",
    "stratum": "telecom",
    "regulator": "TDSAT",
-   "name": "Judgments and daily orders",
+   "name": "Judgments & orders",
    "url": "https://tdsat.gov.in/Delhi/services/dailyorderlist.php",
    "status": "live",
    "method": "post_form",
@@ -1986,7 +1986,14 @@
     "tdsat.gov.in"
    ],
    "default_type": "court_order",
-   "quirks": "Specialist tribunal for telecom and broadcasting. POST-only with a date window; no session, cookie or CSRF. s.52(1)(q)(iv) expressly permits reproducing judgments and orders of a tribunal, and TDSAT publishes no prohibition, so this is the cleanest category in the registry. Item links are javascript handlers carrying a base64 filing number. Replaces notices.php, which was the court diary and carried no instruments. Daily orders run ~39/day, largely procedural (listings, adjournments), so the window is kept short; filtering to substantive judgments via judgment.php is a refinement."
+   "quirks": "Specialist tribunal for telecom and broadcasting. POST-only with a date window; no session, cookie or CSRF. s.52(1)(q)(iv) expressly permits reproducing judgments and orders of a tribunal, and TDSAT publishes no prohibition, so this is the cleanest category in the registry. Item links are javascript handlers carrying a base64 filing number. Replaces notices.php, which was the court diary and carried no instruments. Daily orders run ~39/day, largely procedural (listings, adjournments), so the window is kept short; filtering to substantive judgments via judgment.php is a refinement.",
+   "row_exclude": {
+    "fields": [
+     "extra.case_no",
+     "extra.parties"
+    ],
+    "regex": "\\bAERA\\b|AIRPORT|AIRPORTS ECONOMIC|GMR |BIAL\\b|DIAL\\b|AIRLINE"
+   }
   }
  ],
  "window_start": "2026-06-01",

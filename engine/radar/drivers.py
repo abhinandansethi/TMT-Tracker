@@ -135,25 +135,35 @@ def _parse_gazette_grid(html: str, source: dict, seen_ids: set) -> List[Row]:
     return out
 
 
+_GAZ_FIELDS = ("Impacted Rule", "Applicable Section/Rule", "Date of Applicability",
+               "Impact", "New Gazette", "Amended by", "Amendment")
+
+
 def _split_gazette_subject(subject: str):
-    """Return (clean_instrument_name, {annotation fields}). The e-Gazette subject cell
-    appends a parenthesised annotation block; the name is everything before it."""
+    """Return (clean_instrument_name, {annotation fields}). The e-Gazette subject cell is
+    "<name>. ( New Gazette, Impacted Rule : ..., Date of Applicability : DD/MM/YYYY, Impact
+    : ... ) (Dept)". Field VALUES themselves contain commas and parentheses (a section
+    citation like "Sub-section (2) of section 56 of the ... Act, 2023"), so each value runs
+    up to the next known field label, not the next comma."""
     ann = {}
     m = re.search(r"\s*\(\s*(?:New Gazette|Amendment|Impacted Rule)\b", subject)
     title = subject[:m.start()].strip().rstrip(".") if m else subject.strip().rstrip(".")
     block = subject[m.start():] if m else ""
+    nextfield = r"(?=\s*,?\s*(?:" + "|".join(re.escape(f) for f in _GAZ_FIELDS) + r")\s*:|\s*\)\s*(?:\(|$))"
     for key, field in (("Date of Applicability", "effective_date"),
                        ("Applicable Section/Rule", "applicable_rule"),
                        ("Impacted Rule", "impacted_rule"),
                        ("Impact", "impact")):
-        mm = re.search(re.escape(key) + r"\s*:\s*([^,)]+)", block)
+        mm = re.search(re.escape(key) + r"\s*:\s*(.+?)" + nextfield, block, re.S)
         if mm:
-            val = mm.group(1).strip()
+            val = re.sub(r"\s+", " ", mm.group(1)).strip()
+            # drop repeated bare labels the grid interleaves (", New Gazette", ", Amendment")
+            val = re.sub(r"(?:,\s*(?:New Gazette|Amendment|Amended by)\b[^,]*)+\s*$", "", val).strip().rstrip(",")
             if field == "effective_date":
                 dm = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", val)
-                if dm:
-                    val = f"{dm.group(3)}-{int(dm.group(2)):02d}-{int(dm.group(1)):02d}"
-            ann[field] = val[:120]
+                val = f"{dm.group(3)}-{int(dm.group(2)):02d}-{int(dm.group(1)):02d}" if dm else None
+            if val:
+                ann[field] = val[:160]
     return title, ann
 
 

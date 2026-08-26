@@ -40,30 +40,50 @@ STRATUM_LABEL = {"telecom": "Telecom", "tech_data": "Technology and data",
                  "media": "Media", "safety_net": "Safety net"}
 STRATUM_FILTER_LABEL = {"telecom": "Telecom", "tech_data": "Tech & data", "media": "Media"}
 
-# ---- deterministic display-title shortener (fallback for items with no override) ----
-STRIP = ["Notice for stakeholder consultation on Draft for Comments – Test Cases for ",
-         "Notice for stakeholder consultation on ", "Draft Generic Test Cases for ",
-         "Consultation Paper on Draft Amendments in The ", "Consultation Paper on ",
-         "Instructions to be specified on the portal in accordance with the ",
-         "Direction on Allocation and operationalization of ", "Direction on ", "Order regarding ",
-         "TRAI releases clarifications regarding ", "TRAI releases ", "TRAI issues an amended ",
-         "TRAI issues ", "Press Release on ", "Notification for ", "Notification of ",
-         "NCCS designates ", "Extension of last date for "]
-CUT = [" for Service and Transactional", " for entities in sectors", " under TCCCPR",
-       " in accordance with", " for assessment of", " notified under", " pursuant to",
-       " (Wireline and Wireless)", " Service Regulations, 2024"]
+# ---- deterministic display-title shortener ----
+# A crisp heading tells a partner at a glance what the instrument pertains to. That means
+# stripping the bureaucratic lead-in ("Notification of the...", "Consultation Paper on...")
+# and the statutory tail ("under sub-section (2) of section 56 of the ... Act, 2023") so the
+# subject itself leads. Regex-driven rather than a hand list, so it generalises. Runtime stays
+# deterministic; short_titles.json overrides still win for anything hand-curated.
+_LEAD = re.compile(
+    r"^(?:"
+    r"notice for stakeholder consultation on (?:draft for comments\s*[–-]\s*)?(?:test cases for\s+)?"
+    r"|draft generic test cases for "
+    r"|(?:pre[\s-]?)?consultation paper on (?:draft amendments? (?:in|to) the\s+)?"
+    r"|draft (?:amendments? (?:in|to) the\s+)?"
+    r"|direction (?:on|regarding|to) (?:allocation and operationalization of\s+)?"
+    r"|recommendations? on (?:issues (?:related to|relating to)\s+)?"
+    r"|order (?:regarding|dated|on|in the matter of) "
+    r"|publication of (?:revised |new )?"
+    r"|notification (?:of the |of |regarding |for the |for )?(?:enforcement of\s+)?"
+    r"|notification to be published[^,]*?(?:regarding|of|for) "
+    r"|instructions? to be specified[^,]*?accordance with the\s+"
+    r"|trai (?:releases?|issues?|initiates?|hosts?|assesses?) (?:an?\s+amended\s+|clarifications? regarding\s+)?"
+    r"|nccs (?:designates?|has designated) "
+    r"|press release (?:on|regarding) "
+    r"|in the matter of "
+    r"|clarification (?:regarding|on) "
+    r")", re.I)
+_TAIL = re.compile(
+    r"(?:"
+    r",?\s+under (?:sub-?section|section|rule|clause|the provisions)\b.*$"
+    r"|,?\s+in accordance with\b.*$"
+    r"|,?\s+pursuant to\b.*$"
+    r"|,?\s+in pursuance of\b.*$"
+    r"|\s+for (?:service and transactional|entities in sectors other)\b.*$"
+    r"|\s+by (?:entities|access providers) in\b.*$"
+    r")", re.I)
 
 
-def shorten(t: str, cap: int = 54) -> str:
-    s = t.strip()
-    for p in STRIP:
-        if s.lower().startswith(p.lower()):
-            s = s[len(p):]; break
-    for c in CUT:
-        i = s.find(c)
-        if i > 12:
-            s = s[:i]; break
-    s = s.strip(" ,;:—-")
+def shorten(t: str, cap: int = 66) -> str:
+    s = re.sub(r"\s+", " ", t or "").strip().rstrip(".")
+    s = _LEAD.sub("", s, count=1).strip()
+    s = _TAIL.sub("", s).strip(" ,;:—-")
+    if s and s[0].islower():
+        s = s[0].upper() + s[1:]
+    if not s:
+        s = re.sub(r"\s+", " ", (t or "")).strip()
     if len(s) <= cap:
         return s
     return s[:cap].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
@@ -83,6 +103,10 @@ def venue_label(reg: str, name: str) -> str:
 VENUE = {s["id"]: venue_label(s["regulator"], s["name"]) for s in registry_v1["sources"]}
 VENUE.update({s["id"]: venue_label(s["regulator"], s["name"]) for s in registry["sources"]})
 VENUE["gazette_crosscheck"] = "e-Gazette cross-check"
+VENUE["tdsat_orders"] = "TDSAT"
+VENUE["gazette_communications"] = "e-Gazette · Communications"
+VENUE["gazette_meity"] = "e-Gazette · MeitY"
+VENUE["gazette_mib"] = "e-Gazette · MIB"
 
 V2_BY_ID: dict[str, dict[str, Any]] = {s["id"]: s for s in registry["sources"]}
 
@@ -130,6 +154,62 @@ def first_sentence(t: Optional[str], cap: int = 110) -> str:
     return t if len(t) <= cap else t[:cap].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
 
 
+_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def fmt_date(iso: Optional[str]) -> str:
+    if not iso or len(str(iso)) < 10:
+        return ""
+    y, m, d = str(iso)[:10].split("-")
+    return f"{int(d)} {_MON[int(m) - 1]} {y}"
+
+
+def _short_rule(rule: str) -> str:
+    """'Sub-section (2) of section 56 of the Telecommunications Act, 2023 (44 of 2023)'
+    -> 's.56, Telecommunications Act 2023' — the citation a lawyer scans for."""
+    r = re.sub(r"\s+", " ", rule or "")
+    sec = re.search(r"section\s+(\d+[A-Z]?)", r, re.I)
+    act = re.search(r"of the ([A-Z][^,]+? Act,? \d{4})", r)
+    bits = []
+    if sec:
+        bits.append("s." + sec.group(1))
+    if act:
+        bits.append(re.sub(r",? (\d{4})$", r" \1", act.group(1).strip()))
+    return ", ".join(bits) or (r[:48] + ("…" if len(r) > 48 else ""))
+
+
+def descriptor(it: dict[str, Any]) -> str:
+    """Deterministic one-line 'what it pertains to / what to do'. Built from the item's own
+    metadata — an effective date, a comment deadline, the section it amends — never a model.
+    The short title says what the instrument IS; this says why a partner should care now."""
+    meta = it.get("meta") or {}
+    typ = (it.get("type") or "").lower()
+    dl = it.get("deadline")
+    today = NOW.strftime("%Y-%m-%d")
+    bits: list[str] = []
+    # 1. an open comment window is the most actionable fact
+    if dl and str(dl) >= today and ("consult" in typ or "draft" in typ):
+        bits.append("Comments due " + fmt_date(dl))
+    # 2. a gazette notification: when it bites, what it touches, whether action is flagged
+    if meta.get("gazette_id"):
+        if meta.get("effective_date") and not bits:
+            bits.append("In force " + fmt_date(meta["effective_date"]))
+        if meta.get("impacted_rule"):
+            bits.append("amends " + _short_rule(meta["impacted_rule"]))
+        if str(meta.get("impact", "")).lower().startswith("action"):
+            bits.append("action required")
+    # 3. a tribunal/court order: name the parties (the title is the case number)
+    elif it.get("lane") == "judgments" and meta.get("parties"):
+        p = clean(meta["parties"]).title()
+        bits.append(p[:70] + ("…" if len(p) > 70 else ""))
+    # 4. otherwise a plain type + effective/issue framing
+    if not bits:
+        lab = TYPE_LABEL.get(it.get("type", ""), (it.get("type", "") or "").replace("_", " ").title())
+        when = fmt_date(it.get("date"))
+        bits.append(f"{lab}{(' · ' + when) if when else ''}")
+    return " · ".join(bits)
+
+
 MEMOS = {"d90090c2ea": "2026-08-10_TRAI_1601-series_client-alert_SAMPLE.docx"}
 TYPE_LABEL = {"consultation_notice": "Consultation", "consultation_paper": "Consultation",
   "draft_test_cases": "Draft", "draft_rules": "Draft rules", "exemption_circular": "Circular",
@@ -139,24 +219,38 @@ TYPE_LABEL = {"consultation_notice": "Consultation", "consultation_paper": "Cons
   "rules": "Rules", "direction": "Direction", "recommendation": "Recommendation", "manual": "Manual",
   "order": "Order", "do_letter": "Letter", "policy": "Policy", "other": "Other"}
 
-rows: list[dict[str, Any]] = []
-for it in items["items"]:
-    rows.append({
+def build_row(it: dict[str, Any]) -> dict[str, Any]:
+    meta = it.get("meta") or {}
+    # a gazette entry has no direct PDF (its citation is the permanent Gazette ID), so the
+    # "document" link is the landing page and the id is shown as the reference
+    doc = it.get("doc_url") or it.get("pdf_url")
+    return {
         # date may be null: several media/tech_data listings publish undated rows. Kept in
-        # the ledger, rendered as "—", and excluded from every date bucket — placing an
-        # undated instrument inside a date range would be a claim the source does not make.
+        # the ledger, rendered as "—", and excluded from every date bucket.
         "id": it["id"], "date": it.get("date") or None, "reg": it["regulator"],
-        "routine": it.get("routine", False),
+        "routine": it.get("routine", False), "lane": it.get("lane", "instruments"),
         "stratum": row_stratum(it),
         "type": TYPE_LABEL.get(it.get("type", ""), (it.get("type", "") or "").replace("_", " ").title()),
         "short": overrides.get(it["id"]) or shorten(it["title"]),
         "official": it["title"], "gist": clean(it.get("gist") or ""),
-        "line": lines_map.get(it["id"]) or first_sentence(clean(it.get("gist") or "")),
+        # crisp deterministic descriptor from the item's own metadata; curated override wins
+        "line": lines_map.get(it["id"]) or first_sentence(clean(it.get("gist") or "")) or descriptor(it),
         "venue": VENUE.get(it["source_id"], it["source_id"]),
-        "pdf": it.get("pdf_url"), "page": it.get("page_url"), "pr": it.get("announced_by_pr"),
+        # dual links: the document itself and the official landing page
+        "doc": doc, "page": it.get("page_url"),
+        "gid": meta.get("gazette_id"), "impact": meta.get("impact"),
+        "effective": meta.get("effective_date"), "rule": meta.get("impacted_rule"),
+        "pr": it.get("announced_by_pr"),
         "deadline": it.get("deadline"), "flags": it.get("flags", []),
         "memo": MEMOS.get(it["id"]),
-    })
+    }
+
+
+all_rows = [build_row(it) for it in items["items"]]
+# route by lane: instruments and judgments render in separate tabs; signals stay out of the
+# instruments ledger (they are leads and announcements, shown in the Signals tab)
+rows = [r for r in all_rows if r["lane"] == "instruments"]
+judgment_rows = [r for r in all_rows if r["lane"] == "judgments"]
 
 # ---- fold announcement documents into the instrument they announce ----
 # Same rule already used for TRAI press releases: a notice that merely announces a
@@ -326,7 +420,13 @@ payload: dict[str, Any] = {
     "staleAfterHours": 26,
     "today": NOW.strftime("%Y-%m-%d"),
     "rows": rows,
+    "judgments": sorted(judgment_rows, key=lambda r: (r.get("date") or ""), reverse=True),
     "signals": signals,
+    # Update-now wiring. The published page cannot itself reach gov.in (sandbox), so the
+    # button triggers the partner's pipeline endpoint if one is configured, else opens the
+    # local operator console which runs the real sweep. Both are overridable at deploy time
+    # via window.TMT_CONFIG = {pipelineEndpoint, consoleUrl}.
+    "updateConfig": {"pipelineEndpoint": None, "consoleUrl": "http://127.0.0.1:8787"},
     "strataOrder": [{"key": st, "label": STRATUM_FILTER_LABEL[st]}
                     for st in ("telecom", "tech_data", "media")],
     "stratum_counts": stratum_counts,
@@ -349,8 +449,8 @@ payload: dict[str, Any] = {
         "row_lines": {k: v for k, v in lines_map.items() if not k.startswith("_")},
         "folds": {k: v for k, v in folds_map.items() if not k.startswith("_")},
         "stratum_rule": STRATUM_RULE,
-        "shortener": {"strip_prefixes": STRIP, "cut_at": CUT, "cap": 54,
-                      "note": "short = short_titles[id] if present, else strip a known prefix, cut at a known qualifier, cap at 54 chars on a word boundary. line = row_lines[id] if present, else the first sentence of gist capped at 110 chars. No model judgment."},
+        "shortener": {"lead_pattern": _LEAD.pattern, "tail_pattern": _TAIL.pattern, "cap": 66,
+                      "note": "short = short_titles[id] if present, else strip a boilerplate lead-in (Notification of / Consultation Paper on / Direction on / ...) and a statutory tail (under section ... / in accordance with ...), cap 66 chars on a word boundary. line = row_lines[id] if present, else a deterministic descriptor from the item's own metadata. No runtime model judgment."},
     },
 }
 data_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
@@ -391,8 +491,22 @@ input::placeholder{color:var(--ghost)}
   justify-content:space-between;gap:24px;flex-wrap:wrap}
 .wordmark{font-family:var(--serif);font-weight:400;font-size:29px;letter-spacing:.005em;color:#fff}
 .wordmark b{font-weight:600}
+.updbar{display:flex;align-items:center;gap:16px}
 .updated{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:#B9CEDC}
 .updated span{color:#fff;font-weight:500}
+#updnow{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--ochre);
+  border:0;padding:7px 14px;transition:opacity .12s}
+#updnow:hover{opacity:.85}
+#updnow:disabled{opacity:.5;cursor:progress}
+#updnow:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.upd-note{display:none;background:var(--navy-wash);color:var(--navy);padding:9px 64px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.03em;border-bottom:1px solid var(--rule2)}
+.upd-note.on{display:block}
+.upd-note a{color:var(--navy);text-decoration:underline;text-underline-offset:2px}
+@media (max-width:760px){.upd-note{padding-left:22px;padding-right:22px}}
+.jnote{max-width:78ch;margin:16px 0 8px;font-size:12.5px;line-height:1.5;color:var(--mute)}
+.thead .r.jr,.row .line.jr{grid-template-columns:104px 128px minmax(0,1fr) 120px 24px}
 .tabs{background:var(--navy-d);padding:0 64px;display:flex;gap:2px}
 .tabs button{appearance:none;background:none;border:0;border-bottom:3px solid transparent;
   padding:13px 18px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;
@@ -586,12 +700,17 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
 <div class="sheet">
   <div class="head">
     <div class="wordmark">TMT <b>Regulatory Radar</b></div>
-    <div class="updated">Last updated <span id="upd"></span></div>
+    <div class="updbar">
+      <div class="updated">Last updated <span id="upd"></span></div>
+      <button id="updnow" type="button" title="Run a fresh sweep">Update now</button>
+    </div>
   </div>
   <div class="stale-bar" id="stalebar"></div>
+  <div class="upd-note" id="updnote"></div>
 
   <nav class="tabs">
     <button class="on" data-v="instruments">Instruments</button>
+    <button data-v="judgments">Judgments</button>
     <button data-v="coverage">Coverage</button>
     <button data-v="signals">Signals</button>
   </nav>
@@ -620,6 +739,20 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
       <div id="rows"></div>
     </div></div>
     <div class="empty" id="empty" style="display:none">No instruments match</div>
+  </section>
+
+  <section class="view" id="v-judgments">
+    <div class="sechead"><div class="l">Judgments &amp; orders</div>
+      <div class="r" id="judgct"></div></div>
+    <p class="jnote">Tribunal and court decisions relevant to TMT clients. Interpretive rather
+    than obligation-changing — read for how the law is being applied, not as a compliance
+    deadline. Reproduced under s.52(1)(q)(iv), Copyright Act 1957.</p>
+    <div class="tablewrap"><div class="tbl">
+      <div class="thead"><div class="r jr">
+        <div>Date</div><div>Forum</div><div>Matter</div><div>Type</div><div></div>
+      </div></div>
+      <div id="jrows"></div>
+    </div></div>
   </section>
 
   <section class="view" id="v-coverage">
@@ -658,6 +791,40 @@ const days = iso => Math.round((new Date(iso) - new Date(D.today)) / 86400000);
 const pl = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 
 $('#upd').textContent = D.updated;
+
+// Update-now. The published page runs in a sandbox that cannot reach gov.in, so it cannot
+// sweep itself. Behaviour is "both": if the partner has wired their pipeline endpoint
+// (window.TMT_CONFIG.pipelineEndpoint, or the deploy-time updateConfig), the button triggers
+// that pipeline; otherwise it opens the local operator console, which runs the real sweep.
+(function(){
+  const cfg = Object.assign({}, D.updateConfig || {}, (window.TMT_CONFIG || {}));
+  const btn = $('#updnow'), note = $('#updnote');
+  if (!btn) return;
+  const say = (html) => { note.innerHTML = html; note.classList.add('on'); };
+  btn.addEventListener('click', async () => {
+    if (cfg.pipelineEndpoint) {
+      btn.disabled = true; btn.textContent = 'Updating…';
+      say('Triggering your update pipeline…');
+      try {
+        const res = await fetch(cfg.pipelineEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'sweep', source: 'tmt-radar-dashboard' }) });
+        say(res.ok
+          ? 'Update requested. Your pipeline is running the sweep; this page will refresh when it republishes.'
+          : 'Pipeline returned ' + res.status + '. Check the endpoint, or run a sweep from the console.');
+      } catch (e) {
+        say('Could not reach the pipeline endpoint. It may be offline, or run a sweep from the '
+          + '<a href="' + esc(cfg.consoleUrl || 'http://127.0.0.1:8787') + '" target="_blank" rel="noopener">operator console</a>.');
+      } finally { btn.disabled = false; btn.textContent = 'Update now'; }
+    } else {
+      const url = cfg.consoleUrl || 'http://127.0.0.1:8787';
+      window.open(url, '_blank', 'noopener');
+      say('This shared page cannot fetch government sites itself. Opened the '
+        + '<a href="' + esc(url) + '" target="_blank" rel="noopener">operator console</a> — press '
+        + '<b>Check all sources now</b> there, then ask Claude to republish. '
+        + '(Wire a pipeline endpoint to make this button one-click.)');
+    }
+  });
+})();
 
 // Age is computed when the page opens, not when it was built: a tab left open for a
 // week, or a link opened months later, must still tell the truth about freshness.
@@ -717,14 +884,20 @@ function dlCell(r) {
 }
 function metaCells(r) {
   const m = [['Source', r.venue], ['Issued', r.date ? fmt(r.date) : 'Not dated on venue']];
-  m.push(r.deadline ? [/consult|draft/i.test(r.type) ? 'Comments' : 'Lapses', fmt(r.deadline)] : ['Deadline', 'None stated']);
+  if (r.effective) m.push(['In force', fmt(r.effective)]);
+  m.push(r.deadline && !r.effective ? [/consult|draft/i.test(r.type) ? 'Comments' : 'Lapses', fmt(r.deadline)] : null);
+  if (r.rule) m.push(['Amends', r.rule]);
+  if (r.gid) m.push(['Gazette ID', r.gid]);
+  if (r.impact) m.push(['Impact', r.impact]);
   m.push(['Status', (r.flags || []).includes('needs_verification') ? 'Gazette pending' : 'On official venue']);
-  return m.map(x => '<div><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + '</div></div>').join('');
+  return m.filter(Boolean).map(x => '<div><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + '</div></div>').join('');
 }
 function acts(r) {
   const a = [];
-  if (r.pdf) a.push('<a href="' + esc(r.pdf) + '" target="_blank" rel="noopener">Official text</a>');
-  if (r.page && r.page !== r.pdf) a.push('<a href="' + esc(r.page) + '" target="_blank" rel="noopener">Source page</a>');
+  // dual links, always both where they exist: the document itself and the official page
+  if (r.doc) a.push('<a href="' + esc(r.doc) + '" target="_blank" rel="noopener">Official text</a>');
+  if (r.page && r.page !== r.doc) a.push('<a href="' + esc(r.page) + '" target="_blank" rel="noopener">Source page</a>');
+  if (r.gid && !r.doc) a.push('<span style="font-family:var(--mono);font-size:10.5px;color:var(--mute)">Gazette ID ' + esc(r.gid) + '</span>');
   if (r.pr) a.push('<a href="' + esc(r.pr) + '" target="_blank" rel="noopener">Announcement</a>');
   if (r.notice) a.push('<a href="' + esc(r.notice) + '" target="_blank" rel="noopener">Consultation notice</a>');
   if (r.memo) a.push('<a href="' + esc(r.memo) + '">Draft memo</a>');
@@ -748,12 +921,12 @@ function render() {
         '<div class="c-date' + (r.date ? '' : ' none') + '">' + fmt(r.date) + '</div>' +
         '<div class="c-reg">' + esc(r.reg) + '</div>' +
         '<div class="c-title">' +
-          ((r.pdf || r.page)
-            ? '<a class="t" href="' + esc(r.pdf || r.page) + '" target="_blank" rel="noopener" title="Open the document">' + esc(r.short) + '</a>'
+          ((r.doc || r.page)
+            ? '<a class="t" href="' + esc(r.doc || r.page) + '" target="_blank" rel="noopener" title="Open the document">' + esc(r.short) + '</a>'
             : '<span class="t">' + esc(r.short) + '</span>') +
           (r.line ? '<span class="sub">' + esc(r.line) + '</span>' : '') +
           '<div class="peek"><div class="lbl">Official title</div><div class="full">' + esc(r.official) + '</div>' +
-          '<div class="foot"><span>' + esc(r.venue) + '</span><span>' + (r.pdf ? 'PDF on file' : 'No PDF linked') + '</span></div></div>' +
+          '<div class="foot"><span>' + esc(r.venue) + '</span><span>' + (r.doc ? 'Document on file' : (r.gid ? 'Gazette ' + esc(r.gid) : 'No document linked')) + '</span></div></div>' +
         '</div>' +
         '<div class="c-type"><span class="' + (/draft|consult/i.test(r.type) ? 'draft' : (r.routine ? 'quiet' : '')) +
           '">' + esc((r.type || '').replace(/_/g, ' ')) + '</span></div>' +
@@ -787,6 +960,39 @@ $('#stratum').addEventListener('change', e => { state.stratum = e.target.value; 
 $('#reg').addEventListener('change', e => { state.reg = e.target.value; render(); });
 $('#dates').addEventListener('change', e => { state.dates = e.target.value; render(); });
 render();
+
+/* judgments: a separate lane, so tribunal/court orders never flood the instruments list */
+(function renderJudgments(){
+  const J = D.judgments || [];
+  $('#judgct').textContent = pl(J.length, 'decision') + ' · last 7 days';
+  $('#jrows').innerHTML = J.map(r => {
+    const open = 'j:' + r.id === state.open;
+    const forum = r.venue || r.reg;
+    const matter = r.line || r.short;
+    return '<div class="row' + (open ? ' open' : '') + '" data-id="j:' + r.id + '">' +
+      '<div class="line jr" tabindex="0" role="button" aria-expanded="' + open + '">' +
+        '<div class="c-date' + (r.date ? '' : ' none') + '">' + fmt(r.date) + '</div>' +
+        '<div class="c-reg">' + esc(forum) + '</div>' +
+        '<div class="c-title">' +
+          (r.doc ? '<a class="t" href="' + esc(r.doc) + '" target="_blank" rel="noopener">' + esc(r.short) + '</a>'
+                 : '<span class="t">' + esc(r.short) + '</span>') +
+          (matter && matter !== r.short ? '<span class="sub">' + esc(matter) + '</span>' : '') +
+        '</div>' +
+        '<div class="c-type"><span class="quiet">' + esc((r.type || 'order').replace(/_/g,' ')) + '</span></div>' +
+        '<div class="c-mark">' + (open ? '−' : '+') + '</div>' +
+      '</div>' +
+      '<div class="detail"><div class="lbl">Matter</div><div class="full">' + esc(r.official) + '</div>' +
+        '<div class="meta">' + metaCells(r) + '</div>' +
+        '<div class="acts">' + acts(r) + '</div>' +
+      '</div></div>';
+  }).join('') || '<div class="empty">No judgments in the current window</div>';
+  $('#jrows').querySelectorAll('.line').forEach(el => {
+    const id = el.parentElement.dataset.id;
+    const go = () => { state.open = state.open === id ? null : id; renderJudgments(); };
+    el.addEventListener('click', e => { if (e.target.closest('a')) return; go(); });
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+})();
 
 /* coverage: stratum -> regulator -> venue, with per-source health */
 function venDetail(v) {
