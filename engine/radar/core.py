@@ -49,18 +49,28 @@ def _page_urls(source: dict, max_pages: int) -> List[str]:
     return [base]
 
 
+def _field(row: dict, field: str) -> str:
+    if field.startswith("extra."):
+        return str((row.get("extra") or {}).get(field[6:], ""))
+    return str(row.get(field, ""))
+
+
 def _row_included(row: dict, source: dict) -> bool:
-    """Deterministic include-filter (e.g. e-Gazette ministry match). A filtered row is
-    out of scope by design — not quarantined."""
+    """Deterministic scope filters. A filtered row is out of subject scope by design, so it
+    is counted and reported but never quarantined as if it were malformed.
+
+    row_exclude matters for the Gazette: a ministry is not a subject. Ministry of
+    Communications covers both telecommunications and the Department of Posts, and Post
+    Office regulations are not TMT."""
+    exc = source.get("row_exclude")
+    if exc:
+        blob = " ".join(_field(row, f) for f in exc.get("fields", ["title"]))
+        if re.search(exc["regex"], blob, re.I):
+            return False
     flt = source.get("row_filter")
     if not flt:
         return True
-    field = flt.get("field", "title")
-    if field.startswith("extra."):
-        val = str((row.get("extra") or {}).get(field[6:], ""))
-    else:
-        val = str(row.get(field, ""))
-    return bool(re.search(flt["regex"], val, re.I))
+    return bool(re.search(flt["regex"], _field(row, flt.get("field", "title")), re.I))
 
 
 class Sweeper:
@@ -87,6 +97,56 @@ class Sweeper:
             max_pages = (source.get("pagination") or {}).get("max_pages", 30) if backfill_since else 1
             all_rows: List[dict] = []
             content = b""
+
+            # Sources that cannot be reached by fetching a URL (session + postback flows)
+            # run their own driver. Everything downstream is identical.
+            driver = source["parser"].get("driver")
+            if driver:
+                from .drivers import DRIVERS
+                all_rows = DRIVERS[driver](source, self.today)
+                rows_total = len(all_rows)
+                floor_err = tw.check_floor(rows_total, source)
+                if floor_err:
+                    raise FetchError(floor_err)
+                n_generic = 0
+                fp = None
+                seen_dates = sorted(str(r["date"]) for r in all_rows if r.get("date"))
+                newest_visible = seen_dates[-1] if seen_dates else None
+                seq_state = state.get("seq_state", {})
+                first_run = not state.get("last_run")
+                ing = self._ingest(all_rows, source, backfill_since, first_run)
+                fresh = ing["fresh"]
+                if ing["activated"]:
+                    info.append(f"first sweep: {ing['activated']} item(s) ledgered as activation_baseline")
+                if ing["pre_window"]:
+                    info.append(f"{ing['pre_window']} row(s) predate window_start")
+                if ing["filtered"]:
+                    info.append(f"{ing['filtered']} row(s) outside this source's subject filter")
+                owned = self.ledger.count_for(sid) + self.ledger.sightings_for(sid)
+                if rows_total == 0:
+                    status = "EMPTY"
+                    notes.append("driver returned no rows at all")
+                elif owned == 0 and ing["filtered"] == rows_total:
+                    status = "FILTERED"
+                    info.append(f"all {rows_total} row(s) belong to other subjects")
+                elif owned == 0:
+                    status = "QUIET"
+                    info.append(f"nothing in scope; newest seen {newest_visible or 'undated'}")
+                if notes and status == "OK":
+                    status = "WARN"
+                self.ledger.set_state(sid, last_run=now_ist(), last_status=status,
+                                      last_note="; ".join(notes)[:500] or None,
+                                      consecutive_failures=0, last_row_count=rows_total,
+                                      fingerprint=state.get("fingerprint"),
+                                      seq_state=seq_state, newest_visible=newest_visible)
+                st = self.ledger.get_state(sid)
+                self.health[sid] = {"status": status, "rows_seen": rows_total, "new": fresh,
+                                    "ledgered_total": self.ledger.count_for(sid),
+                                    "newest_visible": st.get("newest_visible"),
+                                    "notes": notes, "info": info, "checked": now_ist(),
+                                    "consecutive_failures": st.get("consecutive_failures", 0)}
+                return
+
             for page_url in _page_urls(source, max_pages):
                 r = get(page_url, tolerant_tls=source.get("tolerant_tls", False),
                         extra_headers=source.get("http_headers"),

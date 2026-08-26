@@ -1,8 +1,11 @@
 #!/bin/zsh
-# TMT Radar — scheduled local sweep. Zero LLM. Fails loud:
-# a FAILED source keeps a non-zero exit; a tripwire WARN (sequence gap, shelf
-# shrink, staleness, drift, crosscheck catch) also raises a notification, because
-# a sequence gap can mean a missed instrument even when every fetch succeeded.
+# TMT Radar — one sweep, on demand.
+#
+# There is deliberately no schedule. Updates happen when someone presses "Check all
+# sources now" in the console, or runs this script. That is a considered trade: the
+# tracker never fetches unattended, but it also never refreshes itself, so the partner
+# dashboard carries a staleness banner that appears once the data is more than a day old.
+# Nothing here silently pretends to be current.
 set -u
 DIR="${0:A:h}"
 PY="$DIR/.venv/bin/python"
@@ -13,20 +16,16 @@ echo "==== sweep $(date '+%Y-%m-%d %H:%M:%S') ====" >> "$LOG"
 "$PY" "$DIR/tracker.py" sweep > "$OUT" 2>&1
 code=$?
 cat "$OUT" >> "$LOG"
-
-# keep the dashboard data file current after every sweep
 "$PY" "$DIR/tracker.py" export >> "$LOG" 2>&1
+"$PY" "$DIR/../code/build_dashboard_v2.py" >> "$LOG" 2>&1
 
 NEW=$(grep -c '^  NEW ' "$OUT")
-WARNS=$(grep -c '^  WARN ' "$OUT")
-
+WARNS=$(grep -cE '^  (WARN|EMPTY) ' "$OUT")
 if [ $code -ne 0 ]; then
   osascript -e 'display notification "A source FAILED — open engine/health.json" with title "TMT Radar" sound name "Basso"' 2>/dev/null
 elif [ "$WARNS" -gt 0 ]; then
-  osascript -e "display notification \"$WARNS tripwire warning(s) — check engine/health.json\" with title \"TMT Radar\" sound name \"Basso\"" 2>/dev/null
+  osascript -e "display notification \"$WARNS source warning(s) — check engine/health.json\" with title \"TMT Radar\" sound name \"Basso\"" 2>/dev/null
 fi
-if [ "$NEW" -gt 0 ]; then
-  osascript -e "display notification \"$NEW new substantive instrument(s) detected\" with title \"TMT Radar\"" 2>/dev/null
-fi
-rm -f "$OUT"
+[ "$NEW" -gt 0 ] && osascript -e "display notification \"$NEW new substantive instrument(s)\" with title \"TMT Radar\"" 2>/dev/null
+cat "$OUT"; rm -f "$OUT"
 exit $code

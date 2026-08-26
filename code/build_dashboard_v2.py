@@ -667,9 +667,11 @@ $('#upd').textContent = D.updated;
   if (!(hrs > (D.staleAfterHours || 26))) return;
   const bar = $('#stalebar');
   const age = hrs < 48 ? Math.round(hrs) + ' hours' : Math.floor(hrs / 24) + ' days';
-  bar.innerHTML = '<b>Not checked for ' + age + '.</b> '
-    + 'Instruments published since then will not appear below. '
-    + '<span>Ask for a sweep before relying on this page.</span>';
+  // There is no schedule: this page only moves when someone runs a sweep. So the banner
+  // is the whole safety net, and it must say plainly that nothing has been checked.
+  bar.innerHTML = '<b>Nobody has run a check for ' + age + '.</b> '
+    + 'Instruments published since then will not appear below, however current this page looks. '
+    + '<span>Run a sweep before relying on it.</span>';
   bar.classList.add('on');
 })();
 const state = { q: '', reg: 'All', stratum: 'All', dates: 'all', open: null, ven: null };

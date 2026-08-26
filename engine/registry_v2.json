@@ -800,40 +800,6 @@
    "blind_reason": "Paused: no robots restriction, but edge blocks identified agents"
   },
   {
-   "id": "egazette_recent",
-   "stratum": "safety_net",
-   "regulator": "e-Gazette",
-   "name": "Recent Extraordinary + Weekly panels",
-   "url": "https://egazette.gov.in/",
-   "status": "live",
-   "method": "static_html",
-   "parser": {
-    "strategy": "egazette_recent",
-    "row_floor": 5
-   },
-   "date_formats": [
-    "DD-Mon-YYYY",
-    "DD-MM-YYYY"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "egazette.gov.in"
-   ],
-   "default_type": "gazette_notification",
-   "row_filter": {
-    "field": "extra.ministry",
-    "regex": "Communications|Electronics|Information Technology|Information (and|&) Broadcasting"
-   },
-   "item_flags": [
-    "needs_verification"
-   ],
-   "stale_after_days": 14,
-   "quirks": "Legally authoritative venue, but the homepage panel carries NO per-item link (the Download column is script-driven) - only a Gazette ID such as CG-DL-E-24082026-275723. Rows are therefore LEADS, not citable instruments, and run in the signals lane: identified by gazette ID, verified by hand against the gazette before any client advice. Full ministry-by-date search is an ASP.NET postback flow, on the roadmap.",
-   "lane": "signals"
-  },
-  {
    "id": "trai_rss",
    "stratum": "telecom",
    "regulator": "TRAI",
@@ -2128,6 +2094,177 @@
    ],
    "default_type": "notification",
    "quirks": "Surfaced by the 25-08-2026 completeness audit; adapter not yet fixture-verified - wire next session."
+  },
+  {
+   "id": "gazette_communications",
+   "stratum": "telecom",
+   "regulator": "e-Gazette",
+   "name": "Gazette — Ministry of Communications (DoT, TRAI)",
+   "url": "https://egazette.gov.in/SearchMinistry.aspx",
+   "status": "live",
+   "method": "aspnet_postback",
+   "lane": "instruments",
+   "parser": {
+    "strategy": "driver",
+    "driver": "egazette_search",
+    "ministry_id": "294",
+    "months_back": 2,
+    "row_floor": 1,
+    "undated_ok": false
+   },
+   "date_formats": [
+    "DD-Mon-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "egazette.gov.in"
+   ],
+   "default_type": "gazette_notification",
+   "type_rules": [
+    {
+     "match": "(?i)\\brules?\\b",
+     "type": "rules"
+    },
+    {
+     "match": "(?i)amend",
+     "type": "rules"
+    },
+    {
+     "match": "(?i)notification",
+     "type": "notification"
+    }
+   ],
+   "quirks": "Gazette of India ministry search. The legally authoritative venue, and the only source where the right to reproduce comes from statute (Copyright Act s.52(1)(q)(i)) rather than a site's permission. Reaching it needs a session token in the URL path, a Referer header (deep pages bounce to error.aspx without one) and an ImageButton postback with .x/.y coordinates. Citation is the Gazette ID, which is permanent; the URL is session-scoped and expires. Recovers DoT and UIDAI instruments that cannot lawfully be taken from their own portals. Ministry of Communications spans telecommunications AND the Department of Posts, so postal instruments are excluded by subject filter.",
+   "row_exclude": {
+    "fields": [
+     "title",
+     "extra.department",
+     "extra.office"
+    ],
+    "regex": "(post office|department of posts|postage|postal|philatel)"
+   }
+  },
+  {
+   "id": "gazette_meity",
+   "stratum": "tech_data",
+   "regulator": "e-Gazette",
+   "name": "Gazette — Ministry of Electronics and IT",
+   "url": "https://egazette.gov.in/SearchMinistry.aspx",
+   "status": "live",
+   "method": "aspnet_postback",
+   "lane": "instruments",
+   "parser": {
+    "strategy": "driver",
+    "driver": "egazette_search",
+    "ministry_id": "397",
+    "months_back": 2,
+    "row_floor": 1,
+    "undated_ok": false
+   },
+   "date_formats": [
+    "DD-Mon-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "egazette.gov.in"
+   ],
+   "default_type": "gazette_notification",
+   "type_rules": [
+    {
+     "match": "(?i)\\brules?\\b",
+     "type": "rules"
+    },
+    {
+     "match": "(?i)amend",
+     "type": "rules"
+    },
+    {
+     "match": "(?i)notification",
+     "type": "notification"
+    }
+   ],
+   "quirks": "Gazette of India ministry search. The legally authoritative venue, and the only source where the right to reproduce comes from statute (Copyright Act s.52(1)(q)(i)) rather than a site's permission. Reaching it needs a session token in the URL path, a Referer header (deep pages bounce to error.aspx without one) and an ImageButton postback with .x/.y coordinates. Citation is the Gazette ID, which is permanent; the URL is session-scoped and expires. Recovers DoT and UIDAI instruments that cannot lawfully be taken from their own portals."
+  },
+  {
+   "id": "gazette_mib",
+   "stratum": "media",
+   "regulator": "e-Gazette",
+   "name": "Gazette — Ministry of Information and Broadcasting",
+   "url": "https://egazette.gov.in/SearchMinistry.aspx",
+   "status": "live",
+   "method": "aspnet_postback",
+   "lane": "instruments",
+   "parser": {
+    "strategy": "driver",
+    "driver": "egazette_search",
+    "ministry_id": "52",
+    "months_back": 2,
+    "row_floor": 1,
+    "undated_ok": false
+   },
+   "date_formats": [
+    "DD-Mon-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "egazette.gov.in"
+   ],
+   "default_type": "gazette_notification",
+   "type_rules": [
+    {
+     "match": "(?i)\\brules?\\b",
+     "type": "rules"
+    },
+    {
+     "match": "(?i)amend",
+     "type": "rules"
+    },
+    {
+     "match": "(?i)notification",
+     "type": "notification"
+    }
+   ],
+   "quirks": "Gazette of India ministry search. The legally authoritative venue, and the only source where the right to reproduce comes from statute (Copyright Act s.52(1)(q)(i)) rather than a site's permission. Reaching it needs a session token in the URL path, a Referer header (deep pages bounce to error.aspx without one) and an ImageButton postback with .x/.y coordinates. Citation is the Gazette ID, which is permanent; the URL is session-scoped and expires. Recovers DoT and UIDAI instruments that cannot lawfully be taken from their own portals."
+  },
+  {
+   "id": "tdsat_orders",
+   "stratum": "telecom",
+   "regulator": "TDSAT",
+   "name": "Judgments and daily orders",
+   "url": "https://tdsat.gov.in/Delhi/services/dailyorderlist.php",
+   "status": "live",
+   "method": "post_form",
+   "lane": "judgments",
+   "parser": {
+    "strategy": "driver",
+    "driver": "tdsat_post",
+    "window_days": 7,
+    "row_floor": 1,
+    "from_field": "from_date1",
+    "to_field": "to_date1",
+    "post_fields": {
+     "frm3": "",
+     "submit11": "Go"
+    },
+    "view_url": "https://tdsat.gov.in/Delhi/services/daily_order_view.php"
+   },
+   "date_formats": [
+    "DD-MM-YYYY"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "tdsat.gov.in"
+   ],
+   "default_type": "court_order",
+   "quirks": "Specialist tribunal for telecom and broadcasting. POST-only with a date window; no session, cookie or CSRF. s.52(1)(q)(iv) expressly permits reproducing judgments and orders of a tribunal, and TDSAT publishes no prohibition, so this is the cleanest category in the registry. Item links are javascript handlers carrying a base64 filing number. Replaces notices.php, which was the court diary and carried no instruments. Daily orders run ~39/day, largely procedural (listings, adjournments), so the window is kept short; filtering to substantive judgments via judgment.php is a refinement."
   }
  ],
  "window_start": "2026-06-01",
@@ -2155,7 +2292,8 @@
  ],
  "lanes": {
   "instruments": "Documents that bind a client. Every row must carry its own citation and may trigger a memo.",
-  "signals": "Real, useful information that is not itself a binding instrument: announcements, registers, court diaries, security bulletins, mirrors. Shown in its own tab, never in the instruments ledger, never memo-triggering."
+  "signals": "Real, useful information that is not itself a binding instrument: announcements, registers, court diaries, security bulletins, mirrors. Shown in its own tab, never in the instruments ledger, never memo-triggering.",
+  "judgments": "Judgments and orders of tribunals and courts. Interpretive rather than obligation-changing: read weekly, never pushed as a compliance alert."
  },
  "compliance": {
   "reviewed": "2026-08-25",

@@ -53,7 +53,15 @@ def selftest() -> int:
     today = date.today()
     failures = []
     print(f"{'source':<28} {'rows':>5} {'gated':>5}  status")
+    drivers = []
     for s in [x for x in reg["sources"] if x.get("status") == "live"]:
+        # Driver sources are session-and-postback flows, not a single fetch, so a saved page
+        # cannot stand in for them. They are exercised against the live site instead; say so
+        # rather than let the harness imply a coverage it does not have.
+        if s["parser"].get("driver"):
+            drivers.append(s["id"])
+            print(f"{s['id']:<28} {'-':>5} {'-':>5}  DRIVER (live-tested, no fixture)")
+            continue
         # fixture matching the strategy wins: API sources test their .json capture even
         # when an .html shell of the same venue sits alongside as evidence
         json_first = s["parser"]["strategy"] in ("meity_api", "tec_er_api", "inspace_api")
@@ -90,6 +98,9 @@ def selftest() -> int:
             print(f"  {sid}: {why}")
         return 1
     print("\nselftest passed: every live source parses its fixture above floor")
+    if drivers:
+        print(f"note: {len(drivers)} driver source(s) not fixture-covered "
+              f"({', '.join(drivers)}) — verify with: tracker.py sweep --source <id>")
     return 0
 
 

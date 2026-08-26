@@ -52,12 +52,15 @@ def gate(row: Row, source: dict, today: date) -> Tuple[Optional[Row], Optional[s
     # Signals-lane sources are exempt by design: a signal is openly a LEAD, not a citation
     # (the e-Gazette homepage panel lists gazettes with no per-item link). They pay for the
     # exemption by having to carry a verifiable identifier instead.
-    if source.get("lane", "instruments") == "signals":
-        ident = (row.get("extra") or {}).get("gazette_id") or (row.get("extra") or {}).get("ref")
-        if not ident:
-            return None, f"signal carries neither a link of its own nor an identifier: {title[:80]!r}"
-    elif _same_page(url, source["url"]):
-        return None, f"row has no citation of its own, only the listing page: {title[:80]!r}"
+    # Every row must be traceable to something other than the page it was scraped from.
+    # Two things qualify: a link of its own, or an official identifier. The identifier is
+    # often the better citation — "CG-DL-E-21082026-275657" is permanent and is what a
+    # lawyer actually cites, while the Gazette's own URLs are session-scoped and expire.
+    extra = row.get("extra") or {}
+    ident = extra.get("gazette_id") or extra.get("ref") or extra.get("filing_token")
+    if _same_page(url, source["url"]) and not ident:
+        kind = "signal" if source.get("lane") == "signals" else "row"
+        return None, f"{kind} has no citation of its own, only the listing page: {title[:80]!r}"
 
     d = row.get("date")
     undated_ok = source["parser"].get("undated_ok", False)
