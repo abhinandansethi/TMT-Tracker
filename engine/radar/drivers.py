@@ -157,8 +157,12 @@ def _split_gazette_subject(subject: str):
         mm = re.search(re.escape(key) + r"\s*:\s*(.+?)" + nextfield, block, re.S)
         if mm:
             val = re.sub(r"\s+", " ", mm.group(1)).strip()
-            # drop repeated bare labels the grid interleaves (", New Gazette", ", Amendment")
-            val = re.sub(r"(?:,\s*(?:New Gazette|Amendment|Amended by)\b[^,]*)+\s*$", "", val).strip().rstrip(",")
+            # the grid interleaves bare labels ("New Gazette", "Amendment"); strip trailing
+            # punctuation, then a trailing label, then any punctuation it leaves behind
+            for _ in range(3):
+                val = re.sub(r"[,\s]+$", "", val)
+                val = re.sub(r",?\s*(?:New Gazette|Amendment|Amended by)\s*$", "", val, flags=re.I)
+            val = val.strip()
             if field == "effective_date":
                 dm = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", val)
                 val = f"{dm.group(3)}-{int(dm.group(2)):02d}-{int(dm.group(1)):02d}" if dm else None

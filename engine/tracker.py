@@ -25,6 +25,7 @@ sys.path.insert(0, str(HERE))
 
 from radar.core import Sweeper  # noqa: E402
 from radar.ledger import IST, Ledger, now_ist  # noqa: E402
+from radar import display  # noqa: E402
 
 REGISTRY_PATH = HERE / "registry_v2.json"
 DB = HERE / "ledger.db"
@@ -218,6 +219,10 @@ def export() -> int:
             # preserve a hand-written gist from the v1 baseline (curated prose), but never let
             # a stale exported entry freeze fresh engine metadata like the impacted rule
             "gist": (curated.get(it["id"], {}) or {}).get("gist", "") or "",
+            # crisp display fields, computed once here and consumed identically by the
+            # dashboard and the connector API (radar.display is the single source of truth)
+            "short": display.shorten(it["title"]),
+            "line": display.descriptor(it, date.today().isoformat()),
         }
         if it.get("flags"):
             rec["flags"] = it["flags"]

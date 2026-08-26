@@ -1,6 +1,6 @@
 {
  "schema_version": "3.2",
- "generated": "2026-08-27T05:06:48+05:30",
+ "generated": "2026-08-27T05:13:28+05:30",
  "window": {
   "from": "2026-06-01",
   "to": "2026-09-01"
@@ -32,6 +32,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "E-band Fixed Radio Relay Systems (TEC56432609)",
+   "line": "Notification · 1 Sep 2026",
    "stratum": "telecom"
   },
   {
@@ -50,6 +52,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0422: Multiple…",
+   "line": "Advisory · 25 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -68,6 +72,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0421: Multiple…",
+   "line": "Advisory · 25 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -86,6 +92,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "Consumer Outreach Program at Kathua (Jammu and Kashmir) by RO…",
+   "line": "Notification · 25 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -107,6 +115,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "Extension of last date for submission of comments and…",
+   "line": "Press release · 25 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -129,6 +139,8 @@
     "filing_token": "NzQ2NDM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/105/2018 — SKYNET DIGITAL SERVICE PVT LTD V…",
+   "line": "Skynet Digital Service Pvt Ltd V Information Tv Pvt Ltd",
    "stratum": "telecom"
   },
   {
@@ -151,6 +163,8 @@
     "filing_token": "NzQ2NDE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/270/2017 — DEN NETWORK LTD V TORRA…",
+   "line": "Den Network Ltd V Torra International",
    "stratum": "telecom"
   },
   {
@@ -173,6 +187,8 @@
     "filing_token": "NzQ2Mjg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/221/2025 — GTPL HATHWAY LTD V RBB DIGITAL…",
+   "line": "Gtpl Hathway Ltd V Rbb Digital Communications",
    "stratum": "telecom"
   },
   {
@@ -195,6 +211,8 @@
     "filing_token": "NzQ2NjM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/195/2024 — ACT DIGITAL HOME ENTERTAINMENT…",
+   "line": "Act Digital Home Entertainment Pvt Ltd V Sri Venkata Sai Lakshmi Cable…",
    "stratum": "telecom"
   },
   {
@@ -217,6 +235,8 @@
     "filing_token": "NzQ2MjI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/61/2023 — SITI NETWORKS LTD V GEETHANJALI…",
+   "line": "Siti Networks Ltd V Geethanjali Cable Network",
    "stratum": "telecom"
   },
   {
@@ -235,6 +255,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Education Workshop at Siwan (Bihar) by Bharti Airtel…",
+   "line": "Notification · 24 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -260,6 +282,8 @@
     "filing_token": "NzQ2NTE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/705/2021 — SITI NETWORKS LTD V HATIGERIA…",
+   "line": "Siti Networks Ltd V Hatigeria Home Cable Service",
    "stratum": "telecom"
   },
   {
@@ -282,6 +306,8 @@
     "filing_token": "NzQ2MzQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/565/2016 — SITI NETWORK LTD V PANDIT CABLE…",
+   "line": "Siti Network Ltd V Pandit Cable Network & Ors",
    "stratum": "telecom"
   },
   {
@@ -300,6 +326,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "NOTICE DATED 24.08.2026 REGARDING DECLARATION OF HOLIDAY ON…",
+   "line": "Court notice · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -322,6 +350,8 @@
     "filing_token": "NzQ2NTQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/20/2022 — SITI NETWORKS LTD V JAI MATA DI…",
+   "line": "Siti Networks Ltd V Jai Mata Di Cable Network",
    "stratum": "telecom"
   },
   {
@@ -344,6 +374,8 @@
     "filing_token": "NzQ2NDQ="
    },
    "gist": "",
+   "short": "E A/14/2019 — V TRIUMPH MEDIA VISION PVT LTD",
+   "line": "V Triumph Media Vision Pvt Ltd",
    "stratum": "telecom"
   },
   {
@@ -366,6 +398,8 @@
     "filing_token": "NzQ2NDI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/514/2017 — HINDUJA GLOBAL SOLUTIONS LIMITED…",
+   "line": "Hinduja Global Solutions Limited V Kiran And Ors",
    "stratum": "telecom"
   },
   {
@@ -384,6 +418,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Outreach Program at Kasaragod (Kerala) by RO BENGALURU",
+   "line": "Notification · 24 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -409,6 +445,8 @@
     "filing_token": "NzQ2NDg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/225/2022 — SITI CABLE NETWORK V SIMRAN…",
+   "line": "Siti Cable Network V Simran Cable Tv Network",
    "stratum": "telecom"
   },
   {
@@ -431,6 +469,8 @@
     "filing_token": "NzQ2NjQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/345/2024 — NOVA DIGITAL AND BROADBAND PVT…",
+   "line": "Nova Digital And Broadband Pvt Ltd V Evolution Ott And Broadband Servi…",
    "stratum": "telecom"
   },
   {
@@ -453,6 +493,8 @@
     "filing_token": "NzQ2MjU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/403/2023 — FASTWAY TRANSMISSION PVT LTD V…",
+   "line": "Fastway Transmission Pvt Ltd V Raspreet Cable And Anr.",
    "stratum": "telecom"
   },
   {
@@ -475,6 +517,8 @@
     "filing_token": "NzQ2NTA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/495/2021 — SITI NETWORKS LTD V GANESH CABLE…",
+   "line": "Siti Networks Ltd V Ganesh Cable Network",
    "stratum": "telecom"
   },
   {
@@ -493,6 +537,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0420",
+   "line": "Advisory · 24 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -515,6 +561,8 @@
     "filing_token": "NzQ2NTM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/749/2021 — SITI NETWORKS LTD V KHATU SHYAM…",
+   "line": "Siti Networks Ltd V Khatu Shyam Jwahra Cable Networkn",
    "stratum": "telecom"
   },
   {
@@ -537,6 +585,8 @@
     "filing_token": "NzQ2NTY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/50/2022 — SITI NETWORKS LTD V MAA…",
+   "line": "Siti Networks Ltd V Maa Siddheswari Cable",
    "stratum": "telecom"
   },
   {
@@ -559,6 +609,8 @@
     "filing_token": "NzQ2NjI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/159/2024 — INDIRA TELEVISION LTD. V TELECOM…",
+   "line": "Indira Television Ltd. V Telecom Regulatory Authority Of India And Ors…",
    "stratum": "telecom"
   },
   {
@@ -581,6 +633,8 @@
     "filing_token": "NzQ2MjY="
    },
    "gist": "",
+   "short": "TELECOM PETITION/23/2024 — TATA COMMUNICATIONS LIMITED V RIYAZ…",
+   "line": "Tata Communications Limited V Riyaz Internet Services Pvt. Ltd. & Ors.",
    "stratum": "telecom"
   },
   {
@@ -599,6 +653,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0419",
+   "line": "Advisory · 24 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -617,6 +673,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Awareness Program at Baksa (Assam) by Gram Vikas Parishad",
+   "line": "Notification · 24 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -642,6 +700,8 @@
     "filing_token": "NzQ2NDY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/560/2021 — SITI NETWORKS LTD V UDAY CABLE…",
+   "line": "Siti Networks Ltd V Uday Cable Network",
    "stratum": "telecom"
   },
   {
@@ -664,6 +724,8 @@
     "filing_token": "NzQ2NDc="
    },
    "gist": "",
+   "short": "E A/6/2022 — V SAHARA INDIA TV NETWORK",
+   "line": "V Sahara India Tv Network",
    "stratum": "telecom"
   },
   {
@@ -686,6 +748,8 @@
     "filing_token": "NzQ2NTc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/529/2022 — SITI NETWORKS LTD V SNLV.…",
+   "line": "Siti Networks Ltd V Snlv. Friends Cable (Jharsugda)",
    "stratum": "telecom"
   },
   {
@@ -708,6 +772,8 @@
     "filing_token": "NzQ2MzA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/258/2025 — HATHWAY DIGITAL LTD V M/S…",
+   "line": "Hathway Digital Ltd V M/S Rameshwar Cable Network",
    "stratum": "telecom"
   },
   {
@@ -730,6 +796,8 @@
     "filing_token": "NzQ2NTI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/730/2021 — SITI NETWORKS LTD V ADITYA CABLE",
+   "line": "Siti Networks Ltd V Aditya Cable",
    "stratum": "telecom"
   },
   {
@@ -752,6 +820,8 @@
     "filing_token": "NzQ2NjE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/27/2024 — INDIAN CABLE NET COMPANY LTD V…",
+   "line": "Indian Cable Net Company Ltd V Biswa Darshan",
    "stratum": "telecom"
   },
   {
@@ -770,6 +840,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0418",
+   "line": "Advisory · 24 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -788,6 +860,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Education Workshop at Gangapur City (Rajasthan) by…",
+   "line": "Notification · 24 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -813,6 +887,8 @@
     "filing_token": "NzQ2NTg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/93/2023 — SITI NETWORK LTD V DIGITAL CABLE…",
+   "line": "Siti Network Ltd V Digital Cable Center",
    "stratum": "telecom"
   },
   {
@@ -835,6 +911,8 @@
     "filing_token": "NzQ2NDU="
    },
    "gist": "",
+   "short": "E A/1/2020 — V KAMYAB TELEVISION PVT LTD",
+   "line": "V Kamyab Television Pvt Ltd",
    "stratum": "telecom"
   },
   {
@@ -857,6 +935,8 @@
     "filing_token": "NzQ2NTU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/21/2022 — SITI NETWORKS LTD V MAA…",
+   "line": "Siti Networks Ltd V Maa Siddhdatri Cable Network",
    "stratum": "telecom"
   },
   {
@@ -879,6 +959,8 @@
     "filing_token": "NzQ2Mzg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/77/2021 — SITI NETWORKS LTD V SAI NETWORK",
+   "line": "Siti Networks Ltd V Sai Network",
    "stratum": "telecom"
   },
   {
@@ -901,6 +983,8 @@
     "filing_token": "NzQ2Mjk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/223/2025 — GTPL HATHWAY LTD V SANJIVANI…",
+   "line": "Gtpl Hathway Ltd V Sanjivani Cable Network",
    "stratum": "telecom"
   },
   {
@@ -923,6 +1007,8 @@
     "filing_token": "NzQ2Mzk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/663/2015 — INDUSIND MEDIA & COMMUNICATIONS…",
+   "line": "Indusind Media & Communications Ltd. V Zee Media & Corporation Ltd.",
    "stratum": "telecom"
   },
   {
@@ -941,6 +1027,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "NOTICE DATED 24.08.2026 REGARDING SITTING OF HON'BLE COURT NO.1…",
+   "line": "Court notice · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -963,6 +1051,8 @@
     "filing_token": "NzQ2MjQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/63/2023 — SITI NETWORKS LTD V ROHIT…",
+   "line": "Siti Networks Ltd V Rohit Communication",
    "stratum": "telecom"
   },
   {
@@ -985,6 +1075,8 @@
     "filing_token": "NzQ2NjU="
    },
    "gist": "",
+   "short": "TELECOM PETITION/21/2025 — ONE OTT INTERTAINMENT LTD. V REISNET…",
+   "line": "One Ott Intertainment Ltd. V Reisnet Broadband Pvt. Ltd.",
    "stratum": "telecom"
   },
   {
@@ -1003,6 +1095,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Awareness Program at East Delhi (Delhi) by Indian…",
+   "line": "Notification · 24 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -1028,6 +1122,8 @@
     "filing_token": "NzQ2NDA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/183/2016 — SITI CABLE NETWORK LTD V MONA…",
+   "line": "Siti Cable Network Ltd V Mona Seth Communication And Anr",
    "stratum": "telecom"
   },
   {
@@ -1050,6 +1146,8 @@
     "filing_token": "NzQ2NTk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/94/2023 — SITI NETWORKS LTD V AZIMGANG…",
+   "line": "Siti Networks Ltd V Azimgang Cable Link",
    "stratum": "telecom"
   },
   {
@@ -1072,6 +1170,8 @@
     "filing_token": "NzQ2MzY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/447/2019 — SITI NETWORKS LTD V SINGH VISION",
+   "line": "Siti Networks Ltd V Singh Vision",
    "stratum": "telecom"
   },
   {
@@ -1094,6 +1194,8 @@
     "filing_token": "NzQ2Njg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/513/2025 — GTPL HATHWAY LTD V STAR CABLE…",
+   "line": "Gtpl Hathway Ltd V Star Cable Network Srinuvas And Anr",
    "stratum": "telecom"
   },
   {
@@ -1116,6 +1218,8 @@
     "filing_token": "NzQ2NDk="
    },
    "gist": "",
+   "short": "TELECOM PETITION/75/2020 — SWIFTMAIL COMMUNICATIONS LTD V…",
+   "line": "Swiftmail Communications Ltd V Supersonic Broadband And Anr",
    "stratum": "telecom"
   },
   {
@@ -1138,6 +1242,8 @@
     "filing_token": "NzQ2Mzc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/32/2020 — SITI NETWORK LTD V SANJAY KUMAR…",
+   "line": "Siti Network Ltd V Sanjay Kumar And Anr",
    "stratum": "telecom"
   },
   {
@@ -1160,6 +1266,8 @@
     "filing_token": "NzQ2NjA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/374/2023 — GTPL HATHWAY LTD. V K CHANNEL…",
+   "line": "Gtpl Hathway Ltd. V K Channel Cable Network-I",
    "stratum": "telecom"
   },
   {
@@ -1182,6 +1290,8 @@
     "filing_token": "NzQ2MzU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/446/2019 — SITI NETWORKS LTD V HAPPY LUCKY…",
+   "line": "Siti Networks Ltd V Happy Lucky Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1204,6 +1314,8 @@
     "filing_token": "NzQ2MjM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/62/2023 — SITI NETWORKS LTD V OM SAI CABLE…",
+   "line": "Siti Networks Ltd V Om Sai Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1226,6 +1338,8 @@
     "filing_token": "NzQ2NjY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/415/2025 — DEN NETWORK LTD V M/S SHIV…",
+   "line": "Den Network Ltd V M/S Shiv Shakti Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1244,6 +1358,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "First Steering Committee Meeting For 57th IFFI Held Under…",
+   "line": "Advisory · 22 Aug 2026",
    "stratum": "media"
   },
   {
@@ -1266,6 +1382,8 @@
     "filing_token": "NzQ2MTA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/584/2015 — NXT DIGITAL LTD AND ORS. V F7…",
+   "line": "Nxt Digital Ltd And Ors. V F7 Broadcast Pvt. Ltd",
    "stratum": "telecom"
   },
   {
@@ -1288,6 +1406,8 @@
     "filing_token": "NzQ2MTk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/98/2014 — INTERMEDIA CABLE COMMUNICATION…",
+   "line": "Intermedia Cable Communication Pvt. Ltd. V New Delhi Television Ltd.",
    "stratum": "telecom"
   },
   {
@@ -1310,6 +1430,8 @@
     "filing_token": "NzQ2MTU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/468/2018 — CCN DIGITAL PRIVATE LIMITED V…",
+   "line": "Ccn Digital Private Limited V Shukla Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1332,6 +1454,8 @@
     "filing_token": "NzQ2MDY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/238/2025 — GTPL HATHWAY LTD V QYOU MEDIA…",
+   "line": "Gtpl Hathway Ltd V Qyou Media India Pvt. Ltd.",
    "stratum": "telecom"
   },
   {
@@ -1354,6 +1478,8 @@
     "filing_token": "NzQ1OTk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/433/2024 — DEN NETWORKS LTD V KESAV CABLE…",
+   "line": "Den Networks Ltd V Kesav Cable Vision",
    "stratum": "telecom"
   },
   {
@@ -1379,10 +1505,12 @@
     "part_section": "Part II-Section 3-Sub-Section (i)",
     "publish_date": "2026-08-21",
     "effective_date": "2026-08-21",
-    "impacted_rule": "Sub-section (2) of section 56 of the Telecommunications Act, 2023 (44 of 2023), New Gazette",
+    "impacted_rule": "Sub-section (2) of section 56 of the Telecommunications Act, 2023 (44 of 2023)",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Telecommunications (User Identification) Rules, 2026",
+   "line": "In force 21 Aug 2026 · amends s.56, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -1405,6 +1533,8 @@
     "filing_token": "NzQ1OTI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/23/2024 — HATHWAY DIGITAL LTD V M/S HOME…",
+   "line": "Hathway Digital Ltd V M/S Home Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1427,6 +1557,8 @@
     "filing_token": "NzQ2MDE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/60/2025 — GTPL HATHWAY LTD V CHRISTU KRUPA…",
+   "line": "Gtpl Hathway Ltd V Christu Krupa Broadcasting Pvt. Ltd.",
    "stratum": "telecom"
   },
   {
@@ -1445,6 +1577,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0417",
+   "line": "Advisory · 21 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -1470,10 +1604,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-08-21",
     "effective_date": "2026-08-21",
-    "impacted_rule": "Sub-section (7) of section 3 of the Telecommunications Act, 2023 (44 of 2023), New Gazette",
+    "impacted_rule": "Sub-section (7) of section 3 of the Telecommunications Act, 2023 (44 of 2023)",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Services",
+   "line": "In force 21 Aug 2026 · amends s.3, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -1496,6 +1632,8 @@
     "filing_token": "NzQ2MDk="
    },
    "gist": "",
+   "short": "CYBER APPEAL/12/2023 — IDBI BANK LTD. V NAVABHARAT CO-OPERATIVE…",
+   "line": "Idbi Bank Ltd. V Navabharat Co-Operative Urban Bank Ltd.",
    "stratum": "telecom"
   },
   {
@@ -1525,6 +1663,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Cable Television Networks",
+   "line": "In force 21 Aug 2026 · amends Cable Television Networks (Regulation) Act, 1995… · action required",
    "stratum": "media"
   },
   {
@@ -1547,6 +1687,8 @@
     "filing_token": "NzQ2MTE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/390/2018 — SITI NETWORK LTD V SS CABLE…",
+   "line": "Siti Network Ltd V Ss Cable Network And Anr",
    "stratum": "telecom"
   },
   {
@@ -1569,6 +1711,8 @@
     "filing_token": "NzQ2MDA="
    },
    "gist": "",
+   "short": "CYBER APPEAL/10/2025 — STATE BANK OF INDIA V MR. RAVINDAR K…",
+   "line": "State Bank Of India V Mr. Ravindar K Pathania",
    "stratum": "telecom"
   },
   {
@@ -1591,6 +1735,8 @@
     "filing_token": "NzQ2MTM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/360/2022 — SITI NETWORKS LTD V BHAVANA…",
+   "line": "Siti Networks Ltd V Bhavana Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1609,6 +1755,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Outreach Program at Amritsar (Punjab) by RO JAIPUR",
+   "line": "Notification · 21 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -1634,6 +1782,8 @@
     "filing_token": "NzQ2MTI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/1/2022 — SITI NETWORKS LTD V R.K.CABLE…",
+   "line": "Siti Networks Ltd V R.K.Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1659,10 +1809,12 @@
     "part_section": "Part I-Section 1",
     "publish_date": "2026-08-21",
     "effective_date": "2026-08-21",
-    "impacted_rule": "Nil, New Gazette",
+    "impacted_rule": "Nil",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "To be published in the Gazette of India, Extraordinary, Part I…",
+   "line": "In force 21 Aug 2026 · amends Nil · action required",
    "stratum": "tech_data"
   },
   {
@@ -1685,6 +1837,8 @@
     "filing_token": "NzQ1OTU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/320/2024 — VK DIGITAL NETWORK PVT LTD V…",
+   "line": "Vk Digital Network Pvt Ltd V Quality Vision",
    "stratum": "telecom"
   },
   {
@@ -1710,10 +1864,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-08-21",
     "effective_date": "2026-08-21",
-    "impacted_rule": "Rule 11 of the Telecommunications (User Identification) Rules, 2026, New Gazette",
+    "impacted_rule": "Rule 11 of the Telecommunications (User Identification) Rules, 2026",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Portal under the Telecommunications (User Identification) Rules…",
+   "line": "In force 21 Aug 2026 · amends Rule 11 of the Telecommunications (User Identifi… · action required",
    "stratum": "telecom"
   },
   {
@@ -1736,6 +1892,8 @@
     "filing_token": "NzQ1OTE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/391/2023 — FASTWAY TRANSMISSION PVT LTD V…",
+   "line": "Fastway Transmission Pvt Ltd V Roshnit Cable Network And Anr.",
    "stratum": "telecom"
   },
   {
@@ -1758,6 +1916,8 @@
     "filing_token": "NzQ2MDI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/61/2025 — GTPL HATHWAY LTD V PRAMOD CABLE…",
+   "line": "Gtpl Hathway Ltd V Pramod Cable Network And. Anr.",
    "stratum": "telecom"
   },
   {
@@ -1780,6 +1940,8 @@
     "filing_token": "NzQ1OTM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/302/2024 — V.K. DIGITAL NETWORK PVT LTD V…",
+   "line": "V.K. Digital Network Pvt Ltd V M/S Vv Satvision",
    "stratum": "telecom"
   },
   {
@@ -1802,6 +1964,8 @@
     "filing_token": "NzQ1OTc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/324/2024 — V.K. DIGITAL NETWORK PVT LTD V…",
+   "line": "V.K. Digital Network Pvt Ltd V M/S Krn Cable Vision",
    "stratum": "telecom"
   },
   {
@@ -1824,6 +1988,8 @@
     "filing_token": "NzQ2MDc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/426/2025 — SATLINKS V VENUS CABLE VISION",
+   "line": "Satlinks V Venus Cable Vision",
    "stratum": "telecom"
   },
   {
@@ -1842,6 +2008,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Education Workshop at Kolkata (West Bengal) by Bharat…",
+   "line": "Notification · 21 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -1870,10 +2038,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-08-21",
     "effective_date": "2026-08-21",
-    "impacted_rule": "Sub -section (3) of section 1 of the Telecommunication Act, 2023 (44 of 2023), New Gazette",
+    "impacted_rule": "Sub -section (3) of section 1 of the Telecommunication Act, 2023 (44 of 2023)",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Section 3(7) of the Telecommunications Act, 2023",
+   "line": "In force 21 Aug 2026 · amends s.1, Telecommunication Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -1896,6 +2066,8 @@
     "filing_token": "NzQ1OTg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/432/2024 — DEN NETWORKS LTD V MAYANK CABLE…",
+   "line": "Den Networks Ltd V Mayank Cable Network",
    "stratum": "telecom"
   },
   {
@@ -1918,6 +2090,8 @@
     "filing_token": "NzQ2MDU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/73/2025 — GTPL HATHWAY LTD V DCN CHANNEL…",
+   "line": "Gtpl Hathway Ltd V Dcn Channel And Anr.",
    "stratum": "telecom"
   },
   {
@@ -1940,6 +2114,8 @@
     "filing_token": "NzQ1OTY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/322/2024 — VK DIGITAL NETWORK PVT LTD V M/S…",
+   "line": "Vk Digital Network Pvt Ltd V M/S Suba Cables",
    "stratum": "telecom"
   },
   {
@@ -1962,6 +2138,8 @@
     "filing_token": "NzQ2MTY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/635/2018 — MODERN SATELLITE VISION V DEN…",
+   "line": "Modern Satellite Vision V Den Networks Ltd",
    "stratum": "telecom"
   },
   {
@@ -1984,6 +2162,8 @@
     "filing_token": "NzQ2MTc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/365/2021 — SITI NETWORKS LTD V OM CABLE…",
+   "line": "Siti Networks Ltd V Om Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2002,6 +2182,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Awareness Program at Saitual (Mizoram) by Mizoram…",
+   "line": "Notification · 21 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -2027,6 +2209,8 @@
     "filing_token": "NzQ1OTQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/306/2024 — V.K. DIGITAL NETWORK PVT LTD V…",
+   "line": "V.K. Digital Network Pvt Ltd V M/S Barani Cable",
    "stratum": "telecom"
   },
   {
@@ -2049,6 +2233,8 @@
     "filing_token": "NzQ2MDQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/72/2025 — GTPL HATHWAY LTD. V YASH CABLE -…",
+   "line": "Gtpl Hathway Ltd. V Yash Cable - Parivartan And Anr.",
    "stratum": "telecom"
   },
   {
@@ -2067,6 +2253,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consumer Awareness Program at Muktsar (Punjab) by Indian…",
+   "line": "Notification · 21 Aug 2026",
    "flags": [
     "caught_by_crosscheck"
    ],
@@ -2092,6 +2280,8 @@
     "filing_token": "NzQ2MDM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/69/2025 — GTPL HATHWAY LTD V HARESH K…",
+   "line": "Gtpl Hathway Ltd V Haresh K Solanki And Anr.",
    "stratum": "telecom"
   },
   {
@@ -2114,6 +2304,8 @@
     "filing_token": "NzQ2MTQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/483/2016 — SITI CABLE NETWORK LTD V MAMTA…",
+   "line": "Siti Cable Network Ltd V Mamta Tiwari & Anr",
    "stratum": "telecom"
   },
   {
@@ -2136,6 +2328,8 @@
     "filing_token": "NzQ2MTg="
    },
    "gist": "",
+   "short": "MISC APPLICATION/60/2026 — V R.K.CABLE NETWORK",
+   "line": "V R.K.Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2158,6 +2352,8 @@
     "filing_token": "NzQ1NDY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/356/2023 — FASTWAY TRANSMISSION PVT LTD V…",
+   "line": "Fastway Transmission Pvt Ltd V Khem Cable Tv And Anr.",
    "stratum": "telecom"
   },
   {
@@ -2180,6 +2376,8 @@
     "filing_token": "NzQ1Mzc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/260/2019 — HATHWAY DIGITAL PRIVATE LIMITED…",
+   "line": "Hathway Digital Private Limited V Shree Ram Cable Tv Network Sp & Anr",
    "stratum": "telecom"
   },
   {
@@ -2202,6 +2400,8 @@
     "filing_token": "NzQ1NzE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/355/2017 — DISH TV INDIA LTD V BROADCAST…",
+   "line": "Dish Tv India Ltd V Broadcast Initiatives Ltd.",
    "stratum": "telecom"
   },
   {
@@ -2224,6 +2424,8 @@
     "filing_token": "NzQ1Mzk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/100/2021 — SITI NETWORKS LTD V WORLD VIEW…",
+   "line": "Siti Networks Ltd V World View Network",
    "stratum": "telecom"
   },
   {
@@ -2246,6 +2448,8 @@
     "filing_token": "NzQ1NTY="
    },
    "gist": "",
+   "short": "E A/9/2015 — TATA SKY LTD V BRAND VALUE COMMUNICATIONS LTD",
+   "line": "Tata Sky Ltd V Brand Value Communications Ltd.",
    "stratum": "telecom"
   },
   {
@@ -2264,6 +2468,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Display of Disclaimer relating to the Harmful Effects of Drug…",
+   "line": "Advisory · 20 Aug 2026",
    "stratum": "media"
   },
   {
@@ -2282,6 +2488,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Stakeholder consultation opened on draft security test cases for the 5G BSF network function.",
+   "short": "Binding Support Function (BSF) of 5G",
+   "line": "Consultation notice · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2304,6 +2512,8 @@
     "filing_token": "NzQ1NTk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/318/2024 — VK DIGITAL NETWORK PVT LTD V M/S…",
+   "line": "Vk Digital Network Pvt Ltd V M/S Appu Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2326,6 +2536,8 @@
     "filing_token": "NzQ1OTA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/518/2018 — SITI NETWORK LTD V ADAVANCE…",
+   "line": "Siti Network Ltd V Adavance Electronics And Anr",
    "stratum": "telecom"
   },
   {
@@ -2348,6 +2560,8 @@
     "filing_token": "NzQ1NzY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/88/2020 — DEN NETWORKS LTD V KIRTHI CABLE…",
+   "line": "Den Networks Ltd V Kirthi Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2370,6 +2584,8 @@
     "filing_token": "NzQ1MzY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/297/2019 — HATHWAY DIGITAL PRIVATE LIMITED…",
+   "line": "Hathway Digital Private Limited V Jagat Gouri Cable Net & Anr",
    "stratum": "telecom"
   },
   {
@@ -2392,6 +2608,8 @@
     "filing_token": "NzQ1NTI="
    },
    "gist": "",
+   "short": "MISC APPLICATION/233/2026 — V OM CABLE NETWORK",
+   "line": "V Om Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2410,6 +2628,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Draft generic security test cases for 5G UDR released for comment under the Security Assurance Standards scheme.",
+   "short": "Unified Data Repository (UDR) of 5G",
+   "line": "Draft test cases · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2432,6 +2652,8 @@
     "filing_token": "NzQ1NDA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/760/2021 — SITI NETWORKS LTD V TRUST LINK…",
+   "line": "Siti Networks Ltd V Trust Link Network",
    "stratum": "telecom"
   },
   {
@@ -2454,6 +2676,8 @@
     "filing_token": "NzQ1NDc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/163/2022 — SITI NETWORKS LTD V SHAHEEN…",
+   "line": "Siti Networks Ltd V Shaheen Cable Tv Network",
    "stratum": "telecom"
   },
   {
@@ -2476,6 +2700,8 @@
     "filing_token": "NzQ1MzQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/200/2023 — DEN NETWORKS LTD V CHHOTU CABLE…",
+   "line": "Den Networks Ltd V Chhotu Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2498,6 +2724,8 @@
     "filing_token": "NzQ1NjU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/236/2025 — DISCOVERY COMMUNICATIONS INDIA V…",
+   "line": "Discovery Communications India V Digital Service Provider",
    "stratum": "telecom"
   },
   {
@@ -2520,6 +2748,8 @@
     "filing_token": "NzQ1NzU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/426/2019 — HATHWAY DIGITAL PRIVATE LIMITED…",
+   "line": "Hathway Digital Private Limited V Jhangra Cable Tv Network & Anr",
    "stratum": "telecom"
   },
   {
@@ -2542,6 +2772,8 @@
     "filing_token": "NzQ1NDU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/337/2023 — FASTWAY TRANSMISSION PVT LTD V…",
+   "line": "Fastway Transmission Pvt Ltd V Bhinda Kashmira And Anr.",
    "stratum": "telecom"
   },
   {
@@ -2560,6 +2792,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Stakeholder consultation opened on draft security test cases for the 5G UDSF network function.",
+   "short": "Unstructured Data Storage Function (UDSF) of 5G",
+   "line": "Consultation notice · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2582,6 +2816,8 @@
     "filing_token": "NzQ1NjY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/251/2025 — JIOSTAR INDIA PVT. LTD. AND ORS.…",
+   "line": "Jiostar India Pvt. Ltd. And Ors. V Saptak Digital Pvt Ltd",
    "stratum": "telecom"
   },
   {
@@ -2604,6 +2840,8 @@
     "filing_token": "NzQ1NDI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/761/2021 — SITI NETWORKS LTD V M.M. CABLE…",
+   "line": "Siti Networks Ltd V M.M. Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2626,6 +2864,8 @@
     "filing_token": "NzQ1ODM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/3/2021 — HINDUJA GLOBAL SOLUTIONS LTD.…",
+   "line": "Hinduja Global Solutions Ltd. (Earlier Known As Nxt Digital Ltd.) V Co…",
    "stratum": "telecom"
   },
   {
@@ -2648,6 +2888,8 @@
     "filing_token": "NzQ1NDk="
    },
    "gist": "",
+   "short": "MISC APPLICATION/232/2026 — V OM CABLE NETWORK",
+   "line": "V Om Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2666,6 +2908,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Stakeholder consultation opened on draft security test cases for the 5G SMSF network function.",
+   "short": "Short Message Service Function (SMSF) of 5G",
+   "line": "Consultation notice · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2688,6 +2932,8 @@
     "filing_token": "NzQ1ODE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/723/2020 — SITI NETWORKS LTD V NALAYANI…",
+   "line": "Siti Networks Ltd V Nalayani Enterprises",
    "stratum": "telecom"
   },
   {
@@ -2710,6 +2956,8 @@
     "filing_token": "NzQ1MzI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/449/2019 — SITI NETWORKS LTD V PRAGATI…",
+   "line": "Siti Networks Ltd V Pragati Cable Network-Rajendra Uparkar",
    "stratum": "telecom"
   },
   {
@@ -2732,6 +2980,8 @@
     "filing_token": "NzQ1ODU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/230/2021 — SITI NETWORKS LTD V SHIV CABLE…",
+   "line": "Siti Networks Ltd V Shiv Cable Network-I",
    "stratum": "telecom"
   },
   {
@@ -2754,6 +3004,8 @@
     "filing_token": "NzQ1Nzk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/382/2020 — ZEE ENTERTAINMENT ENTERPRISE LTD…",
+   "line": "Zee Entertainment Enterprise Ltd V Sagar Cable Network & Anr",
    "stratum": "telecom"
   },
   {
@@ -2776,6 +3028,8 @@
     "filing_token": "NzQ1Mzg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/466/2020 — SITI NETWORKS LTD V STAR WAVES (…",
+   "line": "Siti Networks Ltd V Star Waves ( Unit Maruti )",
    "stratum": "telecom"
   },
   {
@@ -2794,6 +3048,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0042: A End of Mainstream for Windows…",
+   "line": "Advisory · 20 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -2816,6 +3072,8 @@
     "filing_token": "NzQ1ODc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/223/2022 — UCN CABLE NETWORK PVT LTD V 9X…",
+   "line": "Ucn Cable Network Pvt Ltd V 9X Media Pvt Ltd",
    "stratum": "telecom"
   },
   {
@@ -2834,6 +3092,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Draft generic security test cases for 5G BSF released for comment.",
+   "short": "Binding Support Function (BSF) of 5G",
+   "line": "Draft test cases · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2856,6 +3116,8 @@
     "filing_token": "NzQ1ODk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/108/2023 — SITI NETWORKS LTD V REBA CABLE…",
+   "line": "Siti Networks Ltd V Reba Cable Network",
    "stratum": "telecom"
   },
   {
@@ -2878,6 +3140,8 @@
     "filing_token": "NzQ1NjI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/262/2015 — HINDUJA GLOBAL SOLUTIONS LIMITED…",
+   "line": "Hinduja Global Solutions Limited V Siddhi Cable Network And Anr.",
    "stratum": "telecom"
   },
   {
@@ -2900,6 +3164,8 @@
     "filing_token": "NzQ1NjE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/158/2025 — HATHWAY DIGITAL LTD V MUSKAN…",
+   "line": "Hathway Digital Ltd V Muskan Cable Centre",
    "stratum": "telecom"
   },
   {
@@ -2922,6 +3188,8 @@
     "filing_token": "NzQ1NjQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/374/2016 — INTERMEDIA CABLE COMMUNICATION…",
+   "line": "Intermedia Cable Communication Pvt. Ltd. V Zee Entertainment Enterpris…",
    "stratum": "telecom"
   },
   {
@@ -2940,6 +3208,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Stakeholder consultation opened on draft security test cases for the 5G NSACF network function.",
+   "short": "Network Slice Admission Control Function (NSACF) of 5G",
+   "line": "Consultation notice · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2962,6 +3232,8 @@
     "filing_token": "NzQ1NzI="
    },
    "gist": "",
+   "short": "TELECOM PETITION/173/2013 — TULIP TELECOM LTD. V TATA TELESERVICE…",
+   "line": "Tulip Telecom Ltd. V Tata Teleservice Ltd",
    "stratum": "telecom"
   },
   {
@@ -2984,6 +3256,8 @@
     "filing_token": "NzQ1NjA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/321/2024 — VK DIGITAL NETWORK PVT LTD V SAI…",
+   "line": "Vk Digital Network Pvt Ltd V Sai Champakadhama Cable Network",
    "stratum": "telecom"
   },
   {
@@ -3006,6 +3280,8 @@
     "filing_token": "NzQ1NDM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/106/2023 — SITI NETWORKS LTD V MANOJ CABLE…",
+   "line": "Siti Networks Ltd V Manoj Cable Network",
    "stratum": "telecom"
   },
   {
@@ -3028,6 +3304,8 @@
     "filing_token": "NzQ1NzQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/497/2018 — DISH TV INDIA LTD V SAHARA INDIA…",
+   "line": "Dish Tv India Ltd V Sahara India Commercial Corporation Ltd",
    "stratum": "telecom"
   },
   {
@@ -3050,6 +3328,8 @@
     "filing_token": "NzQ1ODA="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/674/2020 — SITI NETWORKS LTD V S.N.ARUN…",
+   "line": "Siti Networks Ltd V S.N.Arun Kumar Cable Tv Network And Anr",
    "stratum": "telecom"
   },
   {
@@ -3072,6 +3352,8 @@
     "filing_token": "NzQ1Njg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/318/2025 — DEN NETWORKS LTD V SUPER CABLE…",
+   "line": "Den Networks Ltd V Super Cable And Anr.",
    "stratum": "telecom"
   },
   {
@@ -3090,6 +3372,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dated 20.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "line": "Court notice · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3112,6 +3396,8 @@
     "filing_token": "NzQ1MzU="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/274/2020 — SITI NETWORKS LTD V MEERA CABLE…",
+   "line": "Siti Networks Ltd V Meera Cable Network And Anr",
    "stratum": "telecom"
   },
   {
@@ -3134,6 +3420,8 @@
     "filing_token": "NzQ1Nzg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/329/2020 — SITI NETWORKS LTD V SAI KALPANA…",
+   "line": "Siti Networks Ltd V Sai Kalpana Vision",
    "stratum": "telecom"
   },
   {
@@ -3152,6 +3440,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Draft generic security test cases for 5G NSACF released for comment.",
+   "short": "Network Slice Admission Control Function (NSACF) of 5G",
+   "line": "Draft test cases · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3174,6 +3464,8 @@
     "filing_token": "NzQ1NDE="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/98/2023 — SITI NETWORKS LTD V SANJAY CABLE…",
+   "line": "Siti Networks Ltd V Sanjay Cable Network",
    "stratum": "telecom"
   },
   {
@@ -3196,6 +3488,8 @@
     "filing_token": "NzQ1NzA="
    },
    "gist": "",
+   "short": "TELECOM PETITION/9/2026 — AIR LINK COMMUNICATION PVT LTD V UNION…",
+   "line": "Air Link Communication Pvt Ltd V Union Of India",
    "stratum": "telecom"
   },
   {
@@ -3218,6 +3512,8 @@
     "filing_token": "NzQ1Njk="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/336/2017 — RVR INFRASTRUCTURES LTD V ZEE…",
+   "line": "Rvr Infrastructures Ltd V Zee Entertainment Enterprise Ltd",
    "stratum": "telecom"
   },
   {
@@ -3240,6 +3536,8 @@
     "filing_token": "NzQ1ODI="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/795/2020 — DEN NETWORKS LTD V SKYLINE CABLE…",
+   "line": "Den Networks Ltd V Skyline Cable Network",
    "stratum": "telecom"
   },
   {
@@ -3258,6 +3556,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Stakeholder consultation opened on draft security test cases for the 5G UDR network function (also listed under SAS circulars).",
+   "short": "Unified Data Repository (UDR) of 5G",
+   "line": "Consultation notice · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3280,6 +3580,8 @@
     "filing_token": "NzQ1Nzc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/328/2020 — SITI NETWORKS LTD V LAXMI CABLE…",
+   "line": "Siti Networks Ltd V Laxmi Cable Network",
    "stratum": "telecom"
   },
   {
@@ -3302,6 +3604,8 @@
     "filing_token": "NzQ1ODY="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/810/2021 — INDIA CAST MEDIA DISTRIBUTION…",
+   "line": "India Cast Media Distribution Pvt. Ltd. & Ors. V Multicity Digital Con…",
    "stratum": "telecom"
   },
   {
@@ -3324,6 +3628,8 @@
     "filing_token": "NzQ1NjM="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/234/2025 — SITI NETWORKS LTD V VISTEL…",
+   "line": "Siti Networks Ltd V Vistel (Lco-2279)",
    "stratum": "telecom"
   },
   {
@@ -3342,6 +3648,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Draft generic security test cases for 5G UDSF released for comment.",
+   "short": "Unstructured Data Storage Function (UDSF) of 5G",
+   "line": "Draft test cases · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3364,6 +3672,8 @@
     "filing_token": "NzQ1Njc="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/85/2017 — TIMES GLOBAL BROADCASTING COMPANY…",
+   "line": "Times Global Broadcasting Company Ltd & Anr V Vxl Digital Pvt. Ltd. & …",
    "stratum": "telecom"
   },
   {
@@ -3386,6 +3696,8 @@
     "filing_token": "NzQ1NDQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/158/2022 — SITI NETWORKS LTD V MAMTA SARAF",
+   "line": "Siti Networks Ltd V Mamta Saraf",
    "stratum": "telecom"
   },
   {
@@ -3408,6 +3720,8 @@
     "filing_token": "NzQ1ODg="
    },
    "gist": "",
+   "short": "MISC APPLICATION/235/2023 — V PRASAR BHARTI",
+   "line": "V Prasar Bharti",
    "stratum": "telecom"
   },
   {
@@ -3430,6 +3744,8 @@
     "filing_token": "NzQ1ODQ="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/64/2021 — SITI NETWORKS LTD V MADHUR…",
+   "line": "Siti Networks Ltd V Madhur Communication-I",
    "stratum": "telecom"
   },
   {
@@ -3448,6 +3764,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Draft generic security test cases for 5G SMSF released for comment.",
+   "short": "Short Message Service Function (SMSF) of 5G",
+   "line": "Draft test cases · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3470,6 +3788,8 @@
     "filing_token": "NzQ1NTg="
    },
    "gist": "",
+   "short": "BROADCASTING PETITION/141/2024 — HATHWAY DIGITAL LTD V THE NEW…",
+   "line": "Hathway Digital Ltd V The New Satellite Channel Network",
    "stratum": "telecom"
   },
   {
@@ -3488,6 +3808,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0416",
+   "line": "Advisory · 20 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3506,6 +3828,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0415",
+   "line": "Advisory · 19 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3524,6 +3848,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 19.8.2026 — court sitting of Hon. Tribunal on…",
+   "line": "Court notice · 19 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3542,6 +3868,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "List of Commissioned Community Radio Stations in India as on…",
+   "line": "Circular · 19 Aug 2026",
    "stratum": "media"
   },
   {
@@ -3560,6 +3888,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0414",
+   "line": "Advisory · 19 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3578,6 +3908,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0041: Multiple Vulnerabilities in…",
+   "line": "Advisory · 19 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3596,6 +3928,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "M/s Intelecyber Services Pvt. Ltd. as Telecom Security Testing…",
+   "line": "Notification · 18 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3614,6 +3948,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0040: Multiple Vulnerabilities in SAP…",
+   "line": "Advisory · 18 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3632,6 +3968,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Intelecyber Services Pvt. Ltd. as TSTL for Wi-Fi CPE version 2.0.0",
+   "line": "Tstl designation · 18 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3650,6 +3988,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0413",
+   "line": "Advisory · 17 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3668,6 +4008,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0412",
+   "line": "Advisory · 17 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3686,6 +4028,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0411",
+   "line": "Advisory · 17 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3704,6 +4048,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0039: Reports on Apple Threat…",
+   "line": "Advisory · 14 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3722,6 +4068,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "M/s Intelecyber Services Pvt. Ltd. as Telecom Security Testing…",
+   "line": "Notification · 14 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3740,6 +4088,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Government Removes 12-Minute Advertisement Duration Cap for…",
+   "line": "Advisory · 14 Aug 2026",
    "stratum": "media"
   },
   {
@@ -3758,6 +4108,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Intelecyber Services Pvt. Ltd. as TSTL for IP Router version 2.0.0",
+   "line": "Tstl designation · 14 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3776,6 +4128,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Shimla & Nearby Areas and Solan &…",
+   "line": "Press release · 14 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3794,6 +4148,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0410",
+   "line": "Advisory · 14 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3812,6 +4168,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dated 14.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "line": "Court notice · 14 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3830,6 +4188,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Deltaphi Labs Pvt. Ltd. as TSTL for L2/L3 Switch & Next…",
+   "line": "Tstl designation · 13 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3848,6 +4208,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0409",
+   "line": "Advisory · 13 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3866,6 +4228,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "NCCS letter dated 13.08.2026 extends the exemption of cloud-implemented IP Routers and Wi-Fi CPEs from mandatory ComSec security certification until 31 December 2026 (supersedes the earlier extension to 31 Aug 2026).",
+   "short": "Exemption of Cloud implemented IP Routers and Wi-Fi CPEs from…",
+   "line": "Exemption circular · 13 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3884,6 +4248,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dated 13.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "line": "Court notice · 13 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3902,6 +4268,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory dated 13.08.2025 for carriage of sign language…",
+   "line": "Advisory · 13 Aug 2026",
    "stratum": "media"
   },
   {
@@ -3920,6 +4288,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Appointment of Chief of Media & Communications for MeitY",
+   "line": "Order · 13 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3938,6 +4308,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "M/s Deltaphi Labs Pvt. Ltd. as Telecom Security Testing…",
+   "line": "Notification · 13 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3956,6 +4328,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0406",
+   "line": "Advisory · 12 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3974,6 +4348,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Special Campaign 6.0 for Institutionalizing Swachhata and…",
+   "line": "Order · 12 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -3992,6 +4368,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "National AI Skilling Initiative Records 60,253 Enrolments in…",
+   "line": "Advisory · 12 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4010,6 +4388,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0405",
+   "line": "Advisory · 12 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4028,6 +4408,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0408",
+   "line": "Advisory · 12 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4046,6 +4428,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Government Endeavours to Strengthen Credible Information…",
+   "line": "Advisory · 12 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4064,6 +4448,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0038: Multiple Vulnerabilities in…",
+   "line": "Advisory · 12 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4082,6 +4468,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0407",
+   "line": "Advisory · 12 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4100,6 +4488,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0403",
+   "line": "Advisory · 11 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4118,6 +4508,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0404",
+   "line": "Advisory · 11 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4136,6 +4528,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dated 11.08.26 regarding sitting of Hon'ble Court No. 1",
+   "line": "Court notice · 11 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4154,6 +4548,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Phase-wise implementation of 1601-series",
+   "line": "Press release · 10 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4172,6 +4568,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Directs access providers to allocate and operationalize the 1601 numbering series for service/transactional voice calls by utilities, courier and logistics entities; onboarding within 90 days, status reports every 10 days, final compliance report within 15 days thereafter.",
+   "short": "1601 numbering series",
+   "line": "Direction · 10 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4190,6 +4588,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0401",
+   "line": "Advisory · 10 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4208,6 +4608,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Vulnerability Note CIVN-2026-0402",
+   "line": "Advisory · 10 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4226,6 +4628,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dated 07.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "line": "Court notice · 7 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4244,6 +4648,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0037: Advisory on Emerging Threats…",
+   "line": "Advisory · 7 Aug 2026",
    "stratum": "tech_data"
   },
   {
@@ -4262,6 +4668,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IT Rules, 2021 Mandate Classification for Liquor & Tobacco…",
+   "line": "Advisory · 7 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4280,6 +4688,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "BRICS WAVES Bazaar 2026 concludes with new International…",
+   "line": "Advisory · 7 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4298,6 +4708,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Exhibition of Public Service Awareness (PSA) Films in Cinema…",
+   "line": "Guideline · 7 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4316,6 +4728,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Chief Secretaries and Disaster Management Departments Urged to…",
+   "line": "Advisory · 7 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4334,6 +4748,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Valve Regulated Lead Acid (VRLA) Batteries",
+   "line": "Gazette notification · 6 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4352,6 +4768,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide IoT Gateway",
+   "line": "Gazette notification · 6 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4370,6 +4788,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dated 06.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "line": "Court notice · 6 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4399,6 +4819,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "New TEC standards",
+   "line": "In force 6 Aug 2026 · amends s.19, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -4417,6 +4839,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Fixed Wireless Access Customer Premises Equipment",
+   "line": "Gazette notification · 6 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4435,6 +4859,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "BRICS WAVES Bazaar, a premier international marketplace for the…",
+   "line": "Advisory · 6 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4453,6 +4879,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Solid Polythene Insulated Fully Jelly…",
+   "line": "Gazette notification · 6 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4482,6 +4910,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Revised TEC standards",
+   "line": "In force 6 Aug 2026 · amends s.19, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -4500,6 +4930,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Consultation paper on draft amendments in The Standards of…",
+   "line": "Press release · 5 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4518,6 +4950,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Draft amendments to the 2024 QoS regulations covering 5G network-slicing PRB metrics, outage reporting, coverage maps and silent-call benchmarks. Comments due 26-08-2026; counter-comments 07-09-2026.",
+   "short": "Standards of Quality of Service of Access (Wireline and Wireless)…",
+   "line": "Consultation paper · 5 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4536,6 +4970,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "No Grievances on Editorial Autonomy or Functioning of Public…",
+   "line": "Advisory · 5 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4554,6 +4990,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Government Ensures Welfare, Healthcare and Accreditation Support…",
+   "line": "Advisory · 5 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4572,6 +5010,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Details of operational Pvt FM Radio channels - 31.07.2026",
+   "line": "Notification · 5 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4590,6 +5030,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Cinematograph (Amendment) Act and IT Framework Strengthen…",
+   "line": "Advisory · 5 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4608,6 +5050,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Government Aims to Keep India's Internet Free from Unlawful and…",
+   "line": "Advisory · 5 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4626,6 +5070,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality on Ahmedabad to Gandhidham Rail Route…",
+   "line": "Press release · 4 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4644,6 +5090,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "TRAI assessed mobile network quality across Srinagar, Ganderbal…",
+   "line": "Press release · 4 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4662,6 +5110,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 04.08.2026 regarding sitting of Hon. Court No. 1",
+   "line": "Court notice · 4 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4680,6 +5130,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Quarterly Highlights of Action Against Unsolicited Commercial…",
+   "line": "Press release · 4 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4705,10 +5157,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-08-03",
     "effective_date": "2026-08-03",
-    "impacted_rule": "Sub Rules (2) and (4) of Rule 10 of the Official Language Rules, 1976, New Gazette",
+    "impacted_rule": "Sub Rules (2) and (4) of Rule 10 of the Official Language Rules, 1976",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Offices",
+   "line": "In force 3 Aug 2026 · amends Sub Rules (2) and (4) of Rule 10 of the Official… · action required",
    "stratum": "telecom"
   },
   {
@@ -4734,10 +5188,12 @@
     "part_section": "Part I-Section 1",
     "publish_date": "2026-08-03",
     "effective_date": "2026-08-03",
-    "impacted_rule": "Sub-section (4) of section 14 of the Telecommunications Act, 2023, New Gazette",
+    "impacted_rule": "Sub-section (4) of section 14 of the Telecommunications Act, 2023",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Nomination of Nodal Officers for 6 States/ UTs",
+   "line": "In force 3 Aug 2026 · amends s.14, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -4756,6 +5212,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "DETAILS OF GRANT RELEASED TO COMMUNITY RADIO STATIONS UNDER THE…",
+   "line": "Circular · 3 Aug 2026",
    "stratum": "media"
   },
   {
@@ -4774,6 +5232,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Relaunch of the revamped TRAI MyCall app for crowdsourced voice-quality assessment (PR No. 107 of 2026).",
+   "short": "TRAI revamps TRAI MyCall mobile application to assess voice call…",
+   "line": "Press release · 3 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4792,6 +5252,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Haridwar, Rishikesh & Nearby Areas",
+   "line": "Press release · 3 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4810,6 +5272,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 01.08.2026 regarding sitting of Hon. Court No. 1",
+   "line": "Court notice · 1 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -4828,6 +5292,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Workshop to Improve Quality of Audit in DAS Ecosystem",
+   "line": "Press release · 31 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -4846,6 +5312,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Session Border Controller (TEC67222606)",
+   "line": "Notification · 30 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -4864,6 +5332,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "VHF UHF Radio System Equipment (TEC58432606)",
+   "line": "Notification · 30 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -4882,6 +5352,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Essential Requirements Session border controller",
+   "line": "Gazette notification · 30 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -4900,6 +5372,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Essential Requirements VHF UHF Radio System Equipment",
+   "line": "Gazette notification · 30 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -4929,6 +5403,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "TEC standards",
+   "line": "In force 30 Jul 2026 · amends s.19, Telecommunication Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -4947,6 +5423,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Setting the Stage: India Targets Global Live Events Leadership by…",
+   "line": "Advisory · 29 Jul 2026",
    "stratum": "media"
   },
   {
@@ -4965,6 +5443,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "WAVES Digital Platforms Expand Business, Investment and…",
+   "line": "Advisory · 29 Jul 2026",
    "stratum": "media"
   },
   {
@@ -4983,6 +5463,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "President Droupadi Murmu's Four Years in Office Marked by Release…",
+   "line": "Advisory · 28 Jul 2026",
    "stratum": "media"
   },
   {
@@ -5012,6 +5494,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Extension in timelines for the implementation of the order for…",
+   "line": "In force 26 Jul 2026 · amends Extension in timelines for the implementation of… · action required",
    "stratum": "tech_data"
   },
   {
@@ -5030,6 +5514,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Godda Lok Sabha Constituency…",
+   "line": "Press release · 28 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5048,6 +5534,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Guidelines for implementation of the Central Sector Scheme…",
+   "line": "Circular · 28 Jul 2026",
    "stratum": "media"
   },
   {
@@ -5066,6 +5554,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Telecom Subscription Data as on June 2026",
+   "line": "Press release · 28 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5095,6 +5585,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "The Ministry of Electronics and Information Technology, Indian…",
+   "line": "In force 27 Jul 2026 · amends The Ministry of Electronics and Information Tech… · action required",
    "stratum": "tech_data"
   },
   {
@@ -5124,6 +5616,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "The Ministry of Electronics and Information Technology, Indian…",
+   "line": "In force 27 Jul 2026 · amends The Ministry of Electronics and Information Tech… · action required",
    "stratum": "tech_data"
   },
   {
@@ -5142,6 +5636,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Television Rating Policy, 2026 to Strengthen Transparency…",
+   "line": "Advisory · 24 Jul 2026",
    "stratum": "media"
   },
   {
@@ -5160,6 +5656,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "386 Private FM Radio Channels Operational; Govt Policy Mandates…",
+   "line": "Advisory · 24 Jul 2026",
    "stratum": "media"
   },
   {
@@ -5178,6 +5676,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 24.07.2026 regarding sitting of Hon. Court No. 1",
+   "line": "Court notice · 24 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5196,6 +5696,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Government Reiterates Legal Obligations of OTT Platforms and…",
+   "line": "Advisory · 24 Jul 2026",
    "stratum": "media"
   },
   {
@@ -5214,6 +5716,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Alipurduar and Cooch Behar…",
+   "line": "Press release · 23 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5232,6 +5736,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality across South Tripura District (North East…",
+   "line": "Press release · 23 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5250,6 +5756,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality along river Ganga from Kolkata to…",
+   "line": "Press release · 23 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5268,6 +5776,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Lunglei, Lawngtlai and Siaha…",
+   "line": "Press release · 22 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5286,6 +5796,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0036: Multiple Vulnerabilities in…",
+   "line": "Advisory · 22 Jul 2026",
    "stratum": "tech_data"
   },
   {
@@ -5304,6 +5816,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Telecommunications (Television, Radio and Associated Services)…",
+   "line": "Pib release · 22 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5329,10 +5843,12 @@
     "part_section": "Part I-Section 2",
     "publish_date": "2026-07-27",
     "effective_date": "2026-07-22",
-    "impacted_rule": ".., New Gazette",
+    "impacted_rule": "..",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Appointment to the Indian Posts and Telecommunications Accounts…",
+   "line": "In force 22 Jul 2026 · amends .. · action required",
    "stratum": "telecom"
   },
   {
@@ -5351,6 +5867,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Route Tracer for Armoured Optical Fibre Cable",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5369,6 +5887,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Route Tracer for Armoured - Optical Fibre Cable",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5387,6 +5907,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Quantum Key Distribution (QKD) System",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5405,6 +5927,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across in Mumbai LSA",
+   "line": "Press release · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5423,6 +5947,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Single Photon Avalanche Diode (SPAD) Detector",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5441,6 +5967,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Fixed Wireless Access Customer Premises…",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5459,6 +5987,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Micro Duct Optical Fibre Cable",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5477,6 +6007,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Small size 5G Core",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5495,6 +6027,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements WLAN Interworking and associated Wi-Fi…",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5513,6 +6047,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Network Management Systems",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5538,10 +6074,12 @@
     "part_section": "Part II-Section 3-Sub-Section (i)",
     "publish_date": "2026-07-22",
     "effective_date": "2026-07-20",
-    "impacted_rule": "sub-section (1) of section 56 of the Telecommunications Act, 2023, New Gazette",
+    "impacted_rule": "sub-section (1) of section 56 of the Telecommunications Act, 2023",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Telecommunications (Authorisation for Telecommunication Network)…",
+   "line": "In force 20 Jul 2026 · amends s.56, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -5560,6 +6098,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Passive Optical Network Time Domain…",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5589,6 +6129,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Revised TEC standards",
+   "line": "In force 17 Jul 2026 · amends s.19, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -5607,6 +6149,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Debarment Order - M/s Shiv Shutra Enterprises (GeM Contract No.…",
+   "line": "Order · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5625,6 +6169,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality in Virudhunagar and Tenkasi districts…",
+   "line": "Press release · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5643,6 +6189,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Network Quality Across Hamirpur & Bilaspur City and connecting…",
+   "line": "Press release · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5661,6 +6209,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide 5G Dual Core",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5679,6 +6229,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Micro Duct Optical Fibre Cable",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5708,6 +6260,8 @@
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "New TEC standards",
+   "line": "In force 17 Jul 2026 · amends s.19, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -5733,10 +6287,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-22",
     "effective_date": "2026-07-20",
-    "impacted_rule": "Rule 65 of the Telecommunications (Authorisation for Telecommunication Network) Rules, 2026, New Gazette",
+    "impacted_rule": "Rule 65 of the Telecommunications (Authorisation for Telecommunication Network) Rules, 2026",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Telecom eServices Portal",
+   "line": "In force 20 Jul 2026 · amends Rule 65 of the Telecommunications (Authorisation… · action required",
    "stratum": "telecom"
   },
   {
@@ -5755,6 +6311,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Quantum-Safe Cryptographic Systems",
+   "line": "Gazette notification · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5773,6 +6331,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Bhopal City & Indore to Neemuch and…",
+   "line": "Press release · 20 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5791,6 +6351,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 18.07.26 regarding non-sitting of Court No. 2 from…",
+   "line": "Court notice · 18 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5809,6 +6371,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0035: Multiple Vulnerabilities in…",
+   "line": "Advisory · 17 Jul 2026",
    "stratum": "tech_data"
   },
   {
@@ -5827,6 +6391,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Sindhudurg District and Pune to…",
+   "line": "Press release · 16 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5845,6 +6411,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Delegation of Powers dtd. 16-07-2026",
+   "line": "Order · 16 Jul 2026",
    "stratum": "tech_data"
   },
   {
@@ -5863,6 +6431,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality in Kasaragod District (Kerala LSA)",
+   "line": "Press release · 16 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5881,6 +6451,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Debarment Order – M/s MI2C Business Enterprises Private Limited…",
+   "line": "Order · 16 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5899,6 +6471,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0034: Multiple Vulnerabilities in SAP…",
+   "line": "Advisory · 16 Jul 2026",
    "stratum": "tech_data"
   },
   {
@@ -5917,6 +6491,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality in Uttara Kannada District (Karnataka LSA)",
+   "line": "Press release · 16 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5935,6 +6511,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Inter-Ministerial Committee (IMC) to examine…",
+   "line": "Notification · 15 Jul 2026",
    "stratum": "media"
   },
   {
@@ -5953,6 +6531,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality on Munabao to Tanot National Highway NH-70…",
+   "line": "Press release · 14 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5971,6 +6551,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 14.07.2026, non-sitting of Hon. Court No. 2",
+   "line": "Court notice · 14 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -5989,6 +6571,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 14.07.2026 regarding sitting of Hon. Court No. 1",
+   "line": "Court notice · 14 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6014,10 +6598,12 @@
     "part_section": "Part II-Section 3-Sub-Section (i)",
     "publish_date": "2026-07-20",
     "effective_date": "2026-07-14",
-    "impacted_rule": "clause (ze) of sub-section (2) of section 87, read with sub-section (3) of section 70B of the Information Technology Act 2000 , New Gazette",
+    "impacted_rule": "clause (ze) of sub-section (2) of section 87, read with sub-section (3) of section 70B of the Information Technology Act 2000",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "EPublishing of Terms and Conditions of service of Officers and…",
+   "line": "In force 14 Jul 2026 · amends s.87, Information Technology Act 2000 · action required",
    "stratum": "tech_data"
   },
   {
@@ -6043,10 +6629,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-13",
     "effective_date": "2026-07-09",
-    "impacted_rule": "Section 79A, Information Technology Act, 2000 , New Gazette",
+    "impacted_rule": "Section 79A, Information Technology Act, 2000",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Gazette Notification of Central Forensic Science Laboratory…",
+   "line": "In force 9 Jul 2026 · amends s.79A · action required",
    "stratum": "tech_data"
   },
   {
@@ -6072,10 +6660,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-13",
     "effective_date": "2026-07-09",
-    "impacted_rule": "Section 79A, Information Technology Act, 2000, New Gazette",
+    "impacted_rule": "Section 79A, Information Technology Act, 2000",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Gazette Notification of Cyber Forensic Division, State Forensic…",
+   "line": "In force 9 Jul 2026 · amends s.79A · action required",
    "stratum": "tech_data"
   },
   {
@@ -6101,10 +6691,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-13",
     "effective_date": "2026-07-09",
-    "impacted_rule": "Section 79A, Information Technology Act, 2000, New Gazette",
+    "impacted_rule": "Section 79A, Information Technology Act, 2000",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Gazette Notification of Directorate of Forensic Science…",
+   "line": "In force 9 Jul 2026 · amends s.79A · action required",
    "stratum": "tech_data"
   },
   {
@@ -6130,10 +6722,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-13",
     "effective_date": "2026-07-09",
-    "impacted_rule": "Section 79A, Information Technology Act, 2000, New Gazette",
+    "impacted_rule": "Section 79A, Information Technology Act, 2000",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Gazette Notification of National Forensics Science University Goa…",
+   "line": "In force 9 Jul 2026 · amends s.79A · action required",
    "stratum": "tech_data"
   },
   {
@@ -6159,10 +6753,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-14",
     "effective_date": "2026-07-09",
-    "impacted_rule": "Section 79A, Information Technology Act, 2000, New Gazette",
+    "impacted_rule": "Section 79A, Information Technology Act, 2000",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Gazette Notification of Cyber Forensic Laboratory, Navy Cyber…",
+   "line": "In force 9 Jul 2026 · amends s.79A · action required",
    "stratum": "tech_data"
   },
   {
@@ -6188,10 +6784,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-13",
     "effective_date": "2026-07-09",
-    "impacted_rule": "Section 79A, Information Technology Act, 2000, New Gazette",
+    "impacted_rule": "Section 79A, Information Technology Act, 2000",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Gazette Notification of Special Instruments Wing SIW, Border…",
+   "line": "In force 9 Jul 2026 · amends s.79A · action required",
    "stratum": "tech_data"
   },
   {
@@ -6210,6 +6808,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Panel of Auditors (Updated List) to carry out audit of Digital…",
+   "line": "Administrative · 10 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6228,6 +6828,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Clarifications (PR No. 91 of 2026) on the functioning of the designated 1600 series (service/transactional calls) and 140 series (promotional calls) under the TCCCPR framework.",
+   "short": "Functioning of designated 1600 series and 140 series",
+   "line": "Clarification · 10 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6246,6 +6848,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality across Barmer, Balotra, Pachpadra city and…",
+   "line": "Press release · 9 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6271,10 +6875,12 @@
     "part_section": "Part II-Section 3-Sub-Section (i)",
     "publish_date": "2026-07-08",
     "effective_date": "2026-07-08",
-    "impacted_rule": "sub-section (1) of section 56 of the Telecommunications Act, 2023, New Gazette",
+    "impacted_rule": "sub-section (1) of section 56 of the Telecommunications Act, 2023",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Telecommunications (Radio Equipment Possession Authorisation)…",
+   "line": "In force 8 Jul 2026 · amends s.56, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
   {
@@ -6300,10 +6906,12 @@
     "part_section": "Part II-Section 3-Sub-Section (ii)",
     "publish_date": "2026-07-09",
     "effective_date": "2026-07-08",
-    "impacted_rule": "Rule 15 of the Telecommunications (Radio Equipment Possession Authorisation) Rules, 2026, New Gazette",
+    "impacted_rule": "Rule 15 of the Telecommunications (Radio Equipment Possession Authorisation) Rules, 2026",
     "impact": "Actionable"
    },
    "gist": "",
+   "short": "Telecom eServices Portal under the Telecommunications (Radio…",
+   "line": "In force 8 Jul 2026 · amends Rule 15 of the Telecommunications (Radio Equipme… · action required",
    "stratum": "telecom"
   },
   {
@@ -6322,6 +6930,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "TDSAT Seminar on 22nd August 2026 at Hyderabad",
+   "line": "Event notice · 8 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6340,6 +6950,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Acucert Labs LLP as TSTL for IP Router v2.0.0 & Wi-Fi CPE v2.0.0",
+   "line": "Tstl designation · 7 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6358,6 +6970,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "M/s Acucert Labs LLP as Telecom Security Testing Laboratory…",
+   "line": "Notification · 7 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6376,6 +6990,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dated 04.07.2026 regarding sitting of Hon. Tribunal",
+   "line": "Court notice · 4 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6394,6 +7010,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Gangtok and Pakyong Districts and…",
+   "line": "Press release · 3 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6412,6 +7030,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality across Dibrugarh and Tinsukia Districts…",
+   "line": "Press release · 3 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6430,6 +7050,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality across Bharuch city and nearby areas…",
+   "line": "Press release · 3 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6448,6 +7070,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Karimnagar city, surrounding towns…",
+   "line": "Press release · 2 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6466,6 +7090,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Highway & Railway Route Hindupur to…",
+   "line": "Press release · 2 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6484,6 +7110,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality in Ganjam, Gajapati and Rayagada districts…",
+   "line": "Press release · 2 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6502,6 +7130,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across in Hyderabad city",
+   "line": "Press release · 2 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6520,6 +7150,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality in Udupi District (Karnataka LSA)",
+   "line": "Press release · 1 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6538,6 +7170,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality in Satara District and Pune to Satara…",
+   "line": "Press release · 1 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6556,6 +7190,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "TRAI Assessed Mobile Network Quality in North Delhi and nearby…",
+   "line": "Press release · 1 Jul 2026",
    "stratum": "telecom"
   },
   {
@@ -6574,6 +7210,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0033: Multiple vulnerabilities in…",
+   "line": "Advisory · 30 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -6592,6 +7230,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Notice dt. 30.06.2026 regarding sitting of Hon. Court No. 1",
+   "line": "Court notice · 30 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6610,6 +7250,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality on Jodhpur to Ahmedabad Rail Route…",
+   "line": "Press release · 29 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6628,6 +7270,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Inviting comments from stakeholders on the draft Recruitment…",
+   "line": "Notification · 25 Jun 2026",
    "stratum": "media"
   },
   {
@@ -6646,6 +7290,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "DoT Opens Online Portal for Telecommunication Service…",
+   "line": "Pib release · 25 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6664,6 +7310,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Telecom Subscription Data as on May 2026",
+   "line": "Press release · 25 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6682,6 +7330,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality on Manoharpur to Dausa National Highway…",
+   "line": "Press release · 24 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6700,6 +7350,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Debarment Order – M/s MI2C Business Enterprises Private Limited…",
+   "line": "Order · 24 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6718,6 +7370,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Corrigendum to notification for notifying sporting events of…",
+   "line": "Notification · 24 Jun 2026",
    "stratum": "media"
   },
   {
@@ -6736,6 +7390,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "End Point Device for Environmental Monitoring (TEC23732607)",
+   "line": "Notification · 23 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6754,6 +7410,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IoT Gateway (TEC24492607)",
+   "line": "Notification · 23 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6772,6 +7430,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Tracking Device (TEC28732607)",
+   "line": "Notification · 23 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6790,6 +7450,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Feedback Device (TEC23232607)",
+   "line": "Notification · 23 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6808,6 +7470,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "Extension of Last date for receipt of Applications in response to…",
+   "line": "Notification · 23 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6826,6 +7490,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Smart Electricity Meter (TEC28362607)",
+   "line": "Notification · 23 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6844,6 +7510,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Extension of last date for Research Associate applications (NCCS…",
+   "line": "Administrative · 23 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6862,6 +7530,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Dated 22.06.2026 in compliance with Order dated 19.06.2026 passed…",
+   "line": "Notification · 23 Jun 2026",
    "stratum": "media"
   },
   {
@@ -6880,6 +7550,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Indian Telecom Services Performance Indicator Report for the…",
+   "line": "Press release · 22 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6898,6 +7570,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Revised work distribution amongst Group Coordinators/HAG level…",
+   "line": "Order · 18 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -6916,6 +7590,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0032: Multiple Vulnerabilities in…",
+   "line": "Advisory · 18 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -6934,6 +7610,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Delegation of Financial Power of ICERT",
+   "line": "Order · 17 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -6952,6 +7630,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across Gorakhpur City & nearby areas",
+   "line": "Press release · 16 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6970,6 +7650,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Draft generic security test cases for the 5G Charging Function released for a 60-day comment period.",
+   "short": "Charging Function (CHF) of 5G",
+   "line": "Draft test cases · 16 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -6988,6 +7670,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "60-day stakeholder consultation on draft security test cases for the 5G Charging Function; comments were due 16-08-2026.",
+   "short": "Charging Function (CHF) of 5G",
+   "line": "Consultation notice · 16 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7006,6 +7690,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across metro routes in DMRC, NMRC & NCRTC",
+   "line": "Press release · 15 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7024,6 +7710,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Video Streaming Platform",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7042,6 +7730,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Telecommunications (Television, Radio and Associated Services)…",
+   "line": "Draft rules · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7060,6 +7750,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Telecommunications (Television, Radio and Associated Services)…",
+   "line": "Notification · 12 Jun 2026",
    "stratum": "media"
   },
   {
@@ -7078,6 +7770,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Ethernet Electrical to Optical Media Converter",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7096,6 +7790,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Router for MPLS based Transport network",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7114,6 +7810,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Lightning and Surge Protection of Telecom Sites",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7132,6 +7830,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Drive Test Tool for Cellular Networks",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7150,6 +7850,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Uninterrupted Power Supply System",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7168,6 +7870,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Notifying sporting events of national importance under Sports…",
+   "line": "Guideline · 12 Jun 2026",
    "stratum": "media"
   },
   {
@@ -7186,6 +7890,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Solar Photovoltaic Power supply for Telecom…",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7204,6 +7910,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Outdoor Weatherproof Rack for Telecom…",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7222,6 +7930,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide gNodeB",
+   "line": "Gazette notification · 12 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7240,6 +7950,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Router for MPLS-based Transport Network",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7258,6 +7970,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Solar Photo Voltaic Based Standalone or…",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7276,6 +7990,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0031: Multiple Vulnerabilities in…",
+   "line": "Advisory · 11 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -7294,6 +8010,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "TSDSI-transposed 3GPP Standards (Release 13–18), outcome of…",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7312,6 +8030,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Outdoor Weatherproof Rack for Telecom Equipment",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7330,6 +8050,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "TSDSI-transposed 3GPP Standards (Release 13–18), outcome of…",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7348,6 +8070,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "TSDSI-transposed 3GPP Standards (Release 13–17), outcome of…",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7366,6 +8090,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Generic Requirements Structured LAN Cabling",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7384,6 +8110,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "TSDSI-transposed 3GPP Standards (Release 13–18), outcome of…",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7402,6 +8130,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "TSDSI-transposed 3GPP Standards (Release 15–18), outcome of…",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7420,6 +8150,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Solar Photovoltaic Power Supply for Telecom Equipment",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7438,6 +8170,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide LAN Switch",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7456,6 +8190,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "TSDSI-transposed 3GPP Standards (Release 13–18), outcome of…",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7474,6 +8210,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Electronic Locator System",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7492,6 +8230,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Test Guide Uninterrupted Power Supply System",
+   "line": "Gazette notification · 11 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7510,6 +8250,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Security Guidelines CISG-2026-03",
+   "line": "Guideline · 10 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -7528,6 +8270,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0030: Multiple Vulnerabilities in…",
+   "line": "Advisory · 10 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -7546,6 +8290,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0029: Multiple Vulnerabilities in SAP…",
+   "line": "Advisory · 9 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -7564,6 +8310,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "Amended Rating Manual 2026 prescribing assessment methodology for rating of properties for digital connectivity under the amended 2024 Regulations.",
+   "short": "Rating Manual 2026 for assessment of Digital Connectivity under…",
+   "line": "Manual · 9 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7582,6 +8330,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality from Lanka to Narainpur Railway Bridge…",
+   "line": "Press release · 8 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7600,6 +8350,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality Across East and West Jaintia Hills…",
+   "line": "Press release · 8 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7618,6 +8370,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality across Chandigarh, Mohali & Panchkula…",
+   "line": "Press release · 8 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7636,6 +8390,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "CERT-In Advisory CIAD-2026-0028: Multiple Vulnerabilities in…",
+   "line": "Advisory · 8 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -7654,6 +8410,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory on adherence of Indian Laws and the Code of Ethics…",
+   "line": "Advisory · 5 Jun 2026",
    "stratum": "media"
   },
   {
@@ -7672,6 +8430,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory for OTT Platforms on Streaming Content Related to…",
+   "line": "Advisory · 5 Jun 2026",
    "stratum": "media"
   },
   {
@@ -7690,6 +8450,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Inclusion of classification rating in promotional and publicity…",
+   "line": "Advisory · 5 Jun 2026",
    "stratum": "media"
   },
   {
@@ -7708,6 +8470,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory on Celebrity/Influencer Endorsements and Advertisements…",
+   "line": "Advisory · 5 Jun 2026",
    "stratum": "media"
   },
   {
@@ -7726,6 +8490,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "PR No. 68 of 2026 extends the comment deadline on the Draft Telecom Consumers Complaint Redressal (Fourth Amendment) Regulation, 2026 (draft issued 07-05-2026; consultation since closed).",
+   "short": "Extension of last date to receive Comments on the Draft Telecom…",
+   "line": "Press release · 4 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7744,6 +8510,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory on monitoring of the broadcast content and technical…",
+   "line": "Guideline · 3 Jun 2026",
    "stratum": "media"
   },
   {
@@ -7762,6 +8530,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Network Quality Across Rudrapur, Haldwani and Kashipur City…",
+   "line": "Press release · 3 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7780,6 +8550,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Network Quality Across Gopal ganj, Chakradhar Nagar etc. in…",
+   "line": "Press release · 2 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7798,6 +8570,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "5G Core (TEC40182606)",
+   "line": "Notification · 2 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7816,6 +8590,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Network Quality Across Palampur city and Chandigarh to Palampur…",
+   "line": "Press release · 2 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7834,6 +8610,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "LAN Switch (TEC37942606)",
+   "line": "Notification · 2 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7852,6 +8630,8 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
+   "short": "Mobile Network Quality across Bathinda, Sri Muktsar Sahib Cities…",
+   "line": "Press release · 1 Jun 2026",
    "stratum": "telecom"
   },
   {
@@ -7870,6 +8650,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Minimum net worth requirement for Downlink Only Satellite TV…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -7888,6 +8670,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Assignment of mandate of CBFC relating to PSA",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -7906,6 +8690,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Ministry of Information & Broadcasting's D.O. letter",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -7924,6 +8710,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory for creation of Printing Press Profile (PDF",
+   "line": "Advisory",
    "stratum": "media"
   },
   {
@@ -7942,6 +8730,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Cansat India Brochure",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -7960,6 +8750,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Industry Connect 7 Day 1 – Leadership Dialogue…",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -7978,6 +8770,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory on cancellation of MSOs",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -7996,6 +8790,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Uplinking and Downlinking Guidelines 2022",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8014,6 +8810,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Glimpses of Indian Space Industries",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8032,6 +8830,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Amendments to the Cable Television Networks Rules, 1994 vide S.O.…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8050,6 +8850,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Uplinking and downlinking guidelines 2011",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8068,6 +8870,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Ministry of Home Affairs Proforma for seeking security clearance",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8086,6 +8890,8 @@
    "status": "new",
    "meta": {},
    "gist": "",
+   "short": "Broadcasters and distributors of television channels relating to…",
+   "line": "Direction",
    "stratum": "telecom"
   },
   {
@@ -8104,6 +8910,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "D.o letter to Shri S.C. L Das, Sec. MSME",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8122,6 +8930,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Uplinking and downlinking Guidelines 2005",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8140,6 +8950,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L1 Overview of BIS Process of Standards development",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8158,6 +8970,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory no. 20 of 2026 - Time-bound compliance with Deficiency…",
+   "line": "Advisory",
    "stratum": "media"
   },
   {
@@ -8176,6 +8990,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "D.O letter to Shri Rajit, Sec. MSDE",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8194,6 +9010,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "RTI Committee",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8212,6 +9030,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Cyber Security Guidelines for Smart City Infrastructure",
+   "line": "Direction",
    "stratum": "tech_data"
   },
   {
@@ -8230,6 +9050,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Ground Station As A Service (GSaaS) in India",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8248,6 +9070,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory no. 18 of 2026 - Online Correction of Annual Statement…",
+   "line": "Advisory",
    "stratum": "media"
   },
   {
@@ -8266,6 +9090,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Visiting hours to RO, Mumbai",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8284,6 +9110,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Integrated Launch Manifesto for 2023-24 (Q4) & 2024-25",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8302,6 +9130,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Industry Connect 7 Report",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8320,6 +9150,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Technical Centre Brochure",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8338,6 +9170,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Industry Connect 7 Day 2 - States for Space Session…",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8356,6 +9190,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "FAQS on Uplinking and Downlinking Guidelines 2022",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8374,6 +9210,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Singapore Space Summit",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8392,6 +9230,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Single AFFIDAVIT",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8410,6 +9250,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "DO to UT fwd model Sop",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8428,6 +9270,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L5 Experience Gained Launch Vehicle",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8446,6 +9290,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "DO to Ministry of EFCC for onboarding on ICH",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8464,6 +9310,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Model Curriculum for Minor Degree",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8482,6 +9330,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Extension of cut-off date for provisioning of non-Indian…",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8500,6 +9350,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L5 Experience Gained Satellite",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8518,6 +9370,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Provisional application form for Uplinking of foreign TV channel…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8536,6 +9390,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L4 Testing Operations Standards",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8554,6 +9410,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory for registration of periodicals (PDF",
+   "line": "Advisory",
    "stratum": "media"
   },
   {
@@ -8572,6 +9430,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Industry Connect 10 - Synopsis Report",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8590,6 +9450,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Projection of SATCOM capacity over India for next 5 years",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8608,6 +9470,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Uplinking and Downlinking Guidelines 2022-English",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8626,6 +9490,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Indian Space Industry Delegation to IAC 2025 Sydney, Australia",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8644,6 +9510,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "List of MSO Registration Surrendered, Cancelled and Expired as on…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8662,6 +9530,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Seeking details of CAS and SMS deployed by MSOs in India",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8680,6 +9550,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Technical Guidelines on SBOM, QBOM & CBOM, AIBOM and HBOM Version…",
+   "line": "Direction",
    "stratum": "tech_data"
   },
   {
@@ -8698,6 +9570,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Nodal Officers for issues of notifications to intermediaries for…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8716,6 +9590,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "D.O to MHA exe framework implementation",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8734,6 +9610,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "List of Registered MSOs as on 31.05.2026",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8752,6 +9630,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Expression of Interst for inviting technology solutions on…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8770,6 +9650,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Bharat Kosh accounts head details",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8788,6 +9670,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Monsoon Season of Parliament, 2022",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8806,6 +9690,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "D.O to Tourism for executing framework implementation",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8824,6 +9710,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Press Release for the Amendments to the Cable Television Networks…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8842,6 +9730,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Satellite TV channels under Devotional Spiritual Yoga Category",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8860,6 +9750,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Various Account Heads of TVI Section",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8878,6 +9770,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L5 Experience Gained Payload",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8896,6 +9790,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Prohibition of Advertising, Promotion & Endorsement of unlawful…",
+   "line": "Advisory",
    "stratum": "media"
   },
   {
@@ -8914,6 +9810,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L6 Annual Standards Plan",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8932,6 +9830,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "During the 2024 Maharashtra assembly elections, the central…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8950,6 +9850,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory for Local Cable Operators",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -8968,6 +9870,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Indian Space Industry Delegation to Veneto Space Meetings, 2026",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -8986,6 +9890,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory for persons seeking grant/renewal of MSO/LCO registration",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9004,6 +9910,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Press Release 1st JWG",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9022,6 +9930,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Amendment in Recruitment Rules (RRs) for the post of MTS in…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9040,6 +9950,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "DO to CS (States) forwarding Model SoP",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9058,6 +9970,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Relaxation of Minimum Net Worth",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9076,6 +9990,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Policy Guidelines for Uplinking and Downlinking of Satellite TV…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9094,6 +10010,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "D.O to Youth Affairs for exe framework",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9112,6 +10030,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Industry Connect 10 - Datawall Content",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9130,6 +10050,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "New Year 2026",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9148,6 +10070,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Blueprint for Reducing Exposure and Defending against AI-Assisted…",
+   "line": "Direction",
    "stratum": "tech_data"
   },
   {
@@ -9166,6 +10090,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Indian Space Policy 2023",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9184,6 +10110,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Cyber Security Framework and Guidelines for Space including…",
+   "line": "Direction",
    "stratum": "tech_data"
   },
   {
@@ -9202,6 +10130,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Model Curriculum for Minor Degree in Space Technology",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9220,6 +10150,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "On the validity of the capacity provisioning contracts",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9238,6 +10170,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Industry Connect 7 Day 2 - IN-SPACe Report Presentation",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9256,6 +10190,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Registering Authorities for Local Cable Operators (LCOs) and…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9274,6 +10210,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Appointment of Transparency officer",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9292,6 +10230,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "EoI for establishment and operation of ground stations by Indian…",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9310,6 +10250,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory on Obligation of PSB",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9328,6 +10270,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L3 Quality Assurance Standards",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9346,6 +10290,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Industry Connect 7 Day 2 – Special Address, Kaleidoscope…",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9364,6 +10310,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "D. O letter to CS with execution framework organized",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9382,6 +10330,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "The Sectoral Guidelines for FDI in Space Sector",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9400,6 +10350,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Norms, Guidelines and Procedures in respect of Authorization",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9418,6 +10370,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Elemental Cyber Defense Controls for Micro, Small, and Medium…",
+   "line": "Direction",
    "stratum": "tech_data"
   },
   {
@@ -9436,6 +10390,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "L2 Systems Engineering Standards",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9454,6 +10410,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "D.O to DPIIT for exe framework implementation",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9472,6 +10430,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory no. 19 of 2026 - Extension of Last Date for e-Filing of…",
+   "line": "Advisory",
    "stratum": "media"
   },
   {
@@ -9490,6 +10450,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "List of Applications Cancelled, Closed and Rejected as on…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9508,6 +10470,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "EO Consultation Paper",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9526,6 +10490,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Revised JWG composition",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9544,6 +10510,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory Guidelines on Sub-Orbital Launches including Model…",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9562,6 +10530,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Brochure, 2026",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9580,6 +10550,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory on Obligation of Public Service Broadcasting",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9598,6 +10570,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Client's /Citizen's Charter Roles & Functions Advisory Committee…",
+   "line": "Direction",
    "stratum": "tech_data"
   },
   {
@@ -9616,6 +10590,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "The definition of Director under the Guidelines",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9634,6 +10610,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Internal Complaints committee reg. sexual harresment of women at…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9652,6 +10630,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Constitution of JWG",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9670,6 +10650,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "IN-SPACe Chronicle, Newsletter",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9688,6 +10670,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Nomination of Chief Information Security Officer and Dy. Chief…",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9706,6 +10690,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "DO to Ministry of Defence for onboarding on ICH portal",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9724,6 +10710,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Format of PBG",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9742,6 +10730,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Advisory for carriage of mandatory channels",
+   "line": "Circular",
    "stratum": "media"
   },
   {
@@ -9760,6 +10750,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Coffee Table Book",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9778,6 +10770,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "New Year 2025",
+   "line": "Guideline",
    "stratum": "telecom"
   },
   {
@@ -9796,6 +10790,8 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
+   "short": "Authorisation Guidelines for undertaking Space Situational…",
+   "line": "Guideline",
    "stratum": "telecom"
   }
  ]

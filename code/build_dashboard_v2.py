@@ -231,10 +231,11 @@ def build_row(it: dict[str, Any]) -> dict[str, Any]:
         "routine": it.get("routine", False), "lane": it.get("lane", "instruments"),
         "stratum": row_stratum(it),
         "type": TYPE_LABEL.get(it.get("type", ""), (it.get("type", "") or "").replace("_", " ").title()),
-        "short": overrides.get(it["id"]) or shorten(it["title"]),
+        # short + line are precomputed in the export by radar.display (one source of truth);
+        # a hand-curated override still wins over the deterministic value
+        "short": overrides.get(it["id"]) or it.get("short") or shorten(it["title"]),
         "official": it["title"], "gist": clean(it.get("gist") or ""),
-        # crisp deterministic descriptor from the item's own metadata; curated override wins
-        "line": lines_map.get(it["id"]) or first_sentence(clean(it.get("gist") or "")) or descriptor(it),
+        "line": lines_map.get(it["id"]) or first_sentence(clean(it.get("gist") or "")) or it.get("line") or descriptor(it),
         "venue": VENUE.get(it["source_id"], it["source_id"]),
         # dual links: the document itself and the official landing page
         "doc": doc, "page": it.get("page_url"),

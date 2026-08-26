@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-27T05:05:27+05:30",
+ "generated": "2026-08-27T05:12:22+05:30",
  "sources": {
   "trai_regulations": {
    "status": "QUIET",
@@ -509,7 +509,7 @@
     "first sweep: 16 item(s) ledgered as activation_baseline",
     "5 row(s) outside this source's subject filter"
    ],
-   "checked": "2026-08-27T05:05:24+05:30",
+   "checked": "2026-08-27T05:12:15+05:30",
    "consecutive_failures": 0
   },
   "gazette_meity": {
@@ -522,7 +522,7 @@
    "info": [
     "first sweep: 11 item(s) ledgered as activation_baseline"
    ],
-   "checked": "2026-08-27T05:05:25+05:30",
+   "checked": "2026-08-27T05:12:19+05:30",
    "consecutive_failures": 0
   },
   "gazette_mib": {
@@ -535,7 +535,7 @@
    "info": [
     "first sweep: 1 item(s) ledgered as activation_baseline"
    ],
-   "checked": "2026-08-27T05:05:27+05:30",
+   "checked": "2026-08-27T05:12:22+05:30",
    "consecutive_failures": 0
   },
   "tdsat_orders": {
