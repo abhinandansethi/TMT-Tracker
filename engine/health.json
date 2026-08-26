@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-27T01:51:00+05:30",
+ "generated": "2026-08-27T04:12:30+05:30",
  "sources": {
   "trai_regulations": {
    "status": "QUIET",
@@ -12,7 +12,7 @@
     "30 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2026-05-14"
    ],
-   "checked": "2026-08-27T01:49:28+05:30",
+   "checked": "2026-08-27T04:11:39+05:30",
    "consecutive_failures": 0
   },
   "trai_directions": {
@@ -25,7 +25,7 @@
    "info": [
     "29 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:29+05:30",
+   "checked": "2026-08-27T04:11:40+05:30",
    "consecutive_failures": 0
   },
   "trai_tariff_telecom": {
@@ -38,7 +38,7 @@
    "info": [
     "84 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:31+05:30",
+   "checked": "2026-08-27T04:11:42+05:30",
    "consecutive_failures": 0
   },
   "trai_tariff_broadcasting": {
@@ -51,7 +51,7 @@
    "info": [
     "146 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:32+05:30",
+   "checked": "2026-08-27T04:11:43+05:30",
    "consecutive_failures": 0
   },
   "trai_consultations": {
@@ -64,7 +64,7 @@
    "info": [
     "29 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:33+05:30",
+   "checked": "2026-08-27T04:11:44+05:30",
    "consecutive_failures": 0
   },
   "trai_open_consultations": {
@@ -75,7 +75,7 @@
    "newest_visible": "2026-08-05",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:34+05:30",
+   "checked": "2026-08-27T04:11:45+05:30",
    "consecutive_failures": 0
   },
   "trai_recommendations": {
@@ -89,7 +89,7 @@
     "30 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2026-02-24"
    ],
-   "checked": "2026-08-27T01:49:35+05:30",
+   "checked": "2026-08-27T04:11:46+05:30",
    "consecutive_failures": 0
   },
   "trai_press_releases": {
@@ -100,7 +100,7 @@
    "newest_visible": "2026-08-25",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:37+05:30",
+   "checked": "2026-08-27T04:11:48+05:30",
    "consecutive_failures": 0
   },
   "trai_whats_new": {
@@ -111,7 +111,7 @@
    "newest_visible": "2026-08-25",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:37+05:30",
+   "checked": "2026-08-27T04:11:48+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_qos": {
@@ -125,7 +125,7 @@
     "13 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2025-01-03"
    ],
-   "checked": "2026-08-27T01:49:39+05:30",
+   "checked": "2026-08-27T04:11:50+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_broadband": {
@@ -139,7 +139,7 @@
     "2 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2016-10-31"
    ],
-   "checked": "2026-08-27T01:49:40+05:30",
+   "checked": "2026-08-27T04:11:51+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_bcs": {
@@ -152,7 +152,7 @@
    "info": [
     "6 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:41+05:30",
+   "checked": "2026-08-27T04:11:52+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_fea": {
@@ -166,7 +166,7 @@
     "24 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2021-12-07"
    ],
-   "checked": "2026-08-27T01:49:42+05:30",
+   "checked": "2026-08-27T04:11:53+05:30",
    "consecutive_failures": 0
   },
   "trai_standing_nsl": {
@@ -180,7 +180,7 @@
     "12 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2020-08-27"
    ],
-   "checked": "2026-08-27T01:49:43+05:30",
+   "checked": "2026-08-27T04:11:55+05:30",
    "consecutive_failures": 0
   },
   "nccs_latest": {
@@ -193,7 +193,7 @@
    "info": [
     "7 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:44+05:30",
+   "checked": "2026-08-27T04:11:55+05:30",
    "consecutive_failures": 0
   },
   "nccs_sas": {
@@ -204,7 +204,7 @@
    "newest_visible": "2026-08-20",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:45+05:30",
+   "checked": "2026-08-27T04:11:56+05:30",
    "consecutive_failures": 0
   },
   "nccs_sc": {
@@ -217,7 +217,7 @@
    "info": [
     "4 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:46+05:30",
+   "checked": "2026-08-27T04:11:57+05:30",
    "consecutive_failures": 0
   },
   "nccs_itsars": {
@@ -231,7 +231,7 @@
     "64 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2026-04-24"
    ],
-   "checked": "2026-08-27T01:49:48+05:30",
+   "checked": "2026-08-27T04:11:59+05:30",
    "consecutive_failures": 0
   },
   "tec_whatsnew": {
@@ -245,33 +245,31 @@
     "266 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2026-05-18"
    ],
-   "checked": "2026-08-27T01:49:50+05:30",
+   "checked": "2026-08-27T04:12:01+05:30",
    "consecutive_failures": 0
   },
   "tdsat_notices": {
    "status": "OK",
    "rows_seen": 438,
-   "new": 2,
+   "new": 0,
    "ledgered_total": 18,
    "newest_visible": "2026-08-24",
    "notes": [],
    "info": [
     "420 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:50+05:30",
+   "checked": "2026-08-27T04:12:02+05:30",
    "consecutive_failures": 0
   },
   "trai_rss": {
-   "status": "WARN",
+   "status": "OK",
    "rows_seen": 10,
-   "new": 1,
+   "new": 0,
    "ledgered_total": 10,
    "newest_visible": "2026-08-25",
-   "notes": [
-    "crosscheck caught 1 item(s) the primary sources missed"
-   ],
+   "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:51+05:30",
+   "checked": "2026-08-27T04:12:02+05:30",
    "consecutive_failures": 0
   },
   "certin_advisories": {
@@ -282,18 +280,18 @@
    "newest_visible": "2026-08-20",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:52+05:30",
+   "checked": "2026-08-27T04:12:03+05:30",
    "consecutive_failures": 0
   },
   "certin_vuln": {
    "status": "OK",
    "rows_seen": 20,
-   "new": 2,
+   "new": 0,
    "ledgered_total": 22,
    "newest_visible": "2026-08-25",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:52+05:30",
+   "checked": "2026-08-27T04:12:04+05:30",
    "consecutive_failures": 0
   },
   "certin_guidelines": {
@@ -306,7 +304,7 @@
    "info": [
     "30 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:54+05:30",
+   "checked": "2026-08-27T04:12:05+05:30",
    "consecutive_failures": 0
   },
   "certin_directions": {
@@ -317,7 +315,7 @@
    "newest_visible": "2022-04-28",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:49:55+05:30",
+   "checked": "2026-08-27T04:12:06+05:30",
    "consecutive_failures": 0
   },
   "mib_acts_policy": {
@@ -330,7 +328,7 @@
    "info": [
     "15 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:57+05:30",
+   "checked": "2026-08-27T04:12:07+05:30",
    "consecutive_failures": 0
   },
   "mib_orders_notices": {
@@ -343,7 +341,7 @@
    "info": [
     "6 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:49:58+05:30",
+   "checked": "2026-08-27T04:12:08+05:30",
    "consecutive_failures": 0
   },
   "mib_other_comms": {
@@ -357,7 +355,7 @@
     "19 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2026-02-04"
    ],
-   "checked": "2026-08-27T01:49:59+05:30",
+   "checked": "2026-08-27T04:12:09+05:30",
    "consecutive_failures": 0
   },
   "mib_digital_media": {
@@ -370,7 +368,7 @@
    "info": [
     "15 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:01+05:30",
+   "checked": "2026-08-27T04:12:11+05:30",
    "consecutive_failures": 0
   },
   "mib_broadcasting": {
@@ -383,7 +381,7 @@
    "info": [
     "17 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:02+05:30",
+   "checked": "2026-08-27T04:12:12+05:30",
    "consecutive_failures": 0
   },
   "prgi": {
@@ -394,7 +392,7 @@
    "newest_visible": null,
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:50:02+05:30",
+   "checked": "2026-08-27T04:12:14+05:30",
    "consecutive_failures": 0
   },
   "cbfc": {
@@ -407,7 +405,7 @@
    "info": [
     "2 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:03+05:30",
+   "checked": "2026-08-27T04:12:14+05:30",
    "consecutive_failures": 0
   },
   "asci": {
@@ -420,7 +418,7 @@
    "info": [
     "5 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:03+05:30",
+   "checked": "2026-08-27T04:12:15+05:30",
    "consecutive_failures": 0
   },
   "trai_miscellaneous": {
@@ -433,7 +431,7 @@
    "info": [
     "26 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:05+05:30",
+   "checked": "2026-08-27T04:12:17+05:30",
    "consecutive_failures": 0
   },
   "tec_circulars": {
@@ -447,7 +445,7 @@
     "126 row(s) predate window_start — not ledgered",
     "nothing inside the tracked window; newest item this venue shows is 2026-04-01"
    ],
-   "checked": "2026-08-27T01:50:07+05:30",
+   "checked": "2026-08-27T04:12:19+05:30",
    "consecutive_failures": 0
   },
   "tec_gazette_standards": {
@@ -460,7 +458,7 @@
    "info": [
     "30 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:08+05:30",
+   "checked": "2026-08-27T04:12:21+05:30",
    "consecutive_failures": 0
   },
   "tec_essential_requirements": {
@@ -473,7 +471,7 @@
    "info": [
     "128 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:10+05:30",
+   "checked": "2026-08-27T04:12:23+05:30",
    "consecutive_failures": 0
   },
   "inspace_publications": {
@@ -484,7 +482,7 @@
    "newest_visible": null,
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:50:11+05:30",
+   "checked": "2026-08-27T04:12:24+05:30",
    "consecutive_failures": 0
   },
   "mib_advisories": {
@@ -497,45 +495,47 @@
    "info": [
     "14 row(s) predate window_start — not ledgered"
    ],
-   "checked": "2026-08-27T01:50:54+05:30",
+   "checked": "2026-08-27T04:12:25+05:30",
    "consecutive_failures": 0
   },
   "gazette_communications": {
-   "status": "QUIET",
+   "status": "OK",
    "rows_seen": 21,
    "new": 0,
-   "ledgered_total": 0,
+   "ledgered_total": 16,
    "newest_visible": "2026-08-21",
    "notes": [],
    "info": [
-    "5 row(s) outside this source's subject filter",
-    "nothing in scope; newest seen 2026-08-21"
+    "first sweep: 16 item(s) ledgered as activation_baseline",
+    "5 row(s) outside this source's subject filter"
    ],
-   "checked": "2026-08-27T01:50:56+05:30",
+   "checked": "2026-08-27T04:12:27+05:30",
    "consecutive_failures": 0
   },
   "gazette_meity": {
    "status": "OK",
    "rows_seen": 11,
    "new": 0,
-   "ledgered_total": 1,
-   "newest_visible": "2026-08-21",
-   "notes": [],
-   "info": [],
-   "checked": "2026-08-27T01:50:58+05:30",
-   "consecutive_failures": 0
-  },
-  "gazette_mib": {
-   "status": "QUIET",
-   "rows_seen": 1,
-   "new": 0,
-   "ledgered_total": 0,
+   "ledgered_total": 11,
    "newest_visible": "2026-08-21",
    "notes": [],
    "info": [
-    "nothing in scope; newest seen 2026-08-21"
+    "first sweep: 11 item(s) ledgered as activation_baseline"
    ],
-   "checked": "2026-08-27T01:50:59+05:30",
+   "checked": "2026-08-27T04:12:28+05:30",
+   "consecutive_failures": 0
+  },
+  "gazette_mib": {
+   "status": "OK",
+   "rows_seen": 1,
+   "new": 0,
+   "ledgered_total": 1,
+   "newest_visible": "2026-08-21",
+   "notes": [],
+   "info": [
+    "first sweep: 1 item(s) ledgered as activation_baseline"
+   ],
+   "checked": "2026-08-27T04:12:29+05:30",
    "consecutive_failures": 0
   },
   "tdsat_orders": {
@@ -546,7 +546,7 @@
    "newest_visible": "2026-08-24",
    "notes": [],
    "info": [],
-   "checked": "2026-08-27T01:51:00+05:30",
+   "checked": "2026-08-27T04:12:30+05:30",
    "consecutive_failures": 0
   }
  },

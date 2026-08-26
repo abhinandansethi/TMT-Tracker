@@ -123,12 +123,20 @@ class Sweeper:
                 if ing["filtered"]:
                     info.append(f"{ing['filtered']} row(s) outside this source's subject filter")
                 owned = self.ledger.count_for(sid) + self.ledger.sightings_for(sid)
+                # rows that were in scope and in window but never landed = silently gated out.
+                # That is a defect, not a quiet week, so it must read EMPTY and never QUIET.
+                gated_out = (rows_total - ing["filtered"] - ing["pre_window"]
+                             - ing["fresh"] - ing["activated"])
                 if rows_total == 0:
                     status = "EMPTY"
                     notes.append("driver returned no rows at all")
                 elif owned == 0 and ing["filtered"] == rows_total:
                     status = "FILTERED"
                     info.append(f"all {rows_total} row(s) belong to other subjects")
+                elif owned == 0 and gated_out > 0:
+                    status = "EMPTY"
+                    notes.append(f"parsed {rows_total} row(s), {gated_out} in-window, yet none "
+                                 f"reached the ledger — gates or extraction are dropping them")
                 elif owned == 0:
                     status = "QUIET"
                     info.append(f"nothing in scope; newest seen {newest_visible or 'undated'}")
@@ -328,7 +336,10 @@ class Sweeper:
                 "type": cl.derive_type(title, source,
                                        (clean.get("extra") or {}).get("src_type")),
                 "routine": cl.is_routine(title, self.routine_rx),
-                "deadline": cl.extract_deadline(title, self.deadline_rx, source.get("date_formats", [])),
+                # a gazette notification's "Date of Applicability" is the operative compliance
+                # date; prefer it over a comment-deadline regex where the venue provides it
+                "deadline": ((clean.get("extra") or {}).get("effective_date")
+                             or cl.extract_deadline(title, self.deadline_rx, source.get("date_formats", []))),
                 "flags": flags,
                 "seq": seq_key,
                 # Routine means recurring administrative output: drive tests, lab

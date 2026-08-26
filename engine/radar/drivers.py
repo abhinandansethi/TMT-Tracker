@@ -117,20 +117,44 @@ def _parse_gazette_grid(html: str, source: dict, seen_ids: set) -> List[Row]:
         seen_ids.add(gid)
         issue = _gaz_date(cell[7]) or _gaz_date(cell[8])
         subject, dept, office = cell[4], cell[2], cell[3]
-        # the grid truncates subjects; department gives the issuing body, which is what
-        # tells a reader whether this is DoT, TRAI or the ministry proper
-        title = subject if subject else f"{dept} gazette notification"
-        if dept and dept.lower() not in ("not applicable", "") and dept.lower() not in title.lower():
-            title = f"{title} ({dept})"
-        out.append({
-            "date": issue,
-            "title": title,
-            "url": source["url"],          # the search page; the citation is the Gazette ID
-            "extra": {"gazette_id": gid, "ministry": cell[1], "department": dept,
-                      "office": office, "category": cell[5], "part_section": cell[6],
-                      "publish_date": _gaz_date(cell[8])},
-        })
+        # The Gazette packs a structured annotation into the subject cell:
+        #   "<instrument name>. ( New Gazette, Impacted Rule : ..., Applicable Section/Rule :
+        #    ..., Date of Applicability : DD/MM/YYYY, Impact : Actionable ) (Department)"
+        # The instrument name is the title; the annotation carries the effective date and an
+        # Impact flag that a partner actually wants. Split them, so the title stays inside the
+        # gate and the useful metadata is kept rather than discarded.
+        title, ann = _split_gazette_subject(subject)
+        if not title:
+            title = f"{dept} gazette notification" if dept else "Gazette notification"
+        extra = {"gazette_id": gid, "ministry": cell[1], "department": dept,
+                 "office": office, "category": cell[5], "part_section": cell[6],
+                 "publish_date": _gaz_date(cell[8])}
+        extra.update(ann)
+        out.append({"date": issue, "title": title[:280],
+                    "url": source["url"], "extra": extra})
     return out
+
+
+def _split_gazette_subject(subject: str):
+    """Return (clean_instrument_name, {annotation fields}). The e-Gazette subject cell
+    appends a parenthesised annotation block; the name is everything before it."""
+    ann = {}
+    m = re.search(r"\s*\(\s*(?:New Gazette|Amendment|Impacted Rule)\b", subject)
+    title = subject[:m.start()].strip().rstrip(".") if m else subject.strip().rstrip(".")
+    block = subject[m.start():] if m else ""
+    for key, field in (("Date of Applicability", "effective_date"),
+                       ("Applicable Section/Rule", "applicable_rule"),
+                       ("Impacted Rule", "impacted_rule"),
+                       ("Impact", "impact")):
+        mm = re.search(re.escape(key) + r"\s*:\s*([^,)]+)", block)
+        if mm:
+            val = mm.group(1).strip()
+            if field == "effective_date":
+                dm = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", val)
+                if dm:
+                    val = f"{dm.group(3)}-{int(dm.group(2)):02d}-{int(dm.group(1)):02d}"
+            ann[field] = val[:120]
+    return title, ann
 
 
 def _gaz_date(text: str) -> Optional[str]:
