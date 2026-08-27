@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /images/combination_pre_filling_form_consultations/
+Disallow: /images/internship/
+Disallow: /public/images/combination_pre_filling_form_consultations/
+Disallow: /public/images/internship/
+Disallow: /images/stakeholdersconsultations/
+Disallow: /public/images/stakeholdersconsultations/

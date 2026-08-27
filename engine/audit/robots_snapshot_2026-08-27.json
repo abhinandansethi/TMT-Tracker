@@ -1,0 +1,468 @@
+{
+ "taken": "2026-08-27T08:31:03",
+ "hosts": {
+  "https://cbfcindia.gov.in": {
+   "url": "https://cbfcindia.gov.in/robots.txt",
+   "sources": 1,
+   "status": 404,
+   "content_type": "text/html; charset=iso-8859-1",
+   "sha256": "80c3fe2ae1062abf",
+   "bytes": 196,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "cbfc": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://ccpa.doca.gov.in": {
+   "url": "https://ccpa.doca.gov.in/robots.txt",
+   "sources": 1,
+   "status": 404,
+   "content_type": "text/html; charset=iso-8859-1",
+   "sha256": "80c3fe2ae1062abf",
+   "bytes": 196,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "ccpa_orders": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://delhihighcourt.nic.in": {
+   "url": "https://delhihighcourt.nic.in/robots.txt",
+   "sources": 1,
+   "status": 404,
+   "content_type": "text/html; charset=iso-8859-1",
+   "sha256": "80c3fe2ae1062abf",
+   "bytes": 196,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "delhihc_judgments": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://egazette.gov.in": {
+   "url": "https://egazette.gov.in/robots.txt",
+   "sources": 3,
+   "status": 404,
+   "content_type": "text/html",
+   "sha256": "dc1d54dab6ec8c00",
+   "bytes": 1245,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "gazette_communications": "allowed",
+    "gazette_meity": "allowed",
+    "gazette_mib": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://mib.gov.in": {
+   "url": "https://mib.gov.in/robots.txt",
+   "sources": 6,
+   "status": 403,
+   "content_type": "text/html; charset=iso-8859-1",
+   "sha256": "242793e9a0acf6a3",
+   "bytes": 282,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "mib_acts_policy": "allowed",
+    "mib_orders_notices": "allowed",
+    "mib_other_comms": "allowed",
+    "mib_digital_media": "allowed",
+    "mib_broadcasting": "allowed",
+    "mib_advisories": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://nccs.gov.in": {
+   "url": "https://nccs.gov.in/robots.txt",
+   "sources": 4,
+   "status": 404,
+   "content_type": "text/html; charset=utf-8",
+   "sha256": "55f7d9e99b8e2d4e",
+   "bytes": 146,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "nccs_latest": "allowed",
+    "nccs_sas": "allowed",
+    "nccs_sc": "allowed",
+    "nccs_itsars": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://pib.gov.in": {
+   "url": "https://pib.gov.in/robots.txt",
+   "sources": 1,
+   "status": 200,
+   "content_type": "text/html",
+   "sha256": "365d41e6568278c4",
+   "bytes": 945,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "pib_moc": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://prgi.gov.in": {
+   "url": "https://prgi.gov.in/robots.txt",
+   "sources": 1,
+   "status": 200,
+   "content_type": "text/plain; charset=UTF-8",
+   "sha256": "2a787f20489a2576",
+   "bytes": 1706,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Allow: /core/*.css$",
+    "Allow: /core/*.css?",
+    "Allow: /core/*.js$",
+    "Allow: /core/*.js?",
+    "Allow: /core/*.gif",
+    "Allow: /core/*.jpg",
+    "Allow: /core/*.jpeg",
+    "Allow: /core/*.png",
+    "Allow: /core/*.svg",
+    "Allow: /profiles/*.css$",
+    "Allow: /profiles/*.css?",
+    "Allow: /profiles/*.js$",
+    "Allow: /profiles/*.js?",
+    "Allow: /profiles/*.gif",
+    "Allow: /profiles/*.jpg",
+    "Allow: /profiles/*.jpeg",
+    "Allow: /profiles/*.png",
+    "Allow: /profiles/*.svg",
+    "Disallow: /core/",
+    "Disallow: /profiles/",
+    "Disallow: /README.txt",
+    "Disallow: /web.config",
+    "Disallow: /admin/",
+    "Disallow: /comment/reply/",
+    "Disallow: /filter/tips",
+    "Disallow: /node/add/",
+    "Disallow: /search/",
+    "Disallow: /user/register",
+    "Disallow: /user/password",
+    "Disallow: /user/login",
+    "Disallow: /user/logout",
+    "Disallow: /media/oembed",
+    "Disallow: /*/media/oembed",
+    "Disallow: /index.php/admin/",
+    "Disallow: /index.php/comment/reply/",
+    "Disallow: /index.php/filter/tips",
+    "Disallow: /index.php/node/add/",
+    "Disallow: /index.php/search/",
+    "Disallow: /index.php/user/password"
+   ],
+   "paths": {
+    "prgi": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://tdsat.gov.in": {
+   "url": "https://tdsat.gov.in/robots.txt",
+   "sources": 2,
+   "status": 404,
+   "content_type": "text/html; charset=iso-8859-1",
+   "sha256": "80c3fe2ae1062abf",
+   "bytes": 196,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "tdsat_notices": "allowed",
+    "tdsat_orders": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://trai.gov.in": {
+   "url": "https://trai.gov.in/robots.txt",
+   "sources": 16,
+   "status": 200,
+   "content_type": "text/plain; charset=UTF-8",
+   "sha256": "7f7c2c6db24fc233",
+   "bytes": 2069,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Allow: /core/*.css$",
+    "Allow: /core/*.css?",
+    "Allow: /core/*.js$",
+    "Allow: /core/*.js?",
+    "Allow: /core/*.gif",
+    "Allow: /core/*.jpg",
+    "Allow: /core/*.jpeg",
+    "Allow: /core/*.png",
+    "Allow: /core/*.svg",
+    "Allow: /profiles/*.css$",
+    "Allow: /profiles/*.css?",
+    "Allow: /profiles/*.js$",
+    "Allow: /profiles/*.js?",
+    "Allow: /profiles/*.gif",
+    "Allow: /profiles/*.jpg",
+    "Allow: /profiles/*.jpeg",
+    "Allow: /profiles/*.png",
+    "Allow: /profiles/*.svg",
+    "Disallow: /core/",
+    "Disallow: /profiles/",
+    "Disallow: /README.md",
+    "Disallow: /composer/Metapackage/README.txt",
+    "Disallow: /composer/Plugin/ProjectMessage/README.md",
+    "Disallow: /composer/Plugin/Scaffold/README.md",
+    "Disallow: /composer/Plugin/VendorHardening/README.txt",
+    "Disallow: /composer/Template/README.txt",
+    "Disallow: /modules/README.txt",
+    "Disallow: /sites/README.txt",
+    "Disallow: /themes/README.txt",
+    "Disallow: /web.config",
+    "Disallow: /admin/",
+    "Disallow: /comment/reply/",
+    "Disallow: /filter/tips",
+    "Disallow: /node/add/",
+    "Disallow: /search/",
+    "Disallow: /user/register",
+    "Disallow: /user/password",
+    "Disallow: /user/login",
+    "Disallow: /user/logout"
+   ],
+   "paths": {
+    "trai_regulations": "allowed",
+    "trai_directions": "allowed",
+    "trai_tariff_telecom": "allowed",
+    "trai_tariff_broadcasting": "allowed",
+    "trai_consultations": "allowed",
+    "trai_open_consultations": "allowed",
+    "trai_recommendations": "allowed",
+    "trai_press_releases": "allowed",
+    "trai_whats_new": "allowed",
+    "trai_standing_qos": "allowed",
+    "trai_standing_broadband": "allowed",
+    "trai_standing_bcs": "allowed",
+    "trai_standing_fea": "allowed",
+    "trai_standing_nsl": "allowed",
+    "trai_rss": "allowed",
+    "trai_miscellaneous": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.ascionline.in": {
+   "url": "https://www.ascionline.in/robots.txt",
+   "sources": 1,
+   "status": 200,
+   "content_type": "text/plain; charset=utf-8",
+   "sha256": "0a0d428e07d9c307",
+   "bytes": 866,
+   "saved": true,
+   "rules": [
+    "Allow: /?display=wide",
+    "Allow: /wp-admin/admin-ajax.php",
+    "Disallow: /asciacademy/",
+    "Disallow: /academy/category/workshop/",
+    "Disallow: /ascipodcast/",
+    "Disallow: /ascimedia/",
+    "Disallow: /asciblogs/",
+    "Disallow: /authoredarticles/",
+    "Disallow: /asci-events/",
+    "Disallow: /latest-news/",
+    "Disallow: /homepage-banner/",
+    "Disallow: /media_slider/",
+    "Disallow: /history-keymilestone/",
+    "Disallow: /advice-resource/",
+    "Disallow: /code-cases/",
+    "Disallow: /non-compliance/",
+    "Disallow: /asci-reports/",
+    "Disallow: /people-page/",
+    "Disallow: /parliament-question/",
+    "Disallow: /media-coverages/",
+    "Disallow: /current-members/",
+    "Disallow: /asci-ad-campaigns/",
+    "Disallow: /gallery/",
+    "User-agent: *",
+    "Disallow:"
+   ],
+   "paths": {
+    "asci": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.cci.gov.in": {
+   "url": "https://www.cci.gov.in/robots.txt",
+   "sources": 1,
+   "status": 200,
+   "content_type": "text/plain",
+   "sha256": "08b9faa580a85c65",
+   "bytes": 309,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Disallow: /images/combination_pre_filling_form_consultations/",
+    "Disallow: /images/internship/",
+    "Disallow: /public/images/combination_pre_filling_form_consultations/",
+    "Disallow: /public/images/internship/",
+    "Disallow: /images/stakeholdersconsultations/",
+    "Disallow: /public/images/stakeholdersconsultations/"
+   ],
+   "paths": {
+    "cci_orders": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.cert-in.org.in": {
+   "url": "https://www.cert-in.org.in/robots.txt",
+   "sources": 4,
+   "status": 200,
+   "content_type": "text/html",
+   "sha256": "d1b160c205b380e7",
+   "bytes": 929,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "certin_advisories": "allowed",
+    "certin_vuln": "allowed",
+    "certin_guidelines": "allowed",
+    "certin_directions": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.dpiit.gov.in": {
+   "url": "https://www.dpiit.gov.in/robots.txt",
+   "sources": 1,
+   "status": 200,
+   "content_type": "text/plain; charset=UTF-8",
+   "sha256": "1cbdbc6504be7abe",
+   "bytes": 25,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Allow: /"
+   ],
+   "paths": {
+    "dpiit_press_notes": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.inspace.gov.in": {
+   "url": "https://www.inspace.gov.in/robots.txt",
+   "sources": 1,
+   "status": 200,
+   "content_type": "text/plain;charset=UTF-8",
+   "sha256": "d16ce9bccdfe8459",
+   "bytes": 1340,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Allow:  /inspace",
+    "Allow:  /inspace?id=inspace_index",
+    "Allow:  /inspace?id=inspace_about_inspace",
+    "Allow:  /inspace?id=inspace_vision",
+    "Allow:  /inspace?id=inspace_orgstruct",
+    "Allow:  /inspace?id=inspace_board",
+    "Allow:  /inspace?id=inspace_chairman",
+    "Allow:  /inspace?id=inspace_team",
+    "Allow:  /inspace?id=inspace_chairman_message",
+    "Allow:  /inspace?id=inspace_contact_us",
+    "Allow:  /inspace?id=inspace_rellinks",
+    "Allow:  /inspace?id=inspace_citizen_charter",
+    "Allow:  /inspace?id=inspace_media",
+    "Allow:  /inspace?id=inspace_intl_coop",
+    "Allow:  /inspace?id=inspace_space_ind",
+    "Allow:  /inspace?id=announcement_for_opportunities",
+    "Allow:  /inspace?id=inspaceh_board",
+    "Allow:  /inspace_hin",
+    "Allow:  /inspace_hin?id=inspaceh_index",
+    "Allow:  /inspace_hin?id=inspaceh_about_inspace",
+    "Allow:  /inspace_hin?id=inspaceh_vision",
+    "Allow:  /inspace_hin?id=inspaceh_orgstruct",
+    "Allow:  /inspace_hin?id=inspaceh_chairman",
+    "Allow:  /inspace_hin?id=inspaceh_team",
+    "Allow:  /inspace_hin?id=inspaceh_chairman_message",
+    "Allow:  /inspace_hin?id=inspaceh_contact_us",
+    "Allow:  /inspace_hin?id=inspaceh_rellinks",
+    "Allow:  /inspace_hin?id=inspaceh_citizen_charter",
+    "Allow:  /inspace_hin?id=inspaceh_media",
+    "Allow:  /inspace_hin?id=inspaceh_intl_coop",
+    "Allow: /sitemap.do",
+    "Disallow: /$pwd_reset.do?sysparm_url=ss_default"
+   ],
+   "paths": {
+    "inspace_publications": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.meity.gov.in": {
+   "url": "https://www.meity.gov.in/robots.txt",
+   "sources": 4,
+   "status": 200,
+   "content_type": "text/plain; charset=UTF-8",
+   "sha256": "eaeaa8d3511d1622",
+   "bytes": 23,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Allow: /"
+   ],
+   "paths": {
+    "meity_gazettes": "allowed",
+    "meity_acts_policies": "allowed",
+    "meity_orders_notices": "allowed",
+    "meity_guidelines": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.mtcte.tec.gov.in": {
+   "url": "https://www.mtcte.tec.gov.in/robots.txt",
+   "sources": 1,
+   "status": 404,
+   "content_type": "text/html;charset=UTF-8",
+   "sha256": "a3bbed4146cf24b1",
+   "bytes": 17259,
+   "saved": false,
+   "note": "served HTML rather than a robots file",
+   "paths": {
+    "tec_essential_requirements": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.sci.gov.in": {
+   "url": "https://www.sci.gov.in/robots.txt",
+   "sources": 1,
+   "status": 200,
+   "content_type": "text/plain; charset=utf-8",
+   "sha256": "9311bab30d8b5d05",
+   "bytes": 67,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Disallow: /wp-admin/",
+    "Allow: /wp-admin/admin-ajax.php"
+   ],
+   "paths": {
+    "sc_judgments": "allowed"
+   },
+   "all_allowed": true
+  },
+  "https://www.tec.gov.in": {
+   "url": "https://www.tec.gov.in/robots.txt",
+   "sources": 3,
+   "status": 200,
+   "content_type": "text/plain",
+   "sha256": "e5c4b84484ee4216",
+   "bytes": 24,
+   "saved": true,
+   "rules": [
+    "User-agent: *",
+    "Disallow:"
+   ],
+   "paths": {
+    "tec_whatsnew": "allowed",
+    "tec_circulars": "allowed",
+    "tec_gazette_standards": "allowed"
+   },
+   "all_allowed": true
+  }
+ }
+}

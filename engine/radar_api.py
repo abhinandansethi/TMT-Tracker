@@ -14,6 +14,7 @@ Endpoints (all GET, all JSON):
     /v1/sources                        the coverage list: every live source and its footing
     /v1/instruments?…                  filterable list of binding instruments
     /v1/judgments?…                    filterable list of tribunal/court decisions
+    /v1/signals?…                      filterable list of non-binding signals (bulletins, leads)
     /v1/items/{id}                     one item, full draft-email-ready payload
     /v1/digest?since=YYYY-MM-DD        everything new since a date, grouped by regulator
     /v1/openapi.json                   the machine-readable contract
@@ -158,6 +159,7 @@ OPENAPI = {
             "parameters": [{"name": n, "in": "query"} for n in
                            ("regulator", "stratum", "type", "since", "until", "has_deadline", "q", "limit")]}},
         "/v1/judgments": {"get": {"summary": "Tribunal and court decisions (same filters)"}},
+        "/v1/signals": {"get": {"summary": "Non-binding signals: bulletins, diaries, unpublished-instrument leads (same filters)"}},
         "/v1/items/{id}": {"get": {"summary": "One item, full payload"}},
         "/v1/digest": {"get": {"summary": "Everything new since ?since=YYYY-MM-DD, grouped by regulator"}},
     },
@@ -201,6 +203,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"count": len(rows), "items": [_payload(i) for i in rows]})
         if path == "/v1/judgments":
             rows = _filtered(items, q, "judgments")
+            return self._send(200, {"count": len(rows), "items": [_payload(i) for i in rows]})
+        if path == "/v1/signals":
+            # non-binding leads: security bulletins, court diaries, announcements, and
+            # reported-but-unpublished instrument signals. Same filters as the other lists.
+            rows = _filtered(items, q, "signals")
             return self._send(200, {"count": len(rows), "items": [_payload(i) for i in rows]})
         if path == "/v1/digest":
             since = q.get("since", [(date.today() - timedelta(days=7)).isoformat()])[0]

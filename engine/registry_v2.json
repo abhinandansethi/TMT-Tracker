@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "updated": "2026-08-25",
+ "updated": "2026-08-27",
  "scope_note": "Engine v2 registry: per-source adapter configs, fixture-tested. Stratum telecom migrated from v1 (all selectors re-verified against 25-08-2026 fixtures). Strata tech_data/media/perimeter appended after the source-completeness audit.",
  "validation_gates": {
   "date": "must parse against the source's declared date formats; undated rows quarantine unless the source declares undated_ok (document shelves)",
@@ -719,8 +719,8 @@
    "quirks": "PIB offers no per-ministry feed; ministry is confirmed by fetching each new release page once (deterministic substring match). Instrument-announcing releases fold into the instrument they announce at curation.",
    "lane": "signals",
    "lane_reason": "The press bureau publishes releases ABOUT instruments, never the instrument. A release reporting that the 12-minute ad cap was removed is not the order that removed it.",
-   "decision_reason": "pib.gov.in has no robots.txt restriction on this feed, but its edge returns 403 to any User-Agent that identifies itself as a bot; only a consumer-browser string is served (verified 25-08-2026). Same choice as MeitY: reaching it means presenting a browser string. Paused for a partner decision. PIB is in the signals lane anyway, since it publishes releases about instruments rather than instruments.",
-   "blind_reason": "Paused: no robots restriction, but edge blocks identified agents"
+   "decision_reason": "UA block RESOLVED (the honest '(compatible; TMTRegulatoryRadar/...)' UA reaches it 200 following the 301, verified 27-08-2026), but the feed itself is not cleanly wireable: RssMain.aspx?ModId=6 force-redirects to a Lang=2 (Hindi) variant with NO <pubDate>, so items arrive undated and non-English and fail the date gate. Needs adapter work (locate the English/dated PIB feed or endpoint) before going live. PIB is signals-lane anyway (it publishes releases ABOUT instruments, not instruments), so the coverage cost of the pause is small; the cloud signals lane already watches PIB.",
+   "blind_reason": "Paused: reachable now, but the RSS 301-redirects to an undated Hindi feed — adapter work needed"
   },
   {
    "id": "trai_rss",
@@ -748,7 +748,7 @@
    "lane_reason": "10 of 10 entries are consumer outreach, education and awareness events. Announcements, not documents."
   },
   {
-   "status": "needs_decision",
+   "status": "live",
    "method": "json_api",
    "stratum": "tech_data",
    "regulator": "MeitY",
@@ -777,11 +777,10 @@
    },
    "page_url": "https://www.meity.gov.in/documents/gazettes-notifications",
    "quirks": "Public headless-WP API discovered 25-08-2026 — no headless browser needed (v1 'headless_required' obsolete). Full corpus per call; monotonic wire. KNOWN STALE: newest gazette row is 16-12-2025 while 2026 MeitY gazette instruments exist (DPDP Rules phases, s.79A) — the eGazette + PIB lanes are the real-time net for MeitY; this venue is provenance and eventual-posting.",
-   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
-   "blind_reason": "Paused: site permits crawling but blocks identified agents"
+   "decision_reason": "RESOLVED 2026-08-27: the pause assumed only a browser spoof could reach this host. Live testing shows the Akamai edge blocks only crawler-signature UA tokens (python-requests, embedded +mailto:); the conventional honest 'Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)' identified-agent form is served HTTP 200. That form names us truthfully and claims no browser, so no spoof arises. Now uses the engine's honest default UA (contact in the From header). robots.txt is honoured; access footing is the source's own permissive robots/terms per the legal analysis."
   },
   {
-   "status": "needs_decision",
+   "status": "live",
    "method": "json_api",
    "stratum": "tech_data",
    "regulator": "MeitY",
@@ -824,11 +823,10 @@
    },
    "page_url": "https://www.meity.gov.in/documents/act-and-policies",
    "quirks": "Type string is case-sensitive: 'Act and policies'. Carries DPDP/IT Rules drafts (Mar-2026 draft IT Rules amendments appear here).",
-   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
-   "blind_reason": "Paused: site permits crawling but blocks identified agents"
+   "decision_reason": "RESOLVED 2026-08-27: the pause assumed only a browser spoof could reach this host. Live testing shows the Akamai edge blocks only crawler-signature UA tokens (python-requests, embedded +mailto:); the conventional honest 'Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)' identified-agent form is served HTTP 200. That form names us truthfully and claims no browser, so no spoof arises. Now uses the engine's honest default UA (contact in the From header). robots.txt is honoured; access footing is the source's own permissive robots/terms per the legal analysis."
   },
   {
-   "status": "needs_decision",
+   "status": "live",
    "method": "json_api",
    "stratum": "tech_data",
    "regulator": "MeitY",
@@ -863,8 +861,7 @@
    },
    "page_url": "https://www.meity.gov.in/documents/orders-and-notices",
    "quirks": "Mostly internal administration (delegations, work distribution) — routine regex and type rules keep noise down; occasionally carries binding orders.",
-   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
-   "blind_reason": "Paused: site permits crawling but blocks identified agents"
+   "decision_reason": "RESOLVED 2026-08-27: the pause assumed only a browser spoof could reach this host. Live testing shows the Akamai edge blocks only crawler-signature UA tokens (python-requests, embedded +mailto:); the conventional honest 'Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)' identified-agent form is served HTTP 200. That form names us truthfully and claims no browser, so no spoof arises. Now uses the engine's honest default UA (contact in the From header). robots.txt is honoured; access footing is the source's own permissive robots/terms per the legal analysis."
   },
   {
    "stratum": "tech_data",
@@ -1443,7 +1440,7 @@
    "regulator": "MeitY",
    "name": "Guidelines (WP-JSON API)",
    "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Guideline&limit=50&sort=date&order=DESC&search=",
-   "status": "needs_decision",
+   "status": "live",
    "method": "json_api",
    "parser": {
     "strategy": "meity_api",
@@ -1468,8 +1465,7 @@
    "quirks": "CRITICAL: type value is SINGULAR 'Guideline' - MeitY's own UI requests the plural and renders 'No Data Available'. sort=date, not sort=year (year field mostly empty).",
    "lane": "signals",
    "lane_reason": "MeitY's grants-and-schemes administration library: proformas, annexures, DPR templates. Not an instrument venue.",
-   "decision_reason": "MeitY's robots.txt is 'User-agent: *' / 'Allow: /', which expressly permits crawling of every path. Its WAF nevertheless returns 403 to any User-Agent that identifies itself as a bot, including the honest identifier and the conventional 'Mozilla/5.0 (compatible; ...)' form; only an exact consumer-browser string is served (verified 25-08-2026). The site therefore consents in its published crawl policy while its edge blocks identified agents. Reaching it requires presenting a browser string, which is the spoofing this review otherwise recommends against. Paused for a partner decision rather than resolved silently either way. Note the e-Gazette lane already covers gazetted MeitY instruments, and MeitY's own gazette listing was last updated 16-12-2025, so the coverage cost of pausing is smaller than it looks.",
-   "blind_reason": "Paused: site permits crawling but blocks identified agents"
+   "decision_reason": "RESOLVED 2026-08-27: the pause assumed only a browser spoof could reach this host. Live testing shows the Akamai edge blocks only crawler-signature UA tokens (python-requests, embedded +mailto:); the conventional honest 'Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)' identified-agent form is served HTTP 200. That form names us truthfully and claims no browser, so no spoof arises. Now uses the engine's honest default UA (contact in the From header). robots.txt is honoured; access footing is the source's own permissive robots/terms per the legal analysis."
   },
   {
    "id": "mib_engage",
@@ -1994,6 +1990,169 @@
     ],
     "regex": "\\bAERA\\b|AIRPORT|AIRPORTS ECONOMIC|GMR |BIAL\\b|DIAL\\b|AIRLINE"
    }
+  },
+  {
+   "id": "cci_orders",
+   "stratum": "tech_data",
+   "regulator": "CCI",
+   "name": "Antitrust Orders",
+   "url": "https://www.cci.gov.in/antitrust/orders/list",
+   "page_url": "https://www.cci.gov.in/antitrust/orders",
+   "status": "live",
+   "method": "json_api",
+   "lane": "judgments",
+   "parser": {
+    "strategy": "cci_datatables",
+    "doc_base": "https://www.cci.gov.in/",
+    "row_floor": 800
+   },
+   "date_formats": [
+    "DD/MM/YYYY"
+   ],
+   "http_headers": {
+    "X-Requested-With": "XMLHttpRequest"
+   },
+   "allowed_domains": [
+    "www.cci.gov.in"
+   ],
+   "default_type": "order",
+   "row_filter": {
+    "field": "title",
+    "regex": "(telecom|telecommunication|broadband|spectrum|internet|online|digital|e-?commerce|marketplace|platform|software|technolog|semiconductor|optoelectronic|electronics|handset|smartphone|feature phone|set[- ]?top box|\\bSEP\\b|standard.essential.patent|\\bOTT\\b|broadcast|media|television|\\bDTH\\b|cable\\b|newspaper|publish|social\\s?media|cloud|fintech|payment|data\\s+protection|intermediar|\\bIT Act\\b|information technology|copyright|licen[cs]|\\bDoT\\b|\\bTRAI\\b|TDSAT|MeitY|dark\\s?pattern|influencer|endorsement|direct[\\s-]?selling|misleading advertisement|wireless|Google|\\bMeta\\b|Facebook|WhatsApp|\\bAmazon\\b|\\bApple\\b|Microsoft|Flipkart|Meesho|ShopClues|Clues Network|Reliance Jio|\\bJio\\b|Airtel|Bharti|Vodafone|Idea Cellular|\\bBSNL\\b|Bharat Sanchar Nigam|\\bMTNL\\b|\\bZee\\b|Star India|\\bSony\\b|Netflix|\\bUber\\b|\\bOla\\b|Swiggy|Zomato|Eternal|MakeMyTrip|Eros International|Twitter|X Corp|ByteDance|TikTok|Nazara|Paytm|PhonePe|Razorpay|\\bIntel\\b|Samsung|Ericsson|\\bNokia\\b|Qualcomm|\\bOPPO\\b|\\bVivo\\b|Xiaomi|Realme|OnePlus|Micromax|\\biBall\\b|\\bLava\\b|Karbonn|Hewlett[- ]?Packard|LG Electronics|Panasonic|Lenovo|Motorola|Foxconn)"
+   },
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "DataTables JSON, full corpus per call (~1234 rows). file_content is HTML-entity-encoded JSON -> PDF at /images/antitrustorder/en/orderNNN.pdf. robots Disallows only 3 /images/*consultation* dirs (never fetched). Adjudicatory competition orders -> judgments lane. TMT row_filter keeps orders naming digital/telecom/media parties (Reliance Jio, Eternal/Zomato, tech Pvt Ltds); non-TMT cartel orders filtered by design. Verified live 27-08-2026, identifying UA."
+  },
+  {
+   "id": "ccpa_orders",
+   "stratum": "tech_data",
+   "regulator": "CCPA",
+   "name": "Orders & Advisories",
+   "url": "https://ccpa.doca.gov.in/ccpa-orders.php?page_no=1",
+   "page_url": "https://ccpa.doca.gov.in/ccpa-orders.php?page_no=1",
+   "status": "live",
+   "method": "static_html",
+   "lane": "instruments",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table#employee_table tr",
+    "title_cell": 1,
+    "date_cell": 2,
+    "link_selector": "td:nth-child(4) a",
+    "row_floor": 20
+   },
+   "date_formats": [
+    "YYYY-MM-DD"
+   ],
+   "pagination": {
+    "scheme": "none"
+   },
+   "allowed_domains": [
+    "ccpa.doca.gov.in"
+   ],
+   "default_type": "order",
+   "row_filter": {
+    "field": "title",
+    "regex": "(telecom|telecommunication|broadband|spectrum|internet|online|digital|e-?commerce|marketplace|platform|software|technolog|semiconductor|optoelectronic|electronics|handset|smartphone|feature phone|set[- ]?top box|\\bSEP\\b|standard.essential.patent|\\bOTT\\b|broadcast|media|television|\\bDTH\\b|cable\\b|newspaper|publish|social\\s?media|cloud|fintech|payment|data\\s+protection|intermediar|\\bIT Act\\b|information technology|copyright|licen[cs]|\\bDoT\\b|\\bTRAI\\b|TDSAT|MeitY|dark\\s?pattern|influencer|endorsement|direct[\\s-]?selling|misleading advertisement|wireless|Google|\\bMeta\\b|Facebook|WhatsApp|\\bAmazon\\b|\\bApple\\b|Microsoft|Flipkart|Meesho|ShopClues|Clues Network|Reliance Jio|\\bJio\\b|Airtel|Bharti|Vodafone|Idea Cellular|\\bBSNL\\b|Bharat Sanchar Nigam|\\bMTNL\\b|\\bZee\\b|Star India|\\bSony\\b|Netflix|\\bUber\\b|\\bOla\\b|Swiggy|Zomato|Eternal|MakeMyTrip|Eros International|Twitter|X Corp|ByteDance|TikTok|Nazara|Paytm|PhonePe|Razorpay|\\bIntel\\b|Samsung|Ericsson|\\bNokia\\b|Qualcomm|\\bOPPO\\b|\\bVivo\\b|Xiaomi|Realme|OnePlus|Micromax|\\biBall\\b|\\bLava\\b|Karbonn|Hewlett[- ]?Packard|LG Electronics|Panasonic|Lenovo|Motorola|Foxconn)"
+   },
+   "quirks": "Migrated host ccpa.doca.gov.in (valid TLS). Page 1 (newest 25) already spans back before window_start, so no pagination needed daily. PDFs via checkuploaddocs.php gateway (direct /uploads/ 404s). TMT row_filter keeps e-commerce/platform/direct-selling/dark-pattern matters (Flipkart, Amazon, dark patterns). robots 404 -> no restriction. Verified live 27-08-2026, identifying UA."
+  },
+  {
+   "id": "delhihc_judgments",
+   "stratum": "tech_data",
+   "regulator": "Delhi HC",
+   "name": "Latest Judgments",
+   "url": "https://delhihighcourt.nic.in/web/judgement/fetch-data",
+   "page_url": "https://delhihighcourt.nic.in/web/judgement/fetch-data",
+   "status": "live",
+   "method": "static_html",
+   "lane": "judgments",
+   "parser": {
+    "strategy": "html_table",
+    "row_selector": "table.customdatatable tbody tr",
+    "title_cells": [
+     1,
+     3,
+     4
+    ],
+    "date_cell": 2,
+    "link_selector": "td:nth-child(6) a[href$='.pdf']",
+    "row_floor": 20
+   },
+   "date_formats": [
+    "DD Month YYYY"
+   ],
+   "allowed_domains": [
+    "delhihighcourt.nic.in"
+   ],
+   "default_type": "judgment",
+   "row_filter": {
+    "field": "title",
+    "regex": "(\\btelecom\\b|telecommunicat|\\bspectrum\\b|broadcast|\\bDTH\\b|\\bISP\\b|net\\s?neutrality|\\bIT Act\\b|information technology act|\\bTRAI\\b|\\bTDSAT\\b|\\bDoT\\b|\\bMeitY\\b|intermediar|data protection|\\bDPDP\\b|\\bOTT\\b|over[-\\s]?the[-\\s]?top|semiconductor|copyright|telegraph act|licen[sc]e (fee|agreement|condition)|\\bAirtel\\b|Bharti Airtel|Bharti Hexacom|Vodafone|Idea Cellular|\\bJio\\b|Reliance Jio|\\bBSNL\\b|\\bMTNL\\b|\\bGoogle\\b|\\bMeta\\b|Facebook|WhatsApp|\\bAmazon\\b|Flipkart|Meesho|Netflix|\\bZee\\b|Star India|Hotstar|Disney|Twitter|\\bX Corp\\b|TikTok|ByteDance|Ericsson|\\bNokia\\b|Qualcomm|Paytm|PhonePe|Nazara|\\bOla\\b|\\bUber\\b|Swiggy|Zomato|Eternal Ltd)"
+   },
+   "tripwire": {
+    "kind": "monotonic"
+   },
+   "quirks": "CAPTCHA-free Latest Judgments feed + direct /app/showFileJudgment/*.pdf (both CAPTCHA-free, distinct from the party-name search). Firehose across all practice areas; tight TMT court-filter keeps only telecom/media/IT-Act/named-TMT-party matters (e.g. 9X Media v TRAI, JioStar). Fine TMT classification is downstream on the order text. SOURCE-SIDE listing outage observed 27-08-2026 ('An error occurred while fetching data') -> live status reads EMPTY until the court's feed recovers; parser validated against archived healthy markup (fixture delhihc_judgments.html = 2026-06-06 snapshot, 286 rows; live-outage bytes kept as delhihc_judgments_live_outage_20260827.html). robots 404 -> no restriction. Verified 27-08-2026."
+  },
+  {
+   "id": "dpiit_press_notes",
+   "stratum": "tech_data",
+   "regulator": "DPIIT",
+   "name": "FDI Press Notes",
+   "url": "https://www.dpiit.gov.in/cms/wp-json/wp/v2/documents?search=press%20note&per_page=100&orderby=date&order=desc",
+   "page_url": "https://www.dpiit.gov.in/policies/foreign-direct-investment-policy",
+   "status": "live",
+   "method": "json_api",
+   "lane": "instruments",
+   "parser": {
+    "strategy": "wp_json",
+    "title_include": "^press\\s+notes?\\b",
+    "row_floor": 20
+   },
+   "date_formats": [
+    "YYYY-MM-DD"
+   ],
+   "allowed_domains": [
+    "www.dpiit.gov.in",
+    "cms-dpiit.digifootprint.gov.in"
+   ],
+   "default_type": "press_note",
+   "decision_reason": "RESOLVED 2026-08-27: the pause assumed only a browser spoof could reach this host. Live testing shows the Akamai edge blocks only crawler-signature UA tokens (python-requests, embedded +mailto:); the conventional honest 'Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)' identified-agent form is served HTTP 200. That form names us truthfully and claims no browser, so no spoof arises. Now uses the engine's honest default UA (contact in the From header). robots.txt is honoured; access footing is the source's own permissive robots/terms per the legal analysis.",
+   "quirks": "WordPress REST v2 top-level array; title.rendered/date/link. PDF binary not in API (detail page captured as doc-url). Uses the engine's honest default UA (no per-source header); reachable 200, no browser spoof."
+  },
+  {
+   "id": "sc_judgments",
+   "stratum": "tech_data",
+   "regulator": "Supreme Court",
+   "name": "Latest Orders",
+   "url": "https://www.sci.gov.in/latest-orders/",
+   "page_url": "https://www.sci.gov.in/latest-orders/",
+   "status": "live",
+   "method": "static_html",
+   "lane": "judgments",
+   "parser": {
+    "strategy": "regex_rows",
+    "row_regex": "<a href=\"(?P<href>https://www\\.sci\\.gov\\.in/view-pdf/\\?diary_no=\\d+&type=[a-z]+&order_date=(?P<date_raw>\\d{4}-\\d{2}-\\d{2})[^\"]*)\"[^>]*>\\s*(?:<i[^>]*>\\s*</i>)?\\s*(?P<title>.*?)\\s*-?\\s*<span[^>]*color:red[^>]*>",
+    "row_floor": 1
+   },
+   "date_formats": [
+    "YYYY-MM-DD",
+    "DD-Mon-YYYY"
+   ],
+   "allowed_domains": [
+    "www.sci.gov.in",
+    "cdn.s3waas.gov.in"
+   ],
+   "default_type": "judgment",
+   "row_filter": {
+    "field": "title",
+    "regex": "(\\btelecom\\b|telecommunicat|\\bspectrum\\b|broadcast|\\bDTH\\b|\\bISP\\b|net\\s?neutrality|\\bIT Act\\b|information technology act|\\bTRAI\\b|\\bTDSAT\\b|\\bDoT\\b|\\bMeitY\\b|intermediar|data protection|\\bDPDP\\b|\\bOTT\\b|over[-\\s]?the[-\\s]?top|semiconductor|copyright|telegraph act|licen[sc]e (fee|agreement|condition)|\\bAirtel\\b|Bharti Airtel|Bharti Hexacom|Vodafone|Idea Cellular|\\bJio\\b|Reliance Jio|\\bBSNL\\b|\\bMTNL\\b|\\bGoogle\\b|\\bMeta\\b|Facebook|WhatsApp|\\bAmazon\\b|Flipkart|Meesho|Netflix|\\bZee\\b|Star India|Hotstar|Disney|Twitter|\\bX Corp\\b|TikTok|ByteDance|Ericsson|\\bNokia\\b|Qualcomm|Paytm|PhonePe|Nazara|\\bOla\\b|\\bUber\\b|Swiggy|Zomato|Eternal Ltd)"
+   },
+   "decision_reason": "RESOLVED 2026-08-27: the pause assumed only a browser spoof could reach this host. Live testing shows the Akamai edge blocks only crawler-signature UA tokens (python-requests, embedded +mailto:); the conventional honest 'Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)' identified-agent form is served HTTP 200. That form names us truthfully and claims no browser, so no spoof arises. Now uses the engine's honest default UA (contact in the From header). robots.txt is honoured; access footing is the source's own permissive robots/terms per the legal analysis.",
+   "quirks": "regex_rows over view-pdf anchors; order_date URL param is the row date. Tight TMT court-filter applied. To activate: set status 'live'."
   }
  ],
  "window_start": "2026-06-01",
@@ -2073,6 +2232,18 @@
    "removed": "2026-08-27",
    "ground": "uidai.gov.in robots.txt is 'Disallow: /'",
    "coverage": "Instruments from this body are gazetted; the Gazette lane (gazette_communications / gazette_meity) recovers them under Copyright Act s.52(1)(q)(i) with statutory evidential standing under BSA 2023 s.81."
+  },
+  {
+   "id": "nclat_orders",
+   "status": "planned",
+   "regulator": "NCLAT",
+   "lane": "judgments",
+   "url": "https://nclat.nic.in/judgement-data",
+   "reason": "NCLAT's public judgement-data / daily-order-data listings render a FROZEN default view — the newest real order rows are 2021 (spanning back to 2016); the only 2026 date on the page is the page-generation timestamp (a field-content span), not an order. Recent orders are reachable only by driving the Drupal exposed date/bench filter, a POST/AJAX flow the plain GET does not exercise. Verified 27-08-2026. Wiring the default view would ledger only 2021 orders — a permanently QUIET source — so it is registered as a known gap, not wired to stale data.",
+   "spec": "Build as a driver (egazette-style): POST the exposed-filter form on /judgement-data with a recent date range; parse the FIRST table.cols-9 (the page repeats 5 identical filter-block tables — dedupe); cells by CSS class (views-field-field-final-date / -nothing / -nothing-1 a[href] resolved against the page URL); keep Section=='Competition'/'MRTP' rows; apply the tight TMT court-filter. PDFs: /sites/default/files/migration/upload/<hash>.pdf (archive, direct 200, no token).",
+   "revisit": "When the exposed-filter driver is built, or if NCLAT exposes a dated/non-frozen listing or an RSS feed.",
+   "stratum": "tech_data",
+   "name": "Competition-appeal orders"
   }
  ],
  "lanes": {

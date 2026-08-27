@@ -24,6 +24,7 @@ fresh as the last sweep. All endpoints are `GET`, all return JSON, and the feed 
 | `GET /v1/sources` | the coverage list: every live source, its footing and freshness |
 | `GET /v1/instruments?…` | binding instruments, filterable |
 | `GET /v1/judgments?…` | tribunal and court decisions, same filters |
+| `GET /v1/signals?…` | non-binding leads: security bulletins, court diaries, unpublished-instrument signals |
 | `GET /v1/items/{id}` | one item, full payload |
 | `GET /v1/digest?since=YYYY-MM-DD` | everything new since a date, grouped by regulator |
 | `GET /v1/openapi.json` | the machine-readable contract |

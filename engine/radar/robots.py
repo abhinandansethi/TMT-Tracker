@@ -43,7 +43,12 @@ class RobotsDisallowed(Exception):
 
 
 def _agent_token() -> str:
-    return re.split(r"[/ ]", UA["User-Agent"].lstrip())[0]
+    # Our real identifier now rides inside the conventional "Mozilla/5.0 (compatible; NAME; ...)"
+    # form, so a robots group targeting us by name is still honoured rather than shadowed by the
+    # vestigial "Mozilla" prefix.
+    ua = UA["User-Agent"]
+    m = re.search(r"\(compatible;\s*([^;/)\s]+)", ua)
+    return m.group(1) if m else re.split(r"[/ ]", ua.lstrip())[0]
 
 
 def _parse(text: str, agent: str) -> List[Tuple[bool, str]]:

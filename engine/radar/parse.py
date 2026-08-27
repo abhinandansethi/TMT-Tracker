@@ -401,6 +401,73 @@ def parse_egazette_recent(soup: BeautifulSoup, cfg: dict, base: str) -> List[Row
     return rows
 
 
+# ---------------------------------------------------------------- wp_json (generic WP REST v2)
+def parse_wp_json(content: bytes, cfg: dict, base: str) -> List[Row]:
+    """Generic WordPress REST v2 documents feed (DPIIT FDI Press Notes). The shape differs
+    from MeitY's headless API: records are the TOP-LEVEL JSON array and each carries
+    title.rendered / date / link. title.rendered is HTML-entity + &nbsp;-encoded, so it is
+    unescaped and space-collapsed before use; a configurable title_include keeps only genuine
+    matches, since WP `search` also matches body text."""
+    import html as _html
+    import json as _json
+    data = _json.loads(content.decode("utf-8", errors="ignore"))
+    p = cfg["parser"]
+    records = data if isinstance(data, list) else (data.get(p.get("records_key", "posts")) or [])
+    include = re.compile(p["title_include"], re.I) if p.get("title_include") else None
+    rows: List[Row] = []
+    for rec in records:
+        t = rec.get("title")
+        raw = t.get("rendered") if isinstance(t, dict) else (t or "")
+        title = _clean(_html.unescape(str(raw)).replace("\u00a0", " "))
+        if not title:
+            continue
+        if include and not include.search(title):
+            continue
+        acf = rec.get("acf") or {}
+        date = extract_date(str(rec.get("date") or "")[:10], ["YYYY-MM-DD"]) or \
+            extract_date(str(acf.get("date") or ""), cfg["date_formats"])
+        rows.append({"date": date, "title": title, "url": rec.get("link") or "", "extra": {}})
+    return rows
+
+
+# ---------------------------------------------------------------- cci_datatables
+def parse_cci_datatables(content: bytes, cfg: dict, base: str) -> List[Row]:
+    """CCI's DataTables JSON: records under top-level "data". The document href sits in
+    file_content, an HTML-entity-encoded JSON string (unescape -> json.loads -> [0].file_name).
+    Rows without a PDF (a couple of legacy 2010 entries) are skipped, never invented."""
+    import html as _html
+    import json as _json
+    data = _json.loads(content.decode("utf-8", errors="ignore"))
+    p = cfg["parser"]
+    records = data.get(p.get("records_key", "data")) or []
+    root = p.get("doc_base", "https://www.cci.gov.in/")
+    rows: List[Row] = []
+    for rec in records:
+        raw = rec.get("file_content")
+        if not raw:
+            continue
+        doc = ""
+        try:
+            arr = _json.loads(_html.unescape(str(raw)))
+            fn = (arr[0].get("file_name") if arr else "") or ""
+            doc = urljoin(root, fn.lstrip("/")) if fn else ""
+        except Exception:  # noqa: BLE001 — a malformed file_content just yields no doc link
+            doc = ""
+        desc = _clean(re.sub(r"<[^>]+>", " ", _html.unescape(str(rec.get("description") or ""))))
+        section = _clean(str(rec.get("type") or ""))
+        case_no = _clean(str(rec.get("case_no") or ""))
+        title = desc or section
+        if not title:
+            continue
+        date = extract_date(str(rec.get("order_date") or rec.get("main_order_date") or ""),
+                            cfg["date_formats"])
+        rid = rec.get("id")
+        page_url = urljoin(root, f"antitrust/orders/details/{rid}/0") if rid else None
+        extra = {k: v for k, v in {"case_no": case_no, "part_section": section}.items() if v}
+        rows.append({"date": date, "title": title, "url": doc, "page_url": page_url, "extra": extra})
+    return rows
+
+
 STRATEGIES = {
     "trai_views": parse_trai_views,
     "trai_grid": parse_trai_grid,
@@ -426,6 +493,10 @@ def parse(source: dict, content: bytes, base: str) -> List[Row]:
         return parse_inspace_api(content, source, base)
     if strategy == "tec_er_api":
         return parse_tec_er_api(content, source, base)
+    if strategy == "wp_json":
+        return parse_wp_json(content, source, base)
+    if strategy == "cci_datatables":
+        return parse_cci_datatables(content, source, base)
     soup = BeautifulSoup(content, "lxml")
     return STRATEGIES[strategy](soup, source, base)
 
@@ -464,7 +535,7 @@ def structure_fingerprint(content: bytes, source: dict) -> str:
            "tr_with_doc": "tr", "link_shelf": "a[href]", "rss": "item",
            "regex_rows": "table", "meity_api": "body", "uidai_rsc": "body",
            "psn_rows": ".psn-container", "inspace_api": "body", "tec_er_api": "body",
-           "egazette_recent": "table"}[source["parser"]["strategy"]]
+           "egazette_recent": "table", "wp_json": "body", "cci_datatables": "body"}[source["parser"]["strategy"]]
     first = soup.select_one(sel)
     sig = ""
     if first is not None:

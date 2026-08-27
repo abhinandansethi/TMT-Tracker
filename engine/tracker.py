@@ -65,7 +65,7 @@ def selftest() -> int:
             continue
         # fixture matching the strategy wins: API sources test their .json capture even
         # when an .html shell of the same venue sits alongside as evidence
-        json_first = s["parser"]["strategy"] in ("meity_api", "tec_er_api", "inspace_api")
+        json_first = s["parser"]["strategy"] in ("meity_api", "tec_er_api", "inspace_api", "wp_json", "cci_datatables")
         exts = (".json", ".html", ".xml") if json_first else (".html", ".json", ".xml")
         fx = None
         for ext in exts:
