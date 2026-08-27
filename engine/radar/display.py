@@ -217,26 +217,41 @@ def _openable(url: str) -> Optional[str]:
     return url
 
 
+def egazette_pdf(gazette_id: str) -> Optional[str]:
+    """Direct, session-less URL for a gazette PDF, built from the Gazette ID.
+
+    The e-Gazette search UI serves each PDF only via a session postback, but the file itself
+    lives at a stable public path: egazette.gov.in/WriteReadData/<YEAR>/<N>.pdf, where <N> is
+    the trailing number of the Gazette ID (CG-DL-E-<DDMMYYYY>-<N>) and <YEAR> is that date's
+    year. Verified 2026-08-27: all 28 in-window gazette IDs resolve to 200 application/pdf."""
+    parts = (gazette_id or "").split("-")
+    if len(parts) < 2:
+        return None
+    num, datep = parts[-1], parts[-2]
+    if not (num.isdigit() and len(datep) == 8 and datep.isdigit()):
+        return None
+    return "https://egazette.gov.in/WriteReadData/" + datep[4:8] + "/" + num + ".pdf"
+
+
 def doc_link(it: Dict[str, Any]) -> Optional[str]:
-    """Best OPENABLE document link. An e-Gazette entry has no stable per-item URL — the portal
-    serves the PDF via a session postback and the bare search URL expires to an error page — so
-    it links to the portal home, which opens, and the permanent Gazette ID (shown alongside)
-    locates the entry."""
+    """Best OPENABLE document link. A gazette entry resolves to its stable WriteReadData PDF
+    built from the Gazette ID; only if the ID cannot be parsed does it fall back to the portal
+    home (which opens), with the Gazette ID shown as the citation."""
     meta = it.get("meta") or {}
     url = it.get("doc_url") or it.get("url") or ""
-    if meta.get("gazette_id") and "egazette.gov.in" in url:
-        return "https://egazette.gov.in/"
+    if meta.get("gazette_id"):
+        return egazette_pdf(meta["gazette_id"]) or "https://egazette.gov.in/"
     return _openable(url)
 
 
 def page_link(it: Dict[str, Any]) -> Optional[str]:
-    """The official landing page, same openability treatment; a gazette landing also routes to
-    the portal home rather than the session-scoped search page that expires to an error."""
+    """The official landing page. A gazette entry has no per-item landing (the direct PDF is the
+    document and the Gazette ID the citation), so it carries none rather than a redundant portal
+    link."""
     meta = it.get("meta") or {}
-    url = it.get("page_url") or ""
-    if meta.get("gazette_id") and "egazette.gov.in" in url:
-        return "https://egazette.gov.in/"
-    return _openable(url)
+    if meta.get("gazette_id"):
+        return None
+    return _openable(it.get("page_url") or "")
 
 
 def descriptor(it: Dict[str, Any], today: str) -> str:

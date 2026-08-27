@@ -904,17 +904,11 @@ function metaCells(r) {
 }
 function acts(r) {
   const a = [];
-  if (r.gid) {
-    // e-Gazette has no stable per-document URL (the portal serves the PDF via a session
-    // postback), so link to the portal — which opens — and show the permanent Gazette ID,
-    // which is the citation and the key to find the entry there.
-    a.push('<a href="https://egazette.gov.in/" target="_blank" rel="noopener">e-Gazette portal</a>');
-    a.push('<span style="font-family:var(--mono);font-size:10.5px;color:var(--mute)">Gazette ID ' + esc(r.gid) + '</span>');
-  } else {
-    // dual links, always both where they exist: the document itself and the official page
-    if (r.doc) a.push('<a href="' + esc(r.doc) + '" target="_blank" rel="noopener">Official text</a>');
-    if (r.page && r.page !== r.doc) a.push('<a href="' + esc(r.page) + '" target="_blank" rel="noopener">Source page</a>');
-  }
+  // dual links, always both where they exist: the document itself and the official page
+  if (r.doc) a.push('<a href="' + esc(r.doc) + '" target="_blank" rel="noopener">Official text</a>');
+  if (r.page && r.page !== r.doc) a.push('<a href="' + esc(r.page) + '" target="_blank" rel="noopener">Source page</a>');
+  // the Gazette ID is the permanent citation — shown alongside the direct PDF
+  if (r.gid) a.push('<span style="font-family:var(--mono);font-size:10.5px;color:var(--mute)">Gazette ID ' + esc(r.gid) + '</span>');
   if (r.pr) a.push('<a href="' + esc(r.pr) + '" target="_blank" rel="noopener">Announcement</a>');
   if (r.notice) a.push('<a href="' + esc(r.notice) + '" target="_blank" rel="noopener">Consultation notice</a>');
   if (r.memo) a.push('<a href="' + esc(r.memo) + '">Draft memo</a>');

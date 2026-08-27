@@ -209,8 +209,8 @@ def export() -> int:
             "type": it["type"], "routine": it["routine"], "title": it["title"],
             "lane": it.get("lane", "instruments"),
             # dual links, every item: the document itself and the official landing page it
-            # was published on. A gazette entry has no direct PDF (postback), so its citation
-            # is the permanent Gazette ID carried in meta.
+            # was published on. A gazette entry's doc is the stable WriteReadData PDF built
+            # from the Gazette ID (radar.display.doc_link); the ID is its permanent citation.
             # openable links: gazette -> portal home (no stable per-item URL), DPIIT -> www
             # host, spaces percent-encoded. Single source of truth in radar.display.
             "doc_url": display.doc_link(it),

@@ -80,8 +80,9 @@ Every instrument and judgment comes back in this shape:
 - **`short_title`** and **`summary`** are the two lines a partner scans: what it is, and why it
   matters now. Both are deterministic — no model produced them.
 - **`document_url`** opens the instrument; **`source_page_url`** is the official listing it was
-  published on. For a gazette entry there is no direct PDF (the Gazette serves it via a session
-  postback), so its citation is the permanent **`gazette_id`**.
+  published on. A gazette entry's **`document_url`** is the stable e-Gazette PDF
+  (`egazette.gov.in/WriteReadData/<year>/<n>.pdf`, built from the Gazette ID); its permanent
+  citation is the **`gazette_id`**, carried alongside.
 - **`effective_date`** / **`deadline`** are the dates your workflow keys client obligations off.
 - **`citation`** is a ready-to-paste provenance line.
 
