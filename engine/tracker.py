@@ -211,9 +211,11 @@ def export() -> int:
             # dual links, every item: the document itself and the official landing page it
             # was published on. A gazette entry has no direct PDF (postback), so its citation
             # is the permanent Gazette ID carried in meta.
-            "doc_url": url or None,
-            "page_url": it.get("page_url") or None,
-            "pdf_url": url if is_pdf else None,   # kept for backward compatibility
+            # openable links: gazette -> portal home (no stable per-item URL), DPIIT -> www
+            # host, spaces percent-encoded. Single source of truth in radar.display.
+            "doc_url": display.doc_link(it),
+            "page_url": display.page_link(it),
+            "pdf_url": display.doc_link(it) if is_pdf else None,   # backward compatibility
             "deadline": it["deadline"], "id": it["id"], "status": it["status"],
             "meta": meta,
             # preserve a hand-written gist from the v1 baseline (curated prose), but never let

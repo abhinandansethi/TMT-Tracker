@@ -203,6 +203,42 @@ def heading(it: Dict[str, Any]) -> str:
     return shorten(it.get("title") or "")
 
 
+def _openable(url: str) -> Optional[str]:
+    """Make a stored URL safe to click. Two fixes, both verified 2026-08-27:
+    - DPIIT detail pages resolve on the public www host; the CMS origin
+      (cms-dpiit.digifootprint.gov.in) is firewalled and times out.
+    - Percent-encode raw spaces so NCCS/TEC filenames that contain spaces don't truncate the
+      href at the first space. Already-encoded URLs (with %20) are untouched — only literal
+      spaces are replaced, so there is no double-encoding."""
+    if not url:
+        return None
+    url = url.replace("cms-dpiit.digifootprint.gov.in", "www.dpiit.gov.in")
+    url = url.replace(" ", "%20")
+    return url
+
+
+def doc_link(it: Dict[str, Any]) -> Optional[str]:
+    """Best OPENABLE document link. An e-Gazette entry has no stable per-item URL — the portal
+    serves the PDF via a session postback and the bare search URL expires to an error page — so
+    it links to the portal home, which opens, and the permanent Gazette ID (shown alongside)
+    locates the entry."""
+    meta = it.get("meta") or {}
+    url = it.get("doc_url") or it.get("url") or ""
+    if meta.get("gazette_id") and "egazette.gov.in" in url:
+        return "https://egazette.gov.in/"
+    return _openable(url)
+
+
+def page_link(it: Dict[str, Any]) -> Optional[str]:
+    """The official landing page, same openability treatment; a gazette landing also routes to
+    the portal home rather than the session-scoped search page that expires to an error."""
+    meta = it.get("meta") or {}
+    url = it.get("page_url") or ""
+    if meta.get("gazette_id") and "egazette.gov.in" in url:
+        return "https://egazette.gov.in/"
+    return _openable(url)
+
+
 def descriptor(it: Dict[str, Any], today: str) -> str:
     """One-line 'what it pertains to / what to do', from the item's own metadata."""
     meta = it.get("meta") or {}

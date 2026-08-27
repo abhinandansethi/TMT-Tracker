@@ -904,10 +904,17 @@ function metaCells(r) {
 }
 function acts(r) {
   const a = [];
-  // dual links, always both where they exist: the document itself and the official page
-  if (r.doc) a.push('<a href="' + esc(r.doc) + '" target="_blank" rel="noopener">Official text</a>');
-  if (r.page && r.page !== r.doc) a.push('<a href="' + esc(r.page) + '" target="_blank" rel="noopener">Source page</a>');
-  if (r.gid && !r.doc) a.push('<span style="font-family:var(--mono);font-size:10.5px;color:var(--mute)">Gazette ID ' + esc(r.gid) + '</span>');
+  if (r.gid) {
+    // e-Gazette has no stable per-document URL (the portal serves the PDF via a session
+    // postback), so link to the portal — which opens — and show the permanent Gazette ID,
+    // which is the citation and the key to find the entry there.
+    a.push('<a href="https://egazette.gov.in/" target="_blank" rel="noopener">e-Gazette portal</a>');
+    a.push('<span style="font-family:var(--mono);font-size:10.5px;color:var(--mute)">Gazette ID ' + esc(r.gid) + '</span>');
+  } else {
+    // dual links, always both where they exist: the document itself and the official page
+    if (r.doc) a.push('<a href="' + esc(r.doc) + '" target="_blank" rel="noopener">Official text</a>');
+    if (r.page && r.page !== r.doc) a.push('<a href="' + esc(r.page) + '" target="_blank" rel="noopener">Source page</a>');
+  }
   if (r.pr) a.push('<a href="' + esc(r.pr) + '" target="_blank" rel="noopener">Announcement</a>');
   if (r.notice) a.push('<a href="' + esc(r.notice) + '" target="_blank" rel="noopener">Consultation notice</a>');
   if (r.memo) a.push('<a href="' + esc(r.memo) + '">Draft memo</a>');
@@ -936,7 +943,7 @@ function render() {
             : '<span class="t">' + esc(r.short) + '</span>') +
           (r.line ? '<span class="sub">' + esc(r.line) + '</span>' : '') +
           '<div class="peek"><div class="lbl">Official title</div><div class="full">' + esc(r.official) + '</div>' +
-          '<div class="foot"><span>' + esc(r.venue) + '</span><span>' + (r.doc ? 'Document on file' : (r.gid ? 'Gazette ' + esc(r.gid) : 'No document linked')) + '</span></div></div>' +
+          '<div class="foot"><span>' + esc(r.venue) + '</span><span>' + (r.gid ? 'Gazette ' + esc(r.gid) : (r.doc ? 'Document on file' : 'No document linked')) + '</span></div></div>' +
         '</div>' +
         '<div class="c-type"><span class="' + (/draft|consult/i.test(r.type) ? 'draft' : (r.routine ? 'quiet' : '')) +
           '">' + esc((r.type || '').replace(/_/g, ' ')) + '</span></div>' +
