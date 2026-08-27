@@ -518,6 +518,7 @@ input::placeholder{color:var(--ghost)}
   font-family:var(--mono);font-size:11px;letter-spacing:.03em;border-bottom:1px solid var(--rule2)}
 .upd-note.on{display:block}
 .upd-note a{color:var(--navy);text-decoration:underline;text-underline-offset:2px}
+.upd-note code{font-family:var(--mono);font-size:11px;background:#fff;border:1px solid var(--rule2);border-radius:3px;padding:1px 5px}
 @media (max-width:760px){.upd-note{padding-left:22px;padding-right:22px}}
 .thead .r.jr,.row .line.jr{grid-template-columns:104px 128px minmax(0,1fr) 120px 24px}
 .tabs{background:var(--navy-d);padding:0 64px;display:flex;gap:2px}
@@ -826,12 +827,14 @@ $('#upd').textContent = D.updated;
           + '<a href="' + esc(cfg.consoleUrl || 'http://127.0.0.1:8787') + '" target="_blank" rel="noopener">operator console</a>.');
       } finally { btn.disabled = false; btn.textContent = 'Update now'; }
     } else {
-      const url = cfg.consoleUrl || 'http://127.0.0.1:8787';
-      window.open(url, '_blank', 'noopener');
-      say('This shared page cannot fetch government sites itself. Opened the '
-        + '<a href="' + esc(url) + '" target="_blank" rel="noopener">operator console</a> — press '
-        + '<b>Check all sources now</b> there, then ask Claude to republish. '
-        + '(Wire a pipeline endpoint to make this button one-click.)');
+      // No pipeline wired: a shared/sandboxed page cannot fetch gov.in itself and cannot reach a
+      // localhost console, so opening one just fails. Give the operator the exact way to refresh.
+      say('This is a published snapshot from <b>' + esc(D.updated || 'the last sweep') + '</b>. '
+        + 'A shared page can\'t fetch government sites itself, so it doesn\'t refresh on click. To update it: '
+        + 'on the firm machine run <code>engine/run_sweep.sh</code> (sweep → export → rebuild), or just '
+        + 'ask Claude <i>"run a TMT Radar sweep and republish"</i>. '
+        + 'For a genuine one-click button, wire your pipeline endpoint — <code>window.TMT_CONFIG = '
+        + '{ pipelineEndpoint: "https://your-host/hooks/tmt-refresh" }</code> (see docs/CONNECTOR.md).');
     }
   });
 })();
