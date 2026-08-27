@@ -221,7 +221,7 @@ def export() -> int:
             "gist": (curated.get(it["id"], {}) or {}).get("gist", "") or "",
             # crisp display fields, computed once here and consumed identically by the
             # dashboard and the connector API (radar.display is the single source of truth)
-            "short": display.shorten(it["title"]),
+            "short": display.heading(it),
             "line": display.descriptor(it, date.today().isoformat()),
         }
         if it.get("flags"):

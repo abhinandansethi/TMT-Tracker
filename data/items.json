@@ -1,6 +1,6 @@
 {
  "schema_version": "3.2",
- "generated": "2026-08-27T09:03:49+05:30",
+ "generated": "2026-08-27T09:23:56+05:30",
  "window": {
   "from": "2026-06-01",
   "to": "2026-09-01"
@@ -139,8 +139,8 @@
     "filing_token": "NzQ2NDM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/105/2018 — SKYNET DIGITAL SERVICE PVT LTD V…",
-   "line": "Skynet Digital Service Pvt Ltd V Information Tv Pvt Ltd",
+   "short": "Skynet Digital Service Pvt Ltd v Information TV Pvt Ltd",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -163,8 +163,8 @@
     "filing_token": "NzQ2NDE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/270/2017 — DEN NETWORK LTD V TORRA…",
-   "line": "Den Network Ltd V Torra International",
+   "short": "DEN Network Ltd v Torra International",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -187,8 +187,8 @@
     "filing_token": "NzQ2Mjg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/221/2025 — GTPL HATHWAY LTD V RBB DIGITAL…",
-   "line": "Gtpl Hathway Ltd V Rbb Digital Communications",
+   "short": "GTPL Hathway Ltd v RBB Digital Communications",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -211,8 +211,8 @@
     "filing_token": "NzQ2NjM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/195/2024 — ACT DIGITAL HOME ENTERTAINMENT…",
-   "line": "Act Digital Home Entertainment Pvt Ltd V Sri Venkata Sai Lakshmi Cable…",
+   "short": "Act Digital Home Entertainment Pvt Ltd v Sri Venkata Sai Lakshmi Cable…",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -235,8 +235,8 @@
     "filing_token": "NzQ2MjI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/61/2023 — SITI NETWORKS LTD V GEETHANJALI…",
-   "line": "Siti Networks Ltd V Geethanjali Cable Network",
+   "short": "SITI Networks Ltd v Geethanjali Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -282,8 +282,8 @@
     "filing_token": "NzQ2NTE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/705/2021 — SITI NETWORKS LTD V HATIGERIA…",
-   "line": "Siti Networks Ltd V Hatigeria Home Cable Service",
+   "short": "SITI Networks Ltd v Hatigeria Home Cable Service",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -306,8 +306,8 @@
     "filing_token": "NzQ2MzQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/565/2016 — SITI NETWORK LTD V PANDIT CABLE…",
-   "line": "Siti Network Ltd V Pandit Cable Network & Ors",
+   "short": "SITI Network Ltd v Pandit Cable Network & Ors",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -326,7 +326,7 @@
    "status": "new",
    "meta": {},
    "gist": "",
-   "short": "NOTICE DATED 24.08.2026 REGARDING DECLARATION OF HOLIDAY ON…",
+   "short": "NOTICE DATED 24.08.2026 — DECLARATION OF HOLIDAY ON 27.08.2026",
    "line": "Court notice · 24 Aug 2026",
    "stratum": "telecom"
   },
@@ -350,8 +350,8 @@
     "filing_token": "NzQ2NTQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/20/2022 — SITI NETWORKS LTD V JAI MATA DI…",
-   "line": "Siti Networks Ltd V Jai Mata Di Cable Network",
+   "short": "SITI Networks Ltd v Jai Mata Di Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -374,7 +374,7 @@
     "filing_token": "NzQ2NDQ="
    },
    "gist": "",
-   "short": "E A/14/2019 — V TRIUMPH MEDIA VISION PVT LTD",
+   "short": "E A/14/2019 — v Triumph Media Vision Pvt Ltd",
    "line": "V Triumph Media Vision Pvt Ltd",
    "stratum": "telecom"
   },
@@ -398,8 +398,8 @@
     "filing_token": "NzQ2NDI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/514/2017 — HINDUJA GLOBAL SOLUTIONS LIMITED…",
-   "line": "Hinduja Global Solutions Limited V Kiran And Ors",
+   "short": "Hinduja Global Solutions Limited v Kiran and Ors",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -445,8 +445,8 @@
     "filing_token": "NzQ2NDg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/225/2022 — SITI CABLE NETWORK V SIMRAN…",
-   "line": "Siti Cable Network V Simran Cable Tv Network",
+   "short": "SITI Cable Network v Simran Cable TV Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -469,8 +469,8 @@
     "filing_token": "NzQ2NjQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/345/2024 — NOVA DIGITAL AND BROADBAND PVT…",
-   "line": "Nova Digital And Broadband Pvt Ltd V Evolution Ott And Broadband Servi…",
+   "short": "Nova Digital and Broadband Pvt Ltd v Evolution OTT and Broadband Services…",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -493,8 +493,8 @@
     "filing_token": "NzQ2MjU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/403/2023 — FASTWAY TRANSMISSION PVT LTD V…",
-   "line": "Fastway Transmission Pvt Ltd V Raspreet Cable And Anr.",
+   "short": "Fastway Transmission Pvt Ltd v Raspreet Cable and Anr",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -517,8 +517,8 @@
     "filing_token": "NzQ2NTA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/495/2021 — SITI NETWORKS LTD V GANESH CABLE…",
-   "line": "Siti Networks Ltd V Ganesh Cable Network",
+   "short": "SITI Networks Ltd v Ganesh Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -561,8 +561,8 @@
     "filing_token": "NzQ2NTM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/749/2021 — SITI NETWORKS LTD V KHATU SHYAM…",
-   "line": "Siti Networks Ltd V Khatu Shyam Jwahra Cable Networkn",
+   "short": "SITI Networks Ltd v Khatu Shyam Jwahra Cable Networkn",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -585,8 +585,8 @@
     "filing_token": "NzQ2NTY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/50/2022 — SITI NETWORKS LTD V MAA…",
-   "line": "Siti Networks Ltd V Maa Siddheswari Cable",
+   "short": "SITI Networks Ltd v Maa Siddheswari Cable",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -609,8 +609,8 @@
     "filing_token": "NzQ2NjI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/159/2024 — INDIRA TELEVISION LTD. V TELECOM…",
-   "line": "Indira Television Ltd. V Telecom Regulatory Authority Of India And Ors…",
+   "short": "Indira Television Ltd v Telecom Regulatory Authority of India and Ors.…",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -633,8 +633,8 @@
     "filing_token": "NzQ2MjY="
    },
    "gist": "",
-   "short": "TELECOM PETITION/23/2024 — TATA COMMUNICATIONS LIMITED V RIYAZ…",
-   "line": "Tata Communications Limited V Riyaz Internet Services Pvt. Ltd. & Ors.",
+   "short": "Tata Communications Limited v Riyaz Internet Services Pvt. Ltd. & Ors",
+   "line": "Telecom petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -700,8 +700,8 @@
     "filing_token": "NzQ2NDY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/560/2021 — SITI NETWORKS LTD V UDAY CABLE…",
-   "line": "Siti Networks Ltd V Uday Cable Network",
+   "short": "SITI Networks Ltd v Uday Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -724,7 +724,7 @@
     "filing_token": "NzQ2NDc="
    },
    "gist": "",
-   "short": "E A/6/2022 — V SAHARA INDIA TV NETWORK",
+   "short": "E A/6/2022 — v Sahara India TV Network",
    "line": "V Sahara India Tv Network",
    "stratum": "telecom"
   },
@@ -748,8 +748,8 @@
     "filing_token": "NzQ2NTc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/529/2022 — SITI NETWORKS LTD V SNLV.…",
-   "line": "Siti Networks Ltd V Snlv. Friends Cable (Jharsugda)",
+   "short": "SITI Networks Ltd v Snlv. Friends Cable (Jharsugda)",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -772,8 +772,8 @@
     "filing_token": "NzQ2MzA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/258/2025 — HATHWAY DIGITAL LTD V M/S…",
-   "line": "Hathway Digital Ltd V M/S Rameshwar Cable Network",
+   "short": "Hathway Digital Ltd v M/S Rameshwar Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -796,8 +796,8 @@
     "filing_token": "NzQ2NTI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/730/2021 — SITI NETWORKS LTD V ADITYA CABLE",
-   "line": "Siti Networks Ltd V Aditya Cable",
+   "short": "SITI Networks Ltd v Aditya Cable",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -820,8 +820,8 @@
     "filing_token": "NzQ2NjE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/27/2024 — INDIAN CABLE NET COMPANY LTD V…",
-   "line": "Indian Cable Net Company Ltd V Biswa Darshan",
+   "short": "Indian Cable Net Company Ltd v Biswa Darshan",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -887,8 +887,8 @@
     "filing_token": "NzQ2NTg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/93/2023 — SITI NETWORK LTD V DIGITAL CABLE…",
-   "line": "Siti Network Ltd V Digital Cable Center",
+   "short": "SITI Network Ltd v Digital Cable Center",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -911,7 +911,7 @@
     "filing_token": "NzQ2NDU="
    },
    "gist": "",
-   "short": "E A/1/2020 — V KAMYAB TELEVISION PVT LTD",
+   "short": "E A/1/2020 — v Kamyab Television Pvt Ltd",
    "line": "V Kamyab Television Pvt Ltd",
    "stratum": "telecom"
   },
@@ -935,8 +935,8 @@
     "filing_token": "NzQ2NTU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/21/2022 — SITI NETWORKS LTD V MAA…",
-   "line": "Siti Networks Ltd V Maa Siddhdatri Cable Network",
+   "short": "SITI Networks Ltd v Maa Siddhdatri Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -959,8 +959,8 @@
     "filing_token": "NzQ2Mzg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/77/2021 — SITI NETWORKS LTD V SAI NETWORK",
-   "line": "Siti Networks Ltd V Sai Network",
+   "short": "SITI Networks Ltd v Sai Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -983,8 +983,8 @@
     "filing_token": "NzQ2Mjk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/223/2025 — GTPL HATHWAY LTD V SANJIVANI…",
-   "line": "Gtpl Hathway Ltd V Sanjivani Cable Network",
+   "short": "GTPL Hathway Ltd v Sanjivani Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1007,8 +1007,8 @@
     "filing_token": "NzQ2Mzk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/663/2015 — INDUSIND MEDIA & COMMUNICATIONS…",
-   "line": "Indusind Media & Communications Ltd. V Zee Media & Corporation Ltd.",
+   "short": "Indusind Media & Communications Ltd v Zee Media & Corporation Ltd",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1027,7 +1027,7 @@
    "status": "new",
    "meta": {},
    "gist": "",
-   "short": "NOTICE DATED 24.08.2026 REGARDING SITTING OF HON'BLE COURT NO.1…",
+   "short": "NOTICE DATED 24.08.2026 — SITTING OF HON'BLE COURT NO.1 ON…",
    "line": "Court notice · 24 Aug 2026",
    "stratum": "telecom"
   },
@@ -1051,8 +1051,8 @@
     "filing_token": "NzQ2MjQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/63/2023 — SITI NETWORKS LTD V ROHIT…",
-   "line": "Siti Networks Ltd V Rohit Communication",
+   "short": "SITI Networks Ltd v Rohit Communication",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1075,8 +1075,8 @@
     "filing_token": "NzQ2NjU="
    },
    "gist": "",
-   "short": "TELECOM PETITION/21/2025 — ONE OTT INTERTAINMENT LTD. V REISNET…",
-   "line": "One Ott Intertainment Ltd. V Reisnet Broadband Pvt. Ltd.",
+   "short": "One OTT Intertainment Ltd v Reisnet Broadband Pvt. Ltd",
+   "line": "Telecom petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1122,8 +1122,8 @@
     "filing_token": "NzQ2NDA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/183/2016 — SITI CABLE NETWORK LTD V MONA…",
-   "line": "Siti Cable Network Ltd V Mona Seth Communication And Anr",
+   "short": "SITI Cable Network Ltd v Mona Seth Communication and Anr",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1146,8 +1146,8 @@
     "filing_token": "NzQ2NTk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/94/2023 — SITI NETWORKS LTD V AZIMGANG…",
-   "line": "Siti Networks Ltd V Azimgang Cable Link",
+   "short": "SITI Networks Ltd v Azimgang Cable Link",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1170,8 +1170,8 @@
     "filing_token": "NzQ2MzY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/447/2019 — SITI NETWORKS LTD V SINGH VISION",
-   "line": "Siti Networks Ltd V Singh Vision",
+   "short": "SITI Networks Ltd v Singh Vision",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1194,8 +1194,8 @@
     "filing_token": "NzQ2Njg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/513/2025 — GTPL HATHWAY LTD V STAR CABLE…",
-   "line": "Gtpl Hathway Ltd V Star Cable Network Srinuvas And Anr",
+   "short": "GTPL Hathway Ltd v Star Cable Network Srinuvas and Anr",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1218,8 +1218,8 @@
     "filing_token": "NzQ2NDk="
    },
    "gist": "",
-   "short": "TELECOM PETITION/75/2020 — SWIFTMAIL COMMUNICATIONS LTD V…",
-   "line": "Swiftmail Communications Ltd V Supersonic Broadband And Anr",
+   "short": "Swiftmail Communications Ltd v Supersonic Broadband and Anr",
+   "line": "Telecom petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1242,8 +1242,8 @@
     "filing_token": "NzQ2Mzc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/32/2020 — SITI NETWORK LTD V SANJAY KUMAR…",
-   "line": "Siti Network Ltd V Sanjay Kumar And Anr",
+   "short": "SITI Network Ltd v Sanjay Kumar and Anr",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1266,8 +1266,8 @@
     "filing_token": "NzQ2NjA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/374/2023 — GTPL HATHWAY LTD. V K CHANNEL…",
-   "line": "Gtpl Hathway Ltd. V K Channel Cable Network-I",
+   "short": "GTPL Hathway Ltd v K Channel Cable NETWORK-I",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1290,8 +1290,8 @@
     "filing_token": "NzQ2MzU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/446/2019 — SITI NETWORKS LTD V HAPPY LUCKY…",
-   "line": "Siti Networks Ltd V Happy Lucky Cable Network",
+   "short": "SITI Networks Ltd v Happy Lucky Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1314,8 +1314,8 @@
     "filing_token": "NzQ2MjM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/62/2023 — SITI NETWORKS LTD V OM SAI CABLE…",
-   "line": "Siti Networks Ltd V Om Sai Cable Network",
+   "short": "SITI Networks Ltd v Om Sai Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1338,8 +1338,8 @@
     "filing_token": "NzQ2NjY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/415/2025 — DEN NETWORK LTD V M/S SHIV…",
-   "line": "Den Network Ltd V M/S Shiv Shakti Cable Network",
+   "short": "DEN Network Ltd v M/S Shiv Shakti Cable Network",
+   "line": "Broadcasting petition · 24 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1382,8 +1382,8 @@
     "filing_token": "NzQ2MTA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/584/2015 — NXT DIGITAL LTD AND ORS. V F7…",
-   "line": "Nxt Digital Ltd And Ors. V F7 Broadcast Pvt. Ltd",
+   "short": "Nxt Digital Ltd and Ors v F7 Broadcast Pvt. Ltd",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1406,8 +1406,8 @@
     "filing_token": "NzQ2MTk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/98/2014 — INTERMEDIA CABLE COMMUNICATION…",
-   "line": "Intermedia Cable Communication Pvt. Ltd. V New Delhi Television Ltd.",
+   "short": "Intermedia Cable Communication Pvt. Ltd v New Delhi Television Ltd",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1430,8 +1430,8 @@
     "filing_token": "NzQ2MTU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/468/2018 — CCN DIGITAL PRIVATE LIMITED V…",
-   "line": "Ccn Digital Private Limited V Shukla Cable Network",
+   "short": "Ccn Digital Private Limited v Shukla Cable Network",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1454,8 +1454,8 @@
     "filing_token": "NzQ2MDY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/238/2025 — GTPL HATHWAY LTD V QYOU MEDIA…",
-   "line": "Gtpl Hathway Ltd V Qyou Media India Pvt. Ltd.",
+   "short": "GTPL Hathway Ltd v Qyou Media India Pvt. Ltd",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1478,8 +1478,8 @@
     "filing_token": "NzQ1OTk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/433/2024 — DEN NETWORKS LTD V KESAV CABLE…",
-   "line": "Den Networks Ltd V Kesav Cable Vision",
+   "short": "DEN Networks Ltd v Kesav Cable Vision",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1533,8 +1533,8 @@
     "filing_token": "NzQ1OTI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/23/2024 — HATHWAY DIGITAL LTD V M/S HOME…",
-   "line": "Hathway Digital Ltd V M/S Home Cable Network",
+   "short": "Hathway Digital Ltd v M/S Home Cable Network",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1557,8 +1557,8 @@
     "filing_token": "NzQ2MDE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/60/2025 — GTPL HATHWAY LTD V CHRISTU KRUPA…",
-   "line": "Gtpl Hathway Ltd V Christu Krupa Broadcasting Pvt. Ltd.",
+   "short": "GTPL Hathway Ltd v Christu Krupa Broadcasting Pvt. Ltd",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1608,7 +1608,7 @@
     "impact": "Actionable"
    },
    "gist": "",
-   "short": "Services",
+   "short": "Services under section 3(7) of the Telecommunications Act, 2023",
    "line": "In force 21 Aug 2026 · amends s.3, Telecommunications Act 2023 · action required",
    "stratum": "telecom"
   },
@@ -1632,8 +1632,8 @@
     "filing_token": "NzQ2MDk="
    },
    "gist": "",
-   "short": "CYBER APPEAL/12/2023 — IDBI BANK LTD. V NAVABHARAT CO-OPERATIVE…",
-   "line": "Idbi Bank Ltd. V Navabharat Co-Operative Urban Bank Ltd.",
+   "short": "Idbi Bank Ltd v Navabharat CO-OPERATIVE Urban Bank Ltd",
+   "line": "Appeal · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1687,8 +1687,8 @@
     "filing_token": "NzQ2MTE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/390/2018 — SITI NETWORK LTD V SS CABLE…",
-   "line": "Siti Network Ltd V Ss Cable Network And Anr",
+   "short": "SITI Network Ltd v Ss Cable Network and Anr",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1711,8 +1711,8 @@
     "filing_token": "NzQ2MDA="
    },
    "gist": "",
-   "short": "CYBER APPEAL/10/2025 — STATE BANK OF INDIA V MR. RAVINDAR K…",
-   "line": "State Bank Of India V Mr. Ravindar K Pathania",
+   "short": "State Bank of India v Mr. Ravindar K Pathania",
+   "line": "Appeal · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1735,8 +1735,8 @@
     "filing_token": "NzQ2MTM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/360/2022 — SITI NETWORKS LTD V BHAVANA…",
-   "line": "Siti Networks Ltd V Bhavana Cable Network",
+   "short": "SITI Networks Ltd v Bhavana Cable Network",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1782,8 +1782,8 @@
     "filing_token": "NzQ2MTI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/1/2022 — SITI NETWORKS LTD V R.K.CABLE…",
-   "line": "Siti Networks Ltd V R.K.Cable Network",
+   "short": "SITI Networks Ltd v R.K.CABLE Network",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1813,8 +1813,8 @@
     "impact": "Actionable"
    },
    "gist": "",
-   "short": "To be published in the Gazette of India, Extraordinary, Part I…",
-   "line": "In force 21 Aug 2026 · amends Nil · action required",
+   "short": "Mobile Phone Manufacturing Scheme MPMS",
+   "line": "In force 21 Aug 2026 · action required",
    "stratum": "tech_data"
   },
   {
@@ -1837,8 +1837,8 @@
     "filing_token": "NzQ1OTU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/320/2024 — VK DIGITAL NETWORK PVT LTD V…",
-   "line": "Vk Digital Network Pvt Ltd V Quality Vision",
+   "short": "Vk Digital Network Pvt Ltd v Quality Vision",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1892,8 +1892,8 @@
     "filing_token": "NzQ1OTE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/391/2023 — FASTWAY TRANSMISSION PVT LTD V…",
-   "line": "Fastway Transmission Pvt Ltd V Roshnit Cable Network And Anr.",
+   "short": "Fastway Transmission Pvt Ltd v Roshnit Cable Network and Anr",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1916,8 +1916,8 @@
     "filing_token": "NzQ2MDI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/61/2025 — GTPL HATHWAY LTD V PRAMOD CABLE…",
-   "line": "Gtpl Hathway Ltd V Pramod Cable Network And. Anr.",
+   "short": "GTPL Hathway Ltd v Pramod Cable Network and. Anr",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1940,8 +1940,8 @@
     "filing_token": "NzQ1OTM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/302/2024 — V.K. DIGITAL NETWORK PVT LTD V…",
-   "line": "V.K. Digital Network Pvt Ltd V M/S Vv Satvision",
+   "short": "V.K. Digital Network Pvt Ltd v M/S Vv Satvision",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1964,8 +1964,8 @@
     "filing_token": "NzQ1OTc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/324/2024 — V.K. DIGITAL NETWORK PVT LTD V…",
-   "line": "V.K. Digital Network Pvt Ltd V M/S Krn Cable Vision",
+   "short": "V.K. Digital Network Pvt Ltd v M/S Krn Cable Vision",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -1988,8 +1988,8 @@
     "filing_token": "NzQ2MDc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/426/2025 — SATLINKS V VENUS CABLE VISION",
-   "line": "Satlinks V Venus Cable Vision",
+   "short": "Satlinks v Venus Cable Vision",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2042,7 +2042,7 @@
     "impact": "Actionable"
    },
    "gist": "",
-   "short": "Section 3(7) of the Telecommunications Act, 2023",
+   "short": "Commencement of section 3(7) of the Telecommunications Act, 2023",
    "line": "In force 21 Aug 2026 · amends s.1, Telecommunication Act 2023 · action required",
    "stratum": "telecom"
   },
@@ -2066,8 +2066,8 @@
     "filing_token": "NzQ1OTg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/432/2024 — DEN NETWORKS LTD V MAYANK CABLE…",
-   "line": "Den Networks Ltd V Mayank Cable Network",
+   "short": "DEN Networks Ltd v Mayank Cable Network",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2090,8 +2090,8 @@
     "filing_token": "NzQ2MDU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/73/2025 — GTPL HATHWAY LTD V DCN CHANNEL…",
-   "line": "Gtpl Hathway Ltd V Dcn Channel And Anr.",
+   "short": "GTPL Hathway Ltd v Dcn Channel and Anr",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2114,8 +2114,8 @@
     "filing_token": "NzQ1OTY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/322/2024 — VK DIGITAL NETWORK PVT LTD V M/S…",
-   "line": "Vk Digital Network Pvt Ltd V M/S Suba Cables",
+   "short": "Vk Digital Network Pvt Ltd v M/S Suba Cables",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2138,8 +2138,8 @@
     "filing_token": "NzQ2MTY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/635/2018 — MODERN SATELLITE VISION V DEN…",
-   "line": "Modern Satellite Vision V Den Networks Ltd",
+   "short": "Modern Satellite Vision v DEN Networks Ltd",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2162,8 +2162,8 @@
     "filing_token": "NzQ2MTc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/365/2021 — SITI NETWORKS LTD V OM CABLE…",
-   "line": "Siti Networks Ltd V Om Cable Network",
+   "short": "SITI Networks Ltd v Om Cable Network",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2209,8 +2209,8 @@
     "filing_token": "NzQ1OTQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/306/2024 — V.K. DIGITAL NETWORK PVT LTD V…",
-   "line": "V.K. Digital Network Pvt Ltd V M/S Barani Cable",
+   "short": "V.K. Digital Network Pvt Ltd v M/S Barani Cable",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2233,8 +2233,8 @@
     "filing_token": "NzQ2MDQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/72/2025 — GTPL HATHWAY LTD. V YASH CABLE -…",
-   "line": "Gtpl Hathway Ltd. V Yash Cable - Parivartan And Anr.",
+   "short": "GTPL Hathway Ltd v Yash Cable - Parivartan and Anr",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2280,8 +2280,8 @@
     "filing_token": "NzQ2MDM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/69/2025 — GTPL HATHWAY LTD V HARESH K…",
-   "line": "Gtpl Hathway Ltd V Haresh K Solanki And Anr.",
+   "short": "GTPL Hathway Ltd v Haresh K Solanki and Anr",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2304,8 +2304,8 @@
     "filing_token": "NzQ2MTQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/483/2016 — SITI CABLE NETWORK LTD V MAMTA…",
-   "line": "Siti Cable Network Ltd V Mamta Tiwari & Anr",
+   "short": "SITI Cable Network Ltd v Mamta Tiwari & Anr",
+   "line": "Broadcasting petition · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2328,8 +2328,8 @@
     "filing_token": "NzQ2MTg="
    },
    "gist": "",
-   "short": "MISC APPLICATION/60/2026 — V R.K.CABLE NETWORK",
-   "line": "V R.K.Cable Network",
+   "short": "V R.K.CABLE Network",
+   "line": "Application · 21 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2352,8 +2352,8 @@
     "filing_token": "NzQ1NDY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/356/2023 — FASTWAY TRANSMISSION PVT LTD V…",
-   "line": "Fastway Transmission Pvt Ltd V Khem Cable Tv And Anr.",
+   "short": "Fastway Transmission Pvt Ltd v Khem Cable TV and Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2376,8 +2376,8 @@
     "filing_token": "NzQ1Mzc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/260/2019 — HATHWAY DIGITAL PRIVATE LIMITED…",
-   "line": "Hathway Digital Private Limited V Shree Ram Cable Tv Network Sp & Anr",
+   "short": "Hathway Digital Private Limited v Shree Ram Cable TV Network Sp & Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2400,8 +2400,8 @@
     "filing_token": "NzQ1NzE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/355/2017 — DISH TV INDIA LTD V BROADCAST…",
-   "line": "Dish Tv India Ltd V Broadcast Initiatives Ltd.",
+   "short": "Dish TV India Ltd v Broadcast Initiatives Ltd",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2424,8 +2424,8 @@
     "filing_token": "NzQ1Mzk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/100/2021 — SITI NETWORKS LTD V WORLD VIEW…",
-   "line": "Siti Networks Ltd V World View Network",
+   "short": "SITI Networks Ltd v World View Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2448,7 +2448,7 @@
     "filing_token": "NzQ1NTY="
    },
    "gist": "",
-   "short": "E A/9/2015 — TATA SKY LTD V BRAND VALUE COMMUNICATIONS LTD",
+   "short": "E A/9/2015 — Tata Sky Ltd v Brand Value Communications Ltd",
    "line": "Tata Sky Ltd V Brand Value Communications Ltd.",
    "stratum": "telecom"
   },
@@ -2512,8 +2512,8 @@
     "filing_token": "NzQ1NTk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/318/2024 — VK DIGITAL NETWORK PVT LTD V M/S…",
-   "line": "Vk Digital Network Pvt Ltd V M/S Appu Cable Network",
+   "short": "Vk Digital Network Pvt Ltd v M/S Appu Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2536,8 +2536,8 @@
     "filing_token": "NzQ1OTA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/518/2018 — SITI NETWORK LTD V ADAVANCE…",
-   "line": "Siti Network Ltd V Adavance Electronics And Anr",
+   "short": "SITI Network Ltd v Adavance Electronics and Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2560,8 +2560,8 @@
     "filing_token": "NzQ1NzY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/88/2020 — DEN NETWORKS LTD V KIRTHI CABLE…",
-   "line": "Den Networks Ltd V Kirthi Cable Network",
+   "short": "DEN Networks Ltd v Kirthi Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2584,8 +2584,8 @@
     "filing_token": "NzQ1MzY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/297/2019 — HATHWAY DIGITAL PRIVATE LIMITED…",
-   "line": "Hathway Digital Private Limited V Jagat Gouri Cable Net & Anr",
+   "short": "Hathway Digital Private Limited v Jagat Gouri Cable Net & Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2608,8 +2608,8 @@
     "filing_token": "NzQ1NTI="
    },
    "gist": "",
-   "short": "MISC APPLICATION/233/2026 — V OM CABLE NETWORK",
-   "line": "V Om Cable Network",
+   "short": "V Om Cable Network",
+   "line": "Application · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2652,8 +2652,8 @@
     "filing_token": "NzQ1NDA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/760/2021 — SITI NETWORKS LTD V TRUST LINK…",
-   "line": "Siti Networks Ltd V Trust Link Network",
+   "short": "SITI Networks Ltd v Trust Link Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2676,8 +2676,8 @@
     "filing_token": "NzQ1NDc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/163/2022 — SITI NETWORKS LTD V SHAHEEN…",
-   "line": "Siti Networks Ltd V Shaheen Cable Tv Network",
+   "short": "SITI Networks Ltd v Shaheen Cable TV Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2700,8 +2700,8 @@
     "filing_token": "NzQ1MzQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/200/2023 — DEN NETWORKS LTD V CHHOTU CABLE…",
-   "line": "Den Networks Ltd V Chhotu Cable Network",
+   "short": "DEN Networks Ltd v Chhotu Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2724,8 +2724,8 @@
     "filing_token": "NzQ1NjU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/236/2025 — DISCOVERY COMMUNICATIONS INDIA V…",
-   "line": "Discovery Communications India V Digital Service Provider",
+   "short": "Discovery Communications India v Digital Service Provider",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2748,8 +2748,8 @@
     "filing_token": "NzQ1NzU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/426/2019 — HATHWAY DIGITAL PRIVATE LIMITED…",
-   "line": "Hathway Digital Private Limited V Jhangra Cable Tv Network & Anr",
+   "short": "Hathway Digital Private Limited v Jhangra Cable TV Network & Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2772,8 +2772,8 @@
     "filing_token": "NzQ1NDU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/337/2023 — FASTWAY TRANSMISSION PVT LTD V…",
-   "line": "Fastway Transmission Pvt Ltd V Bhinda Kashmira And Anr.",
+   "short": "Fastway Transmission Pvt Ltd v Bhinda Kashmira and Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2816,8 +2816,8 @@
     "filing_token": "NzQ1NjY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/251/2025 — JIOSTAR INDIA PVT. LTD. AND ORS.…",
-   "line": "Jiostar India Pvt. Ltd. And Ors. V Saptak Digital Pvt Ltd",
+   "short": "Jiostar India Pvt. Ltd. and Ors v Saptak Digital Pvt Ltd",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2840,8 +2840,8 @@
     "filing_token": "NzQ1NDI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/761/2021 — SITI NETWORKS LTD V M.M. CABLE…",
-   "line": "Siti Networks Ltd V M.M. Cable Network",
+   "short": "SITI Networks Ltd v M.M. Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2864,8 +2864,8 @@
     "filing_token": "NzQ1ODM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/3/2021 — HINDUJA GLOBAL SOLUTIONS LTD.…",
-   "line": "Hinduja Global Solutions Ltd. (Earlier Known As Nxt Digital Ltd.) V Co…",
+   "short": "Hinduja Global Solutions Ltd. (Earlier Known As Nxt Digital Ltd.) v Colva…",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2888,8 +2888,8 @@
     "filing_token": "NzQ1NDk="
    },
    "gist": "",
-   "short": "MISC APPLICATION/232/2026 — V OM CABLE NETWORK",
-   "line": "V Om Cable Network",
+   "short": "V Om Cable Network",
+   "line": "Application · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2932,8 +2932,8 @@
     "filing_token": "NzQ1ODE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/723/2020 — SITI NETWORKS LTD V NALAYANI…",
-   "line": "Siti Networks Ltd V Nalayani Enterprises",
+   "short": "SITI Networks Ltd v Nalayani Enterprises",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2956,8 +2956,8 @@
     "filing_token": "NzQ1MzI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/449/2019 — SITI NETWORKS LTD V PRAGATI…",
-   "line": "Siti Networks Ltd V Pragati Cable Network-Rajendra Uparkar",
+   "short": "SITI Networks Ltd v Pragati Cable NETWORK-RAJENDRA Uparkar",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -2980,8 +2980,8 @@
     "filing_token": "NzQ1ODU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/230/2021 — SITI NETWORKS LTD V SHIV CABLE…",
-   "line": "Siti Networks Ltd V Shiv Cable Network-I",
+   "short": "SITI Networks Ltd v Shiv Cable NETWORK-I",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3004,8 +3004,8 @@
     "filing_token": "NzQ1Nzk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/382/2020 — ZEE ENTERTAINMENT ENTERPRISE LTD…",
-   "line": "Zee Entertainment Enterprise Ltd V Sagar Cable Network & Anr",
+   "short": "Zee Entertainment Enterprise Ltd v Sagar Cable Network & Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3028,8 +3028,8 @@
     "filing_token": "NzQ1Mzg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/466/2020 — SITI NETWORKS LTD V STAR WAVES (…",
-   "line": "Siti Networks Ltd V Star Waves ( Unit Maruti )",
+   "short": "SITI Networks Ltd v Star Waves ( Unit Maruti )",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3072,8 +3072,8 @@
     "filing_token": "NzQ1ODc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/223/2022 — UCN CABLE NETWORK PVT LTD V 9X…",
-   "line": "Ucn Cable Network Pvt Ltd V 9X Media Pvt Ltd",
+   "short": "Ucn Cable Network Pvt Ltd v 9X Media Pvt Ltd",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3116,8 +3116,8 @@
     "filing_token": "NzQ1ODk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/108/2023 — SITI NETWORKS LTD V REBA CABLE…",
-   "line": "Siti Networks Ltd V Reba Cable Network",
+   "short": "SITI Networks Ltd v Reba Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3140,8 +3140,8 @@
     "filing_token": "NzQ1NjI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/262/2015 — HINDUJA GLOBAL SOLUTIONS LIMITED…",
-   "line": "Hinduja Global Solutions Limited V Siddhi Cable Network And Anr.",
+   "short": "Hinduja Global Solutions Limited v Siddhi Cable Network and Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3164,8 +3164,8 @@
     "filing_token": "NzQ1NjE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/158/2025 — HATHWAY DIGITAL LTD V MUSKAN…",
-   "line": "Hathway Digital Ltd V Muskan Cable Centre",
+   "short": "Hathway Digital Ltd v Muskan Cable Centre",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3188,8 +3188,8 @@
     "filing_token": "NzQ1NjQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/374/2016 — INTERMEDIA CABLE COMMUNICATION…",
-   "line": "Intermedia Cable Communication Pvt. Ltd. V Zee Entertainment Enterpris…",
+   "short": "Intermedia Cable Communication Pvt. Ltd v Zee Entertainment Enterprise Ltd",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3232,8 +3232,8 @@
     "filing_token": "NzQ1NzI="
    },
    "gist": "",
-   "short": "TELECOM PETITION/173/2013 — TULIP TELECOM LTD. V TATA TELESERVICE…",
-   "line": "Tulip Telecom Ltd. V Tata Teleservice Ltd",
+   "short": "Tulip Telecom Ltd v Tata Teleservice Ltd",
+   "line": "Telecom petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3256,8 +3256,8 @@
     "filing_token": "NzQ1NjA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/321/2024 — VK DIGITAL NETWORK PVT LTD V SAI…",
-   "line": "Vk Digital Network Pvt Ltd V Sai Champakadhama Cable Network",
+   "short": "Vk Digital Network Pvt Ltd v Sai Champakadhama Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3280,8 +3280,8 @@
     "filing_token": "NzQ1NDM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/106/2023 — SITI NETWORKS LTD V MANOJ CABLE…",
-   "line": "Siti Networks Ltd V Manoj Cable Network",
+   "short": "SITI Networks Ltd v Manoj Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3304,8 +3304,8 @@
     "filing_token": "NzQ1NzQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/497/2018 — DISH TV INDIA LTD V SAHARA INDIA…",
-   "line": "Dish Tv India Ltd V Sahara India Commercial Corporation Ltd",
+   "short": "Dish TV India Ltd v Sahara India Commercial Corporation Ltd",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3328,8 +3328,8 @@
     "filing_token": "NzQ1ODA="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/674/2020 — SITI NETWORKS LTD V S.N.ARUN…",
-   "line": "Siti Networks Ltd V S.N.Arun Kumar Cable Tv Network And Anr",
+   "short": "SITI Networks Ltd v S.N.ARUN Kumar Cable TV Network and Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3352,8 +3352,8 @@
     "filing_token": "NzQ1Njg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/318/2025 — DEN NETWORKS LTD V SUPER CABLE…",
-   "line": "Den Networks Ltd V Super Cable And Anr.",
+   "short": "DEN Networks Ltd v Super Cable and Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3372,7 +3372,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dated 20.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "short": "Notice dated 20.08.2026 — sitting of Hon'ble Court No. 1",
    "line": "Court notice · 20 Aug 2026",
    "stratum": "telecom"
   },
@@ -3396,8 +3396,8 @@
     "filing_token": "NzQ1MzU="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/274/2020 — SITI NETWORKS LTD V MEERA CABLE…",
-   "line": "Siti Networks Ltd V Meera Cable Network And Anr",
+   "short": "SITI Networks Ltd v Meera Cable Network and Anr",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3420,8 +3420,8 @@
     "filing_token": "NzQ1Nzg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/329/2020 — SITI NETWORKS LTD V SAI KALPANA…",
-   "line": "Siti Networks Ltd V Sai Kalpana Vision",
+   "short": "SITI Networks Ltd v Sai Kalpana Vision",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3464,8 +3464,8 @@
     "filing_token": "NzQ1NDE="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/98/2023 — SITI NETWORKS LTD V SANJAY CABLE…",
-   "line": "Siti Networks Ltd V Sanjay Cable Network",
+   "short": "SITI Networks Ltd v Sanjay Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3488,8 +3488,8 @@
     "filing_token": "NzQ1NzA="
    },
    "gist": "",
-   "short": "TELECOM PETITION/9/2026 — AIR LINK COMMUNICATION PVT LTD V UNION…",
-   "line": "Air Link Communication Pvt Ltd V Union Of India",
+   "short": "Air Link Communication Pvt Ltd v Union of India",
+   "line": "Telecom petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3512,8 +3512,8 @@
     "filing_token": "NzQ1Njk="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/336/2017 — RVR INFRASTRUCTURES LTD V ZEE…",
-   "line": "Rvr Infrastructures Ltd V Zee Entertainment Enterprise Ltd",
+   "short": "Rvr Infrastructures Ltd v Zee Entertainment Enterprise Ltd",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3536,8 +3536,8 @@
     "filing_token": "NzQ1ODI="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/795/2020 — DEN NETWORKS LTD V SKYLINE CABLE…",
-   "line": "Den Networks Ltd V Skyline Cable Network",
+   "short": "DEN Networks Ltd v Skyline Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3580,8 +3580,8 @@
     "filing_token": "NzQ1Nzc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/328/2020 — SITI NETWORKS LTD V LAXMI CABLE…",
-   "line": "Siti Networks Ltd V Laxmi Cable Network",
+   "short": "SITI Networks Ltd v Laxmi Cable Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3604,8 +3604,8 @@
     "filing_token": "NzQ1ODY="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/810/2021 — INDIA CAST MEDIA DISTRIBUTION…",
-   "line": "India Cast Media Distribution Pvt. Ltd. & Ors. V Multicity Digital Con…",
+   "short": "India Cast Media Distribution Pvt. Ltd. & Ors v Multicity Digital…",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3628,8 +3628,8 @@
     "filing_token": "NzQ1NjM="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/234/2025 — SITI NETWORKS LTD V VISTEL…",
-   "line": "Siti Networks Ltd V Vistel (Lco-2279)",
+   "short": "SITI Networks Ltd v Vistel (LCO-2279)",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3672,8 +3672,8 @@
     "filing_token": "NzQ1Njc="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/85/2017 — TIMES GLOBAL BROADCASTING COMPANY…",
-   "line": "Times Global Broadcasting Company Ltd & Anr V Vxl Digital Pvt. Ltd. & …",
+   "short": "Times Global Broadcasting Company Ltd & Anr v Vxl Digital Pvt. Ltd. & Ors",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3696,8 +3696,8 @@
     "filing_token": "NzQ1NDQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/158/2022 — SITI NETWORKS LTD V MAMTA SARAF",
-   "line": "Siti Networks Ltd V Mamta Saraf",
+   "short": "SITI Networks Ltd v Mamta Saraf",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3720,8 +3720,8 @@
     "filing_token": "NzQ1ODg="
    },
    "gist": "",
-   "short": "MISC APPLICATION/235/2023 — V PRASAR BHARTI",
-   "line": "V Prasar Bharti",
+   "short": "V Prasar Bharti",
+   "line": "Application · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3744,8 +3744,8 @@
     "filing_token": "NzQ1ODQ="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/64/2021 — SITI NETWORKS LTD V MADHUR…",
-   "line": "Siti Networks Ltd V Madhur Communication-I",
+   "short": "SITI Networks Ltd v Madhur COMMUNICATION-I",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3788,8 +3788,8 @@
     "filing_token": "NzQ1NTg="
    },
    "gist": "",
-   "short": "BROADCASTING PETITION/141/2024 — HATHWAY DIGITAL LTD V THE NEW…",
-   "line": "Hathway Digital Ltd V The New Satellite Channel Network",
+   "short": "Hathway Digital Ltd v The New Satellite Channel Network",
+   "line": "Broadcasting petition · 20 Aug 2026",
    "stratum": "telecom"
   },
   {
@@ -3908,7 +3908,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "In matter Of Flipkart Internet Private Limited with regard to…",
+   "short": "Flipkart Internet Private Limited — sale of toys on its platform…",
    "line": "Order · 19 Aug 2026",
    "stratum": "tech_data"
   },
@@ -3968,7 +3968,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "In the matter of: Case against E biotorium Network Private…",
+   "short": "E biotorium Network Private Limited (Direct Selling Entity)…",
    "line": "Order · 18 Aug 2026",
    "stratum": "tech_data"
   },
@@ -4208,7 +4208,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dated 14.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "short": "Notice dated 14.08.2026 — sitting of Hon'ble Court No. 1",
    "line": "Court notice · 14 Aug 2026",
    "stratum": "telecom"
   },
@@ -4288,7 +4288,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dated 13.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "short": "Notice dated 13.08.2026 — sitting of Hon'ble Court No. 1",
    "line": "Court notice · 13 Aug 2026",
    "stratum": "telecom"
   },
@@ -4568,7 +4568,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dated 11.08.26 regarding sitting of Hon'ble Court No. 1",
+   "short": "Notice dated 11.08.26 — sitting of Hon'ble Court No. 1",
    "line": "Court notice · 11 Aug 2026",
    "stratum": "telecom"
   },
@@ -4668,7 +4668,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dated 07.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "short": "Notice dated 07.08.2026 — sitting of Hon'ble Court No. 1",
    "line": "Court notice · 7 Aug 2026",
    "stratum": "telecom"
   },
@@ -4828,7 +4828,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dated 06.08.2026 regarding sitting of Hon'ble Court No. 1",
+   "short": "Notice dated 06.08.2026 — sitting of Hon'ble Court No. 1",
    "line": "Court notice · 6 Aug 2026",
    "stratum": "telecom"
   },
@@ -5110,7 +5110,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "In the matter of: Amazon Seller Services Private Limited - Sale…",
+   "short": "Amazon Seller Services Private Limited - Sale of sweets on its…",
    "line": "Order · 4 Aug 2026",
    "stratum": "tech_data"
   },
@@ -5170,7 +5170,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dt. 04.08.2026 regarding sitting of Hon. Court No. 1",
+   "short": "Notice dt. 04.08.2026 — sitting of Hon. Court No. 1",
    "line": "Court notice · 4 Aug 2026",
    "stratum": "telecom"
   },
@@ -5221,7 +5221,7 @@
     "impact": "Actionable"
    },
    "gist": "",
-   "short": "Offices",
+   "short": "Offices in pursuance of Sub Rules (2) and (4) of Rule 10 of the…",
    "line": "In force 3 Aug 2026 · amends Sub Rules (2) and (4) of Rule 10 of the Official… · action required",
    "stratum": "telecom"
   },
@@ -5332,7 +5332,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dt. 01.08.2026 regarding sitting of Hon. Court No. 1",
+   "short": "Notice dt. 01.08.2026 — sitting of Hon. Court No. 1",
    "line": "Court notice · 1 Aug 2026",
    "stratum": "telecom"
   },
@@ -5736,7 +5736,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dt. 24.07.2026 regarding sitting of Hon. Court No. 1",
+   "short": "Notice dt. 24.07.2026 — sitting of Hon. Court No. 1",
    "line": "Court notice · 24 Jul 2026",
    "stratum": "telecom"
   },
@@ -5819,8 +5819,8 @@
     "part_section": "Anti-trust Section 19 (1) (a)"
    },
    "gist": "",
-   "short": "R. Suresh Vs. Eternal Limited (Formerly zomato Limited)",
-   "line": "Order · 23 Jul 2026",
+   "short": "R. Suresh v Eternal Limited (Formerly Zomato Limited)",
+   "line": "Antitrust order · 23 Jul 2026",
    "stratum": "tech_data"
   },
   {
@@ -6434,7 +6434,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dt. 18.07.26 regarding non-sitting of Court No. 2 from…",
+   "short": "Notice dt. 18.07.26 — non-sitting of Court No. 2 from 20.07.26 to…",
    "line": "Court notice · 18 Jul 2026",
    "stratum": "telecom"
   },
@@ -6517,8 +6517,8 @@
     "part_section": "Anti-trust Section 19 (1) (a)"
    },
    "gist": "",
-   "short": "Goutam Mohanta vs. Reliance Jio Infocom Limited and Others",
-   "line": "Order · 16 Jul 2026",
+   "short": "Goutam Mohanta v Reliance Jio Infocom Limited and Others",
+   "line": "Antitrust order · 16 Jul 2026",
    "stratum": "tech_data"
   },
   {
@@ -6677,7 +6677,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "In the matter of: Use of dark pattern resulting in unfair trade…",
+   "short": "Use of dark pattern resulting in unfair trade practices…",
    "line": "Order · 14 Jul 2026",
    "stratum": "tech_data"
   },
@@ -6697,7 +6697,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dt. 14.07.2026 regarding sitting of Hon. Court No. 1",
+   "short": "Notice dt. 14.07.2026 — sitting of Hon. Court No. 1",
    "line": "Court notice · 14 Jul 2026",
    "stratum": "telecom"
   },
@@ -7116,7 +7116,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dated 04.07.2026 regarding sitting of Hon. Tribunal",
+   "short": "Notice dated 04.07.2026 — sitting of Hon. Tribunal",
    "line": "Court notice · 4 Jul 2026",
    "stratum": "telecom"
   },
@@ -7356,7 +7356,7 @@
    "status": "baseline",
    "meta": {},
    "gist": "",
-   "short": "Notice dt. 30.06.2026 regarding sitting of Hon. Court No. 1",
+   "short": "Notice dt. 30.06.2026 — sitting of Hon. Court No. 1",
    "line": "Court notice · 30 Jun 2026",
    "stratum": "telecom"
   },
@@ -7716,7 +7716,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "In the matter of: Misleading advertisement and unfair trade…",
+   "short": "Misleading advertisement and unfair trade practice by M/s Storia…",
    "line": "Order · 18 Jun 2026",
    "stratum": "tech_data"
   },
@@ -8216,7 +8216,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "In the matter of: Misleading advertisement by Narayana…",
+   "short": "Misleading advertisement by Narayana Educational Institutions…",
    "line": "Order · 11 Jun 2026",
    "stratum": "tech_data"
   },
@@ -8619,8 +8619,8 @@
     "part_section": "Anti-trust Section 19 (1) (a)"
    },
    "gist": "",
-   "short": "Dinesh Kumar Dadsena And Whitesheep Technology Pvt. Ltd",
-   "line": "Order · 4 Jun 2026",
+   "short": "Dinesh Kumar Dadsena and Whitesheep Technology Pvt. Ltd",
+   "line": "Antitrust order · 4 Jun 2026",
    "stratum": "tech_data"
   },
   {
@@ -8779,7 +8779,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "In the matter of: Use of dark patterns resulting in unfair trade…",
+   "short": "Use of dark patterns resulting in unfair trade practice…",
    "line": "Order · 1 Jun 2026",
    "stratum": "tech_data"
   },
@@ -10519,7 +10519,7 @@
    "status": "activation_baseline",
    "meta": {},
    "gist": "",
-   "short": "Norms, Guidelines and Procedures in respect of Authorization",
+   "short": "Norms, Guidelines and Procedures — Authorization",
    "line": "Guideline",
    "stratum": "telecom"
   },
