@@ -3,3 +3,4 @@ engine/.venv/
 instruments/
 __pycache__/
 *.pyc
+pipeline/drafts/

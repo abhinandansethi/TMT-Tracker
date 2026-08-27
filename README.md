@@ -152,6 +152,8 @@ its embedded JSON, so a scheduled cloud session needs nothing but the artifact U
     docs/TMT-Radar-legal-basis.pdf     per-source legal basis: access + copyright, reasoned apart
     docs/CONNECTOR.md                  partner-pipeline integration contract (API / feed / MCP)
     engine/radar_api.py                read-only localhost connector over the same ledger
+    pipeline/pipeline.py               reference client-alert pipeline: feed -> client match -> draft emails
+    pipeline/clients.json              sample client roster (watch-lists); replace with the firm's
     runbook/cloud-runbook.md           Lane B: exact steps every scheduled cloud run follows
     memos/memo_template.docx           fixed client-alert template
     memos/2026-08-10_TRAI_1601-series_client-alert_SAMPLE.docx   real sample

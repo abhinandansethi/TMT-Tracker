@@ -1,0 +1,42 @@
+{
+  "note": "Client roster for the TMT practice. The pipeline matches new instruments/judgments to clients deterministically, requiring a subject-keyword hit so a client sees only what actually concerns it (not every item from a regulator it follows). Keywords are precise multi-word terms to keep false positives low; tune per client. Replace with the firm's real roster or point at the CRM. No client data leaves the machine.",
+  "clients": [
+    {
+      "id": "roblox",
+      "name": "Roblox",
+      "sector": "Online gaming + user-generated-content platform (large minor user base)",
+      "partner": "A. Sethi",
+      "watch": {
+        "regulators": ["MeitY", "CERT-In", "MIB", "CCPA", "DPIIT", "e-Gazette"],
+        "strata": ["tech_data", "media"],
+        "keywords": [
+          "online.?gaming", "real.?money.?gaming", "\\bgaming\\b", "e-?sports",
+          "intermediar", "\\bIT Rules\\b", "due diligence", "safe.?harbour",
+          "grievance officer", "grievance redress", "significant social media",
+          "data protection", "\\bDPDP\\b", "personal data", "consent manager",
+          "\\bchild\\b", "children", "\\bminor\\b", "age.?verification", "age.?gating", "parental",
+          "dark.?pattern", "content moderation", "objectionable content", "user.?generated content", "\\bUGC\\b",
+          "surrogate advertis", "advertising to child", "influencer",
+          "user identification", "online safety", "self-?regulat"
+        ]
+      }
+    },
+    {
+      "id": "accenture",
+      "name": "Accenture",
+      "sector": "Global IT / consulting services + India delivery centres (data processor at scale)",
+      "partner": "A. Sethi",
+      "watch": {
+        "regulators": ["MeitY", "CERT-In", "DPIIT", "e-Gazette", "CCI"],
+        "strata": ["tech_data"],
+        "keywords": [
+          "data protection", "\\bDPDP\\b", "personal data", "cross.?border data", "data transfer", "data localis",
+          "cyber.?security", "\\bCERT-In\\b", "incident report", "\\bs\\.?70B\\b", "vulnerability note", "empanel",
+          "intermediar", "\\bIT Rules\\b", "cloud comput", "data centre", "outsourc",
+          "\\bSEZ\\b", "\\bSTPI\\b", "\\bFDI\\b", "press note", "foreign.?direct",
+          "artificial intelligence", "semiconductor", "global capability cent", "\\bGCC\\b"
+        ]
+      }
+    }
+  ]
+}

@@ -5,6 +5,8 @@ list and context, and draft a client-alert email for the partner to review. This
 the contract for the boundary between us. Nothing here reaches your clients — it emits the raw
 material your workflow turns into a draft.
 
+There are three ways to consume the data, in increasing order of directness. A working reference of the whole downstream — match the feed to a client roster and draft alert emails — ships in `pipeline/` (`python3 pipeline/pipeline.py`); adapt it or read it as the contract.
+
 There are three ways to consume the data, in increasing order of directness.
 
 ## 1. The queryable API (recommended)
