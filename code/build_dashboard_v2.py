@@ -486,7 +486,7 @@ TEMPLATE = r"""<meta charset="utf-8">
   --serif:Spectral,Georgia,'Times New Roman',serif;
   --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  --grid:104px 78px minmax(0,1fr) 132px 116px 24px;
+  --grid:104px 78px minmax(0,1fr) 132px 24px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--ground)}
@@ -747,7 +747,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     </div>
     <div class="tablewrap"><div class="tbl">
       <div class="thead"><div class="r">
-        <div>Date</div><div>Regulator</div><div>Instrument</div><div>Type</div><div>Deadline</div><div></div>
+        <div>Date</div><div>Regulator</div><div>Instrument</div><div>Type</div><div></div>
       </div></div>
       <div id="rows"></div>
     </div></div>
@@ -941,7 +941,6 @@ function render() {
         '</div>' +
         '<div class="c-type"><span class="' + (/draft|consult/i.test(r.type) ? 'draft' : (r.routine ? 'quiet' : '')) +
           '">' + esc((r.type || '').replace(/_/g, ' ')) + '</span></div>' +
-        dlCell(r) +
         '<div class="c-mark">' + (open ? '−' : '+') + '</div>' +
       '</div>' +
       '<div class="detail"><div class="lbl">Official title</div><div class="full">' + esc(r.official) + '</div>' +
