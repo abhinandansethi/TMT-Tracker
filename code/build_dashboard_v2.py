@@ -902,28 +902,10 @@ function metaCells(r) {
   m.push(['Status', (r.flags || []).includes('needs_verification') ? 'Gazette pending' : 'On official venue']);
   return m.filter(Boolean).map(x => '<div><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + '</div></div>').join('');
 }
-// Some government PDFs are served with a forced-download header (Content-Disposition:
-// attachment). Where the server also sends a real application/pdf type, routing the link
-// through a viewer makes it open in the tab instead of downloading. Verified 2026-08-27:
-// tec.gov.in/pdf and IN-SPACe render; MTCTE (application/octet-stream) does NOT preview, so
-// it is deliberately left as a direct link. Public documents only. Display-only — the feed
-// and API keep the real PDF URL for a downstream pipeline to fetch.
-function openable(u) {
-  if (!u) return u;
-  // Firm-hosted only: route the government "forced download" endpoints through the connector's
-  // /v1/doc proxy, which re-serves them application/pdf inline so they open in the tab (this is
-  // the one thing that also fixes MTCTE's octet-stream). Set window.TMT_CONFIG.docProxy to enable.
-  // Without a proxy we link direct — no third-party viewer: a document opens inline wherever the
-  // server allows it, and downloads cleanly on the few servers that force an attachment.
-  var cfg = window.TMT_CONFIG || {};
-  if (cfg.docProxy && (/\/\/www\.tec\.gov\.in\/pdf\//i.test(u) || /inspace\.gov\.in\/[^?]*sys_attachment/i.test(u) || /mtcte\.tec\.gov\.in\/filedownload/i.test(u)))
-    return cfg.docProxy.replace(/\/$/, '') + '/v1/doc?u=' + encodeURIComponent(u);
-  return u;
-}
 function acts(r) {
   const a = [];
   // dual links, always both where they exist: the document itself and the official page
-  if (r.doc) a.push('<a href="' + esc(openable(r.doc)) + '" target="_blank" rel="noopener">Official text</a>');
+  if (r.doc) a.push('<a href="' + esc(r.doc) + '" target="_blank" rel="noopener">Official text</a>');
   if (r.page && r.page !== r.doc) a.push('<a href="' + esc(r.page) + '" target="_blank" rel="noopener">Source page</a>');
   // the Gazette ID is the permanent citation — shown alongside the direct PDF
   if (r.gid) a.push('<span style="font-family:var(--mono);font-size:10.5px;color:var(--mute)">Gazette ID ' + esc(r.gid) + '</span>');
@@ -951,7 +933,7 @@ function render() {
         '<div class="c-reg">' + esc(r.reg) + '</div>' +
         '<div class="c-title">' +
           ((r.doc || r.page)
-            ? '<a class="t" href="' + esc(openable(r.doc || r.page)) + '" target="_blank" rel="noopener" title="Open the document">' + esc(r.short) + '</a>'
+            ? '<a class="t" href="' + esc(r.doc || r.page) + '" target="_blank" rel="noopener" title="Open the document">' + esc(r.short) + '</a>'
             : '<span class="t">' + esc(r.short) + '</span>') +
           (r.line ? '<span class="sub">' + esc(r.line) + '</span>' : '') +
           '<div class="peek"><div class="lbl">Official title</div><div class="full">' + esc(r.official) + '</div>' +
@@ -1002,7 +984,7 @@ render();
         '<div class="c-date' + (r.date ? '' : ' none') + '">' + fmt(r.date) + '</div>' +
         '<div class="c-reg">' + esc(forum) + '</div>' +
         '<div class="c-title">' +
-          (r.doc ? '<a class="t" href="' + esc(openable(r.doc)) + '" target="_blank" rel="noopener">' + esc(r.short) + '</a>'
+          (r.doc ? '<a class="t" href="' + esc(r.doc) + '" target="_blank" rel="noopener">' + esc(r.short) + '</a>'
                  : '<span class="t">' + esc(r.short) + '</span>') +
           (matter && matter !== r.short ? '<span class="sub">' + esc(matter) + '</span>' : '') +
         '</div>' +
