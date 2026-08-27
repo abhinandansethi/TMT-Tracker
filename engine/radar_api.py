@@ -35,6 +35,8 @@ from datetime import date, datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import ssl
+import urllib.request
 from urllib.parse import parse_qs, urlparse
 
 HERE = Path(__file__).resolve().parent
@@ -162,8 +164,12 @@ OPENAPI = {
         "/v1/signals": {"get": {"summary": "Non-binding signals: bulletins, diaries, unpublished-instrument leads (same filters)"}},
         "/v1/items/{id}": {"get": {"summary": "One item, full payload"}},
         "/v1/digest": {"get": {"summary": "Everything new since ?since=YYYY-MM-DD, grouped by regulator"}},
+        "/v1/doc": {"get": {"summary": "Proxy a feed document, re-served inline (opens forced-download PDFs in-browser). ?u=<doc url from the feed>"}},
     },
 }
+
+
+_PROXY_UA = "Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)"
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -209,6 +215,37 @@ class Handler(BaseHTTPRequestHandler):
             # reported-but-unpublished instrument signals. Same filters as the other lists.
             rows = _filtered(items, q, "signals")
             return self._send(200, {"count": len(rows), "items": [_payload(i) for i in rows]})
+        if path == "/v1/doc":
+            # Document proxy: fetch a government PDF server-side and re-serve it INLINE, so
+            # forced-download endpoints (e.g. MTCTE, served as application/octet-stream +
+            # attachment, which no in-browser viewer can render) open in the tab instead of
+            # downloading. SSRF guard: only URLs that already appear in the feed are proxied.
+            target = (q.get("u") or [""])[0]
+            allowed = {i.get(f) for i in items for f in ("doc_url", "page_url", "pdf_url") if i.get(f)}
+            if target not in allowed:
+                return self._send(403, {"error": "url not in feed",
+                                        "hint": "only documents present in /v1/instruments|judgments|signals can be proxied"})
+            try:
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE  # some gov TLS chains are flaky; this is a read-only GET
+                req = urllib.request.Request(target, headers={"User-Agent": _PROXY_UA})
+                with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:  # noqa: S310 (feed-gated)
+                    body = resp.read()
+                    upstream_ct = resp.headers.get("Content-Type", "")
+            except Exception as e:  # noqa: BLE001
+                return self._send(502, {"error": "upstream fetch failed", "detail": str(e)[:200]})
+            # normalise a PDF byte-stream to a renderable type; otherwise pass the real type through
+            ctype = "application/pdf" if body[:4] == b"%PDF" else (upstream_ct or "application/octet-stream")
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Disposition", "inline")          # override any attachment
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if path == "/v1/digest":
             since = q.get("since", [(date.today() - timedelta(days=7)).isoformat()])[0]
             rows = [i for i in items if i.get("lane", "instruments") == "instruments"

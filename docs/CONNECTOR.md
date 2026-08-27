@@ -111,6 +111,21 @@ set a global before the page's script runs (e.g. via your embedding wrapper):
 The button then `POST`s `{ "action": "sweep", "source": "tmt-radar-dashboard" }` to that
 endpoint. Your pipeline runs the sweep and republishes; the page reloads to the new data.
 
+## Making every document open in-browser (`docProxy`)
+
+A few government servers send PDFs with a forced-download header (`Content-Disposition:
+attachment`), and one (TEC MTCTE) also mislabels them `application/octet-stream`, which no
+hosted viewer can preview. On the public preview those download. When you serve the dashboard
+through your own infrastructure alongside the connector, point it at the connector's document
+proxy and **every** document — MTCTE included — opens in the tab instead of downloading:
+
+```html
+<script>window.TMT_CONFIG = { docProxy: "https://your-host/connector" };</script>
+```
+
+`GET {docProxy}/v1/doc?u=<doc url from the feed>` fetches the file server-side and re-serves it
+`application/pdf; inline`. It only proxies URLs that already appear in the feed (SSRF guard).
+
 ## MCP
 
 If your workflow speaks MCP, wrap the API: each endpoint above maps to one read-only tool
