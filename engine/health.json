@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-27T08:58:07+05:30",
+ "generated": "2026-08-27T15:26:09+05:30",
  "sources": {
   "trai_regulations": {
    "status": "QUIET",
@@ -273,50 +273,56 @@
    "consecutive_failures": 0
   },
   "certin_advisories": {
-   "status": "OK",
-   "rows_seen": 15,
+   "status": "FAILED",
+   "rows_seen": 0,
    "new": 0,
    "ledgered_total": 15,
    "newest_visible": "2026-08-20",
-   "notes": [],
+   "notes": [
+    "FetchError: parsed 0 rows, floor is 10 — treating as FAILED parse"
+   ],
    "info": [],
-   "checked": "2026-08-27T08:20:17+05:30",
-   "consecutive_failures": 0
+   "checked": "2026-08-27T15:24:30+05:30",
+   "consecutive_failures": 1
   },
   "certin_vuln": {
-   "status": "OK",
-   "rows_seen": 20,
+   "status": "FAILED",
+   "rows_seen": 0,
    "new": 0,
    "ledgered_total": 22,
    "newest_visible": "2026-08-25",
-   "notes": [],
+   "notes": [
+    "FetchError: parsed 0 rows, floor is 10 — treating as FAILED parse"
+   ],
    "info": [],
-   "checked": "2026-08-27T08:20:18+05:30",
-   "consecutive_failures": 0
+   "checked": "2026-08-27T15:25:12+05:30",
+   "consecutive_failures": 1
   },
   "certin_guidelines": {
-   "status": "OK",
-   "rows_seen": 31,
+   "status": "FAILED",
+   "rows_seen": 0,
    "new": 0,
    "ledgered_total": 1,
    "newest_visible": "2026-06-10",
-   "notes": [],
-   "info": [
-    "30 row(s) predate window_start — not ledgered"
+   "notes": [
+    "FetchError: parsed 0 rows, floor is 5 — treating as FAILED parse"
    ],
-   "checked": "2026-08-27T08:20:19+05:30",
-   "consecutive_failures": 0
+   "info": [],
+   "checked": "2026-08-27T15:25:13+05:30",
+   "consecutive_failures": 1
   },
   "certin_directions": {
-   "status": "OK",
-   "rows_seen": 12,
+   "status": "FAILED",
+   "rows_seen": 0,
    "new": 0,
    "ledgered_total": 6,
    "newest_visible": "2022-04-28",
-   "notes": [],
+   "notes": [
+    "FetchError: parsed 0 rows, floor is 1 — treating as FAILED parse"
+   ],
    "info": [],
-   "checked": "2026-08-27T08:20:21+05:30",
-   "consecutive_failures": 0
+   "checked": "2026-08-27T15:26:09+05:30",
+   "consecutive_failures": 1
   },
   "mib_acts_policy": {
    "status": "OK",
@@ -673,18 +679,9 @@
   }
  },
  "provenance": {
-  "requests": 1,
-  "by_source": {
-   "cci_orders": {
-    "hosts": [
-     "www.cci.gov.in"
-    ],
-    "requests": 1
-   }
-  },
-  "hosts": [
-   "www.cci.gov.in"
-  ],
+  "requests": 0,
+  "by_source": {},
+  "hosts": [],
   "undeclared": []
  }
 }
