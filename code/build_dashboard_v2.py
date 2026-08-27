@@ -519,7 +519,6 @@ input::placeholder{color:var(--ghost)}
 .upd-note.on{display:block}
 .upd-note a{color:var(--navy);text-decoration:underline;text-underline-offset:2px}
 @media (max-width:760px){.upd-note{padding-left:22px;padding-right:22px}}
-.jnote{max-width:78ch;margin:16px 0 8px;font-size:12.5px;line-height:1.5;color:var(--mute)}
 .thead .r.jr,.row .line.jr{grid-template-columns:104px 128px minmax(0,1fr) 120px 24px}
 .tabs{background:var(--navy-d);padding:0 64px;display:flex;gap:2px}
 .tabs button{appearance:none;background:none;border:0;border-bottom:3px solid transparent;
@@ -758,9 +757,6 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
   <section class="view" id="v-judgments">
     <div class="sechead"><div class="l">Judgments &amp; orders</div>
       <div class="r" id="judgct"></div></div>
-    <p class="jnote">Tribunal and court decisions relevant to TMT clients. Interpretive rather
-    than obligation-changing — read for how the law is being applied, not as a compliance
-    deadline. Reproduced under s.52(1)(q)(iv), Copyright Act 1957.</p>
     <div class="tablewrap"><div class="tbl">
       <div class="thead"><div class="r jr">
         <div>Date</div><div>Forum</div><div>Matter</div><div>Type</div><div></div>
