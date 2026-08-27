@@ -98,6 +98,33 @@ Every instrument and judgment comes back in this shape:
    is a monitoring signal and a first draft's raw material, not a legal opinion. The draft email
    your pipeline produces is for a partner to check and send, never to auto-send.
 
+## Enriching the feed with LLM briefs (optional)
+
+The deterministic brief is composed from an instrument's *metadata* — it can say
+"amends s.56 of the Telecommunications Act, 2023", but it can't say what the new s.56
+actually *requires*, because that lives in the PDF body the engine never reads.
+
+`pipeline/brief.py` reads that body. For each actionable instrument it fetches the
+document, extracts the text, and asks Claude (Anthropic SDK, `claude-opus-5` by default)
+for a short, factual, lawyer-facing brief — what the instrument does, plus a one-line
+compliance implication and a confidence flag. Briefs cache to `pipeline/brief_cache.json`
+keyed by item id; the dashboard build embeds them, and the Clients tab shows the LLM brief
+(marked **AI brief · <confidence> · verify**) in place of the metadata brief.
+
+```bash
+python3 pipeline/brief.py --dry-run --limit 3   # fetch + extract + show the prompt, no API call, no credentials
+python3 pipeline/brief.py                        # brief the actionable instruments (needs credentials)
+engine/.venv/bin/python code/build_dashboard_v2.py   # rebuild so the dashboard embeds them
+```
+
+It is **additive and server-side only**: the published dashboard can't call an LLM, so
+briefs are baked in here. If credentials are absent, a document can't be fetched, or the
+model declines, that item simply keeps its deterministic brief — nothing breaks. Credentials
+resolve the standard SDK way (`ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, or an `ant auth
+login` profile); no key is stored. Set `TMT_BRIEF_MODEL=claude-sonnet-5` (or `-haiku-4-5`)
+to run a large batch cheaper. The brief is a monitoring aid — it stays under the same
+verify-against-the-official-text rule (boundary rule 2); it is never legal advice.
+
 ## Wiring the dashboard "Update now" button to your pipeline
 
 The published dashboard cannot fetch government sites from its sandbox, so its **Update now**

@@ -26,6 +26,11 @@ shelf = json.loads((DATA / "rules_shelf.json").read_text())
 overrides = json.loads((DATA / "short_titles.json").read_text())
 clients_path = ROOT / "pipeline" / "clients.json"
 default_clients = json.loads(clients_path.read_text()).get("clients", []) if clients_path.exists() else []
+# LLM briefs (optional): pipeline/brief.py reads each instrument's PDF and writes a substantive
+# brief here, keyed by item id. Absent by default; when present, the Clients tab shows it in
+# place of the deterministic metadata brief. Purely additive — a missing cache changes nothing.
+brief_cache_path = ROOT / "pipeline" / "brief_cache.json"
+brief_cache = json.loads(brief_cache_path.read_text()) if brief_cache_path.exists() else {}
 lines_map = json.loads((DATA / "row_lines.json").read_text())
 folds_map = json.loads((DATA / "folds.json").read_text())
 
@@ -246,6 +251,8 @@ def build_row(it: dict[str, Any]) -> dict[str, Any]:
         "pr": it.get("announced_by_pr"),
         "deadline": it.get("deadline"), "flags": it.get("flags", []),
         "memo": MEMOS.get(it["id"]),
+        # LLM brief of the document body, if pipeline/brief.py has produced one for this item
+        "llm": brief_cache.get(it["id"]),
     }
 
 
@@ -569,6 +576,9 @@ input::placeholder{color:var(--ghost)}
 .cl-idraft{margin-top:8px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:5px 12px;border-radius:3px}
 .cl-idraft:hover{background:var(--navy);color:#fff}
 li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
+.cl-so{color:#37474f}
+.cl-so::before{content:"→ ";color:var(--mute)}
+.cl-ai{display:inline-block;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:20px;padding:1px 7px;margin-left:4px;white-space:nowrap}
 .cl-none{color:var(--faint);font-style:italic}
 .cl-draft{margin-top:14px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:3px}
 .cl-draft:disabled{opacity:.4;cursor:default}
@@ -1200,6 +1210,12 @@ $('#sigs').innerHTML = D.signals.map(s =>
     if(it.impact && /action/i.test(it.impact)) p.push('The Gazette marks it action-required.');
     return p.join(' ');
   }
+  // Prefer the LLM brief of the document body when the pipeline has produced one; else the
+  // deterministic metadata brief. ai/conf drive the "verify" marker shown in the UI.
+  function briefOf(it){
+    if(it.llm && it.llm.brief) return {text:it.llm.brief, so:(it.llm.so_what||''), ai:true, conf:(it.llm.confidence||'')};
+    return {text:brief(it), so:'', ai:false, conf:''};
+  }
 
   function matchClient(cl){
     const w=cl.watch||{};
@@ -1225,7 +1241,7 @@ $('#sigs').innerHTML = D.signals.map(s =>
     let s='Subject: TMT regulatory update — '+n+' item'+pl+' for '+cl.name+'\n\nDear [client contact],\n\n';
     s+='The following '+n+(worth.length?' priority':'')+' development'+pl+' may affect '+cl.name+' ('+cl.sector+'):\n\n';
     use.forEach((m,i)=>{const it=m.it, doc=it.doc||it.page||'', cite=it.gid?('Gazette '+it.gid):'';
-      s+=(i+1)+'. '+(it.short||it.official||'')+'  ['+m.mat.label+']\n   '+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n   '+brief(it)+'\n   Why on your radar: '+m.reasons.join('; ')+'.\n   Official text: '+doc+(cite?('  ·  '+cite):'')+'\n\n';});
+      s+=(i+1)+'. '+(it.short||it.official||'')+'  ['+m.mat.label+']\n   '+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n   '+(function(){var b=briefOf(it);return b.text+(b.so?(' '+b.so):'');})()+'\n   Why on your radar: '+m.reasons.join('; ')+'.\n   Official text: '+doc+(cite?('  ·  '+cite):'')+'\n\n';});
     s+='We flag these for your review and will follow with a considered note on any that warrant action.\n\nPrepared by [partner], Trilegal TMT.\n\n— DRAFT for partner review. Verify each item against the official text before advising the client. Not sent.';
     return s;
   }
@@ -1234,7 +1250,7 @@ $('#sigs').innerHTML = D.signals.map(s =>
     let s='Subject: '+(it.reg||'Regulatory')+' update — '+(it.short||it.official)+' ('+cl.name+')\n\nDear [client contact],\n\n';
     s+='A quick note on a regulatory development we think is relevant to '+cl.name+':\n\n';
     s+=(it.short||it.official||'')+'\n'+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n\n';
-    s+=brief(it)+'\n\n';
+    var bf=briefOf(it); s+=bf.text+(bf.so?(' '+bf.so):'')+'\n\n';
     s+='Why it matters to you: '+m.reasons.join('; ')+'.\n\n';
     if(m.mat.level==='notify') s+='We think this warrants your attention'+(it.deadline?(', and note the deadline of '+fmtD(it.deadline)):'')+'. ';
     s+='The official text is here: '+doc+(cite?('  ·  '+cite):'')+'\n\n';
@@ -1248,11 +1264,11 @@ $('#sigs').innerHTML = D.signals.map(s =>
     wrap.innerHTML = clients.map((cl,idx)=>{
       const m=matchClient(cl), w=cl.watch||{}, worth=m.filter(x=>x.mat.level==='notify').length;
       const scope=[(w.regulators||[]).join(', '), ((w.keywords||[]).length)+' keywords'].filter(Boolean).join(' · ');
-      const items=m.slice(0,80).map((x,j)=>{const it=x.it;
+      const items=m.slice(0,80).map((x,j)=>{const it=x.it, bf=briefOf(it);
         return '<li class="mat-'+x.mat.level+'"><div class="cl-itop"><a href="'+escc(it.doc||it.page||'#')+'" target="_blank" rel="noopener">'+escc(it.short||it.official)+'</a>'
           +'<span class="cl-badge b-'+x.mat.level+'">'+escc(x.mat.label)+'</span></div>'
           +'<div class="cl-m">'+escc(it.reg||'')+' · '+escc((it.type||'').replace(/_/g,' '))+' · '+escc(fmtD(it.date))+'</div>'
-          +'<div class="cl-brief">'+escc(brief(it))+'</div>'
+          +'<div class="cl-brief">'+escc(bf.text)+(bf.so?(' <span class="cl-so">'+escc(bf.so)+'</span>'):'')+(bf.ai?(' <span class="cl-ai">AI brief · '+escc(bf.conf)+' · verify</span>'):'')+'</div>'
           +'<div class="cl-why">On the radar — '+escc(x.reasons.join('; '))+'. <span class="cl-matwhy">'+escc(x.mat.why)+'.</span></div>'
           +'<button class="cl-idraft" data-act="idraft" data-i="'+idx+'" data-j="'+j+'">Draft email</button></li>';}).join('');
       return '<div class="cl-card" data-i="'+idx+'">'
