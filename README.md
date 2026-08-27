@@ -41,7 +41,7 @@ queryable connector (**`engine/radar_api.py`**, contract in **`docs/CONNECTOR.md
 https://claude.ai/code/artifact/a9fd1bea-260c-4aa2-9354-b251ccb8e873
 Private to Abhi until shared from the page's share menu. Four tabs: Instruments (ledger, hover
 for the official title, click to expand), Judgments (tribunal and court decisions), Coverage
-(per-source health, blind spots), Signals (reported-but-unpublished instruments). An **Update now**
+(per-source health, blind spots), Signals (reported-but-unpublished instruments), and Clients (add/edit clients with watch-lists, see matched instruments/judgments, draft an alert email in a click — all client-side, stored in the browser). An **Update now**
 button sits by the "Last updated" stamp; in the sandboxed published page it opens the local
 operator console, or POSTs to a partner pipeline endpoint if one is wired (see `docs/CONNECTOR.md`).
 

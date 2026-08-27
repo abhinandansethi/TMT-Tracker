@@ -24,6 +24,8 @@ items = json.loads((DATA / "items.json").read_text())
 signals = json.loads((DATA / "signals.json").read_text())
 shelf = json.loads((DATA / "rules_shelf.json").read_text())
 overrides = json.loads((DATA / "short_titles.json").read_text())
+clients_path = ROOT / "pipeline" / "clients.json"
+default_clients = json.loads(clients_path.read_text()).get("clients", []) if clients_path.exists() else []
 lines_map = json.loads((DATA / "row_lines.json").read_text())
 folds_map = json.loads((DATA / "folds.json").read_text())
 
@@ -433,6 +435,7 @@ payload: dict[str, Any] = {
     "updatedISO": NOW.isoformat(timespec="seconds"),
     "staleAfterHours": 26,
     "today": NOW.strftime("%Y-%m-%d"),
+    "clients": default_clients,
     "rows": rows,
     "judgments": sorted(judgment_rows, key=lambda r: (r.get("date") or ""), reverse=True),
     "signals": signals,
@@ -529,6 +532,52 @@ input::placeholder{color:var(--ghost)}
 .tabs button:hover{color:#fff}
 .view{display:none;padding:0 64px 90px}
 .view.on{display:block}
+.cl-eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--navy);margin-bottom:5px}
+.cl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin:2px 0 20px}
+.cl-sub{font-size:13px;color:var(--mute);max-width:640px;line-height:1.5}
+.cl-headbtns{white-space:nowrap}
+.cl-add,.cl-reset{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;border-radius:3px;padding:8px 14px}
+.cl-add{background:var(--ochre);border:1px solid var(--ochre);color:#1a1206}
+.cl-reset{margin-left:8px;border:1px solid var(--rule2);color:var(--mute);background:#fff}
+.cl-card{border:1px solid var(--rule2);border-radius:9px;padding:16px 20px;margin:12px 0}
+.cl-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.cl-name{font-family:var(--serif);font-size:19px;color:var(--ink)}
+.cl-sec{font-size:12px;color:var(--mute);margin-left:6px}
+.cl-act{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.cl-count{font-family:var(--mono);font-size:11px;color:var(--ochre);margin-right:4px}
+.cl-btn{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;border:1px solid var(--rule2);background:#fff;color:var(--navy);padding:4px 9px;border-radius:3px}
+.cl-btn:hover{border-color:var(--navy)}
+.cl-del{color:var(--alarm);border-color:transparent;font-size:15px;padding:0 6px;letter-spacing:0}
+.cl-scope{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:8px}
+.cl-matches{display:none;margin-top:14px;border-top:1px solid var(--rule2);padding-top:12px}
+.cl-matches.on{display:block}
+.cl-matches ul{list-style:none;margin:0;padding:0}
+.cl-matches li{padding:9px 0;border-top:1px solid #eef2f4}
+.cl-matches li:first-child{border-top:none}
+.cl-matches a{color:var(--navy);text-decoration:none;font-weight:600;font-size:14px}
+.cl-matches a:hover{text-decoration:underline}
+.cl-m{font-size:12px;color:#44555d;margin-top:2px}
+.cl-why{font-size:11px;color:var(--faint);font-style:italic;margin-top:2px}
+.cl-none{color:var(--faint);font-style:italic}
+.cl-draft{margin-top:14px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:3px}
+.cl-draft:disabled{opacity:.4;cursor:default}
+.cl-empty{color:var(--mute);padding:24px 0}
+#cl-modal{display:none;position:fixed;inset:0;background:rgba(0,20,35,.45);z-index:50;align-items:flex-start;justify-content:center;overflow:auto;padding:40px 16px}
+#cl-modal.on{display:flex}
+.cl-dialog{background:#fff;border-radius:10px;max-width:560px;width:100%;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.cl-dialog h3{font-family:var(--serif);font-weight:500;margin:0 0 14px;font-size:21px}
+.cl-lbl{display:block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);margin:14px 0 5px}
+.cl-hint{text-transform:none;letter-spacing:0;color:var(--faint);font-weight:400}
+.cl-in,.cl-ta{width:100%;box-sizing:border-box;border:1px solid var(--rule2);border-radius:4px;padding:8px 10px;font-family:var(--sans);font-size:14px}
+.cl-ta{font-family:var(--mono);font-size:12px}
+.cl-boxes{display:flex;flex-wrap:wrap;gap:6px 14px}
+.cl-chk{font-size:12.5px;color:var(--ink);display:flex;align-items:center;gap:4px}
+.cl-formact{display:flex;gap:10px;margin-top:20px}
+.cl-save{appearance:none;cursor:pointer;background:var(--ochre);border:none;color:#1a1206;font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:9px 18px;border-radius:3px}
+.cl-cancel{appearance:none;cursor:pointer;background:#fff;border:1px solid var(--rule2);color:var(--mute);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;padding:9px 16px;border-radius:3px}
+.cl-draftdlg{max-width:680px}
+.cl-draftbox{width:100%;box-sizing:border-box;height:340px;border:1px solid var(--rule2);border-radius:4px;padding:12px;font-family:var(--mono);font-size:11.5px;line-height:1.5;white-space:pre;overflow:auto}
+.cl-draftnote{font-size:11px;color:var(--alarm);margin-top:10px}
 
 /* controls */
 .controls{margin-top:30px;display:flex;align-items:flex-end;justify-content:space-between;gap:28px;flex-wrap:wrap}
@@ -727,6 +776,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     <button data-v="judgments">Judgments</button>
     <button data-v="coverage">Coverage</button>
     <button data-v="signals">Signals</button>
+    <button data-v="clients">Clients</button>
   </nav>
 
   <section class="view on" id="v-instruments">
@@ -788,6 +838,15 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     <div style="margin-top:22px;max-width:1000px" id="sigs"></div>
     <div class="foot">Not memo eligible until gazetted</div>
   </section>
+  <section class="view" id="v-clients">
+    <div class="cl-head">
+      <div><div class="cl-eyebrow">Clients</div>
+        <div class="cl-sub">Match new instruments and judgments to each client's watch-list, then draft an alert email in a click. Clients and edits are stored in your browser only — nothing leaves this page.</div></div>
+      <div class="cl-headbtns"><button class="cl-add" id="cl-add">+ Add client</button><button class="cl-reset" id="cl-reset" title="Restore the sample clients">Reset</button></div>
+    </div>
+    <div id="clientlist"></div>
+  </section>
+  <div id="cl-modal"></div>
 </div>
 
 <script id="tracker-data" type="application/json">__DATA__</script>
@@ -1082,6 +1141,134 @@ $('#sigs').innerHTML = D.signals.map(s =>
   '<div class="line">' + esc(s.title) + '</div>' +
   '<div class="src"><span class="lbl">Source</span><a href="' + esc(s.secondary_url) + '" target="_blank" rel="noopener">' +
   esc((s.secondary_url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0]) + '</a></div></div>').join('');
+/* ---- Clients tab: add/edit clients, match items, draft an alert email (client-side) ---- */
+(function(){
+  const CLKEY = 'tmt_clients_v2';
+  const $c = s => document.querySelector(s);
+  const escc = s => (s==null?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmtD = iso => { if(!iso||String(iso).length<10) return String(iso||''); const [y,m,d]=String(iso).slice(0,10).split('-'); return (+d)+' '+MON[(+m)-1]+' '+y; };
+
+  function seed(){ return JSON.parse(JSON.stringify(D.clients || [])); }
+  function load(){ try{ const s=localStorage.getItem(CLKEY); if(s) return JSON.parse(s); }catch(e){} return seed(); }
+  function save(list){ try{ localStorage.setItem(CLKEY, JSON.stringify(list)); }catch(e){} }
+  let clients = load();
+
+  const POOL = () => (D.rows||[]).concat(D.judgments||[]);
+  const REGS = () => [...new Set(POOL().map(x=>x.reg).filter(Boolean))].sort();
+
+  function matchClient(cl){
+    const w = cl.watch||{};
+    const kws = (w.keywords||[]).map(k=>{ try{ return new RegExp(k,'i'); }catch(e){ return null; } }).filter(Boolean);
+    const regs = new Set(w.regulators||[]);
+    const out=[];
+    for(const it of POOL()){
+      const hay=[it.short,it.line,it.official,it.type].filter(Boolean).join(' ');
+      const hits=[];
+      for(const rx of kws){ const m=hay.match(rx); if(m) hits.push(m[0].toLowerCase()); }
+      if(!hits.length) continue;
+      const reasons=[];
+      if(regs.has(it.reg)) reasons.push('from '+it.reg+', a regulator you follow');
+      reasons.push('mentions '+[...new Set(hits)].slice(0,4).map(h=>"'"+h+"'").join(', '));
+      out.push({it, reasons});
+    }
+    out.sort((a,b)=>(b.it.date||'').localeCompare(a.it.date||''));
+    return out;
+  }
+
+  function draftEmail(cl, matched){
+    const n=matched.length, pl=n!==1?'s':'';
+    let s='Subject: TMT regulatory update — '+n+' item'+pl+' for '+cl.name+'\n\n';
+    s+='Dear [client contact],\n\n';
+    s+='The following '+n+' development'+pl+' on the regulatory radar may affect '+cl.name+' ('+cl.sector+'):\n\n';
+    matched.forEach((m,i)=>{ const it=m.it, doc=it.doc||it.page||'', cite=it.gid?('Gazette '+it.gid):'';
+      s+=(i+1)+'. '+(it.short||it.official||'')+'\n';
+      s+='   '+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n';
+      if(it.line) s+='   '+it.line+'\n';
+      s+='   Why on your radar: '+m.reasons.join('; ')+'.\n';
+      s+='   Official text: '+doc+(cite?('  ·  '+cite):'')+'\n\n';
+    });
+    s+='We flag these for your review and will follow with a considered note on any that warrant action.\n\n';
+    s+='Prepared by [partner], Trilegal TMT.\n\n';
+    s+='— DRAFT for partner review. Verify each item against the official text before advising the client. Not sent.';
+    return s;
+  }
+
+  function renderList(){
+    const wrap=$c('#clientlist'); if(!wrap) return;
+    if(!clients.length){ wrap.innerHTML='<div class="cl-empty">No clients yet. Add one to start matching regulatory items to it.</div>'; return; }
+    wrap.innerHTML = clients.map((cl,idx)=>{
+      const m=matchClient(cl), w=cl.watch||{};
+      const scope=[(w.regulators||[]).join(', '), ((w.keywords||[]).length)+' keywords'].filter(Boolean).join(' · ');
+      const items=m.slice(0,60).map(x=>'<li><a href="'+escc(x.it.doc||x.it.page||'#')+'" target="_blank" rel="noopener">'+escc(x.it.short||x.it.official)+'</a>'
+        +'<div class="cl-m">'+escc(x.it.reg||'')+' · '+escc(fmtD(x.it.date))+(x.it.line?(' · '+escc(x.it.line)):'')+'</div>'
+        +'<div class="cl-why">'+escc(x.reasons.join('; '))+'</div></li>').join('');
+      return '<div class="cl-card" data-i="'+idx+'">'
+        +'<div class="cl-top"><div><span class="cl-name">'+escc(cl.name)+'</span> <span class="cl-sec">'+escc(cl.sector||'')+'</span></div>'
+        +'<div class="cl-act"><span class="cl-count">'+m.length+' match'+(m.length!==1?'es':'')+'</span>'
+        +'<button class="cl-btn" data-act="toggle" data-i="'+idx+'">View</button>'
+        +'<button class="cl-btn" data-act="edit" data-i="'+idx+'">Edit</button>'
+        +'<button class="cl-btn cl-del" data-act="del" data-i="'+idx+'">×</button></div></div>'
+        +'<div class="cl-scope">Watches: '+escc(scope)+'</div>'
+        +'<div class="cl-matches" id="clm-'+idx+'"><ul>'+(items||'<li class="cl-none">No current items match this scope.</li>')+'</ul>'
+        +'<button class="cl-draft" data-act="draft" data-i="'+idx+'"'+(m.length?'':' disabled')+'>Draft alert email</button></div></div>';
+    }).join('');
+  }
+
+  // form modal
+  function openForm(idx){
+    const editing = idx!=null;
+    const cl = editing ? clients[idx] : {name:'',sector:'',watch:{regulators:[],strata:[],keywords:[]}};
+    const w=cl.watch||{regulators:[],strata:[],keywords:[]};
+    const regBoxes = REGS().map(r=>'<label class="cl-chk"><input type="checkbox" value="'+escc(r)+'"'+((w.regulators||[]).includes(r)?' checked':'')+'> '+escc(r)+'</label>').join('');
+    const strBoxes = [['telecom','Telecom'],['tech_data','Tech & data'],['media','Media']].map(s=>'<label class="cl-chk"><input type="checkbox" value="'+s[0]+'"'+((w.strata||[]).includes(s[0])?' checked':'')+'> '+s[1]+'</label>').join('');
+    $c('#cl-modal').innerHTML =
+      '<div class="cl-dialog"><h3>'+(editing?'Edit client':'Add client')+'</h3>'
+      +'<label class="cl-lbl">Name</label><input id="cf-name" class="cl-in" value="'+escc(cl.name)+'">'
+      +'<label class="cl-lbl">Sector / description</label><input id="cf-sec" class="cl-in" value="'+escc(cl.sector||'')+'">'
+      +'<label class="cl-lbl">Regulators to follow</label><div class="cl-boxes" id="cf-regs">'+regBoxes+'</div>'
+      +'<label class="cl-lbl">Strata</label><div class="cl-boxes" id="cf-str">'+strBoxes+'</div>'
+      +'<label class="cl-lbl">Keywords <span class="cl-hint">— one per line; a subject must match one of these. Regex ok (e.g. <code>dark.?pattern</code>, <code>\\bDPDP\\b</code>).</span></label>'
+      +'<textarea id="cf-kw" class="cl-ta" rows="6">'+escc((w.keywords||[]).join('\n'))+'</textarea>'
+      +'<div class="cl-formact"><button class="cl-save" id="cf-save">Save</button><button class="cl-cancel" id="cf-cancel">Cancel</button></div></div>';
+    $c('#cl-modal').classList.add('on');
+    $c('#cf-cancel').onclick=()=>$c('#cl-modal').classList.remove('on');
+    $c('#cf-save').onclick=()=>{
+      const name=$c('#cf-name').value.trim(); if(!name){ $c('#cf-name').focus(); return; }
+      const regs=[...$c('#cf-regs').querySelectorAll('input:checked')].map(x=>x.value);
+      const str=[...$c('#cf-str').querySelectorAll('input:checked')].map(x=>x.value);
+      const kw=$c('#cf-kw').value.split('\n').map(x=>x.trim()).filter(Boolean);
+      const obj={id:(editing?cl.id:('c'+Date.now())), name, sector:$c('#cf-sec').value.trim(), watch:{regulators:regs,strata:str,keywords:kw}};
+      if(editing) clients[idx]=obj; else clients.push(obj);
+      save(clients); $c('#cl-modal').classList.remove('on'); renderList();
+    };
+  }
+
+  function openDraft(idx){
+    const cl=clients[idx], text=draftEmail(cl, matchClient(cl));
+    $c('#cl-modal').innerHTML='<div class="cl-dialog cl-draftdlg"><h3>Draft alert — '+escc(cl.name)+'</h3>'
+      +'<textarea class="cl-draftbox" id="cl-drafttext" readonly>'+escc(text)+'</textarea>'
+      +'<div class="cl-formact"><button class="cl-save" id="cl-copy">Copy</button><button class="cl-cancel" id="cl-close">Close</button></div>'
+      +'<div class="cl-draftnote">DRAFT for partner review — verify each item against the official text before sending. Nothing is sent from here.</div></div>';
+    $c('#cl-modal').classList.add('on');
+    $c('#cl-close').onclick=()=>$c('#cl-modal').classList.remove('on');
+    $c('#cl-copy').onclick=()=>{ const t=$c('#cl-drafttext'); t.select(); try{ document.execCommand('copy'); }catch(e){} if(navigator.clipboard){ navigator.clipboard.writeText(t.value).catch(()=>{}); } $c('#cl-copy').textContent='Copied'; setTimeout(()=>{$c('#cl-copy').textContent='Copy';},1200); };
+  }
+
+  // events
+  document.addEventListener('click', e=>{
+    const b=e.target.closest('[data-act]'); if(!b) return;
+    const i=+b.dataset.i, act=b.dataset.act;
+    if(act==='toggle'){ const m=$c('#clm-'+i); m.classList.toggle('on'); b.textContent=m.classList.contains('on')?'Hide':'View'; }
+    else if(act==='edit') openForm(i);
+    else if(act==='del'){ if(confirm('Remove '+clients[i].name+'?')){ clients.splice(i,1); save(clients); renderList(); } }
+    else if(act==='draft') openDraft(i);
+  });
+  const addBtn=$c('#cl-add'); if(addBtn) addBtn.onclick=()=>openForm(null);
+  const resetBtn=$c('#cl-reset'); if(resetBtn) resetBtn.onclick=()=>{ if(confirm('Reset to the sample clients?')){ clients=seed(); save(clients); renderList(); } };
+  renderList();
+})();
+
 </script>
 """
 
