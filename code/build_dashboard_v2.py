@@ -1159,6 +1159,10 @@ $('#sigs').innerHTML = D.signals.map(s =>
   const escc = s => (s==null?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const fmtD = iso => { if(!iso||String(iso).length<10) return String(iso||''); const [y,m,d]=String(iso).slice(0,10).split('-'); return (+d)+' '+MON[(+m)-1]+' '+y; };
+  const ruleText = r => { if(!r || /^\s*nil\s*$/i.test(r)) return ''; return r
+      .replace(/\s*\(\d+ of \d{4}\)/g,'')
+      .replace(/,\s*Amendment,\s*Change in Substance/i,' (a change in substance)')
+      .replace(/,\s*Amendment\b/i,'').replace(/\s+/g,' ').trim(); };
   const shortRule = r => { if(!r) return ''; const sec=/section\s+(\d+[A-Z]?)/i.exec(r); const act=/of the ([A-Z][^,]+? Act,? \d{4})/.exec(r);
     const bits=[]; if(sec) bits.push('s.'+sec[1]); if(act) bits.push(act[1].replace(/,?\s(\d{4})$/,' $1').trim()); return bits.join(', '); };
 
@@ -1189,7 +1193,7 @@ $('#sigs').innerHTML = D.signals.map(s =>
     const reg=it.reg||'The regulator', t=(it.type||'').toLowerCase();
     const verb = /amend/.test(t)?'has amended':/order/.test(t)?'has passed an order regarding':/(rule|regulation|notif)/.test(t)?'has notified':/direction/.test(t)?'has issued a direction on':/advisory/.test(t)?'has issued an advisory on':/press.?note/.test(t)?'has issued':'has published';
     const p=[reg+' '+verb+' '+(it.short||it.official)+'.'];
-    if(it.rule && shortRule(it.rule)) p.push('It amends '+shortRule(it.rule)+'.');
+    const rt=ruleText(it.rule); if(rt) p.push('It amends '+rt+'.');
     if(it.effective) p.push('In force from '+fmtD(it.effective)+'.');
     else if(it.date) p.push('Dated '+fmtD(it.date)+'.');
     if(it.deadline) p.push('Deadline: '+fmtD(it.deadline)+'.');
