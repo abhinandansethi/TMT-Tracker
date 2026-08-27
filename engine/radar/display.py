@@ -241,6 +241,12 @@ def doc_link(it: Dict[str, Any]) -> Optional[str]:
     url = it.get("doc_url") or it.get("url") or ""
     if meta.get("gazette_id"):
         return egazette_pdf(meta["gazette_id"]) or "https://egazette.gov.in/"
+    # MTCTE Essential-Requirement downloads are now session/AES-gated: the plain
+    # filedownload?name=<TEC no>.pdf URL returns a session-error page (verified 2026-08-27).
+    # Point at the working ER listing page, which opens; the TEC number in the heading locates
+    # the row. (Reconstructing the encrypted download param is fragile and not worth it here.)
+    if "mtcte.tec.gov.in/filedownload" in url:
+        return "https://www.mtcte.tec.gov.in/er_list"
     return _openable(url)
 
 
