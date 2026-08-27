@@ -558,6 +558,17 @@ input::placeholder{color:var(--ghost)}
 .cl-matches a:hover{text-decoration:underline}
 .cl-m{font-size:12px;color:#44555d;margin-top:2px}
 .cl-why{font-size:11px;color:var(--faint);font-style:italic;margin-top:2px}
+.cl-itop{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cl-badge{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.09em;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.b-notify{background:#E9F3EA;color:#276B2E;border:1px solid #B9DCBD}
+.b-review{background:var(--ochre-wash);color:#7A5E0E;border:1px solid #E4D19A}
+.b-monitor{background:#EAF0F4;color:#1B6288;border:1px solid #BFD3E0}
+.b-fyi{background:#F1F3F4;color:#7A868D;border:1px solid #E2E8EC}
+.cl-brief{font-size:12.5px;color:#37474f;line-height:1.5;margin-top:4px;max-width:760px}
+.cl-matwhy{color:var(--mute);font-style:normal}
+.cl-idraft{margin-top:8px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:5px 12px;border-radius:3px}
+.cl-idraft:hover{background:var(--navy);color:#fff}
+li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
 .cl-none{color:var(--faint);font-style:italic}
 .cl-draft{margin-top:14px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:3px}
 .cl-draft:disabled{opacity:.4;cursor:default}
@@ -1141,13 +1152,15 @@ $('#sigs').innerHTML = D.signals.map(s =>
   '<div class="line">' + esc(s.title) + '</div>' +
   '<div class="src"><span class="lbl">Source</span><a href="' + esc(s.secondary_url) + '" target="_blank" rel="noopener">' +
   esc((s.secondary_url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0]) + '</a></div></div>').join('');
-/* ---- Clients tab: add/edit clients, match items, draft an alert email (client-side) ---- */
+/* ---- Clients tab: match items, judge materiality, brief + per-item draft email (client-side) ---- */
 (function(){
   const CLKEY = 'tmt_clients_v2';
   const $c = s => document.querySelector(s);
   const escc = s => (s==null?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const fmtD = iso => { if(!iso||String(iso).length<10) return String(iso||''); const [y,m,d]=String(iso).slice(0,10).split('-'); return (+d)+' '+MON[(+m)-1]+' '+y; };
+  const shortRule = r => { if(!r) return ''; const sec=/section\s+(\d+[A-Z]?)/i.exec(r); const act=/of the ([A-Z][^,]+? Act,? \d{4})/.exec(r);
+    const bits=[]; if(sec) bits.push('s.'+sec[1]); if(act) bits.push(act[1].replace(/,?\s(\d{4})$/,' $1').trim()); return bits.join(', '); };
 
   function seed(){ return JSON.parse(JSON.stringify(D.clients || [])); }
   function load(){ try{ const s=localStorage.getItem(CLKEY); if(s) return JSON.parse(s); }catch(e){} return seed(); }
@@ -1157,115 +1170,143 @@ $('#sigs').innerHTML = D.signals.map(s =>
   const POOL = () => (D.rows||[]).concat(D.judgments||[]);
   const REGS = () => [...new Set(POOL().map(x=>x.reg).filter(Boolean))].sort();
 
+  // Deterministic materiality: does this change justify proactively emailing the client?
+  // Rules-based and transparent — no black box, the partner sees the reason.
+  function materiality(it){
+    const t=(it.type||'').toLowerCase(), line=(it.line||'').toLowerCase();
+    const actionable = (it.impact && /action/i.test(it.impact)) || /action required/.test(line) || !!it.deadline || !!it.effective;
+    if(it.routine) return {level:'fyi', label:'FYI', why:'recurring or administrative output — not usually a client alert'};
+    if(it.lane==='judgments') return {level:'monitor', label:'Monitor', why:'a decision/precedent — inform and verify if it touches the client, rather than alert'};
+    if(/(rule|regulation|notif|direction|amend)/i.test(t) && actionable)
+      return {level:'notify', label:'Worth an email', why:'a binding change carrying an obligation'+(it.deadline?' with a deadline':'')+' — worth proactively notifying the client'};
+    if(/(rule|regulation|notif|direction|amend|order|press.?note|guideline)/i.test(t))
+      return {level:'review', label:'Partner to judge', why:'a binding instrument but no clear deadline — a partner should decide whether it warrants a note'};
+    return {level:'fyi', label:'FYI', why:'informational'};
+  }
+  const ORDER={notify:0, review:1, monitor:2, fyi:3};
+
+  function brief(it){
+    const reg=it.reg||'The regulator', t=(it.type||'').toLowerCase();
+    const verb = /amend/.test(t)?'has amended':/order/.test(t)?'has passed an order regarding':/(rule|regulation|notif)/.test(t)?'has notified':/direction/.test(t)?'has issued a direction on':/advisory/.test(t)?'has issued an advisory on':/press.?note/.test(t)?'has issued':'has published';
+    const p=[reg+' '+verb+' '+(it.short||it.official)+'.'];
+    if(it.rule && shortRule(it.rule)) p.push('It amends '+shortRule(it.rule)+'.');
+    if(it.effective) p.push('In force from '+fmtD(it.effective)+'.');
+    else if(it.date) p.push('Dated '+fmtD(it.date)+'.');
+    if(it.deadline) p.push('Deadline: '+fmtD(it.deadline)+'.');
+    if(it.impact && /action/i.test(it.impact)) p.push('The Gazette marks it action-required.');
+    return p.join(' ');
+  }
+
   function matchClient(cl){
-    const w = cl.watch||{};
-    const kws = (w.keywords||[]).map(k=>{ try{ return new RegExp(k,'i'); }catch(e){ return null; } }).filter(Boolean);
-    const regs = new Set(w.regulators||[]);
+    const w=cl.watch||{};
+    const kws=(w.keywords||[]).map(k=>{try{return new RegExp(k,'i');}catch(e){return null;}}).filter(Boolean);
+    const regs=new Set(w.regulators||[]);
     const out=[];
     for(const it of POOL()){
       const hay=[it.short,it.line,it.official,it.type].filter(Boolean).join(' ');
-      const hits=[];
-      for(const rx of kws){ const m=hay.match(rx); if(m) hits.push(m[0].toLowerCase()); }
+      const hits=[]; for(const rx of kws){const m=hay.match(rx); if(m) hits.push(m[0].toLowerCase());}
       if(!hits.length) continue;
-      const reasons=[];
-      if(regs.has(it.reg)) reasons.push('from '+it.reg+', a regulator you follow');
+      const reasons=[]; if(regs.has(it.reg)) reasons.push('from '+it.reg+', a regulator you follow');
       reasons.push('mentions '+[...new Set(hits)].slice(0,4).map(h=>"'"+h+"'").join(', '));
-      out.push({it, reasons});
+      out.push({it, reasons, mat:materiality(it)});
     }
-    out.sort((a,b)=>(b.it.date||'').localeCompare(a.it.date||''));
+    out.sort((a,b)=> (ORDER[a.mat.level]-ORDER[b.mat.level]) || (b.it.date||'').localeCompare(a.it.date||''));
     return out;
   }
 
-  function draftEmail(cl, matched){
-    const n=matched.length, pl=n!==1?'s':'';
-    let s='Subject: TMT regulatory update — '+n+' item'+pl+' for '+cl.name+'\n\n';
-    s+='Dear [client contact],\n\n';
-    s+='The following '+n+' development'+pl+' on the regulatory radar may affect '+cl.name+' ('+cl.sector+'):\n\n';
-    matched.forEach((m,i)=>{ const it=m.it, doc=it.doc||it.page||'', cite=it.gid?('Gazette '+it.gid):'';
-      s+=(i+1)+'. '+(it.short||it.official||'')+'\n';
-      s+='   '+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n';
-      if(it.line) s+='   '+it.line+'\n';
-      s+='   Why on your radar: '+m.reasons.join('; ')+'.\n';
-      s+='   Official text: '+doc+(cite?('  ·  '+cite):'')+'\n\n';
-    });
-    s+='We flag these for your review and will follow with a considered note on any that warrant action.\n\n';
-    s+='Prepared by [partner], Trilegal TMT.\n\n';
-    s+='— DRAFT for partner review. Verify each item against the official text before advising the client. Not sent.';
+  // --- draft emails ---
+  function bulkDraft(cl, matched){
+    const worth=matched.filter(m=>m.mat.level==='notify'); const use=worth.length?worth:matched;
+    const n=use.length, pl=n!==1?'s':'';
+    let s='Subject: TMT regulatory update — '+n+' item'+pl+' for '+cl.name+'\n\nDear [client contact],\n\n';
+    s+='The following '+n+(worth.length?' priority':'')+' development'+pl+' may affect '+cl.name+' ('+cl.sector+'):\n\n';
+    use.forEach((m,i)=>{const it=m.it, doc=it.doc||it.page||'', cite=it.gid?('Gazette '+it.gid):'';
+      s+=(i+1)+'. '+(it.short||it.official||'')+'  ['+m.mat.label+']\n   '+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n   '+brief(it)+'\n   Why on your radar: '+m.reasons.join('; ')+'.\n   Official text: '+doc+(cite?('  ·  '+cite):'')+'\n\n';});
+    s+='We flag these for your review and will follow with a considered note on any that warrant action.\n\nPrepared by [partner], Trilegal TMT.\n\n— DRAFT for partner review. Verify each item against the official text before advising the client. Not sent.';
+    return s;
+  }
+  function itemDraft(cl, m){
+    const it=m.it, doc=it.doc||it.page||'', cite=it.gid?('Gazette '+it.gid):'';
+    let s='Subject: '+(it.reg||'Regulatory')+' update — '+(it.short||it.official)+' ('+cl.name+')\n\nDear [client contact],\n\n';
+    s+='A quick note on a regulatory development we think is relevant to '+cl.name+':\n\n';
+    s+=(it.short||it.official||'')+'\n'+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n\n';
+    s+=brief(it)+'\n\n';
+    s+='Why it matters to you: '+m.reasons.join('; ')+'.\n\n';
+    if(m.mat.level==='notify') s+='We think this warrants your attention'+(it.deadline?(', and note the deadline of '+fmtD(it.deadline)):'')+'. ';
+    s+='The official text is here: '+doc+(cite?('  ·  '+cite):'')+'\n\n';
+    s+='Happy to talk through how it applies to '+cl.name+'.\n\nBest regards,\n[partner], Trilegal TMT\n\n— DRAFT for partner review. Verify against the official text before sending. Not sent.';
     return s;
   }
 
   function renderList(){
     const wrap=$c('#clientlist'); if(!wrap) return;
-    if(!clients.length){ wrap.innerHTML='<div class="cl-empty">No clients yet. Add one to start matching regulatory items to it.</div>'; return; }
+    if(!clients.length){ wrap.innerHTML='<div class="cl-empty">No clients yet. Add one to start matching regulatory changes to it.</div>'; return; }
     wrap.innerHTML = clients.map((cl,idx)=>{
-      const m=matchClient(cl), w=cl.watch||{};
+      const m=matchClient(cl), w=cl.watch||{}, worth=m.filter(x=>x.mat.level==='notify').length;
       const scope=[(w.regulators||[]).join(', '), ((w.keywords||[]).length)+' keywords'].filter(Boolean).join(' · ');
-      const items=m.slice(0,60).map(x=>'<li><a href="'+escc(x.it.doc||x.it.page||'#')+'" target="_blank" rel="noopener">'+escc(x.it.short||x.it.official)+'</a>'
-        +'<div class="cl-m">'+escc(x.it.reg||'')+' · '+escc(fmtD(x.it.date))+(x.it.line?(' · '+escc(x.it.line)):'')+'</div>'
-        +'<div class="cl-why">'+escc(x.reasons.join('; '))+'</div></li>').join('');
+      const items=m.slice(0,80).map((x,j)=>{const it=x.it;
+        return '<li class="mat-'+x.mat.level+'"><div class="cl-itop"><a href="'+escc(it.doc||it.page||'#')+'" target="_blank" rel="noopener">'+escc(it.short||it.official)+'</a>'
+          +'<span class="cl-badge b-'+x.mat.level+'">'+escc(x.mat.label)+'</span></div>'
+          +'<div class="cl-m">'+escc(it.reg||'')+' · '+escc((it.type||'').replace(/_/g,' '))+' · '+escc(fmtD(it.date))+'</div>'
+          +'<div class="cl-brief">'+escc(brief(it))+'</div>'
+          +'<div class="cl-why">On the radar — '+escc(x.reasons.join('; '))+'. <span class="cl-matwhy">'+escc(x.mat.why)+'.</span></div>'
+          +'<button class="cl-idraft" data-act="idraft" data-i="'+idx+'" data-j="'+j+'">Draft email</button></li>';}).join('');
       return '<div class="cl-card" data-i="'+idx+'">'
         +'<div class="cl-top"><div><span class="cl-name">'+escc(cl.name)+'</span> <span class="cl-sec">'+escc(cl.sector||'')+'</span></div>'
-        +'<div class="cl-act"><span class="cl-count">'+m.length+' match'+(m.length!==1?'es':'')+'</span>'
+        +'<div class="cl-act"><span class="cl-count">'+m.length+' match'+(m.length!==1?'es':'')+(worth?(' · <b>'+worth+' worth an email</b>'):'')+'</span>'
         +'<button class="cl-btn" data-act="toggle" data-i="'+idx+'">View</button>'
         +'<button class="cl-btn" data-act="edit" data-i="'+idx+'">Edit</button>'
         +'<button class="cl-btn cl-del" data-act="del" data-i="'+idx+'">×</button></div></div>'
         +'<div class="cl-scope">Watches: '+escc(scope)+'</div>'
         +'<div class="cl-matches" id="clm-'+idx+'"><ul>'+(items||'<li class="cl-none">No current items match this scope.</li>')+'</ul>'
-        +'<button class="cl-draft" data-act="draft" data-i="'+idx+'"'+(m.length?'':' disabled')+'>Draft alert email</button></div></div>';
+        +(m.length?'<button class="cl-draft" data-act="draft" data-i="'+idx+'">Draft alert — '+(worth||m.length)+' item'+((worth||m.length)!==1?'s':'')+'</button>':'')+'</div></div>';
     }).join('');
   }
 
-  // form modal
   function openForm(idx){
-    const editing = idx!=null;
-    const cl = editing ? clients[idx] : {name:'',sector:'',watch:{regulators:[],strata:[],keywords:[]}};
-    const w=cl.watch||{regulators:[],strata:[],keywords:[]};
-    const regBoxes = REGS().map(r=>'<label class="cl-chk"><input type="checkbox" value="'+escc(r)+'"'+((w.regulators||[]).includes(r)?' checked':'')+'> '+escc(r)+'</label>').join('');
-    const strBoxes = [['telecom','Telecom'],['tech_data','Tech & data'],['media','Media']].map(s=>'<label class="cl-chk"><input type="checkbox" value="'+s[0]+'"'+((w.strata||[]).includes(s[0])?' checked':'')+'> '+s[1]+'</label>').join('');
-    $c('#cl-modal').innerHTML =
-      '<div class="cl-dialog"><h3>'+(editing?'Edit client':'Add client')+'</h3>'
+    const editing=idx!=null, cl=editing?clients[idx]:{name:'',sector:'',watch:{regulators:[],strata:[],keywords:[]}}, w=cl.watch||{regulators:[],strata:[],keywords:[]};
+    const regBoxes=REGS().map(r=>'<label class="cl-chk"><input type="checkbox" value="'+escc(r)+'"'+((w.regulators||[]).includes(r)?' checked':'')+'> '+escc(r)+'</label>').join('');
+    const strBoxes=[['telecom','Telecom'],['tech_data','Tech & data'],['media','Media']].map(s=>'<label class="cl-chk"><input type="checkbox" value="'+s[0]+'"'+((w.strata||[]).includes(s[0])?' checked':'')+'> '+s[1]+'</label>').join('');
+    $c('#cl-modal').innerHTML='<div class="cl-dialog"><h3>'+(editing?'Edit client':'Add client')+'</h3>'
       +'<label class="cl-lbl">Name</label><input id="cf-name" class="cl-in" value="'+escc(cl.name)+'">'
       +'<label class="cl-lbl">Sector / description</label><input id="cf-sec" class="cl-in" value="'+escc(cl.sector||'')+'">'
       +'<label class="cl-lbl">Regulators to follow</label><div class="cl-boxes" id="cf-regs">'+regBoxes+'</div>'
       +'<label class="cl-lbl">Strata</label><div class="cl-boxes" id="cf-str">'+strBoxes+'</div>'
-      +'<label class="cl-lbl">Keywords <span class="cl-hint">— one per line; a subject must match one of these. Regex ok (e.g. <code>dark.?pattern</code>, <code>\\bDPDP\\b</code>).</span></label>'
+      +'<label class="cl-lbl">Keywords <span class="cl-hint">— one per line; a subject must match one. Regex ok (e.g. <code>dark.?pattern</code>, <code>\\bDPDP\\b</code>).</span></label>'
       +'<textarea id="cf-kw" class="cl-ta" rows="6">'+escc((w.keywords||[]).join('\n'))+'</textarea>'
       +'<div class="cl-formact"><button class="cl-save" id="cf-save">Save</button><button class="cl-cancel" id="cf-cancel">Cancel</button></div></div>';
     $c('#cl-modal').classList.add('on');
     $c('#cf-cancel').onclick=()=>$c('#cl-modal').classList.remove('on');
-    $c('#cf-save').onclick=()=>{
-      const name=$c('#cf-name').value.trim(); if(!name){ $c('#cf-name').focus(); return; }
+    $c('#cf-save').onclick=()=>{const name=$c('#cf-name').value.trim(); if(!name){$c('#cf-name').focus();return;}
       const regs=[...$c('#cf-regs').querySelectorAll('input:checked')].map(x=>x.value);
       const str=[...$c('#cf-str').querySelectorAll('input:checked')].map(x=>x.value);
       const kw=$c('#cf-kw').value.split('\n').map(x=>x.trim()).filter(Boolean);
       const obj={id:(editing?cl.id:('c'+Date.now())), name, sector:$c('#cf-sec').value.trim(), watch:{regulators:regs,strata:str,keywords:kw}};
       if(editing) clients[idx]=obj; else clients.push(obj);
-      save(clients); $c('#cl-modal').classList.remove('on'); renderList();
-    };
+      save(clients); $c('#cl-modal').classList.remove('on'); renderList();};
   }
 
-  function openDraft(idx){
-    const cl=clients[idx], text=draftEmail(cl, matchClient(cl));
-    $c('#cl-modal').innerHTML='<div class="cl-dialog cl-draftdlg"><h3>Draft alert — '+escc(cl.name)+'</h3>'
+  function showDraft(title, text){
+    $c('#cl-modal').innerHTML='<div class="cl-dialog cl-draftdlg"><h3>'+escc(title)+'</h3>'
       +'<textarea class="cl-draftbox" id="cl-drafttext" readonly>'+escc(text)+'</textarea>'
       +'<div class="cl-formact"><button class="cl-save" id="cl-copy">Copy</button><button class="cl-cancel" id="cl-close">Close</button></div>'
       +'<div class="cl-draftnote">DRAFT for partner review — verify each item against the official text before sending. Nothing is sent from here.</div></div>';
     $c('#cl-modal').classList.add('on');
     $c('#cl-close').onclick=()=>$c('#cl-modal').classList.remove('on');
-    $c('#cl-copy').onclick=()=>{ const t=$c('#cl-drafttext'); t.select(); try{ document.execCommand('copy'); }catch(e){} if(navigator.clipboard){ navigator.clipboard.writeText(t.value).catch(()=>{}); } $c('#cl-copy').textContent='Copied'; setTimeout(()=>{$c('#cl-copy').textContent='Copy';},1200); };
+    $c('#cl-copy').onclick=()=>{const t=$c('#cl-drafttext'); t.select(); try{document.execCommand('copy');}catch(e){} if(navigator.clipboard){navigator.clipboard.writeText(t.value).catch(()=>{});} $c('#cl-copy').textContent='Copied'; setTimeout(()=>{$c('#cl-copy').textContent='Copy';},1200);};
   }
 
-  // events
   document.addEventListener('click', e=>{
     const b=e.target.closest('[data-act]'); if(!b) return;
     const i=+b.dataset.i, act=b.dataset.act;
-    if(act==='toggle'){ const m=$c('#clm-'+i); m.classList.toggle('on'); b.textContent=m.classList.contains('on')?'Hide':'View'; }
+    if(act==='toggle'){const m=$c('#clm-'+i); m.classList.toggle('on'); b.textContent=m.classList.contains('on')?'Hide':'View';}
     else if(act==='edit') openForm(i);
-    else if(act==='del'){ if(confirm('Remove '+clients[i].name+'?')){ clients.splice(i,1); save(clients); renderList(); } }
-    else if(act==='draft') openDraft(i);
+    else if(act==='del'){ if(confirm('Remove '+clients[i].name+'?')){clients.splice(i,1); save(clients); renderList();} }
+    else if(act==='draft'){const cl=clients[i]; showDraft('Draft alert — '+cl.name, bulkDraft(cl, matchClient(cl)));}
+    else if(act==='idraft'){const cl=clients[i], m=matchClient(cl)[+b.dataset.j]; if(m) showDraft('Draft email — '+cl.name, itemDraft(cl, m));}
   });
   const addBtn=$c('#cl-add'); if(addBtn) addBtn.onclick=()=>openForm(null);
-  const resetBtn=$c('#cl-reset'); if(resetBtn) resetBtn.onclick=()=>{ if(confirm('Reset to the sample clients?')){ clients=seed(); save(clients); renderList(); } };
+  const resetBtn=$c('#cl-reset'); if(resetBtn) resetBtn.onclick=()=>{ if(confirm('Reset to the sample clients?')){clients=seed(); save(clients); renderList();} };
   renderList();
 })();
 
