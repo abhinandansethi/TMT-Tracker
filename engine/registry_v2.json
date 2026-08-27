@@ -1345,35 +1345,6 @@
    "quirks": "Standards become mandatory on gazette notification (Telecom Act standards framework). CMS-pasted table, no class/id; malformed pre-doctype head. Dates only from the Notification Date column, never filenames. Each row carries TWO links: the standard's own PDF in td[2] and the gazette notification in td[4]. The gazette link is shared by every standard notified together, so the standard's own PDF is the citation."
   },
   {
-   "id": "tec_essential_requirements",
-   "stratum": "telecom",
-   "regulator": "TEC",
-   "name": "MTCTE Essential Requirements (ER list API)",
-   "url": "https://www.mtcte.tec.gov.in/get_er_list",
-   "status": "live",
-   "method": "json_api",
-   "parser": {
-    "strategy": "tec_er_api",
-    "row_floor": 120
-   },
-   "date_formats": [
-    "YYYY-MM-DD"
-   ],
-   "pagination": {
-    "scheme": "none"
-   },
-   "allowed_domains": [
-    "mtcte.tec.gov.in",
-    "www.mtcte.tec.gov.in",
-    "tec.gov.in"
-   ],
-   "default_type": "notification",
-   "tripwire": {
-    "kind": "monotonic"
-   },
-   "quirks": "tec.gov.in/essential-requirements is DEAD (empty 200 since ~Apr 2026); the MTCTE portal API serves the full dataset (828 elements = 138 records, stride 6). PDFs need GET - HEAD 403s."
-  },
-  {
    "id": "inspace_publications",
    "stratum": "telecom",
    "regulator": "IN-SPACe",
@@ -2244,6 +2215,17 @@
    "revisit": "When the exposed-filter driver is built, or if NCLAT exposes a dated/non-frozen listing or an RSS feed.",
    "stratum": "tech_data",
    "name": "Competition-appeal orders"
+  },
+  {
+   "id": "tec_essential_requirements",
+   "status": "planned",
+   "regulator": "TEC",
+   "name": "MTCTE Essential Requirements",
+   "stratum": "telecom",
+   "lane": "instruments",
+   "url": "https://www.mtcte.tec.gov.in/er_list",
+   "reason": "The MTCTE portal encrypted its per-document download endpoint (CryptoJS AES/SHA over the file name); filedownload?name=<TEC no>.pdf now returns a session-error page, so the individual ER PDFs are no longer retrievable at a stable URL (only through the portal's client-side flow). The ER LIST metadata (get_er_list) is still readable, but with no retrievable document per item this source is demoted from live coverage rather than shown with links we cannot honour. Verified 2026-08-27.",
+   "revisit": "If MTCTE restores a stable/plain download URL, or a decryptable pattern is confirmed, re-promote to live."
   }
  ],
  "lanes": {

@@ -21,7 +21,7 @@ Coverage spans three strata (17 regulators, 52 venues live):
 
 - **telecom** (28 venues): TRAI (16 listings incl. all five standing-direction divisions and the
   sitewide RSS as a lag cross-check), NCCS latest/SAS/ComSec/ITSARs, TEC circulars, gazette-notified
-  standards, MTCTE essential requirements and What's New, TDSAT notices and orders, IN-SPACe, and
+  standards and What's New, TDSAT notices and orders, IN-SPACe, and
   the Ministry-of-Communications e-Gazette lane.
 - **technology & data** (14): MeitY gazettes, acts & policies, orders & notices and guidelines via
   its public headless-WordPress JSON API; CERT-In advisories (CIAD), vulnerability notes (CIVN),
