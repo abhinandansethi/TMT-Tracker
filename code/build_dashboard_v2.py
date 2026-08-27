@@ -910,19 +910,15 @@ function metaCells(r) {
 // and API keep the real PDF URL for a downstream pipeline to fetch.
 function openable(u) {
   if (!u) return u;
-  var forced = /\/\/www\.tec\.gov\.in\/pdf\//i.test(u) || /inspace\.gov\.in\/[^?]*sys_attachment/i.test(u)
-            || /mtcte\.tec\.gov\.in\/filedownload/i.test(u);
-  if (!forced) return u;
+  // Firm-hosted only: route the government "forced download" endpoints through the connector's
+  // /v1/doc proxy, which re-serves them application/pdf inline so they open in the tab (this is
+  // the one thing that also fixes MTCTE's octet-stream). Set window.TMT_CONFIG.docProxy to enable.
+  // Without a proxy we link direct — no third-party viewer: a document opens inline wherever the
+  // server allows it, and downloads cleanly on the few servers that force an attachment.
   var cfg = window.TMT_CONFIG || {};
-  // Firm-hosted: the connector's /v1/doc proxy re-serves any document inline, so EVERY
-  // forced-download PDF opens in-tab — including MTCTE, whose octet-stream no hosted viewer
-  // can preview. Set window.TMT_CONFIG.docProxy to the connector base URL to enable it.
-  if (cfg.docProxy)
+  if (cfg.docProxy && (/\/\/www\.tec\.gov\.in\/pdf\//i.test(u) || /inspace\.gov\.in\/[^?]*sys_attachment/i.test(u) || /mtcte\.tec\.gov\.in\/filedownload/i.test(u)))
     return cfg.docProxy.replace(/\/$/, '') + '/v1/doc?u=' + encodeURIComponent(u);
-  // Published preview (no proxy reachable): Google renders application/pdf; MTCTE's octet-stream
-  // cannot be previewed by any viewer, so it is left as a direct link there.
-  if (/mtcte\.tec\.gov\.in/i.test(u)) return u;
-  return 'https://docs.google.com/viewer?url=' + encodeURIComponent(u) + '&embedded=true';
+  return u;
 }
 function acts(r) {
   const a = [];
