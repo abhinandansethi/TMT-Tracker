@@ -4,3 +4,10 @@ instruments/
 __pycache__/
 *.pyc
 pipeline/drafts/
+
+# Generated at build time — Vercel builds the dashboard from the committed data, so the
+# artifact is no longer committed. Two writers (CI sweeps + the firm machine) editing a
+# 600KB generated file in git produced a merge conflict on every round trip.
+# dist/tmt-radar.html (legacy v1) is NOT ignored: nothing regenerates it.
+dist/tmt-radar-v2.html
+dist/memos/

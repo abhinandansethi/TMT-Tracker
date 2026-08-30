@@ -103,14 +103,13 @@ jobs:
             python pipeline/brief.py || echo "::warning::brief generation failed — dashboard falls back to deterministic briefs"
           fi
 
-      - name: Rebuild the dashboard
-        env:
-          # Bakes the hosted-run URL into the page so its "Update now" button opens
-          # this workflow (one authenticated click starts the next run).
-          TMT_ACTIONS_URL: https://github.com/${{ github.repository }}/actions/workflows/sweep.yml
+      - name: Build the dashboard (check only — Vercel builds the deployed copy)
+        # The artifact is not committed: Vercel rebuilds it from the data this run commits.
+        # Building here anyway catches a broken build in the Actions log, with the sweep's
+        # own context, instead of only as a failed deploy later.
         run: python code/build_dashboard_v2.py
 
-      - name: Commit the refreshed ledger, feed and page
+      - name: Commit the refreshed ledger and feed
         # git add is all-or-nothing across pathspecs: one missing path (brief_cache.json is
         # absent whenever no LLM key is configured) would stage NOTHING and silently discard
         # the sweep. Stage the always-present paths plainly — a real failure must fail loudly —
@@ -118,7 +117,7 @@ jobs:
         run: |
           git config user.name  "tmt-radar-sweep"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add engine/ledger.db engine/ledger.jsonl engine/health.json data dist
+          git add engine/ledger.db engine/ledger.jsonl engine/health.json data
           if [ -f pipeline/brief_cache.json ]; then git add pipeline/brief_cache.json; fi
           if git diff --cached --quiet; then
             echo "nothing changed since the last sweep"

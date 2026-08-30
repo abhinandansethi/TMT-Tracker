@@ -512,8 +512,13 @@ if _orphaned:
 # machine carries it too — otherwise a locally-built page ships with the button disarmed and
 # silently loses the one-click refresh the hosted setup provides.
 def _actions_url() -> Optional[str]:
+    # Resolved for whichever environment is building: an explicit override, Vercel's own git
+    # metadata (its build checkout may have no usable git remote), else the local remote.
     if os.environ.get("TMT_ACTIONS_URL"):
         return os.environ["TMT_ACTIONS_URL"]
+    owner, slug = os.environ.get("VERCEL_GIT_REPO_OWNER"), os.environ.get("VERCEL_GIT_REPO_SLUG")
+    if owner and slug:
+        return f"https://github.com/{owner}/{slug}/actions/workflows/sweep.yml"
     try:
         import subprocess
         url = subprocess.run(["git", "remote", "get-url", "origin"], cwd=ROOT,
