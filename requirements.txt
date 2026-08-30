@@ -1,0 +1,10 @@
+# TMT Regulatory Radar — everything the pipeline needs, anywhere it runs
+# (firm machine or CI). The engine itself is zero-LLM; the two SDKs at the
+# bottom are only exercised by pipeline/brief.py, and only when a key is set.
+requests
+beautifulsoup4
+lxml
+feedparser
+pypdf
+anthropic
+openai

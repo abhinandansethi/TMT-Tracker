@@ -125,18 +125,52 @@ login` profile); no key is stored. Set `TMT_BRIEF_MODEL=claude-sonnet-5` (or `-h
 to run a large batch cheaper. The brief is a monitoring aid — it stays under the same
 verify-against-the-official-text rule (boundary rule 2); it is never legal advice.
 
+## Hosted mode — running the whole thing off the firm machine
+
+The repo ships a complete hosted pipeline so nothing depends on any one laptop:
+
+- **`.github/workflows/sweep.yml`** runs the exact `run_sweep.sh` chain on GitHub Actions —
+  sweep all sources → export → LLM briefs → rebuild the dashboard → commit the refreshed
+  ledger/data/page back to the repo. Daily on schedule, or on demand from the workflow page.
+- **`vercel.json`** serves `dist/` on Vercel: connect the repo once and every CI commit
+  redeploys the partner URL automatically (`/` serves the dashboard).
+- **The page's Update-now button**, in hosted builds, opens the workflow page — one
+  authenticated click on "Run workflow" starts the full run. A static page deliberately
+  holds no token: any token in the page would be readable by every viewer.
+
+Setup, once:
+
+1. Create a **private** GitHub repository and push this repo to it.
+2. Add the LLM key as a **repository secret** (Settings → Secrets and variables → Actions):
+   `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` — `pipeline/brief.py` auto-detects whichever is
+   present. Never commit a key, and never paste one into a chat.
+3. Import the repo in Vercel (framework: none). `vercel.json` does the rest.
+4. **Access**: a default Vercel URL is reachable by anyone who has it, and the page embeds
+   the client roster. Turn on Vercel Deployment Protection (or serve behind the firm's SSO)
+   before sharing the URL beyond the team.
+
+Two honest caveats: government WAFs may treat GitHub's cloud IPs differently from the firm
+network — if sources read FAILED in CI but fine locally, that is why, and the firm-machine
+sweep stays the fallback lane (health records either way, the Coverage tab shows it). And the
+scheduled run commits a refreshed `engine/ledger.db` each day, which grows repo history; that
+is the price of the ledger being the tracker's memory.
+
 ## Wiring the dashboard "Update now" button to your pipeline
 
-The published dashboard cannot fetch government sites from its sandbox, so its **Update now**
-button, by default, opens the local operator console. To make it trigger your pipeline instead,
-set a global before the page's script runs (e.g. via your embedding wrapper):
+The published dashboard cannot fetch government sites from its sandbox. The **Update now**
+button resolves, in order:
+
+1. `pipelineEndpoint` configured → `POST`s `{ "action": "sweep", "source": "tmt-radar-dashboard" }`
+   to your endpoint; your pipeline sweeps and republishes.
+2. `actionsUrl` configured (hosted mode; CI bakes in its own workflow URL via `TMT_ACTIONS_URL`)
+   → opens the GitHub Actions workflow page for a one-click authenticated run.
+3. Neither → the button explains exactly how to refresh (run `engine/run_sweep.sh`, or ask Claude).
+
+Both knobs can also be set at embed time:
 
 ```html
 <script>window.TMT_CONFIG = { pipelineEndpoint: "https://your-system/hooks/tmt-refresh" };</script>
 ```
-
-The button then `POST`s `{ "action": "sweep", "source": "tmt-radar-dashboard" }` to that
-endpoint. Your pipeline runs the sweep and republishes; the page reloads to the new data.
 
 ## Making every document open in-browser (`docProxy`)
 

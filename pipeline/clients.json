@@ -1,23 +1,117 @@
 {
-  "note": "Client roster for the TMT practice. The pipeline matches new instruments/judgments to clients deterministically, requiring a subject-keyword hit so a client sees only what actually concerns it (not every item from a regulator it follows). Keywords are precise multi-word terms to keep false positives low; tune per client. Replace with the firm's real roster or point at the CRM. No client data leaves the machine.",
+  "note": "Client roster for the TMT practice. The pipeline matches new instruments/judgments to clients deterministically, requiring a subject-keyword hit so a client sees only what actually concerns it (not every item from a regulator it follows). Each client carries: 'scope' — the advice scope the partner covers for them, shown on the card and quoted in draft emails; 'gaps' — an honest note where the client's sectoral regulator sits OUTSIDE this tracker's coverage, so silence here is never mistaken for regulatory silence. Keywords are precise multi-word regexes to keep false positives low; tune per client. Replace with the firm's real roster or point at the CRM. No client data leaves the machine.",
   "clients": [
+    {
+      "id": "aws",
+      "name": "AWS",
+      "sector": "Global cloud infrastructure and platform services (IaaS/PaaS), India regions and data centres",
+      "scope": "Cloud and data-centre regulation, data protection and localisation (DPDP), CERT-In cybersecurity obligations, intermediary/safe-harbour status, encryption and government-access, FDI and digital-competition policy.",
+      "gaps": "RBI/SEBI financial-sector cloud and outsourcing directions, and state-level data-centre incentives/electricity policy, are outside this tracker's coverage.",
+      "partner": "A. Sethi",
+      "watch": {
+        "regulators": [
+          "MeitY",
+          "CERT-In",
+          "TRAI",
+          "e-Gazette",
+          "DPIIT",
+          "CCI"
+        ],
+        "strata": [
+          "tech_data",
+          "telecom"
+        ],
+        "keywords": [
+          "\\bcloud\\b",
+          "data.?cent",
+          "hosting",
+          "server",
+          "data protection",
+          "\\bDPDP\\b",
+          "personal data",
+          "data localis",
+          "cross.?border data",
+          "data transfer",
+          "cyber.?security",
+          "\\bCERT-In\\b",
+          "incident report",
+          "\\bs\\.?70B\\b",
+          "vulnerability",
+          "critical information infrastructure",
+          "\\bCII\\b",
+          "\\bNCIIPC\\b",
+          "intermediar",
+          "\\bIT Rules\\b",
+          "safe.?harbour",
+          "encryption",
+          "interception",
+          "decryption",
+          "artificial intelligence",
+          "\\bAI\\b",
+          "machine learning",
+          "\\bFDI\\b",
+          "press note",
+          "digital competition",
+          "submarine cable",
+          "\\bM2M\\b",
+          "internet of things",
+          "\\bIoT\\b"
+        ]
+      }
+    },
     {
       "id": "roblox",
       "name": "Roblox",
       "sector": "Online gaming + user-generated-content platform (large minor user base)",
+      "scope": "Online-gaming and intermediary regulation, minor-safety and age-verification obligations, dark-pattern and advertising standards, content moderation, and DPDP compliance for the India user base.",
+      "gaps": "State gazettes are outside coverage — state online-gaming statutes (e.g. Tamil Nadu, Karnataka) will not appear here.",
       "partner": "A. Sethi",
       "watch": {
-        "regulators": ["MeitY", "CERT-In", "MIB", "CCPA", "DPIIT", "e-Gazette"],
-        "strata": ["tech_data", "media"],
+        "regulators": [
+          "MeitY",
+          "CERT-In",
+          "MIB",
+          "CCPA",
+          "DPIIT",
+          "e-Gazette"
+        ],
+        "strata": [
+          "tech_data",
+          "media"
+        ],
         "keywords": [
-          "online.?gaming", "real.?money.?gaming", "\\bgaming\\b", "e-?sports",
-          "intermediar", "\\bIT Rules\\b", "due diligence", "safe.?harbour",
-          "grievance officer", "grievance redress", "significant social media",
-          "data protection", "\\bDPDP\\b", "personal data", "consent manager",
-          "\\bchild\\b", "children", "\\bminor\\b", "age.?verification", "age.?gating", "parental",
-          "dark.?pattern", "content moderation", "objectionable content", "user.?generated content", "\\bUGC\\b",
-          "surrogate advertis", "advertising to child", "influencer",
-          "user identification", "online safety", "self-?regulat"
+          "online.?gaming",
+          "real.?money.?gaming",
+          "\\bgaming\\b",
+          "e-?sports",
+          "intermediar",
+          "\\bIT Rules\\b",
+          "due diligence",
+          "safe.?harbour",
+          "grievance officer",
+          "grievance redress",
+          "significant social media",
+          "data protection",
+          "\\bDPDP\\b",
+          "personal data",
+          "consent manager",
+          "\\bchild\\b",
+          "children",
+          "\\bminors\\b",
+          "age.?verification",
+          "age.?gating",
+          "parental",
+          "dark.?pattern",
+          "content moderation",
+          "objectionable content",
+          "user.?generated content",
+          "\\bUGC\\b",
+          "surrogate advertis",
+          "advertising to child",
+          "influencer",
+          "user identification",
+          "online safety",
+          "self-?regulat"
         ]
       }
     },
@@ -25,16 +119,89 @@
       "id": "accenture",
       "name": "Accenture",
       "sector": "Global IT / consulting services + India delivery centres (data processor at scale)",
+      "scope": "IT/ITeS and outsourcing regulation: DPDP processor obligations, CERT-In incident reporting and empanelment, cross-border data transfer, SEZ/STPI and FDI policy, AI and GCC policy for delivery operations.",
+      "gaps": "RBI bank-outsourcing directions and sectoral financial-services regulation — relevant to Accenture's BFSI clients — are outside coverage, as are Commerce-ministry SEZ/STPI notifications.",
       "partner": "A. Sethi",
       "watch": {
-        "regulators": ["MeitY", "CERT-In", "DPIIT", "e-Gazette", "CCI"],
-        "strata": ["tech_data"],
+        "regulators": [
+          "MeitY",
+          "CERT-In",
+          "DPIIT",
+          "e-Gazette",
+          "CCI"
+        ],
+        "strata": [
+          "tech_data"
+        ],
         "keywords": [
-          "data protection", "\\bDPDP\\b", "personal data", "cross.?border data", "data transfer", "data localis",
-          "cyber.?security", "\\bCERT-In\\b", "incident report", "\\bs\\.?70B\\b", "vulnerability note", "empanel",
-          "intermediar", "\\bIT Rules\\b", "cloud comput", "data centre", "outsourc",
-          "\\bSEZ\\b", "\\bSTPI\\b", "\\bFDI\\b", "press note", "foreign.?direct",
-          "artificial intelligence", "semiconductor", "global capability cent", "\\bGCC\\b"
+          "data protection",
+          "\\bDPDP\\b",
+          "personal data",
+          "cross.?border data",
+          "data transfer",
+          "data localis",
+          "cyber.?security",
+          "\\bCERT-In\\b",
+          "incident report",
+          "\\bs\\.?70B\\b",
+          "vulnerability note",
+          "empanel",
+          "intermediar",
+          "\\bIT Rules\\b",
+          "cloud comput",
+          "data centre",
+          "outsourc",
+          "\\bSEZ\\b",
+          "\\bSTPI\\b",
+          "\\bFDI\\b",
+          "press note",
+          "foreign.?direct",
+          "artificial intelligence",
+          "semiconductor",
+          "global capability cent",
+          "\\bGCC\\b"
+        ]
+      }
+    },
+    {
+      "id": "annalise",
+      "name": "Annalise.ai",
+      "sector": "Clinical AI — radiology decision-support software deployed to Indian healthcare providers",
+      "scope": "AI and health-data regulation for India deployments: DPDP consent and health-data processing, MeitY AI advisories and model-governance obligations, cybersecurity of clinical systems, telemedicine-adjacent rules.",
+      "gaps": "CDSCO and the Medical Device Rules — the sectoral regulator for software-as-a-medical-device — are outside this tracker's coverage, as are MoHFW/NMC telemedicine rules; instruments from those regulators will not appear here.",
+      "partner": "A. Sethi",
+      "watch": {
+        "regulators": [
+          "MeitY",
+          "CERT-In",
+          "e-Gazette",
+          "CCPA"
+        ],
+        "strata": [
+          "tech_data"
+        ],
+        "keywords": [
+          "artificial intelligence",
+          "\\bAI\\b",
+          "machine learning",
+          "algorithm",
+          "deep.?fake",
+          "synthetic",
+          "data protection",
+          "\\bDPDP\\b",
+          "personal data",
+          "sensitive personal",
+          "\\bhealth\\b",
+          "medical",
+          "diagnos",
+          "clinical",
+          "telemedicine",
+          "radiolog",
+          "hospital",
+          "\\bCERT-In\\b",
+          "incident report",
+          "vulnerability",
+          "health claim"
         ]
       }
     }

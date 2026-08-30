@@ -8,6 +8,7 @@ stratum -> regulator -> venue. Signals is unchanged. Writes dist/tmt-radar-v2.ht
 Visual system copied verbatim from build_dashboard.py (v1) — same type, same spacing.
 """
 import json
+import os
 import re
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -41,6 +42,14 @@ registry = json.loads((ENGINE / "registry_v2.json").read_text())             # v
 health_path = ENGINE / "health.json"
 health_doc: dict[str, Any] = json.loads(health_path.read_text()) if health_path.exists() else {}
 health: dict[str, Any] = health_doc.get("sources", {})
+
+# The page's freshness claims are anchored to the LAST SWEEP, never to the build. Rebuilding
+# without sweeping must not reset the staleness banner: "Last updated" is a claim about the
+# data, and the data is only as fresh as the last time a source was actually checked.
+try:
+    SWEPT = datetime.fromisoformat(health_doc["generated"])
+except Exception:
+    SWEPT = None
 
 STRATA = ("telecom", "tech_data", "media", "safety_net")
 STRATUM_LABEL = {"telecom": "Telecom", "tech_data": "Technology and data",
@@ -253,6 +262,8 @@ def build_row(it: dict[str, Any]) -> dict[str, Any]:
         "memo": MEMOS.get(it["id"]),
         # LLM brief of the document body, if pipeline/brief.py has produced one for this item
         "llm": brief_cache.get(it["id"]),
+        # source_id: which coverage link this item was scraped from (the audit tab's join key)
+        "src": it["source_id"],
     }
 
 
@@ -323,6 +334,19 @@ HEALTH_UI = {
 }
 
 
+_EGZ_NOTE = ("The fetch target is the ministry-search endpoint behind this portal; it is "
+             "session-based, so a cold deep-link lands on the portal's error page. This link "
+             "opens the portal entry — search the ministry there to replicate the sweep.")
+
+
+def display_url(u: str) -> str:
+    return "https://egazette.gov.in/" if "egazette.gov.in/Search" in (u or "") else u
+
+
+def display_note(u: str):
+    return _EGZ_NOTE if "egazette.gov.in/Search" in (u or "") else None
+
+
 def venue_name(s: dict[str, Any]) -> str:
     vn = clean(s["name"]).split(" (")[0]
     reg = s["regulator"]
@@ -354,7 +378,7 @@ for st in STRATA:
         notes = list((h or {}).get("notes") or [])
         info = list((h or {}).get("info") or [])
         groups[reg].append({
-            "n": venue_name(s), "id": s["id"], "url": s.get("url", ""),
+            "n": venue_name(s), "id": s["id"], "url": display_url(s.get("url", "")),
             "method": s.get("method", ""), "role": s.get("role", ""),
             "s": label, "st": cls,
             "rows": (h or {}).get("rows_seen"), "new": (h or {}).get("new"),
@@ -364,7 +388,7 @@ for st in STRATA:
             "newest": (h or {}).get("newest_visible"),
             "held": (h or {}).get("ledgered_total"),
             "lane": s.get("lane", "instruments"),
-            "notes": notes, "info": info,
+            "notes": notes, "info": info + ([display_note(s.get("url", ""))] if display_note(s.get("url", "")) else []),
         })
     if not order:
         continue
@@ -392,14 +416,16 @@ def blind_label(s: dict[str, Any]) -> str:
 
 # Which live lane picks up each blind source. Encoded from the mitigation already written
 # into each v1 source's "quirks" field — the registry states it in prose, not as a field.
+# Only lanes that are LIVE may be named as covering. PIB sits at needs_decision and the DoT
+# eServices adapter is planned — neither has ever swept, so neither earns a mention as cover.
 COVERED_BY = {
-    "dot_main": "e-Gazette + PIB + signals",
-    "wpc_legacy": "DoT eServices",
-    "saralsanchar": "DoT eServices",
+    "dot_main": "e-Gazette MoC lane + curated signals (PIB planned, not yet covering)",
+    "wpc_legacy": "No live lane (DoT eServices adapter planned)",
+    "saralsanchar": "No live lane (DoT eServices adapter planned)",
     "tdsat_judgments": "No live lane (phase 2)",
-    "dpb_watch": "MeitY + e-Gazette + PIB",
-    "ogai_watch": "MeitY + signals",
-    "sansad_bills": "MeitY/MIB consultations + PIB",
+    "dpb_watch": "MeitY + e-Gazette lanes (PIB planned, not yet covering)",
+    "ogai_watch": "MeitY + curated signals",
+    "sansad_bills": "MeitY/MIB consultation lanes (PIB planned, not yet covering)",
     "indiacode": "Reference only, not a net",
 }
 
@@ -423,25 +449,75 @@ for x in registry.get("excluded", []):
                   "st": STRATUM_LABEL.get(x.get("stratum", ""), "Technology and data")})
 
 # Not yet live: v1 planned venues the v2 engine has not shipped an adapter for.
+# Counted from the live v2 registry, not the retired v1 one: every v2 source that exists
+# but is not sweeping (planned / watch / needs_decision), grouped by stratum.
 planned: dict[str, int] = {}
-for s in registry_v1["sources"]:
-    if s["status"] == "planned" and s["id"] not in V2_LIVE_IDS:
-        planned[s["stratum"]] = planned.get(s["stratum"], 0) + 1
-notlive = [f'{STRATUM_LABEL.get(k, k)}, {v} venue{"s" if v != 1 else ""}' for k, v in planned.items()]
+for s_ in registry["sources"]:
+    if s_.get("status") != "live":
+        planned[s_["stratum"]] = planned.get(s_["stratum"], 0) + 1
+notlive = [f'{STRATUM_LABEL.get(k, k)}, {v} venue{"s" if v != 1 else ""}'
+           for k, v in sorted(planned.items())]
 
 stratum_counts = {st: {"rows": sum(1 for r in rows if r["stratum"] == st),
                        "venues": stratum_venue_counts.get(st, 0)}
                   for st in STRATA}
 
+# ---- audit: the link-wise scraped-document ledger for human verification ----
+# For every live source — including the ones that yielded nothing — the exact URL the engine
+# fetches and every document scraped from it, across all three lanes. A human auditor opens
+# the live listing next to this list and checks nothing was missed. Zero-yield sources are
+# listed deliberately: silence has to be auditable, not hidden.
+items_by_src: dict[str, list[dict[str, Any]]] = {}
+for it in items["items"]:
+    items_by_src.setdefault(it["source_id"], []).append(it)
+
+audit_groups: list[dict[str, Any]] = []
+_audit_seen_ids: set[str] = set()
+for st in STRATA:
+    src_entries = []
+    for s in registry["sources"]:
+        if s["stratum"] != st or s.get("status") != "live":
+            continue
+        h = health.get(s["id"]) or {}
+        label, cls = HEALTH_UI.get(h.get("status", ""), ("Pending", "pending"))
+        got = sorted(items_by_src.get(s["id"], []),
+                     key=lambda i: (i.get("date") or ""), reverse=True)
+        _audit_seen_ids.add(s["id"])
+        src_entries.append({
+            "id": s["id"], "n": venue_name(s), "reg": s["regulator"],
+            "url": display_url(s.get("url", "")), "method": s.get("method", ""),
+            "note": display_note(s.get("url", "")),
+            "s": label, "st": cls,
+            "checked": (h.get("checked") or "")[:16].replace("T", " "),
+            "newest": h.get("newest_visible"), "rows": h.get("rows_seen"),
+            "items": [{
+                "d": i.get("date"),
+                "t": i.get("short") or i.get("title"),
+                # the venue lists official titles, so the auditor compares on this
+                "o": i["title"],
+                "doc": i.get("doc_url") or i.get("pdf_url"), "page": i.get("page_url"),
+                "lane": i.get("lane", "instruments"),
+            } for i in got],
+        })
+    if src_entries:
+        audit_groups.append({"key": st, "label": STRATUM_LABEL[st], "sources": src_entries})
+
+# Invariant check, not decoration: every ledgered item must belong to a live coverage source.
+# An item from a source that is no longer on the coverage list is a boundary violation.
+_orphaned = {sid for sid in items_by_src if sid not in _audit_seen_ids}
+if _orphaned:
+    raise SystemExit(f"audit invariant broken: items from non-live sources {sorted(_orphaned)}")
+
 payload: dict[str, Any] = {
     # Real build time. Never hardcode this: a stated sweep time that did not happen
     # is a false claim about how fresh the ledger is.
-    "updated": NOW.strftime("%d %b %Y, %H:%M IST"),
+    "updated": (SWEPT or NOW).strftime("%d %b %Y, %H:%M IST"),
     # The page computes its own age from this at open time. A dashboard that has quietly
     # stopped being swept must announce it rather than look identical to a fresh one.
-    "updatedISO": NOW.isoformat(timespec="seconds"),
+    "updatedISO": (SWEPT or NOW).isoformat(timespec="seconds"),
+    "builtISO": NOW.isoformat(timespec="seconds"),
     "staleAfterHours": 26,
-    "today": NOW.strftime("%Y-%m-%d"),
+    "today": (SWEPT or NOW).strftime("%Y-%m-%d"),
     "clients": default_clients,
     "rows": rows,
     "judgments": sorted(judgment_rows, key=lambda r: (r.get("date") or ""), reverse=True),
@@ -450,7 +526,10 @@ payload: dict[str, Any] = {
     # button triggers the partner's pipeline endpoint if one is configured, else opens the
     # local operator console which runs the real sweep. Both are overridable at deploy time
     # via window.TMT_CONFIG = {pipelineEndpoint, consoleUrl}.
-    "updateConfig": {"pipelineEndpoint": None, "consoleUrl": "http://127.0.0.1:8787"},
+    "updateConfig": {"pipelineEndpoint": None, "consoleUrl": "http://127.0.0.1:8787",
+                     # Hosted mode: CI bakes in its own workflow URL so the button can open
+                     # the "Run workflow" page. Locally unset -> the button explains itself.
+                     "actionsUrl": os.environ.get("TMT_ACTIONS_URL") or None},
     "strataOrder": [{"key": st, "label": STRATUM_FILTER_LABEL[st]}
                     for st in ("telecom", "tech_data", "media")],
     "stratum_counts": stratum_counts,
@@ -458,6 +537,7 @@ payload: dict[str, Any] = {
                  "blind": blind, "notlive": notlive,
                  "healthAt": (health_doc.get("generated") or "")[:16].replace("T", " "),
                  "tally": health_tally},
+    "audit": audit_groups,
     "shelfCount": len(shelf),
     # --- pipeline state: not rendered, read by the scheduled sweep so a fresh
     # session is fully self-contained (source list, adapter configs, gates, shelf). ---
@@ -555,7 +635,6 @@ input::placeholder{color:var(--ghost)}
 .cl-btn{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;border:1px solid var(--rule2);background:#fff;color:var(--navy);padding:4px 9px;border-radius:3px}
 .cl-btn:hover{border-color:var(--navy)}
 .cl-del{color:var(--alarm);border-color:transparent;font-size:15px;padding:0 6px;letter-spacing:0}
-.cl-scope{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:8px}
 .cl-matches{display:none;margin-top:14px;border-top:1px solid var(--rule2);padding-top:12px}
 .cl-matches.on{display:block}
 .cl-matches ul{list-style:none;margin:0;padding:0}
@@ -579,6 +658,41 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
 .cl-so{color:#37474f}
 .cl-so::before{content:"→ ";color:var(--mute)}
 .cl-ai{display:inline-block;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:20px;padding:1px 7px;margin-left:4px;white-space:nowrap}
+/* client card: advice scope + honest coverage-gap note */
+.cl-scope{font-size:12px;color:#37474f;margin-top:6px;max-width:820px;line-height:1.5}
+.cl-scope b{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);font-weight:600;margin-right:6px}
+.cl-gap{font-size:11.5px;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:3px;padding:6px 10px;margin-top:8px;max-width:820px;line-height:1.5}
+/* coverage venue card: the exact fetched URL, always visible */
+.ven .vlink{grid-column:1/-1;font-family:var(--mono);font-size:10px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ven .vlink a{color:var(--mute);text-decoration:none;border-bottom:1px dotted var(--rule2)}
+.ven .vlink a:hover{color:var(--navy)}
+/* instruments detail: What changed note */
+.note.wc .body{max-width:900px}
+.note.wc .ai{margin-top:6px;color:#37474f}
+.aitag{display:inline-block;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:20px;padding:1px 7px;margin-left:4px;white-space:nowrap}
+/* audit tab: per-link scraped-document ledger */
+.asrc{border:1px solid var(--rule2);border-radius:4px;background:#fff;margin-top:10px}
+.asrc .ahead{display:grid;grid-template-columns:14px minmax(180px,1.1fr) minmax(0,1.4fr) 110px 24px;gap:12px;align-items:center;padding:10px 14px;cursor:pointer}
+.asrc .ahead .dot{width:8px;height:8px;border-radius:50%}
+.asrc .an{font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asrc .alink{font-family:var(--mono);font-size:10.5px;color:var(--mute);text-decoration:none;border-bottom:1px dotted var(--rule2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asrc .alink:hover{color:var(--navy)}
+.asrc .act{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);text-align:right}
+.asrc .abody{display:none;border-top:1px dashed var(--rule2);padding:10px 14px 14px}
+.asrc.open .abody{display:block}
+.asrc .ameta{font-family:var(--mono);font-size:10.5px;color:var(--mute);margin-bottom:8px}
+.aitem{display:grid;grid-template-columns:78px 20px minmax(0,1fr);gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--wash)}
+.aitem:last-child{border-bottom:none}
+.aitem .ad{font-family:var(--mono);font-size:10.5px;color:var(--mute)}
+.aitem a{color:var(--ink);text-decoration:none;font-size:12.5px;border-bottom:1px dotted var(--rule2)}
+.aitem a:hover{color:var(--navy)}
+.aitem span.noL{color:var(--ink);font-size:12.5px}
+.alane{font-family:var(--mono);font-size:9px;text-transform:uppercase;border-radius:3px;text-align:center;padding:1px 0}
+.alane.instruments{background:#E9F3EA;color:#276B2E}
+.alane.judgments{background:#EAF0F4;color:#1B6288}
+.alane.signals{background:var(--ochre-wash);color:#7A5E0E}
+.anone{font-size:12px;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:3px;padding:8px 12px}
+.averify{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-top:10px;line-height:1.7}
 .cl-none{color:var(--faint);font-style:italic}
 .cl-draft{margin-top:14px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:3px}
 .cl-draft:disabled{opacity:.4;cursor:default}
@@ -793,14 +907,15 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
   <div class="upd-note" id="updnote"></div>
 
   <nav class="tabs">
-    <button class="on" data-v="instruments">Instruments</button>
+    <button class="on" data-v="coverage">Coverage</button>
+    <button data-v="instruments">Instruments</button>
     <button data-v="judgments">Judgments</button>
-    <button data-v="coverage">Coverage</button>
     <button data-v="signals">Signals</button>
     <button data-v="clients">Clients</button>
+    <button data-v="audit">Audit</button>
   </nav>
 
-  <section class="view on" id="v-instruments">
+  <section class="view" id="v-instruments">
     <div class="controls">
       <div class="left">
         <input type="text" id="q" placeholder="Search instruments">
@@ -837,7 +952,11 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     </div></div>
   </section>
 
-  <section class="view" id="v-coverage">
+  <section class="view on" id="v-coverage">
+    <div class="cl-head" style="margin-bottom:6px">
+      <div><div class="cl-eyebrow">Coverage — the whole world</div>
+        <div class="cl-sub">Every link this tracker fetches, by stratum and regulator. If a venue is not on this list, nothing from it can enter the Instruments, Judgments or Audit ledgers — by design. (The Signals tab alone carries hand-curated press leads, each with its cited source.) Click a venue for its health evidence and the exact URL fetched.</div></div>
+    </div>
     <div id="strata"></div>
     <div class="two">
       <div>
@@ -867,6 +986,13 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     </div>
     <div id="clientlist"></div>
   </section>
+  <section class="view" id="v-audit">
+    <div class="cl-head">
+      <div><div class="cl-eyebrow">Audit — verify us</div>
+        <div class="cl-sub">Link by link from Coverage: every document this tracker scraped from each source URL, all three lanes. Open the live listing beside each group and compare — anything the venue shows for the window that is missing below is a miss, and should be reported. Sources that yielded nothing are listed too: silence must be checkable, not hidden.</div></div>
+    </div>
+    <div id="auditlist"></div>
+  </section>
   <div id="cl-modal"></div>
 </div>
 
@@ -886,13 +1012,25 @@ $('#upd').textContent = D.updated;
 // Update-now. The published page runs in a sandbox that cannot reach gov.in, so it cannot
 // sweep itself. Behaviour is "both": if the partner has wired their pipeline endpoint
 // (window.TMT_CONFIG.pipelineEndpoint, or the deploy-time updateConfig), the button triggers
-// that pipeline; otherwise it opens the local operator console, which runs the real sweep.
+// that pipeline; with actionsUrl it opens the hosted workflow page; with neither it explains how to refresh.
 (function(){
   const cfg = Object.assign({}, D.updateConfig || {}, (window.TMT_CONFIG || {}));
   const btn = $('#updnow'), note = $('#updnote');
   if (!btn) return;
+  // The tooltip must not promise a sweep the page cannot start.
+  if (!cfg.pipelineEndpoint && !cfg.actionsUrl) btn.title = 'How to refresh this page';
   const say = (html) => { note.innerHTML = html; note.classList.add('on'); };
   btn.addEventListener('click', async () => {
+    if (cfg.actionsUrl && !cfg.pipelineEndpoint) {
+      // Hosted mode: the sweep runs on GitHub Actions, independent of any one machine.
+      // A static page cannot hold a token that could start the run itself (it would be
+      // exposed to every viewer), so the button opens the workflow page — one authenticated
+      // click there ("Run workflow") starts the full sweep -> briefs -> rebuild run.
+      window.open(cfg.actionsUrl, '_blank', 'noopener');
+      say('Opened the hosted pipeline. Click <b>Run workflow</b> there — it sweeps every source, '
+        + 'regenerates the briefs, and rebuilds this page (a few minutes). Then reload here.');
+      return;
+    }
     if (cfg.pipelineEndpoint) {
       btn.disabled = true; btn.textContent = 'Updating…';
       say('Triggering your update pipeline…');
@@ -985,6 +1123,34 @@ function metaCells(r) {
   m.push(['Status', (r.flags || []).includes('needs_verification') ? 'Gazette pending' : 'On official venue']);
   return m.filter(Boolean).map(x => '<div><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + '</div></div>').join('');
 }
+/* "What changed": one deterministic sentence-set composed from the item's own metadata,
+   plus the LLM brief of the document body when pipeline/brief.py has produced one. */
+const ruleTextOf = r => { if (!r) return ''; return String(r)
+  .replace(/\s*\(\d+ of \d{4}\)/g, '')
+  .replace(/,\s*Amendment,\s*Change in Substance/i, ' (a change in substance)')
+  .replace(/,\s*Amendment\b/i, '').replace(/\s+/g, ' ').trim(); };
+function whatChanged(r) {
+  const t = (r.type || '').toLowerCase();
+  const verb = /amend/.test(t) ? 'has amended' : /order/.test(t) ? 'has passed an order regarding'
+    : /(rule|regulation|notif)/.test(t) ? 'has notified' : /direction/.test(t) ? 'has issued a direction on'
+    : /advisory/.test(t) ? 'has issued an advisory on' : /press.?note/.test(t) ? 'has issued'
+    : /consult|draft/.test(t) ? 'has floated for consultation' : 'has published';
+  const p = [(r.reg || 'The regulator') + ' ' + verb + ' ' + (r.short || r.official) + '.'];
+  const rt = (r.rule && !/^\s*nil\s*$/i.test(r.rule)) ? ruleTextOf(r.rule) : '';
+  if (rt) p.push('It amends ' + rt + '.');
+  if (r.effective) p.push('In force from ' + fmt(r.effective) + '.');
+  if (r.deadline && !r.effective) p.push((/consult|draft/i.test(r.type) ? 'Comments close ' : 'Deadline: ') + fmt(r.deadline) + '.');
+  if (r.impact && /action/i.test(r.impact)) p.push('The Gazette marks it action-required.');
+  return p.join(' ');
+}
+function wcNote(r, label) {
+  let h = '<div class="note wc"><div class="lbl">' + (label || 'What changed') + '</div><div class="body">' + esc(whatChanged(r)) + '</div>';
+  if (r.llm && r.llm.brief) {
+    h += '<div class="body ai">' + esc(r.llm.brief) + (r.llm.so_what ? ' ' + esc(r.llm.so_what) : '') +
+         ' <span class="aitag">AI brief · ' + esc(r.llm.confidence || '') + ' · verify</span></div>';
+  }
+  return h + '</div>';
+}
 function acts(r) {
   const a = [];
   // dual links, always both where they exist: the document itself and the official page
@@ -994,7 +1160,7 @@ function acts(r) {
   if (r.gid) a.push('<span style="font-family:var(--mono);font-size:10.5px;color:var(--mute)">Gazette ID ' + esc(r.gid) + '</span>');
   if (r.pr) a.push('<a href="' + esc(r.pr) + '" target="_blank" rel="noopener">Announcement</a>');
   if (r.notice) a.push('<a href="' + esc(r.notice) + '" target="_blank" rel="noopener">Consultation notice</a>');
-  if (r.memo) a.push('<a href="' + esc(r.memo) + '">Draft memo</a>');
+  if (r.memo) a.push('<a href="memos/' + esc(r.memo) + '" target="_blank" rel="noopener">Draft memo</a>');
   if (!a.length) a.push('<span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:#8F9396">No linkable copy yet</span>');
   return a.join('<span class="sep"></span>');
 }
@@ -1028,6 +1194,7 @@ function render() {
       '</div>' +
       '<div class="detail"><div class="lbl">Official title</div><div class="full">' + esc(r.official) + '</div>' +
         '<div class="meta">' + metaCells(r) + '</div>' +
+        wcNote(r) +
         (r.gist ? '<div class="note"><div class="lbl">Note</div><div class="body">' + esc(r.gist) + '</div></div>' : '') +
         '<div class="acts">' + acts(r) + '</div>' +
       '</div></div>';
@@ -1076,6 +1243,7 @@ render();
       '</div>' +
       '<div class="detail"><div class="lbl">Matter</div><div class="full">' + esc(r.official) + '</div>' +
         '<div class="meta">' + metaCells(r) + '</div>' +
+        (r.llm && r.llm.brief ? '<div class="note wc"><div class="lbl">What it holds</div><div class="body ai">' + esc(r.llm.brief) + ' <span class="aitag">AI brief · ' + esc(r.llm.confidence || '') + ' · verify</span></div></div>' : '') +
         '<div class="acts">' + acts(r) + '</div>' +
       '</div></div>';
   }).join('') || '<div class="empty">No judgments in the current window</div>';
@@ -1126,6 +1294,7 @@ function renderCoverage() {
                  : (v.rows != null ? esc(v.rows) + ' rows' : '—')) + '</div>' +
             '<div class="s ' + esc(v.st) + '"' + (tip ? ' title="' + esc(tip) + '"' : '') + '>' +
               '<span>' + esc(v.s) + '</span><span class="dot ' + esc(v.st) + '"></span></div>' +
+            (v.url ? '<div class="vlink"><a href="' + esc(v.url) + '" target="_blank" rel="noopener" title="The exact URL the engine fetches">' + esc(prettyUrl(v.url)) + '</a></div>' : '') +
             venDetail(v) + '</div>';
         }).join('') + '</div>').join('') +
       '</div>' +
@@ -1136,6 +1305,7 @@ function renderCoverage() {
       '<span><i class="dot warn"></i>Warn</span>' +
       '<span><i class="dot bad"></i>Failed or yielding nothing</span>' +
       '<span>' + pl(D.coverage.regs, 'regulator') + ', ' + pl(D.coverage.live, 'venue') + ' live' +
+      ((D.coverage.tally && D.coverage.tally.bad) ? ' · ' + D.coverage.tally.bad + ' currently down' : '') +
       (D.coverage.healthAt ? ' · health ' + esc(D.coverage.healthAt) + ' IST' : '') + '</span>' +
     '</div>';
 
@@ -1154,6 +1324,58 @@ $('#blind').innerHTML = D.coverage.blind.map(b =>
   '<div class="c' + (/no live lane|reference only/i.test(b.c) ? ' gap' : '') + '">' + esc(b.c) + '</div></div>').join('');
 $('#notlive').innerHTML = D.coverage.notlive.map(n => '<div class="nl">' + esc(n) + '</div>').join('');
 
+/* audit: link-wise scraped-document ledger for human verification */
+(function renderAudit(){
+  const A = D.audit || [];
+  const wrap = document.querySelector('#auditlist'); if (!wrap || !A.length) return;
+  let openSrc = null;
+  const laneName = l => l === 'judgments' ? 'jdg' : l === 'signals' ? 'sig' : 'ins';
+  function draw(){
+    wrap.innerHTML = A.map(st =>
+      '<div class="stsec"><div class="sechead"><div class="l">' + esc(st.label) + '</div>' +
+      '<div class="r">' + pl(st.sources.length, 'source link') + ' · ' +
+        pl(st.sources.reduce((n, x) => n + x.items.length, 0), 'document') + ' scraped</div></div>' +
+      st.sources.map(sc => {
+        const open = openSrc === sc.id;
+        return '<div class="asrc' + (open ? ' open' : '') + '" data-id="' + esc(sc.id) + '">' +
+          '<div class="ahead" tabindex="0" role="button" aria-expanded="' + open + '">' +
+            '<span class="dot ' + esc(sc.st) + '"' + ' title="' + esc(sc.s) + '"></span>' +
+            '<div class="an" title="' + esc(sc.reg + ' — ' + sc.n) + '"><b>' + esc(sc.reg) + '</b> — ' + esc(sc.n) + '</div>' +
+            '<a class="alink" href="' + esc(sc.url) + '" target="_blank" rel="noopener" title="Open the live listing this tracker fetches">' + esc(prettyUrl(sc.url)) + '</a>' +
+            '<div class="act">' + (sc.items.length ? pl(sc.items.length, 'doc') : 'nothing') + '</div>' +
+            '<div class="c-mark">' + (open ? String.fromCharCode(8722) : '+') + '</div>' +
+          '</div>' +
+          '<div class="abody">' +
+            (sc.note ? '<div class="ameta">' + esc(sc.note) + '</div>' : '') +
+            '<div class="ameta">Health: ' + esc(sc.s) +
+              (sc.checked ? ' · last checked ' + esc(sc.checked) + ' IST' : ' · no sweep recorded yet') +
+              (sc.newest ? ' · newest item visible on the venue: ' + esc(sc.newest) : '') +
+              (sc.rows != null ? ' · ' + esc(sc.rows) + ' rows parsed on the last sweep' : '') +
+              (sc.method && sc.method !== 'GET' ? ' · fetched via ' + esc(sc.method) : '') + '</div>' +
+            (sc.items.length
+              ? '<div class="alist">' + sc.items.map(i =>
+                  '<div class="aitem"><span class="ad">' + (i.d ? fmt(i.d) : String.fromCharCode(8212)) + '</span>' +
+                  '<span class="alane ' + esc(i.lane) + '" title="' + esc(i.lane) + '">' + laneName(i.lane) + '</span>' +
+                  ((i.doc || i.page)
+                    ? '<a href="' + esc(i.doc || i.page) + '" target="_blank" rel="noopener" title="' + esc(i.o || '') + '">' + esc(i.t) + '</a>'
+                    : '<span class="noL" title="' + esc(i.o || '') + '">' + esc(i.t) + '</span>') +
+                  '</div>').join('') + '</div>'
+              : (sc.st === 'bad'
+                ? '<div class="anone">This source has been FAILING ' + String.fromCharCode(8212) + ' the tracker cannot currently read the venue, so this lane is blind, not silent. Anything the venue published' + (sc.checked ? ' since ' + esc(sc.checked) : '') + ' is unverified until the source recovers.</div>'
+                : '<div class="anone">Nothing was scraped from this link in the window. That is a claim, and it is checkable: open the live listing and confirm the venue really published nothing new. If it did, this tracker missed it ' + String.fromCharCode(8212) + ' report it.</div>')) +
+            '<div class="averify">Audit check: open the source link ' + String.fromCharCode(8594) + ' list what the venue shows for the window ' + String.fromCharCode(8594) + ' compare with the rows above. Hover a row for the official title as the venue prints it.</div>' +
+          '</div></div>';
+      }).join('') + '</div>').join('');
+    wrap.querySelectorAll('.ahead').forEach(el => {
+      const id = el.parentElement.dataset.id;
+      const go = () => { openSrc = openSrc === id ? null : id; draw(); };
+      el.addEventListener('click', e => { if (e.target.closest('a')) return; go(); });
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+  }
+  draw();
+})();
+
 /* signals */
 $('#sigs').innerHTML = D.signals.map(s =>
   '<div class="sig"><div class="h"><span class="badge">Unpublished</span><span class="vbar"></span>' +
@@ -1164,7 +1386,7 @@ $('#sigs').innerHTML = D.signals.map(s =>
   esc((s.secondary_url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0]) + '</a></div></div>').join('');
 /* ---- Clients tab: match items, judge materiality, brief + per-item draft email (client-side) ---- */
 (function(){
-  const CLKEY = 'tmt_clients_v2';
+  const CLKEY = 'tmt_clients_v3';
   const $c = s => document.querySelector(s);
   const escc = s => (s==null?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1239,18 +1461,18 @@ $('#sigs').innerHTML = D.signals.map(s =>
     const worth=matched.filter(m=>m.mat.level==='notify'); const use=worth.length?worth:matched;
     const n=use.length, pl=n!==1?'s':'';
     let s='Subject: TMT regulatory update — '+n+' item'+pl+' for '+cl.name+'\n\nDear [client contact],\n\n';
-    s+='The following '+n+(worth.length?' priority':'')+' development'+pl+' may affect '+cl.name+' ('+cl.sector+'):\n\n';
+    s+='The following '+n+(worth.length?' priority':'')+' development'+pl+' may affect '+cl.name+(cl.scope?(' within our advice scope ('+cl.scope.replace(/\.$/,'')+')'):(' ('+cl.sector+')'))+':\n\n';
     use.forEach((m,i)=>{const it=m.it, doc=it.doc||it.page||'', cite=it.gid?('Gazette '+it.gid):'';
-      s+=(i+1)+'. '+(it.short||it.official||'')+'  ['+m.mat.label+']\n   '+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n   '+(function(){var b=briefOf(it);return b.text+(b.so?(' '+b.so):'');})()+'\n   Why on your radar: '+m.reasons.join('; ')+'.\n   Official text: '+doc+(cite?('  ·  '+cite):'')+'\n\n';});
+      s+=(i+1)+'. '+(it.short||it.official||'')+'  ['+m.mat.label+']\n   '+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n   '+(function(){var b=briefOf(it);return b.text+(b.so?(' '+b.so):'')+(b.ai?(' [AI brief — '+(b.conf||'unrated')+' confidence — verify against the official text]'):'');})()+'\n   Why on your radar: '+m.reasons.join('; ')+'.\n   Official text: '+doc+(cite?('  ·  '+cite):'')+'\n\n';});
     s+='We flag these for your review and will follow with a considered note on any that warrant action.\n\nPrepared by [partner], Trilegal TMT.\n\n— DRAFT for partner review. Verify each item against the official text before advising the client. Not sent.';
     return s;
   }
   function itemDraft(cl, m){
     const it=m.it, doc=it.doc||it.page||'', cite=it.gid?('Gazette '+it.gid):'';
     let s='Subject: '+(it.reg||'Regulatory')+' update — '+(it.short||it.official)+' ('+cl.name+')\n\nDear [client contact],\n\n';
-    s+='A quick note on a regulatory development we think is relevant to '+cl.name+':\n\n';
+    s+='A quick note on a regulatory development relevant to '+cl.name+(cl.scope?(' '+String.fromCharCode(8212)+' within our advice scope: '+cl.scope.replace(/\.$/,'')):'')+'.\n\n';
     s+=(it.short||it.official||'')+'\n'+(it.reg||'')+' · '+((it.type||'').replace(/_/g,' '))+' · '+fmtD(it.date)+'\n\n';
-    var bf=briefOf(it); s+=bf.text+(bf.so?(' '+bf.so):'')+'\n\n';
+    var bf=briefOf(it); s+=bf.text+(bf.so?(' '+bf.so):'')+(bf.ai?(' [AI brief — '+(bf.conf||'unrated')+' confidence — verify against the official text]'):'')+'\n\n';
     s+='Why it matters to you: '+m.reasons.join('; ')+'.\n\n';
     if(m.mat.level==='notify') s+='We think this warrants your attention'+(it.deadline?(', and note the deadline of '+fmtD(it.deadline)):'')+'. ';
     s+='The official text is here: '+doc+(cite?('  ·  '+cite):'')+'\n\n';
@@ -1277,7 +1499,7 @@ $('#sigs').innerHTML = D.signals.map(s =>
         +'<button class="cl-btn" data-act="toggle" data-i="'+idx+'">View</button>'
         +'<button class="cl-btn" data-act="edit" data-i="'+idx+'">Edit</button>'
         +'<button class="cl-btn cl-del" data-act="del" data-i="'+idx+'">×</button></div></div>'
-        +'<div class="cl-scope">Watches: '+escc(scope)+'</div>'
+        +(cl.scope?('<div class="cl-scope"><b>Advises on</b>'+escc(cl.scope)+'</div>'):'')+'<div class="cl-scope"><b>Watches</b>'+escc(scope)+'</div>'+(cl.gaps?('<div class="cl-gap">Coverage gap: '+escc(cl.gaps)+'</div>'):'')
         +'<div class="cl-matches" id="clm-'+idx+'"><ul>'+(items||'<li class="cl-none">No current items match this scope.</li>')+'</ul>'
         +(m.length?'<button class="cl-draft" data-act="draft" data-i="'+idx+'">Draft alert — '+(worth||m.length)+' item'+((worth||m.length)!==1?'s':'')+'</button>':'')+'</div></div>';
     }).join('');
@@ -1290,6 +1512,8 @@ $('#sigs').innerHTML = D.signals.map(s =>
     $c('#cl-modal').innerHTML='<div class="cl-dialog"><h3>'+(editing?'Edit client':'Add client')+'</h3>'
       +'<label class="cl-lbl">Name</label><input id="cf-name" class="cl-in" value="'+escc(cl.name)+'">'
       +'<label class="cl-lbl">Sector / description</label><input id="cf-sec" class="cl-in" value="'+escc(cl.sector||'')+'">'
+      +'<label class="cl-lbl">Advice scope <span class="cl-hint">— what the firm advises this client on; quoted in draft emails.</span></label>'+'<textarea id="cf-scope" class="cl-ta" rows="2">'+escc(cl.scope||'')+'</textarea>'
+      +'<label class="cl-lbl">Coverage gaps <span class="cl-hint">— regulators this client needs that are NOT in coverage; shown as an honest warning on the card.</span></label>'+'<textarea id="cf-gaps" class="cl-ta" rows="2">'+escc(cl.gaps||'')+'</textarea>'
       +'<label class="cl-lbl">Regulators to follow</label><div class="cl-boxes" id="cf-regs">'+regBoxes+'</div>'
       +'<label class="cl-lbl">Strata</label><div class="cl-boxes" id="cf-str">'+strBoxes+'</div>'
       +'<label class="cl-lbl">Keywords <span class="cl-hint">— one per line; a subject must match one. Regex ok (e.g. <code>dark.?pattern</code>, <code>\\bDPDP\\b</code>).</span></label>'
@@ -1301,7 +1525,7 @@ $('#sigs').innerHTML = D.signals.map(s =>
       const regs=[...$c('#cf-regs').querySelectorAll('input:checked')].map(x=>x.value);
       const str=[...$c('#cf-str').querySelectorAll('input:checked')].map(x=>x.value);
       const kw=$c('#cf-kw').value.split('\n').map(x=>x.trim()).filter(Boolean);
-      const obj={id:(editing?cl.id:('c'+Date.now())), name, sector:$c('#cf-sec').value.trim(), watch:{regulators:regs,strata:str,keywords:kw}};
+      const obj={id:(editing?cl.id:('c'+Date.now())), name, sector:$c('#cf-sec').value.trim(), scope:$c('#cf-scope').value.trim(), gaps:$c('#cf-gaps').value.trim(), watch:{regulators:regs,strata:str,keywords:kw}};
       if(editing) clients[idx]=obj; else clients.push(obj);
       save(clients); $c('#cl-modal').classList.remove('on'); renderList();};
   }
@@ -1332,6 +1556,15 @@ $('#sigs').innerHTML = D.signals.map(s =>
 
 </script>
 """
+
+# Ship the sample memo beside the page so its link resolves from any host.
+_memo_src = ROOT / "memos"
+if _memo_src.exists():
+    _memo_dst = DIST / "memos"
+    _memo_dst.mkdir(exist_ok=True)
+    for _f in MEMOS.values():
+        if (_memo_src / _f).exists():
+            (_memo_dst / _f).write_bytes((_memo_src / _f).read_bytes())
 
 html = TEMPLATE.replace("__DATA__", data_json)
 (DIST / "tmt-radar-v2.html").write_text(html, encoding="utf-8")

@@ -1,0 +1,116 @@
+# TMT Regulatory Radar — the hosted sweep.
+#
+# Runs the exact chain engine/run_sweep.sh runs on the firm machine, but on GitHub's
+# infrastructure, so the tracker no longer depends on any one laptop being open:
+#
+#   sweep (all 51 sources) -> export the feed -> LLM briefs -> rebuild the dashboard
+#   -> commit the refreshed ledger/data/page back to this repo
+#
+# Vercel (connected to this repo) then redeploys dist/ automatically, so the partner
+# URL refreshes a minute or two after each run.
+#
+# Triggers: the dashboard's "Update now" button opens this workflow's page — one
+# authenticated click on "Run workflow" starts it. A daily scheduled run keeps the
+# page fresh unattended. There is deliberately no secret in the page itself: a static
+# dashboard cannot hold a token without exposing it to every viewer.
+#
+# Honesty notes, same rules as everywhere else in this project:
+# - A failing source is recorded in health and shown on the Coverage/Audit tabs,
+#   never swallowed. The run does not pretend a partial sweep was complete.
+# - Government WAFs may treat GitHub's cloud IPs differently from the firm network.
+#   If sources start reading FAILED here but work from the firm machine, that is the
+#   reason — the firm-machine sweep (engine/run_sweep.sh) remains the fallback lane.
+# - The LLM-brief step runs only if a key is configured as a repository secret
+#   (OPENAI_API_KEY or ANTHROPIC_API_KEY). Absent both, briefs are skipped and the
+#   dashboard falls back to its deterministic briefs. Keys live in GitHub's secret
+#   store only — never in this file, the repo, or the page.
+
+name: sweep
+run-name: "Sweep every source → rebuild the radar"
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "30 5 * * *"   # 11:00 IST daily
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Sweep every source
+        # A non-zero exit means at least one source FAILED. That is information, not a
+        # reason to abort: the failure is already recorded in engine/health.json and will
+        # show red on the Coverage and Audit tabs. The run continues so the page reflects
+        # exactly what happened.
+        run: |
+          python engine/tracker.py sweep || echo "::warning::sweep reported source failures — recorded in health, visible on the Coverage tab"
+
+      - name: Assert the sweep actually ran
+        # A crash before the sweep wrote health must not let a stale ledger be re-stamped
+        # and published as fresh. health.json is written at the end of every sweep.
+        run: |
+          find engine/health.json -newermt '-2 hours' | grep -q . \
+            || { echo "::error::engine/health.json was not refreshed by this run — aborting before export"; exit 1; }
+
+      - name: Export the feed
+        run: python engine/tracker.py export
+
+      - name: LLM briefs (skipped when no key is configured)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "${OPENAI_API_KEY}" ] && [ -z "${ANTHROPIC_API_KEY}" ]; then
+            echo "no LLM key configured — skipping briefs; the dashboard uses its deterministic briefs"
+          else
+            python pipeline/brief.py || echo "::warning::brief generation failed — dashboard falls back to deterministic briefs"
+          fi
+
+      - name: Rebuild the dashboard
+        env:
+          # Bakes the hosted-run URL into the page so its "Update now" button opens
+          # this workflow (one authenticated click starts the next run).
+          TMT_ACTIONS_URL: https://github.com/${{ github.repository }}/actions/workflows/sweep.yml
+        run: python code/build_dashboard_v2.py
+
+      - name: Commit the refreshed ledger, feed and page
+        # git add is all-or-nothing across pathspecs: one missing path (brief_cache.json is
+        # absent whenever no LLM key is configured) would stage NOTHING and silently discard
+        # the sweep. Stage the always-present paths plainly — a real failure must fail loudly —
+        # and the optional file only if it exists.
+        run: |
+          git config user.name  "tmt-radar-sweep"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add engine/ledger.db engine/ledger.jsonl engine/health.json data dist
+          if [ -f pipeline/brief_cache.json ]; then git add pipeline/brief_cache.json; fi
+          if git diff --cached --quiet; then
+            echo "nothing changed since the last sweep"
+          else
+            git commit -m "sweep: $(date -u '+%Y-%m-%d %H:%MZ') (hosted run)"
+            # The firm-machine lane can push while this run is in flight; rebase and retry
+            # rather than losing the hosted sweep to a non-fast-forward rejection.
+            for i in 1 2 3; do
+              git push && break
+              echo "push rejected (attempt $i) — rebasing onto the remote and retrying"
+              git pull --rebase || exit 1
+              [ "$i" = 3 ] && { echo "::error::could not push after 3 attempts"; exit 1; }
+            done
+          fi

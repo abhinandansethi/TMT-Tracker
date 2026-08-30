@@ -24,8 +24,11 @@ Design constraints, in keeping with the rest of the project:
   banner. The feed is a monitoring signal, checked by a partner against the
   official text (docs/CONNECTOR.md, rule 2 of the boundary).
 
-Credentials resolve the standard way (anthropic SDK): ANTHROPIC_API_KEY, or
-ANTHROPIC_AUTH_TOKEN, or an ``ant auth login`` profile. No key is stored here.
+Model provider — either works, pick by which key you have. Nothing is stored here;
+keys come from the environment (locally: export the variable; in CI: a repository secret):
+  OPENAI_API_KEY     -> OpenAI backend (default model gpt-5-mini)
+  ANTHROPIC_API_KEY  -> Anthropic backend (default model claude-opus-5)
+Override with TMT_BRIEF_PROVIDER=openai|anthropic and TMT_BRIEF_MODEL=<model id>.
 
 Usage:
     python3 pipeline/brief.py --dry-run --limit 3     # extract + show the prompt, no API call, no creds needed
@@ -48,7 +51,18 @@ CONTACT = os.environ.get("TMT_RADAR_CONTACT", "compliance@trilegal.com")
 UA = {"User-Agent": "Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)",
       "From": CONTACT}
 
-MODEL = os.environ.get("TMT_BRIEF_MODEL", "claude-opus-5")
+def _resolve_provider():
+    p = (os.environ.get("TMT_BRIEF_PROVIDER") or "").lower()
+    if p and p not in ("openai", "anthropic"):
+        sys.exit(f"unknown TMT_BRIEF_PROVIDER={p!r} (use openai|anthropic)")
+    if p:
+        return p
+    if os.environ.get("OPENAI_API_KEY"):
+        return "openai"
+    return "anthropic"   # key, auth token, or an `ant auth login` profile
+
+PROVIDER = _resolve_provider()
+MODEL = os.environ.get("TMT_BRIEF_MODEL") or ("gpt-5-mini" if PROVIDER == "openai" else "claude-opus-5")
 EFFORT = os.environ.get("TMT_BRIEF_EFFORT", "medium")   # low | medium | high | xhigh | max
 MAX_CHARS = 18000                                        # ~first dozen pages; enough for the operative part
 
@@ -171,6 +185,27 @@ def call_claude(client, it, text):
     return {k: data[k] for k in ("brief", "so_what", "confidence")}
 
 
+def call_openai(client, it, text):
+    """Same brief via the OpenAI API (strict JSON-schema output)."""
+    resp = client.chat.completions.create(
+        model=MODEL,
+        messages=[{"role": "system", "content": SYSTEM},
+                  {"role": "user", "content": build_user_prompt(it, text)}],
+        response_format={"type": "json_schema",
+                         "json_schema": {"name": "instrument_brief", "strict": True,
+                                         "schema": SCHEMA}},
+    )
+    choice = resp.choices[0]
+    if getattr(choice.message, "refusal", None):
+        raise RuntimeError(f"model declined: {choice.message.refusal[:120]}")
+    data = json.loads(choice.message.content)
+    return {k: data[k] for k in ("brief", "so_what", "confidence")}
+
+
+def call_llm(client, it, text):
+    return call_openai(client, it, text) if PROVIDER == "openai" else call_claude(client, it, text)
+
+
 def select(items, args):
     if args.ids:
         want = set(args.ids)
@@ -201,16 +236,21 @@ def main():
 
     cache = load_json(CACHE, {})
     chosen = select(items, args)
-    print(f"[brief] {len(chosen)} item(s) selected · model={MODEL} effort={EFFORT} · dry_run={args.dry_run}")
+    print(f"[brief] {len(chosen)} item(s) selected · provider={PROVIDER} model={MODEL} · dry_run={args.dry_run}")
 
     client = None
     if not args.dry_run:
         try:
-            import anthropic
-            client = anthropic.Anthropic()   # resolves ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN / ant profile
+            if PROVIDER == "openai":
+                from openai import OpenAI
+                client = OpenAI()            # resolves OPENAI_API_KEY from the environment
+            else:
+                import anthropic
+                client = anthropic.Anthropic()   # ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN / ant profile
         except Exception as e:
-            sys.exit(f"[brief] cannot start the Anthropic client ({e}). Set ANTHROPIC_API_KEY or run `ant auth login`, "
-                     f"or use --dry-run to test extraction without credentials.")
+            sys.exit(f"[brief] cannot start the {PROVIDER} client ({e}). Set "
+                     f"{'OPENAI_API_KEY' if PROVIDER == 'openai' else 'ANTHROPIC_API_KEY'} "
+                     f"(or use --dry-run to test extraction without credentials).")
 
     done = skipped = failed = 0
     for it in chosen:
@@ -236,13 +276,13 @@ def main():
             continue
 
         try:
-            brief = call_claude(client, it, text)
+            brief = call_llm(client, it, text)
         except Exception as e:
             print(f"  fail  {iid}  {title}  — {e}")
             failed += 1
             continue
-        cache[iid] = {**brief, "model": MODEL, "doc_hash": h,
-                      "generated_at": datetime.datetime.now().strftime("%Y-%m-%d")}
+        cache[iid] = {**brief, "model": MODEL, "provider": PROVIDER, "doc_hash": h,
+                      "generated_at": datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).strftime("%Y-%m-%d")}
         CACHE.write_text(json.dumps(cache, indent=2, ensure_ascii=False))  # checkpoint each success
         print(f"  ok    {iid}  {title}  [{brief['confidence']}]")
         done += 1
