@@ -145,9 +145,17 @@ Setup, once:
    `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` — `pipeline/brief.py` auto-detects whichever is
    present. Never commit a key, and never paste one into a chat.
 3. Import the repo in Vercel (framework: none). `vercel.json` does the rest.
-4. **Access**: a default Vercel URL is reachable by anyone who has it, and the page embeds
-   the client roster. Turn on Vercel Deployment Protection (or serve behind the firm's SSO)
-   before sharing the URL beyond the team.
+4. **Access — do this before sharing the URL.** A default Vercel URL is reachable by anyone
+   who has it, and the page embeds the client roster. `middleware.js` gates the whole
+   deployment (page *and* `/api/sweep`) behind HTTP Basic Auth at Vercel's edge, so an
+   unauthenticated request never receives the HTML. It runs on the free Hobby plan — no
+   Deployment Protection subscription needed. Set `AUTH_USER` / `AUTH_PASS` in Vercel →
+   Settings → Environment Variables and redeploy; unset, it falls back to the starter
+   credentials in the file, which you should change.
+
+   A login rendered *inside* the dashboard would not do this job: the page is one static
+   file, so the roster and the password would both be readable in its source. The gate has
+   to sit in front of the file, which is what middleware does.
 
 Two honest caveats: government WAFs may treat GitHub's cloud IPs differently from the firm
 network — if sources read FAILED in CI but fine locally, that is why, and the firm-machine
