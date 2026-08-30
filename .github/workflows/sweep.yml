@@ -64,11 +64,25 @@ jobs:
           python engine/tracker.py sweep || echo "::warning::sweep reported source failures — recorded in health, visible on the Coverage tab"
 
       - name: Assert the sweep actually ran
-        # A crash before the sweep wrote health must not let a stale ledger be re-stamped
-        # and published as fresh. health.json is written at the end of every sweep.
+        # A crash before the sweep wrote health must not let a stale ledger be re-stamped and
+        # published as fresh. Check the timestamp INSIDE health.json, not the file's mtime:
+        # checkout rewrites every file, so an mtime test would pass on a stale checkout and
+        # catch nothing (verified — a fresh clone yields a 0-minute-old health.json from Aug).
         run: |
-          find engine/health.json -newermt '-2 hours' | grep -q . \
-            || { echo "::error::engine/health.json was not refreshed by this run — aborting before export"; exit 1; }
+          python - <<'PY'
+          import datetime, json, sys
+          try:
+              gen = json.load(open("engine/health.json"))["generated"]
+              age = (datetime.datetime.now(datetime.timezone.utc)
+                     - datetime.datetime.fromisoformat(gen)).total_seconds() / 3600
+          except Exception as e:
+              sys.exit(f"::error::cannot read engine/health.json ({e}) — the sweep did not complete")
+          print(f"health.json generated {gen} ({age:.2f}h ago)")
+          if age > 2:
+              sys.exit("::error::health.json was not refreshed by this run "
+                       f"(stamped {gen}) — aborting before export so stale data "
+                       "is not republished under a fresh timestamp")
+          PY
 
       - name: Export the feed
         run: python engine/tracker.py export
