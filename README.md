@@ -60,7 +60,7 @@ custody:
    each source URL across all three lanes, beside the live listing, so a person can verify
    nothing was missed. Zero-yield sources are listed too — silence is checkable.
 
-The brief is composed from the instrument's metadata by default; running `pipeline/brief.py` (server-side; OpenAI or Anthropic key, auto-detected) reads each document's text and swaps in a substantive LLM brief, marked "AI brief · verify". The whole chain also runs hosted — GitHub Actions sweeps and rebuilds daily or on demand, Vercel serves the page — see `docs/CONNECTOR.md` → Hosted mode. An **Update now**
+The brief is composed from the instrument's metadata by default; running `pipeline/brief.py` (server-side; OpenAI or Anthropic key, auto-detected) reads each document's text and swaps in a substantive LLM brief, marked "AI brief · verify". The whole chain also runs hosted — GitHub Actions sweeps and rebuilds **when a human triggers it**, Vercel serves the page — see `docs/CONNECTOR.md` → Hosted mode. An **Update now**
 button sits by the "Last updated" stamp; in the sandboxed published page it opens the local
 operator console, or POSTs to a partner pipeline endpoint if one is wired (see `docs/CONNECTOR.md`).
 

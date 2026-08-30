@@ -9,10 +9,17 @@
 # Vercel (connected to this repo) then redeploys dist/ automatically, so the partner
 # URL refreshes a minute or two after each run.
 #
-# Triggers: the dashboard's "Update now" button opens this workflow's page — one
-# authenticated click on "Run workflow" starts it. A daily scheduled run keeps the
-# page fresh unattended. There is deliberately no secret in the page itself: a static
-# dashboard cannot hold a token without exposing it to every viewer.
+# Trigger: a human, always. The dashboard's "Update now" button POSTs to /api/sweep, which
+# dispatches this workflow; the workflow page's "Run workflow" does the same thing by hand.
+#
+# There is deliberately NO schedule, matching engine/run_sweep.sh and the README: collection is
+# a supervised, on-demand act. That is a compliance position, not a preference — unattended
+# repetitive crawling is what turns an arguable technical breach into an evidential one, and the
+# per-source legal analysis (engine/audit/) rests on load that is occasional and human-initiated.
+# Do not add a `schedule:` trigger here without revisiting that analysis.
+#
+# There is deliberately no secret in the page itself either: a static dashboard cannot hold a
+# token without exposing it to every viewer, so the token lives in Vercel and /api/sweep uses it.
 #
 # Honesty notes, same rules as everywhere else in this project:
 # - A failing source is recorded in health and shown on the Coverage/Audit tabs,
@@ -29,9 +36,7 @@ name: sweep
 run-name: "Sweep every source → rebuild the radar"
 
 on:
-  workflow_dispatch: {}
-  schedule:
-    - cron: "30 5 * * *"   # 11:00 IST daily
+  workflow_dispatch: {}   # human-triggered only — see the note above before adding a schedule
 
 permissions:
   contents: write

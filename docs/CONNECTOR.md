@@ -131,7 +131,8 @@ The repo ships a complete hosted pipeline so nothing depends on any one laptop:
 
 - **`.github/workflows/sweep.yml`** runs the exact `run_sweep.sh` chain on GitHub Actions —
   sweep all sources → export → LLM briefs → rebuild the dashboard → commit the refreshed
-  ledger/data/page back to the repo. Daily on schedule, or on demand from the workflow page.
+  ledger/data/page back to the repo. **On demand only — there is no schedule**, so every sweep
+  is a supervised act (see the note at the top of the workflow file before adding one).
 - **`vercel.json`** serves `dist/` on Vercel: connect the repo once and every CI commit
   redeploys the partner URL automatically (`/` serves the dashboard).
 - **The page's Update-now button**, in hosted builds, opens the workflow page — one
