@@ -5,16 +5,41 @@
 // dashboard POSTs to /api/sweep; this function asks GitHub to run the sweep workflow.
 //
 // Configure in Vercel → Settings → Environment Variables:
-//   GITHUB_DISPATCH_TOKEN   a fine-grained PAT for this repo with Actions: read & write
-//   GITHUB_REPO             owner/repo, e.g. abhinandansethi/TMT-Tracker
+//   a GitHub token with Actions: read & write on this repo, named any of TOKEN_NAMES below
+//   (GITHUB_DISPATCH_TOKEN is canonical; TMT_TOKEN etc. are accepted, case-insensitively).
 //
-// Until both are set the endpoint answers 501 with a plain explanation, and the dashboard
-// falls back to offering the GitHub "Run workflow" link. Nothing here ever claims a sweep
-// ran that did not run.
+// The repository is derived automatically from Vercel's built-in VERCEL_GIT_REPO_OWNER /
+// VERCEL_GIT_REPO_SLUG on a git-connected project; set GITHUB_REPO ("owner/repo") only to
+// override that.
+//
+// Until a token is present the endpoint answers 501 naming exactly what it looked for, and the
+// dashboard falls back to offering the GitHub "Run workflow" link. Nothing here ever claims a
+// sweep ran that did not run, and no token value is ever echoed, logged, or returned.
 //
 // NOTE ON ACCESS: this endpoint inherits the deployment's protection. On an unprotected
-// deployment anyone with the URL could trigger a sweep (spending Actions minutes and
-// hitting government sites). Keep Vercel Deployment Protection on.
+// deployment anyone with the URL could trigger a sweep (spending Actions minutes and hitting
+// government sites in the firm's name). Keep Vercel Deployment Protection on.
+
+const TOKEN_NAMES = [
+  'GITHUB_DISPATCH_TOKEN', 'TMT_TOKEN', 'TMT_DISPATCH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN',
+];
+
+// Vercel variable names are case-sensitive and easy to mistype, so match case-insensitively
+// across the accepted names rather than failing on a capitalisation difference.
+function findToken(env) {
+  const want = new Set(TOKEN_NAMES.map((n) => n.toLowerCase()));
+  for (const [k, v] of Object.entries(env)) {
+    if (want.has(k.toLowerCase()) && v) return v;
+  }
+  return null;
+}
+
+function findRepo(env) {
+  if (env.GITHUB_REPO) return env.GITHUB_REPO;
+  const owner = env.VERCEL_GIT_REPO_OWNER;
+  const slug = env.VERCEL_GIT_REPO_SLUG;
+  return owner && slug ? `${owner}/${slug}` : null;
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -22,16 +47,26 @@ module.exports = async (req, res) => {
     return res.status(405).json({ ok: false, message: 'POST only.' });
   }
 
-  const token = process.env.GITHUB_DISPATCH_TOKEN;
-  const repo = process.env.GITHUB_REPO;
-  if (!token || !repo) {
+  const token = findToken(process.env);
+  const repo = findRepo(process.env);
+
+  if (!token) {
     return res.status(501).json({
       ok: false,
-      message: 'This deployment has no sweep trigger configured yet. Add GITHUB_DISPATCH_TOKEN '
-        + 'and GITHUB_REPO in Vercel → Settings → Environment Variables, then redeploy.',
+      message: 'No GitHub token is configured on this deployment. Add one in Vercel → Settings → '
+        + `Environment Variables named any of: ${TOKEN_NAMES.join(', ')} — then redeploy `
+        + '(environment changes only take effect on a new deployment).',
+    });
+  }
+  if (!repo) {
+    return res.status(501).json({
+      ok: false,
+      message: 'The repository could not be determined. Set GITHUB_REPO to "owner/repo" in '
+        + 'Vercel → Settings → Environment Variables, then redeploy.',
     });
   }
 
+  const branch = process.env.VERCEL_GIT_COMMIT_REF || 'main';
   const url = `https://api.github.com/repos/${repo}/actions/workflows/sweep.yml/dispatches`;
   try {
     const gh = await fetch(url, {
@@ -43,7 +78,7 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json',
         'User-Agent': 'tmt-radar-dashboard',
       },
-      body: JSON.stringify({ ref: process.env.GITHUB_REF_NAME || 'main' }),
+      body: JSON.stringify({ ref: branch }),
     });
 
     // 204 No Content is GitHub's success for a workflow dispatch.
@@ -59,10 +94,14 @@ module.exports = async (req, res) => {
     const detail = await gh.text();
     let reason = '';
     try { reason = JSON.parse(detail).message || ''; } catch (e) { reason = ''; }
+    const hint = gh.status === 401 ? ' The token is invalid or has expired.'
+      : gh.status === 403 ? ' The token likely lacks Actions: read & write on this repository.'
+      : gh.status === 404 ? ` Checked ${repo} for .github/workflows/sweep.yml on branch ${branch} —`
+        + ' a 404 here usually means the token cannot see this repository.'
+      : '';
     return res.status(502).json({
       ok: false,
-      message: `GitHub declined the request (${gh.status}${reason ? ': ' + reason : ''}). `
-        + 'Check that the token has Actions: read & write on this repository and has not expired.',
+      message: `GitHub declined the request (${gh.status}${reason ? ': ' + reason : ''}).${hint}`,
     });
   } catch (e) {
     return res.status(502).json({ ok: false, message: 'Could not reach the GitHub API.' });
