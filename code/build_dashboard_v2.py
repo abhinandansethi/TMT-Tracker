@@ -439,14 +439,22 @@ blind = [{"n": blind_label(s), "r": s.get("blind_reason", s["status"]),
 # v2 registry.excluded entries marked "planned" are cleared-but-not-yet-built venues (e.g.
 # NCLAT: legally cleared, listing frozen at 2021, needs a date-filter driver). Name them on
 # the coverage page so the "whole world" is complete rather than silently short.
+# "planned" = cleared but never built. "demoted" = was live and had to be removed. Those are
+# different claims: a reader deciding whether a venue is watched needs to know the difference
+# between not-yet-built and no-longer-readable, so the labels must not be shared.
+EXCLUDED_LABEL = {
+    "planned": ("PLANNED — cleared, adapter pending", "No live lane (planned)"),
+    "demoted": ("DEMOTED — source unreadable", "No live lane (source down)"),
+}
 for x in registry.get("excluded", []):
-    if x.get("status") != "planned" or x.get("id") in V2_LIVE_IDS:
+    label = EXCLUDED_LABEL.get(x.get("status"))
+    if not label or x.get("id") in V2_LIVE_IDS:
         continue
     reg_ = (x.get("regulator") or "").strip()
     nm = x.get("name") or (x.get("id") or "").replace("_", " ").title()
     nm = f"{reg_} {nm}".strip() if reg_ and not nm.lower().startswith(reg_.lower()) else nm
-    blind.append({"n": nm, "r": "PLANNED — cleared, adapter pending",
-                  "c": "No live lane (planned)", "q": clean(x.get("reason", "")),
+    blind.append({"n": nm, "r": label[0],
+                  "c": label[1], "q": clean(x.get("reason", "")),
                   "st": STRATUM_LABEL.get(x.get("stratum", ""), "Technology and data")})
 
 # Not yet live: v1 planned venues the v2 engine has not shipped an adapter for.
