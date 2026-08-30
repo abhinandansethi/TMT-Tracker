@@ -1587,7 +1587,18 @@ if _memo_src.exists():
             (_memo_dst / _f).write_bytes((_memo_src / _f).read_bytes())
 
 html = TEMPLATE.replace("__DATA__", data_json)
-(DIST / "tmt-radar-v2.html").write_text(html, encoding="utf-8")
+_out = DIST / "tmt-radar-v2.html"
+_out.write_text(html, encoding="utf-8")
+
+# Vercel promotes any build that exits 0. dist/ also holds the legacy v1 page, so it is never
+# empty and Vercel's own missing-output-directory guard can never fire — meaning a build that
+# silently produced no page would deploy successfully and serve a 404 at "/". Assert the
+# artifact exists and is a plausible size, so a broken build fails loudly and the previous
+# deployment keeps serving instead.
+if not _out.exists() or _out.stat().st_size < 100_000:
+    raise SystemExit(f"build produced no usable page at {_out} "
+                     f"({_out.stat().st_size if _out.exists() else 'missing'} bytes) — "
+                     f"refusing to exit 0 and let a broken deployment be promoted")
 print(f"wrote {DIST/'tmt-radar-v2.html'} ({len(html):,} bytes)")
 print(f"rows={len(rows)} folded={folded_n} undated={undated_n} live_venues={live_count} "
       f"regs={reg_count} blind={len(blind)} notlive={notlive}")

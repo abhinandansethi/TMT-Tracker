@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "buildCommand": "python3 code/build_dashboard_v2.py",
   "installCommand": "",
   "outputDirectory": "dist",
