@@ -124,5 +124,745 @@
     "provider": "openai",
     "doc_hash": "5774d2891ce7",
     "generated_at": "2026-08-31"
+  },
+  "fc308cf2fe": {
+    "brief": "Ordered the petition be listed before the Tribunal Bench for orders/directions on 25 Aug 2026 due to Respondent No.2's failure to file its evidence affidavit.",
+    "so_what": "Parties must appear at the Tribunal Bench listing; Respondent No.2's evidence affidavit remains outstanding.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "8347d60daab9",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "fb8ba4668c": {
+    "brief": "Petitioner Hathway is permitted to file an amendment application within three weeks; the hearings are adjourned and listed for directions on 29.09.2026.",
+    "so_what": "Hathway must file the amendment within three weeks; matter adjourned to 29.09.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "f321de1548a8",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "d6fb1a2672": {
+    "brief": "Requires Creative Cable Network Pvt Ltd to file its evidence affidavit within four weeks (from 25 Aug 2026) and lists the matter for directions on 12 Oct 2026.",
+    "so_what": "Petitioner must file the affidavit; binds Creative Cable Network Pvt Ltd (petitioner).",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "13fcc2d68432",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "b4383c1f76": {
+    "brief": "Granted Indiacast four weeks from 25.08.2026 to file a rejoinder affidavit in proceedings against Paavani; matter listed for directions on 09.10.2026.",
+    "so_what": "Petitioner must file rejoinder within four weeks; registry to list matter on 09.10.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "31f9c4dbe3a4",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "99aa964889": {
+    "brief": "Frames issues whether Deon Networks must pay Creative Cable ₹12,36,933 plus 18% interest and whether the petition is time‑barred; orders petitioner to file evidence affidavit within four weeks.",
+    "so_what": "Petitioner must file an evidence affidavit within four weeks; respondents face potential liability to pay ₹12,36,933 plus 18% interest.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "fcf817a6fefe",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "8f6f9f787a": {
+    "brief": "Permitted Siti Networks Ltd a one-week extension (from 25/08/2026) to file its Rejoinder Affidavit.",
+    "so_what": "Siti Networks must file its Rejoinder Affidavit within one week (from 25/08/2026).",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "1b39f397090f",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "89c28494c5": {
+    "brief": "Allows the respondent's Legal Aid Counsel to file a vakalatnama today and to file an application to recall the ex-parte order, with hearing listed for 30.09.2026.",
+    "so_what": "Respondent must file vakalatnama and recall application; Tribunal to hear on 30.09.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "bf7fa07164ab",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "775197c3c2": {
+    "brief": "Granted Siti Networks Ltd four weeks to file its evidence affidavit in this ex‑parte proceeding; matter listed for directions on 12 October 2026.",
+    "so_what": "Siti Networks Ltd must file its evidence affidavit within four weeks (binds the petitioner).",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "3f95b2819a33",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "2f89b33112": {
+    "brief": "Granted Vk Digital Network Pvt Ltd a four-week extension to file its rejoinder affidavit, and listed the matter for directions on 16.10.2026.",
+    "so_what": "Petitioner must file rejoinder within four weeks; parties must appear 16.10.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "0ec03ba984d4",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "2e09f310cf": {
+    "brief": "Extends the deadline for submitting comments on TRAI's Consultation Paper on draft QoS Regulations (2024) to 2 Sept 2026 and counter-comments to 15 Sept 2026.",
+    "so_what": "Stakeholders must file comments by 2 Sept and counter-comments by 15 Sept 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "e7b90cc1f99e",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "224b62226e": {
+    "brief": "Grants Bharti Airtel two weeks to file a Rejoinder Affidavit; case listed for directions on 28 September 2026.",
+    "so_what": "Bharti Airtel must file its Rejoinder Affidavit within two weeks; binds the petitioner.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "596dc316dca6",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "0d6110bb5b": {
+    "brief": "Adjournment of Paavani Digital Communications' appearance is allowed, but any further adjournment will require the Respondent to pay Rs.5,000 to TDSAT Employees' Welfare Society; issues listed 03.09.2026.",
+    "so_what": "Respondent Paavani Digital Communications must pay Rs.5,000 for any further adjournment.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "0cb3978cecce",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "f5815b5780": {
+    "brief": "Permits the petitioner to file written submissions by end of 24/08/2026 and lists the matter for final hearing on 07.10.2026.",
+    "so_what": "Petitioner must file submissions by that date; both parties must appear for final hearing on 07.10.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "5a258d42fa1c",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "e8eb75a3eb": {
+    "brief": "Requires respondent Torra International (a proprietorship) to specify and bring on record a living entity to be sued, serve/file that application, and pay costs; matter listed 05.10.2026.",
+    "so_what": "Torra International must identify the entity, serve and file the application, and pay the costs.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "a2864a7ff68c",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "e869c54105": {
+    "brief": "Adjourns GTPL Hathway Ltd v RBB Digital Communications to 11 September 2026 and grants petitioner an extension to file affidavits of examination-in-chief until that date.",
+    "so_what": "Petitioner (GTPL Hathway) must file affidavits of examination-in-chief by 11 September 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "286bbeb699e3",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "e81e453f02": {
+    "brief": "Extended Act Digital Home Entertainment Pvt Ltd's deadline to file its evidence affidavit by three weeks; matter listed for directions on 25.09.2026.",
+    "so_what": "Petitioner Act Digital must file its evidence affidavit within three weeks.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "a58212ab616a",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "e72287d7d6": {
+    "brief": "Hearing in Siti Networks Ltd v Geethanjali Cable Network is adjourned to 15 September 2026, granting the respondent one more opportunity to appear.",
+    "so_what": "Respondent must appear at the adjourned hearing on 15 September 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "a869b0555518",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "e09a4013e4": {
+    "brief": "Grants Siti Networks Ltd four weeks to file its evidence affidavit in three ex‑parte broadcasting petitions; matters listed for directions on 1 October 2026.",
+    "so_what": "Siti Networks must file the evidence affidavit within four weeks.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "f47683e9dd2a",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "d47e8aee0c": {
+    "brief": "Directed a reminder-cum-show-cause notice be issued via the Controlling Police Officer to the Police Station, returnable for directions on 07.12.2026.",
+    "so_what": "Police Station must respond to the show-cause via the Controlling Police Officer by 07.12.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "4f1396f54e67",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "cdff0eaeab": {
+    "brief": "Granted Siti Networks Ltd a final three-week extension to file its evidence affidavit in this ex‑parte matter, listing the matter for directions on 1 October 2026.",
+    "so_what": "Siti Networks must file its evidence affidavit within three weeks; proceeding listed for directions on 1 Oct 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "149b3c709f6b",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "cdf2b3088a": {
+    "brief": "Directed decree-holder to file within four weeks an application specifying execution course and naming company's authorised representative/executive director with parentage, address and police-station details before seeking coercive process.",
+    "so_what": "Decree-holder must file the application and provide executive's identity/address to enable service before coercive measures.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "a8db8c058298",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "c4fe779023": {
+    "brief": "Requires Respondent No.1 to file vakalatnama and serve a reply (paying Rs.1,000 cost) within two weeks, with replication due two weeks thereafter; listed 16.11.2026.",
+    "so_what": "Respondent No.1 must file vakalatnama and reply with Rs.1,000 cost; replication follows.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "f03c5f274c22",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "b6ed815ef3": {
+    "brief": "Allowed recall of ex-parte proceedings and condoned 17-day delay, permitting respondent Simran Cable to file reply within four weeks and ordering Rs.1,000 costs; hearing 01.12.2026.",
+    "so_what": "Respondent must file reply in four weeks; pay Rs.1,000 costs to petitioner's counsel.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "49f278368e5f",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "b1aa230f7b": {
+    "brief": "Granted Nova Digital and Broadband Pvt Ltd four weeks to file its evidence affidavit in these petitions; matters listed for directions on 05.10.2026.",
+    "so_what": "Petitioner (Nova Digital) must file the evidence affidavit within four weeks.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "adc54d324645",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "af9a838d68": {
+    "brief": "Adjourns Fastway Transmission Pvt Ltd v Raspreet Cable and Anr. to 11 September 2026 and extends petitioner's time to file examination-in-chief affidavits until the next hearing.",
+    "so_what": "Respondent No.1 must appear by 11 Sept 2026; petitioner must file witness affidavits by that date.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "6f258fb180c1",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "af6f1f41da": {
+    "brief": "Granted Siti Networks one week's extension from 24 Aug 2026 to file its evidence affidavit; matter listed for directions on 18 Sep 2026.",
+    "so_what": "Siti Networks must file its evidence affidavit within one week; binds the petitioner.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "715a44d0d794",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "a60dd5e190": {
+    "brief": "Allows Siti Networks Ltd three further weeks from 24 Aug 2026 to file its evidence affidavit in the listed ex-parte petitions; next directions hearing 01 Oct 2026.",
+    "so_what": "Siti Networks Ltd must file its evidence affidavit within the three-week extension.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "ff27133f1778",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "a1098b0dbb": {
+    "brief": "Granted Siti Networks Ltd a three-week extension from 24.08.2026 to file its evidence affidavit in the ex-parte broadcasting petition; listed for directions on 01.10.2026.",
+    "so_what": "Siti Networks Ltd must file its evidence affidavit within three weeks (from 24.08.2026).",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "cd50ab00fedc",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "9c548ff241": {
+    "brief": "Court ordered that issues in this broadcasting petition be framed on 21 September 2026.",
+    "so_what": "Parties must attend on 21.09.2026 for framing of issues.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "67430fc0bdf2",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "9ab27b1901": {
+    "brief": "Adjourned the petition's hearing to 11 September 2026 to give the absent respondent another opportunity to appear.",
+    "so_what": "Respondent(s) must appear on 11 September 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "ca1cd27ac5e3",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "83f5bfcc09": {
+    "brief": "The Tribunal listed Siti Networks Ltd v Uday Cable Network for further hearing on 07.09.2026.",
+    "so_what": "Both parties (particularly the respondent) must appear for the hearing on 07.09.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "9d566c32c6c6",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "837140204d": {
+    "brief": "Order issuance of police-station notice requiring director Devender Kumar Srivastava to appear before TDSAT on 12.10.2026 to explain why civil-prison proceedings for decree execution should not proceed.",
+    "so_what": "Director Devender Kumar Srivastava must attend TDSAT on 12.10.2026 after police notice; face potential civil-prison process.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "85af2887df19",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "7ad7332baf": {
+    "brief": "Permits Siti Networks to file its evidence affidavit today and grants Snlv. Friends Cable (Jharsugda) four weeks to file its evidence affidavit; matter listed 01.10.2026.",
+    "so_what": "Siti Networks must file affidavit today; Snlv. Friends Cable must file its affidavit within four weeks.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "773a37110d6a",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "73c0a68da1": {
+    "brief": "Adjourned Hathway Digital Ltd's petition against M/s Rameshwar Cable Network to 11 September 2026 and extended time to file examination-in-chief affidavits until that date.",
+    "so_what": "Petitioner must file witness affidavits by 11 Sep 2026; respondent required to appear on that date.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "63c03773b594",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "71b1a5a4d3": {
+    "brief": "Extended three-week further time to Siti Networks Ltd to file its evidence affidavit in ex-parte proceedings against Aditya Cable; directions listed 01.10.2026.",
+    "so_what": "Siti Networks must file its evidence affidavit within three weeks before the 01.10.2026 directions hearing.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "7dfcd154d626",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "7152383883": {
+    "brief": "TDSAT granted respondents in Broadcasting Petitions 27–30/2024 a four‑week extension from 24‑Aug‑2026 to file their Evidence Affidavits; matters listed for directions on 05‑Oct‑2026.",
+    "so_what": "Respondents (Biswa Darshan; Kamal Das; Arup Cable Network; Akangsha Netcom) must file Evidence Affidavits within four weeks.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "96b8ffe4ceb2",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "6d15f23677": {
+    "brief": "Grants Digital Cable Center a 10‑day extension to file its evidence affidavit, subject to possible costs if not filed; matters listed for directions on 14.09.2026.",
+    "so_what": "Respondent must file the affidavit within 10 days or face costs.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "92672118ec5f",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "666f83d7c6": {
+    "brief": "Directs the Registry to write to the Director General of Police, Odisha, annexing this and prior orders and to report action taken against erring Khordha/Bhubaneswar police officers; next hearing 12.10.2026.",
+    "so_what": "Registry must send letter and DGP Odisha must provide action report; binds TDSAT Registry and Odisha police.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "f6b4aa8b34d7",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "65420ddc8d": {
+    "brief": "Granted a three-week extension to Siti Networks Ltd to file its evidence affidavit in the ex-parte broadcasting petitions, with directions listed for 01.10.2026.",
+    "so_what": "Siti Networks must file the evidence affidavit within three weeks; matter listed for directions on 01.10.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "2a16c5c412a7",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "5f5c55a886": {
+    "brief": "Directs DGP, Uttar Pradesh to issue a named show-cause notice to the concerned police station in-charge requiring an explanation and compliance report within four weeks (24 Aug 2026).",
+    "so_what": "Police station in-charge must submit explanation and compliance report within four weeks; UP DGP must issue the notice.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "58def787da5e",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "5d77ac32f0": {
+    "brief": "Adjourned proceedings between GTPL Hathway and Sanjivani Cable Network to 11 September 2026, and permitted GTPL Hathway to file examination-in-chief affidavits by that date.",
+    "so_what": "GTPL must file witness examination-in-chief affidavits by 11 Sep 2026; Sanjivani must appear on that date.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "3f660cbe81cf",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "52439a72d4": {
+    "brief": "Granted one final opportunity to file the settlement deed and fresh power in petitions between Indusind Media & Communications Ltd. and Zee Media, and listed the matter for hearing on 19.11.2026.",
+    "so_what": "Petitioner and respondent must file settlement deed and fresh power by 19 November 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "7eec794def6d",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "4d4c08cc81": {
+    "brief": "Adjourns the petition's hearing to 15.09.2026 to give the absent respondent one more chance to appear.",
+    "so_what": "Respondent must appear at TDSAT on 15.09.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "9cfbef1adc3c",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "4bd6674b65": {
+    "brief": "Allowed the petitioner two weeks from 24/08/2026 to file a rejoinder affidavit; matter listed for directions on 18/09/2026.",
+    "so_what": "Petitioner must file the rejoinder within two weeks; case is scheduled for TDSAT directions on 18/09/2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "daf115640dd5",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "3cd7a54ce9": {
+    "brief": "Listed this petition for hearing on 06.10.2026, proceeded ex parte against Respondent No.1, and recorded the Petitioner’s virtual appearance.",
+    "so_what": "Parties must appear on 06.10.2026; Respondent No.1 is treated as absent/ex parte.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "e986fc22e731",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "3bd3da3902": {
+    "brief": "Granted Azimgang Cable Link a 10-day extension to file its evidence affidavit (order dated 24/08/2026), failing which costs may be imposed.",
+    "so_what": "Azimgang Cable Link must file the evidence affidavit within 10 days; non-compliance may attract costs.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "9d13f76b5a2e",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "3a4d765237": {
+    "brief": "Directed issuance of a show-cause notice to the concerned Police Station in-charge via the UP DGP, requiring an explanation and compliance report within four weeks for non-compliance.",
+    "so_what": "Police Station in-charge must submit explanation and compliance report to UP DGP within four weeks; non-compliance may invite coercive action.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "b4ae799f15fb",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "34421d0d59": {
+    "brief": "Continues the interim relief in GTPL Hathway's broadcasting petitions against the listed local cable operators until the next hearing on 11.09.2026.",
+    "so_what": "Keeps respondents bound by the Tribunal's interim order of 06.01.2026 (named cable operators) until 11.09.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "afc69ab590cc",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "332399a408": {
+    "brief": "Permits the Respondent Supersonic Broadband to file its evidence affidavit on 24.08.2026; matter listed for directions on 11.09.2026.",
+    "so_what": "Binds Respondent (Supersonic Broadband) to file its evidence affidavit by 24.08.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "eb77b2dc8962",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "2c360f0ea0": {
+    "brief": "Tribunal proceeded ex parte against respondent Sanjay Kumar (proprietor) and listed the matter before the Registrar for recording ex parte evidence on 02.12.2026.",
+    "so_what": "Registrar to record ex parte evidence 02.12.2026; absent respondent (Sanjay Kumar) will be bound by ex parte proceedings.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "721b8f144033",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "2af46ace7e": {
+    "brief": "Granted K Channel Cable Network-I one week's extension from 24/08/2026 to file its evidence affidavit; matter listed for directions on 03/09/2026.",
+    "so_what": "Respondent must file the evidence affidavit within one week (binds K Channel Cable Network-I).",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "11828190606e",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "135c580bd5": {
+    "brief": "Mandates the UP DGP to serve a show‑cause notice on the named police‑station in‑charge, requiring explanation and a compliance report within four weeks, or face coercive process; listed 07.12.2026.",
+    "so_what": "Police‑station in‑charge must file explanation and compliance report within four weeks; UP DGP to issue the notice.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "04eab7b2660f",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "12a156a7fd": {
+    "brief": "Adjourns the petition to 15 September 2026 and extends time for the petitioner to file examination‑in‑chief affidavits until the next hearing.",
+    "so_what": "Petitioner must file examination‑in‑chief affidavits by next hearing; respondent required to appear on 15.09.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "05b045dc5630",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "0c05b23edf": {
+    "brief": "Hearing to be listed in due course before TDSAT for Den Network Ltd v M/s Shiv Shakti Cable Network; respondent's evidence affidavit filed and pleadings complete (24 Aug 2026).",
+    "so_what": "TDSAT registry to list hearing; parties (Den Network and Shiv Shakti) must appear.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "1fcf0ac81c05",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "fe6def4b23": {
+    "brief": "Orders petitioner Nxt Digital Ltd to apply within four weeks for service by newspaper publication; matter listed for further directions on 16.11.2026.",
+    "so_what": "Petitioner must seek newspaper service to effect service; binds Nxt Digital Ltd.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "ebb5946dbfcd",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "f98aba2886": {
+    "brief": "Directs Intermedia Cable Communication Pvt. Ltd. and New Delhi Television Ltd. to meet in person for settlement discussions on 16 September 2026 and lists hearing for 19 November 2026.",
+    "so_what": "Both parties must attend the settlement meeting (preferably at Saket Singh's office) and appear at the 19 Nov hearing.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "8af47015a2e7",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "f1725ec8c5": {
+    "brief": "Requires petitioner CCN Digital Pvt Ltd to file an affidavit under Section 63(4) Bhartiya Sakshya Adhiniyam authenticating computer-ledger/statement and submit updated STB depreciation and interest (@18%) calculations by 27.11.2026.",
+    "so_what": "Petitioner must file affidavit and calculations; binds CCN Digital Pvt Ltd ahead of ex-parte hearing.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "33538be853da",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "ef8c154655": {
+    "brief": "Adjourned GTPL Hathway Ltd v QYOU Media India to 18 November 2026 for parties to file settlement agreement details; respondent paid the final installment.",
+    "so_what": "Parties must file settlement agreement details by 18 November 2026; binds petitioner and respondent.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "868d8cc45e1c",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "e8dd123ed1": {
+    "brief": "Adjourned the broadcasting petition to 14.12.2026, giving respondent Kesav Cable Vision one further chance to appear despite prior service of a bailable warrant.",
+    "so_what": "Respondent Kesav Cable Vision must appear on 14.12.2026; matter remains adjourned until then.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "3d4aa6d775ff",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "dafbc95e03": {
+    "brief": "Cross-examination of the petitioner’s witness(es) in Hathway Digital Ltd v M/s Home Cable Network is scheduled before the Court of Registrar on 10.09.2026.",
+    "so_what": "Petitioner to produce witness(es) for cross-examination before the Court of Registrar on 10.09.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "8a92f0d5fc88",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "d4c93b27a8": {
+    "brief": "Granted time to GTPL Hathway Ltd to file Christu Krupa Broadcasting Pvt. Ltd.'s fresh address; matter adjourned to 14 October 2026.",
+    "so_what": "Petitioner GTPL Hathway Ltd must file Christu Krupa's fresh address; binds petitioner until 14 Oct 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "a3692cee1f77",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "ca49cc0626": {
+    "brief": "The hearing in the appeal between IDBI Bank Ltd and Navabharat Co-operative Urban Bank Ltd is adjourned to 11 December 2026 at counsels' joint request.",
+    "so_what": "Both parties' counsels must appear on 11 December 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "a63949b56ed9",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "c3933311ec": {
+    "brief": "Orders fresh notice via Deputy Commissioner of Police to Respondent No.1 to ensure compliance and submit a report; petitioner must file affidavit within one week.",
+    "so_what": "Respondent No.1 must be served via DCP and submit compliance report; petitioner must file affidavit within one week.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "b0f8bf4a9e91",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "b51be91331": {
+    "brief": "Permitted State Bank of India's counsel to amend and resubmit its miscellaneous application by the next hearing and adjourned the appeal to 13 October 2026.",
+    "so_what": "SBI's counsel must amend and resubmit its miscellaneous application by the next hearing (13 Oct 2026).",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "c94e6e357d17",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "aea67147f3": {
+    "brief": "Ordered that Siti Networks Ltd v Bhavana Cable Network be listed before the Court of Registrar on 29.09.2026 for framing issues and recording evidence.",
+    "so_what": "Parties (Siti Networks and Bhavana Cable) must appear and produce evidence; Registrar to frame issues.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "9b8987eb2998",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "9951fa0236": {
+    "brief": "TDSAT directed respondent R.K. Cable to file a Vakalatnama today, to file a reply within four weeks and any replication within two weeks; hearing listed for 02.12.2026.",
+    "so_what": "Respondent R.K. Cable must file Vakalatnama, serve/file reply in four weeks; replication within two weeks.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "f3fd43bb88db",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "88fdca7c8f": {
+    "brief": "Adjourned the petition to 2 December 2026 and directed Registry to resend earlier orders and a reminder to Thiru P. Rajaram, District Police Office, Thanjavur.",
+    "so_what": "Registry must resend earlier orders and a reminder to Thiru P. Rajaram (District Police Office, Thanjavur).",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "bd123270c86a",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "7d4dabe47d": {
+    "brief": "Adjourned these broadcasting petitions to 03.12.2026, giving respondent No.1 an additional opportunity to appear and respond.",
+    "so_what": "Respondent No.1 must appear and file its response by 03.12.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "07d3bcee712f",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "7863f35e33": {
+    "brief": "Proceeding in GTPL Hathway v Pramod Cable adjourned to 04.11.2026; respondent No.2 given four weeks from 21.08.2026 to file its reply.",
+    "so_what": "R2 must file reply within four weeks; R1 must appear by 04.11.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "8941a871427f",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "77a418d025": {
+    "brief": "Adjourns the petition to 03.12.2026, permits respondent to file a reply (to be filed during the day) and grants petitioner leave to file a rejoinder by the next hearing.",
+    "so_what": "Respondent must file reply; petitioner may file rejoinder; both must appear on 3 Dec 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "9b072c7062f0",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "636f5938b0": {
+    "brief": "Adjourns the petition to 02.12.2026 and directs the Registry to resend earlier orders and a reminder to Thiru P. Rajaram (District Police Office, Thanjavur).",
+    "so_what": "Registry must send reminder and earlier orders to Thiru P. Rajaram; respondent must appear on 02.12.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "d306b8e956ca",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "613cf66414": {
+    "brief": "Grants respondent (Venus Cable Vision) a four-week extension from 21 Aug 2026 to file vakalatnama and reply, and adjourns the matter to 16 Nov 2026.",
+    "so_what": "Respondent must file vakalatnama and reply within four weeks; matter listed 16 Nov 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "106839bf2b32",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "4414d7bff1": {
+    "brief": "Adjourned Den Networks Ltd v Mayank Cable Network to 14.12.2026 and directed the Registry to send a reminder with earlier orders to Mahamandir Police Station.",
+    "so_what": "Registry must send reminder with earlier orders to Mahamandir Police Station; hearing postponed to 14 Dec 2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "4fb9fadb76e2",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
+  },
+  "41038f1a73": {
+    "brief": "Adjourned GTPL Hathway Ltd's broadcasting petition against DCN Channel to 07.12.2026 after noting the respondent's non-appearance despite service of a bailable warrant.",
+    "so_what": "DCN Channel must appear before TDSAT on 07.12.2026.",
+    "confidence": "high",
+    "model": "gpt-5-mini",
+    "provider": "openai",
+    "doc_hash": "3685b561b52f",
+    "prompt_version": 2,
+    "generated_at": "2026-08-31"
   }
 }
