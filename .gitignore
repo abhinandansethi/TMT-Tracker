@@ -11,3 +11,9 @@ pipeline/drafts/
 # dist/tmt-radar.html (legacy v1) is NOT ignored: nothing regenerates it.
 dist/tmt-radar-v2.html
 dist/memos/
+dist/favicon.ico
+dist/favicon.svg
+dist/favicon-*.png
+dist/apple-touch-icon.png
+dist/icon-*.png
+dist/site.webmanifest

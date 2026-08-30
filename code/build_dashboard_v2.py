@@ -7,6 +7,7 @@ engine/health.json; a stratum filter on the Instruments tab; Coverage grouped
 stratum -> regulator -> venue. Signals is unchanged. Writes dist/tmt-radar-v2.html.
 Visual system copied verbatim from build_dashboard.py (v1) — same type, same spacing.
 """
+import base64
 import json
 import os
 import re
@@ -586,6 +587,11 @@ data_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
 TEMPLATE = r"""<meta charset="utf-8">
 <title>TMT Regulatory Radar</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0C3A55">
+<link rel="icon" href="data:image/svg+xml;base64,__FAVICON_SVG__" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:wght@300;400;500&display=swap">
@@ -1585,6 +1591,16 @@ $('#sigs').innerHTML = D.signals.map(s =>
 </script>
 """
 
+# Favicon and web-app assets: copied beside the page at build time (they are generated output,
+# so dist/ holds copies while assets/favicon/ is the tracked source). The SVG is additionally
+# inlined into the head as a data URI, so the icon survives in the standalone artifact too,
+# where these sibling files do not exist.
+_ICONS = ROOT / "assets" / "favicon"
+if _ICONS.exists():
+    for _f in _ICONS.iterdir():
+        if _f.is_file():
+            (DIST / _f.name).write_bytes(_f.read_bytes())
+
 # Ship the sample memo beside the page so its link resolves from any host.
 _memo_src = ROOT / "memos"
 if _memo_src.exists():
@@ -1594,7 +1610,9 @@ if _memo_src.exists():
         if (_memo_src / _f).exists():
             (_memo_dst / _f).write_bytes((_memo_src / _f).read_bytes())
 
-html = TEMPLATE.replace("__DATA__", data_json)
+_svg = (_ICONS / "favicon.svg")
+_favicon_b64 = base64.b64encode(_svg.read_bytes()).decode() if _svg.exists() else ""
+html = TEMPLATE.replace("__DATA__", data_json).replace("__FAVICON_SVG__", _favicon_b64)
 _out = DIST / "tmt-radar-v2.html"
 _out.write_text(html, encoding="utf-8")
 
