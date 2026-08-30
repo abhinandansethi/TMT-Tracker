@@ -33,10 +33,11 @@ on:
 permissions:
   contents: write
 
-# Serialised against itself. It is NOT in sweep.yml's group: the two touch different files
-# (this one only brief_cache.json), and both push with rebase-and-retry, so an overlap is safe.
+# Shared with sweep.yml on purpose: sweep also commits pipeline/brief_cache.json (it briefs a
+# small slice of new items), so the two would race on the same file if they ran together.
+# Queue rather than rely on rebase-and-retry to untangle a same-file conflict.
 concurrency:
-  group: briefs
+  group: tmt-radar-pipeline
   cancel-in-progress: false
 
 jobs:

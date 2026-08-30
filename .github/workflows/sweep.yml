@@ -41,8 +41,10 @@ on:
 permissions:
   contents: write
 
+# Shared with briefs.yml: both jobs commit pipeline/brief_cache.json, so they must not run
+# concurrently and race on it. GitHub queues the second behind the first.
 concurrency:
-  group: sweep
+  group: tmt-radar-pipeline
   cancel-in-progress: false
 
 jobs:
