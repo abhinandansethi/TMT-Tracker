@@ -508,6 +508,24 @@ _orphaned = {sid for sid in items_by_src if sid not in _audit_seen_ids}
 if _orphaned:
     raise SystemExit(f"audit invariant broken: items from non-live sources {sorted(_orphaned)}")
 
+# The hosted-run URL is derived from the repo's own git remote, so a build made on the firm
+# machine carries it too — otherwise a locally-built page ships with the button disarmed and
+# silently loses the one-click refresh the hosted setup provides.
+def _actions_url() -> Optional[str]:
+    if os.environ.get("TMT_ACTIONS_URL"):
+        return os.environ["TMT_ACTIONS_URL"]
+    try:
+        import subprocess
+        url = subprocess.run(["git", "remote", "get-url", "origin"], cwd=ROOT,
+                             capture_output=True, text=True, timeout=5).stdout.strip()
+    except Exception:
+        return None
+    m = re.search(r"github\.com[:/]+([^/]+/[^/.]+)", url)
+    return f"https://github.com/{m.group(1)}/actions/workflows/sweep.yml" if m else None
+
+
+ACTIONS_URL = _actions_url()
+
 payload: dict[str, Any] = {
     # Real build time. Never hardcode this: a stated sweep time that did not happen
     # is a false claim about how fresh the ledger is.
@@ -526,10 +544,11 @@ payload: dict[str, Any] = {
     # button triggers the partner's pipeline endpoint if one is configured, else opens the
     # local operator console which runs the real sweep. Both are overridable at deploy time
     # via window.TMT_CONFIG = {pipelineEndpoint, consoleUrl}.
-    "updateConfig": {"pipelineEndpoint": None, "consoleUrl": "http://127.0.0.1:8787",
-                     # Hosted mode: CI bakes in its own workflow URL so the button can open
-                     # the "Run workflow" page. Locally unset -> the button explains itself.
-                     "actionsUrl": os.environ.get("TMT_ACTIONS_URL") or None},
+    "updateConfig": {"pipelineEndpoint": os.environ.get("TMT_PIPELINE_ENDPOINT", "/api/sweep"),
+                     "consoleUrl": "http://127.0.0.1:8787",
+                     # Fallback lane when the trigger endpoint is absent or unconfigured:
+                     # the GitHub "Run workflow" page, one authenticated click.
+                     "actionsUrl": ACTIONS_URL},
     "strataOrder": [{"key": st, "label": STRATUM_FILTER_LABEL[st]}
                     for st in ("telecom", "tech_data", "media")],
     "stratum_counts": stratum_counts,
@@ -1020,40 +1039,36 @@ $('#upd').textContent = D.updated;
   // The tooltip must not promise a sweep the page cannot start.
   if (!cfg.pipelineEndpoint && !cfg.actionsUrl) btn.title = 'How to refresh this page';
   const say = (html) => { note.innerHTML = html; note.classList.add('on'); };
+  const ghLink = () => cfg.actionsUrl
+    ? ' You can still run it yourself: <a href="' + esc(cfg.actionsUrl) + '" target="_blank" rel="noopener">open the sweep workflow</a> and press <b>Run workflow</b>.'
+    : ' On the firm machine, run <code>engine/run_sweep.sh</code>.';
   btn.addEventListener('click', async () => {
-    if (cfg.actionsUrl && !cfg.pipelineEndpoint) {
-      // Hosted mode: the sweep runs on GitHub Actions, independent of any one machine.
-      // A static page cannot hold a token that could start the run itself (it would be
-      // exposed to every viewer), so the button opens the workflow page — one authenticated
-      // click there ("Run workflow") starts the full sweep -> briefs -> rebuild run.
+    if (cfg.pipelineEndpoint) {
+      btn.disabled = true; btn.textContent = 'Updating…';
+      say('Asking the pipeline to run a sweep…');
+      try {
+        const res = await fetch(cfg.pipelineEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'sweep', source: 'tmt-radar-dashboard' }) });
+        let msg = '';
+        try { msg = ((await res.json()) || {}).message || ''; } catch (e) { msg = ''; }
+        // Report exactly what happened — never claim a sweep started unless the endpoint said so.
+        say(res.ok ? esc(msg || 'Sweep requested. Reload this page once it finishes.')
+                   : esc(msg || ('The trigger endpoint returned ' + res.status + '.')) + ghLink());
+      } catch (e) {
+        say('No sweep trigger is reachable from this page.' + ghLink());
+      } finally { btn.disabled = false; btn.textContent = 'Update now'; }
+      return;
+    }
+    if (cfg.actionsUrl) {
       window.open(cfg.actionsUrl, '_blank', 'noopener');
       say('Opened the hosted pipeline. Click <b>Run workflow</b> there — it sweeps every source, '
         + 'regenerates the briefs, and rebuilds this page (a few minutes). Then reload here.');
       return;
     }
-    if (cfg.pipelineEndpoint) {
-      btn.disabled = true; btn.textContent = 'Updating…';
-      say('Triggering your update pipeline…');
-      try {
-        const res = await fetch(cfg.pipelineEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'sweep', source: 'tmt-radar-dashboard' }) });
-        say(res.ok
-          ? 'Update requested. Your pipeline is running the sweep; this page will refresh when it republishes.'
-          : 'Pipeline returned ' + res.status + '. Check the endpoint, or run a sweep from the console.');
-      } catch (e) {
-        say('Could not reach the pipeline endpoint. It may be offline, or run a sweep from the '
-          + '<a href="' + esc(cfg.consoleUrl || 'http://127.0.0.1:8787') + '" target="_blank" rel="noopener">operator console</a>.');
-      } finally { btn.disabled = false; btn.textContent = 'Update now'; }
-    } else {
-      // No pipeline wired: a shared/sandboxed page cannot fetch gov.in itself and cannot reach a
-      // localhost console, so opening one just fails. Give the operator the exact way to refresh.
-      say('This is a published snapshot from <b>' + esc(D.updated || 'the last sweep') + '</b>. '
-        + 'A shared page can\'t fetch government sites itself, so it doesn\'t refresh on click. To update it: '
-        + 'on the firm machine run <code>engine/run_sweep.sh</code> (sweep → export → rebuild), or just '
-        + 'ask Claude <i>"run a TMT Radar sweep and republish"</i>. '
-        + 'For a genuine one-click button, wire your pipeline endpoint — <code>window.TMT_CONFIG = '
-        + '{ pipelineEndpoint: "https://your-host/hooks/tmt-refresh" }</code> (see docs/CONNECTOR.md).');
-    }
+    // Nothing wired: a sandboxed page cannot fetch government sites itself. Say so plainly.
+    say('This is a published snapshot from <b>' + esc(D.updated || 'the last sweep') + '</b>. '
+      + 'A shared page can\'t fetch government sites itself, so it doesn\'t refresh on click. To update it: '
+      + 'on the firm machine run <code>engine/run_sweep.sh</code>, or wire a trigger — see docs/CONNECTOR.md.');
   });
 })();
 
