@@ -66,8 +66,22 @@ module.exports = async (req, res) => {
     });
   }
 
+  // Allow-list, never a caller-supplied filename: an arbitrary workflow name from the request
+  // body would let anyone reaching this endpoint run any workflow in the repository.
+  const WORKFLOWS = { sweep: 'sweep.yml', briefs: 'briefs.yml' };
+  let wanted = 'sweep';
+  try {
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    if (body.workflow && Object.prototype.hasOwnProperty.call(WORKFLOWS, body.workflow)) {
+      wanted = body.workflow;
+    } else if (body.workflow) {
+      return res.status(400).json({ ok: false,
+        message: `Unknown workflow "${body.workflow}". Allowed: ${Object.keys(WORKFLOWS).join(', ')}.` });
+    }
+  } catch (e) { /* no body, or unparseable — fall through to the default sweep */ }
+
   const branch = process.env.VERCEL_GIT_COMMIT_REF || 'main';
-  const url = `https://api.github.com/repos/${repo}/actions/workflows/sweep.yml/dispatches`;
+  const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOWS[wanted]}/dispatches`;
   try {
     const gh = await fetch(url, {
       method: 'POST',
@@ -87,7 +101,9 @@ module.exports = async (req, res) => {
         ok: true,
         // Kept short and free of plumbing: the partner needs to know it started and that
         // the page does not refresh itself. How it runs is not their concern.
-        message: 'Sweep running. Reload in a few minutes.',
+        message: wanted === 'briefs'
+          ? 'Briefing the backlog. This takes a while — reload later.'
+          : 'Sweep running. Reload in a few minutes.',
       });
     }
 
@@ -97,7 +113,7 @@ module.exports = async (req, res) => {
     try { reason = JSON.parse(detail).message || ''; } catch (e) { reason = ''; }
     const hint = gh.status === 401 ? ' The token is invalid or has expired.'
       : gh.status === 403 ? ' The token likely lacks Actions: read & write on this repository.'
-      : gh.status === 404 ? ` Checked ${repo} for .github/workflows/sweep.yml on branch ${branch} —`
+      : gh.status === 404 ? ` Checked ${repo} for .github/workflows/${WORKFLOWS[wanted]} on branch ${branch} —`
         + ' a 404 here usually means the token cannot see this repository.'
       : '';
     return res.status(502).json({

@@ -1,0 +1,110 @@
+# TMT Regulatory Radar — brief the backlog.
+#
+# Separate from sweep.yml on purpose. The sweep collects and must stay inside its timeout, so it
+# briefs only a small number of newly-arrived items. This job exists to work through the whole
+# corpus (~361 instruments and judgments) in one pass, so coverage is not rationed at 80 per
+# sweep. It reads the feed the sweep already committed, fetches each document, asks the model
+# what the instrument does, and commits only pipeline/brief_cache.json. It never sweeps, never
+# touches the ledger, and never rebuilds the page — Vercel does that from the committed cache.
+#
+# Trigger: a human, always. There is deliberately NO schedule, for the same reason sweep.yml has
+# none: this job fetches hundreds of documents from government servers, which is collection, and
+# the per-source legal analysis (engine/audit/) rests on that load being occasional and
+# human-initiated rather than unattended and repetitive. Fetches are paced by --delay on top of
+# model latency, so the load stays at the de-minimis rate that analysis describes.
+# Do not add a `schedule:` trigger without revisiting it.
+
+name: briefs
+run-name: "Brief the backlog → what each update actually says"
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Max items to brief this run (0 = no limit, work the whole backlog)"
+        required: false
+        default: "0"
+      force:
+        description: "Re-brief everything, including items already briefed under the current prompt"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+# Serialised against itself. It is NOT in sweep.yml's group: the two touch different files
+# (this one only brief_cache.json), and both push with rebase-and-retry, so an overlap is safe.
+concurrency:
+  group: briefs
+  cancel-in-progress: false
+
+jobs:
+  briefs:
+    runs-on: ubuntu-latest
+    # ~361 items, each a document fetch plus a model call, paced ~1s apart: roughly 40 minutes.
+    # Generous headroom so a slow government server cannot truncate the backlog.
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Brief the backlog
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "${OPENAI_API_KEY}" ] && [ -z "${ANTHROPIC_API_KEY}" ]; then
+            echo "::error::No LLM key configured. Add OPENAI_API_KEY or ANTHROPIC_API_KEY as a repository secret."
+            exit 1
+          fi
+          ARGS=""
+          if [ "${{ inputs.limit }}" != "0" ] && [ -n "${{ inputs.limit }}" ]; then
+            ARGS="--limit ${{ inputs.limit }}"
+          fi
+          if [ "${{ inputs.force }}" = "true" ]; then
+            ARGS="$ARGS --force"
+          fi
+          echo "running: pipeline/brief.py $ARGS"
+          python pipeline/brief.py $ARGS
+
+      - name: Report coverage
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          cache = json.loads(pathlib.Path("pipeline/brief_cache.json").read_text()) if pathlib.Path("pipeline/brief_cache.json").exists() else {}
+          items = json.loads(pathlib.Path("data/items.json").read_text())["items"]
+          scope = [i for i in items
+                   if i.get("lane") in ("instruments", "judgments")
+                   and (i.get("doc_url") or i.get("pdf_url") or i.get("page_url"))]
+          done = sum(1 for i in scope if i["id"] in cache)
+          lens = [len(v["brief"]) for v in cache.values() if v.get("brief")]
+          avg = sum(lens) / len(lens) if lens else 0
+          print(f"briefed {done}/{len(scope)} items in scope · average brief {avg:.0f} chars")
+          print(f"::notice::Briefs cover {done} of {len(scope)} items; average length {avg:.0f} characters")
+          PY
+
+      - name: Commit the briefs
+        run: |
+          git config user.name  "tmt-radar-briefs"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pipeline/brief_cache.json
+          if git diff --cached --quiet; then
+            echo "no new briefs"
+          else
+            git commit -m "briefs: $(date -u '+%Y-%m-%d %H:%MZ') (backlog run)"
+            # The sweep lane can commit while this runs; rebase rather than lose the work.
+            for i in 1 2 3; do
+              git push && break
+              echo "push rejected (attempt $i) — rebasing onto the remote and retrying"
+              git pull --rebase || exit 1
+              [ "$i" = 3 ] && { echo "::error::could not push after 3 attempts"; exit 1; }
+            done
+          fi

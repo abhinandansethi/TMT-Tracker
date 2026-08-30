@@ -38,7 +38,7 @@ Usage:
     TMT_BRIEF_MODEL=claude-sonnet-5 python3 pipeline/brief.py   # cheaper model for a large batch
 """
 from __future__ import annotations
-import argparse, datetime, hashlib, io, json, os, re, sys
+import argparse, datetime, hashlib, io, json, os, re, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -260,6 +260,9 @@ def main():
     ap.add_argument("--ids", nargs="*", help="brief only these item ids")
     ap.add_argument("--limit", type=int, default=0, help="cap how many items to brief")
     ap.add_argument("--force", action="store_true", help="re-brief even if a fresh cache entry exists")
+    ap.add_argument("--delay", type=float, default=1.0,
+                    help="seconds to pause between document fetches (default 1.0). Keeps bulk "
+                         "runs at the de-minimis, non-disruptive load the legal analysis records.")
     ap.add_argument("--dry-run", action="store_true", help="extract text and print the prompt; make NO API call (needs no credentials)")
     args = ap.parse_args()
 
@@ -286,7 +289,7 @@ def main():
                      f"{'OPENAI_API_KEY' if PROVIDER == 'openai' else 'ANTHROPIC_API_KEY'} "
                      f"(or use --dry-run to test extraction without credentials).")
 
-    done = skipped = failed = 0
+    done = skipped = failed = fetched = 0
     for it in chosen:
         iid, title = it.get("id"), (it.get("short") or it.get("title") or "")[:70]
         h = doc_hash(it)
@@ -296,6 +299,9 @@ def main():
             skipped += 1
             continue
         url = doc_url_of(it)
+        if fetched and args.delay:
+            time.sleep(args.delay)
+        fetched += 1
         try:
             text = extract_text(url)
         except Exception as e:
@@ -321,7 +327,7 @@ def main():
                       "prompt_version": PROMPT_VERSION,
                       "generated_at": datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).strftime("%Y-%m-%d")}
         CACHE.write_text(json.dumps(cache, indent=2, ensure_ascii=False))  # checkpoint each success
-        print(f"  ok    {iid}  {title}  [{brief['confidence']}]")
+        print(f"  ok   [{done + 1:>3}/{len(chosen)}] {iid}  {title}  [{brief['confidence']}]", flush=True)
         done += 1
 
     print(f"\n[brief] done={done} skipped(cached)={skipped} failed/no-text={failed}")
