@@ -973,8 +973,8 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
 
   <section class="view on" id="v-coverage">
     <div class="cl-head" style="margin-bottom:6px">
-      <div><div class="cl-eyebrow">Coverage — the whole world</div>
-        <div class="cl-sub">Every link this tracker fetches, by stratum and regulator. If a venue is not on this list, nothing from it can enter the Instruments, Judgments or Audit ledgers — by design. (The Signals tab alone carries hand-curated press leads, each with its cited source.) Click a venue for its health evidence and the exact URL fetched.</div></div>
+      <div><div class="cl-eyebrow">Coverage</div>
+        <div class="cl-sub">Every link this tracker fetches, by stratum and regulator. If a venue is not on this list, nothing from it can enter the Instruments, Judgments or Audit ledgers.</div></div>
     </div>
     <div id="strata"></div>
     <div class="two">

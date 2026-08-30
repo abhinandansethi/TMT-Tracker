@@ -85,8 +85,9 @@ module.exports = async (req, res) => {
     if (gh.status === 204) {
       return res.status(202).json({
         ok: true,
-        message: 'Sweep started on GitHub Actions. It checks every source, regenerates the '
-          + 'briefs and rebuilds this page — a few minutes. Reload when it finishes.',
+        // Kept short and free of plumbing: the partner needs to know it started and that
+        // the page does not refresh itself. How it runs is not their concern.
+        message: 'Sweep running. Reload in a few minutes.',
       });
     }
 
