@@ -1161,14 +1161,21 @@ function whatChanged(r) {
   if (r.effective) p.push('In force from ' + fmt(r.effective) + '.');
   if (r.deadline && !r.effective) p.push((/consult|draft/i.test(r.type) ? 'Comments close ' : 'Deadline: ') + fmt(r.deadline) + '.');
   if (r.impact && /action/i.test(r.impact)) p.push('The Gazette marks it action-required.');
-  return p.join(' ');
+  // p[0] only rewrites the heading as a sentence. With nothing after it there is no fact to
+  // report, and printing it anyway is padding that costs the reader a line and teaches them
+  // the field is worthless. Say nothing instead.
+  return p.length > 1 ? p.join(' ') : null;
 }
 function wcNote(r, label) {
-  let h = '<div class="note wc"><div class="lbl">' + (label || 'What changed') + '</div><div class="body">' + esc(whatChanged(r)) + '</div>';
-  if (r.llm && r.llm.brief) {
+  const det = whatChanged(r);
+  const ai = r.llm && r.llm.brief;
+  if (!det && !ai) return '';        // nothing to say beyond the heading — omit the block
+  let h = '<div class="note wc"><div class="lbl">' + (label || 'What changed') + '</div>';
+  if (ai) {
     h += '<div class="body ai">' + esc(r.llm.brief) + (r.llm.so_what ? ' ' + esc(r.llm.so_what) : '') +
          ' <span class="aitag">AI brief · ' + esc(r.llm.confidence || '') + ' · verify</span></div>';
   }
+  if (det) h += '<div class="body">' + esc(det) + '</div>';
   return h + '</div>';
 }
 function acts(r) {
@@ -1450,13 +1457,14 @@ $('#sigs').innerHTML = D.signals.map(s =>
     else if(it.date) p.push('Dated '+fmtD(it.date)+'.');
     if(it.deadline) p.push('Deadline: '+fmtD(it.deadline)+'.');
     if(it.impact && /action/i.test(it.impact)) p.push('The Gazette marks it action-required.');
-    return p.join(' ');
+    // p[0] merely restates the heading; with nothing after it there is no fact to report.
+    return p.length>1 ? p.join(' ') : '';
   }
   // Prefer the LLM brief of the document body when the pipeline has produced one; else the
   // deterministic metadata brief. ai/conf drive the "verify" marker shown in the UI.
   function briefOf(it){
     if(it.llm && it.llm.brief) return {text:it.llm.brief, so:(it.llm.so_what||''), ai:true, conf:(it.llm.confidence||'')};
-    return {text:brief(it), so:'', ai:false, conf:''};
+    return {text:brief(it), so:'', ai:false, conf:''};   // text may be '' — callers must tolerate it
   }
 
   function matchClient(cl){
@@ -1510,7 +1518,7 @@ $('#sigs').innerHTML = D.signals.map(s =>
         return '<li class="mat-'+x.mat.level+'"><div class="cl-itop"><a href="'+escc(it.doc||it.page||'#')+'" target="_blank" rel="noopener">'+escc(it.short||it.official)+'</a>'
           +'<span class="cl-badge b-'+x.mat.level+'">'+escc(x.mat.label)+'</span></div>'
           +'<div class="cl-m">'+escc(it.reg||'')+' · '+escc((it.type||'').replace(/_/g,' '))+' · '+escc(fmtD(it.date))+'</div>'
-          +'<div class="cl-brief">'+escc(bf.text)+(bf.so?(' <span class="cl-so">'+escc(bf.so)+'</span>'):'')+(bf.ai?(' <span class="cl-ai">AI brief · '+escc(bf.conf)+' · verify</span>'):'')+'</div>'
+          +(bf.text?('<div class="cl-brief">'+escc(bf.text)+(bf.so?(' <span class="cl-so">'+escc(bf.so)+'</span>'):'')+(bf.ai?(' <span class="cl-ai">AI brief · '+escc(bf.conf)+' · verify</span>'):'')+'</div>'):'')
           +'<div class="cl-why">On the radar — '+escc(x.reasons.join('; '))+'. <span class="cl-matwhy">'+escc(x.mat.why)+'.</span></div>'
           +'<button class="cl-idraft" data-act="idraft" data-i="'+idx+'" data-j="'+j+'">Draft email</button></li>';}).join('');
       return '<div class="cl-card" data-i="'+idx+'">'

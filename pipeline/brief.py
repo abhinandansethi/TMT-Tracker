@@ -38,7 +38,7 @@ Usage:
     TMT_BRIEF_MODEL=claude-sonnet-5 python3 pipeline/brief.py   # cheaper model for a large batch
 """
 from __future__ import annotations
-import argparse, datetime, hashlib, io, json, os, sys
+import argparse, datetime, hashlib, io, json, os, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -66,20 +66,27 @@ MODEL = os.environ.get("TMT_BRIEF_MODEL") or ("gpt-5-mini" if PROVIDER == "opena
 EFFORT = os.environ.get("TMT_BRIEF_EFFORT", "medium")   # low | medium | high | xhigh | max
 MAX_CHARS = 18000                                        # ~first dozen pages; enough for the operative part
 
+# Bumped whenever SYSTEM/SCHEMA change: cached briefs written under an older prompt are
+# regenerated rather than left in place, so a prompt fix actually reaches the page.
+PROMPT_VERSION = 2
+
 SYSTEM = (
-    "You brief a busy TMT (technology, media, telecom) lawyer at an Indian law firm. "
-    "You are given the text of ONE regulatory instrument issued by an Indian regulator — a "
-    "rule, notification, order, direction, press note, or advisory. Summarise what it "
-    "actually does, precisely and factually, for a lawyer who will verify against the official "
-    "text before advising a client.\n\n"
+    "You brief a busy TMT (technology, media, telecom) lawyer at an Indian law firm on ONE "
+    "regulatory instrument or decision from an Indian regulator, tribunal or court.\n\n"
+    "Say what it DOES, as briefly as possible.\n\n"
     "Rules:\n"
-    "- Quote the specific section numbers, obligations, thresholds, entities covered, and dates "
-    "the text states. Prefer the instrument's own operative language.\n"
-    "- State only what the instrument says. Do not infer obligations it does not contain, and do "
-    "not add background the text does not supply.\n"
-    "- Never give advice or a recommendation. Describe the instrument, not what anyone should do.\n"
-    "- If the extracted text looks truncated, garbled, or does not clearly contain the operative "
-    "provisions, say so and set confidence to \"low\"."
+    "- 'brief': ONE sentence, 30 words or fewer. Lead with the substantive action — what is now "
+    "required, permitted, prohibited, extended, exempted, amended, or decided — and name the "
+    "thing it applies to plus any date, threshold or duration that defines it.\n"
+    "- Do NOT restate the title, the file/reference number, or the citation. A reader who has "
+    "already read the heading must learn something new from your sentence.\n"
+    "- Do not quote long passages. Do not give advice or recommendations.\n"
+    "- 'so_what': at most 20 words on the concrete obligation and who it binds. Use an empty "
+    "string if the instrument imposes nothing concrete.\n"
+    "- If the extracted text is truncated, garbled, or does not show the operative substance, "
+    "set confidence to \"low\" and say plainly in 'brief' that the substance was not readable "
+    "rather than guessing.\n"
+    "- For a judgment: say what was held and who prevailed, not the procedural history."
 )
 
 SCHEMA = {
@@ -87,20 +94,19 @@ SCHEMA = {
     "properties": {
         "brief": {
             "type": "string",
-            "description": "2-4 sentences: what the instrument is and what it does or changes, "
-                           "with the specific sections, obligations, covered entities and dates "
-                           "the text states.",
+            "description": "ONE sentence, 30 words or fewer, saying what the instrument does — "
+                           "the substantive change, not the title restated.",
         },
         "so_what": {
             "type": "string",
-            "description": "One sentence on the concrete compliance implication for a regulated "
-                           "entity, grounded only in the text. No recommendation.",
+            "description": "At most 20 words on the concrete obligation and who it binds. "
+                           "Empty string if it imposes nothing concrete.",
         },
         "confidence": {
             "type": "string",
             "enum": ["high", "medium", "low"],
-            "description": "low if the extracted text was truncated, garbled, or did not clearly "
-                           "contain the operative provisions.",
+            "description": "low if the extracted text was truncated, garbled, or did not show "
+                           "the operative substance.",
         },
     },
     "required": ["brief", "so_what", "confidence"],
@@ -135,22 +141,45 @@ def is_actionable(it):
     return binding or flagged
 
 
-def extract_pdf_text(url):
-    """Fetch a document and return its text. Raises on anything that isn't a usable PDF."""
-    import requests
+def _pdf_text(body):
     from pypdf import PdfReader
+    reader = PdfReader(io.BytesIO(body))
+    return "\n".join((pg.extract_text() or "") for pg in reader.pages[:12]).strip()
+
+
+def _html_text(body):
+    """Text of an HTML document. Most TDSAT/court decisions and several regulator pages are
+    served as HTML, not PDF — treating those as unreadable silently discarded the majority of
+    the corpus (24 of 25 in a sample), which is why briefs covered so few items."""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(body, "lxml")
+    for tag in soup(["script", "style", "nav", "header", "footer", "noscript", "form"]):
+        tag.decompose()
+    # Prefer the main content region when the page marks one; fall back to the whole body.
+    node = soup.find("main") or soup.find(attrs={"role": "main"}) or soup.body or soup
+    text = node.get_text("\n", strip=True)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
+
+
+def extract_text(url):
+    """Fetch a document and return its text, whether it is a PDF or an HTML page.
+    Raises with a stated reason on anything unusable, so the caller can log why."""
+    import requests
     r = requests.get(url, headers=UA, timeout=45)
     r.raise_for_status()
     ct = (r.headers.get("content-type") or "").lower()
     body = r.content
-    looks_pdf = body[:5] == b"%PDF-" or "pdf" in ct or url.lower().endswith(".pdf")
-    if not looks_pdf:
-        raise ValueError(f"not a PDF (content-type={ct or 'none'})")
-    reader = PdfReader(io.BytesIO(body))
-    pages = [(pg.extract_text() or "") for pg in reader.pages[:12]]
-    text = "\n".join(pages).strip()
+
+    if body[:5] == b"%PDF-" or "pdf" in ct or url.lower().endswith(".pdf"):
+        text, kind = _pdf_text(body), "pdf"
+    elif "html" in ct or body[:200].lstrip()[:1] == b"<":
+        text, kind = _html_text(body), "html"
+    else:
+        raise ValueError(f"unsupported document type (content-type={ct or 'none'})")
+
     if len(text) < 120:
-        raise ValueError(f"no extractable text ({len(text)} chars — likely a scanned image)")
+        raise ValueError(f"no extractable text from {kind} "
+                         f"({len(text)} chars — scanned image, or the body is script-rendered)")
     return text[:MAX_CHARS]
 
 
@@ -212,8 +241,12 @@ def select(items, args):
         chosen = [i for i in items if i.get("id") in want]
     elif args.all:
         chosen = [i for i in items if i.get("lane") in ("instruments", "judgments") and doc_url_of(i)]
-    else:
+    elif args.actionable:
         chosen = [i for i in items if is_actionable(i) and doc_url_of(i)]
+    else:
+        # Default is every instrument and judgment with a document. The cache makes this cheap:
+        # each run only briefs what is new or stale, so coverage fills in across runs.
+        chosen = [i for i in items if i.get("lane") in ("instruments", "judgments") and doc_url_of(i)]
     chosen.sort(key=lambda i: (i.get("date") or ""), reverse=True)
     if args.limit:
         chosen = chosen[: args.limit]
@@ -222,7 +255,8 @@ def select(items, args):
 
 def main():
     ap = argparse.ArgumentParser(description="Generate LLM briefs for TMT Radar instruments.")
-    ap.add_argument("--all", action="store_true", help="brief every instrument/judgment with a document (not just actionable)")
+    ap.add_argument("--all", action="store_true", help="every instrument/judgment with a document (the default)")
+    ap.add_argument("--actionable", action="store_true", help="restrict to actionable instruments only")
     ap.add_argument("--ids", nargs="*", help="brief only these item ids")
     ap.add_argument("--limit", type=int, default=0, help="cap how many items to brief")
     ap.add_argument("--force", action="store_true", help="re-brief even if a fresh cache entry exists")
@@ -256,12 +290,14 @@ def main():
     for it in chosen:
         iid, title = it.get("id"), (it.get("short") or it.get("title") or "")[:70]
         h = doc_hash(it)
-        if not args.force and cache.get(iid, {}).get("doc_hash") == h:
+        prev = cache.get(iid, {})
+        if (not args.force and prev.get("doc_hash") == h
+                and prev.get("prompt_version") == PROMPT_VERSION):
             skipped += 1
             continue
         url = doc_url_of(it)
         try:
-            text = extract_pdf_text(url)
+            text = extract_text(url)
         except Exception as e:
             print(f"  skip  {iid}  {title}  — {e}")
             failed += 1
@@ -282,6 +318,7 @@ def main():
             failed += 1
             continue
         cache[iid] = {**brief, "model": MODEL, "provider": PROVIDER, "doc_hash": h,
+                      "prompt_version": PROMPT_VERSION,
                       "generated_at": datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).strftime("%Y-%m-%d")}
         CACHE.write_text(json.dumps(cache, indent=2, ensure_ascii=False))  # checkpoint each success
         print(f"  ok    {iid}  {title}  [{brief['confidence']}]")

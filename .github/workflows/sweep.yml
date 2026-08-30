@@ -100,7 +100,11 @@ jobs:
           if [ -z "${OPENAI_API_KEY}" ] && [ -z "${ANTHROPIC_API_KEY}" ]; then
             echo "no LLM key configured — skipping briefs; the dashboard uses its deterministic briefs"
           else
-            python pipeline/brief.py || echo "::warning::brief generation failed — dashboard falls back to deterministic briefs"
+            # Capped per run: the selection is now every instrument and judgment with a
+            # document (~355), and each one is a fetch plus a model call. Uncapped that would
+            # overrun the job timeout. The cache means a run only briefs what is new or written
+            # under an older prompt, so coverage fills in across runs instead of in one.
+            python pipeline/brief.py --limit 80 || echo "::warning::brief generation failed — dashboard falls back to deterministic briefs"
           fi
 
       - name: Build the dashboard (check only — Vercel builds the deployed copy)
