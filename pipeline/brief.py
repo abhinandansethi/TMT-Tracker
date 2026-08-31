@@ -38,7 +38,7 @@ Usage:
     TMT_BRIEF_MODEL=claude-sonnet-5 python3 pipeline/brief.py   # cheaper model for a large batch
 """
 from __future__ import annotations
-import argparse, base64, datetime, hashlib, io, json, os, re, sys, time
+import argparse, collections, base64, datetime, hashlib, io, json, os, re, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -391,6 +391,10 @@ def main():
                      f"(or use --dry-run to test extraction without credentials).")
 
     done = skipped = failed = fetched = 0
+    # Why a run left work behind is the question every post-mortem asks, and the log could not
+    # answer it: a bare "failed=113" says nothing about whether one venue broke or the provider
+    # cut us off. Tallied by source and by cause so the next log names the culprit itself.
+    trouble: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
     for it in chosen:
         iid, title = it.get("id"), (it.get("short") or it.get("title") or "")[:70]
         h = doc_hash(it)
@@ -416,11 +420,13 @@ def main():
                 except Exception as e2:
                     print(f"  skip  {iid}  {title}  — scan, and rendering failed: {e2}", flush=True)
                     failed += 1
+                    trouble[it.get("source_id", "?")]["scan, render failed"] += 1
                     continue
             else:
                 print(f"  skip  {iid}  {title}  — {e}"
                       + (" (scan; vision needs the openai provider)" if scanned else ""), flush=True)
                 failed += 1
+                trouble[it.get("source_id", "?")]["scan/extract"] += 1
                 continue
 
         if args.dry_run and text is None:
@@ -444,6 +450,7 @@ def main():
         except Exception as e:
             print(f"  fail  {iid}  {title}  — {e}", flush=True)
             failed += 1
+            trouble[it.get("source_id", "?")]["model call"] += 1
             continue
         cache[iid] = {**brief, "model": MODEL, "provider": PROVIDER, "doc_hash": h,
                       "prompt_version": PROMPT_VERSION,
@@ -453,6 +460,11 @@ def main():
         done += 1
 
     print(f"\n[brief] done={done} skipped(cached)={skipped} failed/no-text={failed}")
+    if trouble:
+        print("[brief] what did not get briefed, by source and cause:")
+        for src, causes in sorted(trouble.items(), key=lambda kv: -sum(kv[1].values())):
+            print(f"         {sum(causes.values()):4d}  {src:26s} "
+                  + ", ".join(f"{n} {c}" for c, n in causes.most_common()))
     if not args.dry_run:
         print(f"[brief] cache: {CACHE}  ({len(cache)} briefs) — rebuild the dashboard to embed them")
 

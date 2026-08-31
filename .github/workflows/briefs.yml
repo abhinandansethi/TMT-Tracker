@@ -97,6 +97,9 @@ jobs:
       - name: Report coverage and assert progress
         env:
           BEFORE: ${{ steps.before.outputs.count }}
+          # Only an uncapped run is expected to clear the backlog; a capped one is a slice by
+          # design and must not be failed for leaving the rest.
+          CAPPED: ${{ inputs.limit != '' && inputs.limit != '0' }}
         run: |
           python - <<'PY'
           import json, os, pathlib, sys
@@ -127,6 +130,23 @@ jobs:
           if added <= 0 and len(fresh) < len(scope):
               sys.exit(f"::error::Ran to completion but added no briefs, with "
                        f"{len(scope) - len(fresh)} still outstanding — treat this run as failed")
+          # "added > 0" is too weak a bar for an uncapped backlog run. One brief out of a hundred
+          # outstanding passed that test, and did: a full run finished with instruments at 52%
+          # while judgments sat at 98%, and nothing in this step said so. An uncapped run is asked
+          # to clear the backlog, so anything it leaves behind has to be argued for, per lane.
+          # GitHub renders a false expression as the STRING "false", which is truthy in Python.
+          # Compare to "true" or the gate silently never runs.
+          if os.environ.get("CAPPED") != "true":
+              behind = {lane: tot - got for lane, (got, tot) in by_lane.items() if tot - got}
+              if behind:
+                  worst = max(behind.values())
+                  msg = (f"uncapped run finished with " +
+                         ", ".join(f"{n} {lane} unbriefed" for lane, n in sorted(behind.items())))
+                  if worst > 20:
+                      sys.exit(f"::error::{msg} — the backlog was not cleared. The per-source "
+                               f"tally printed by the brief step above names which venue failed "
+                               f"and why; fix that before calling this run good.")
+                  print(f"::warning::{msg} — small residue, check the per-source tally above")
           PY
 
       - name: Commit the briefs
