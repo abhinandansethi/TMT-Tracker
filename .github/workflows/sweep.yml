@@ -105,7 +105,9 @@ jobs:
             # Only a small slice here: this job's purpose is collection, and each brief is a
             # fetch plus a model call. Newly-arrived items get briefed promptly; the backlog is
             # the briefs.yml workflow's job, which is dispatched separately and has the timeout
-            # to work through everything.
+            # to work through everything. brief.py orders client-matched items ahead of merely
+            # recent ones, so these 40 land on the Clients tab first — that is the view a partner
+            # opens, and it is where an unbriefed row costs the most.
             python pipeline/brief.py --limit 40 || echo "::warning::brief generation failed — dashboard falls back to deterministic briefs"
           fi
 

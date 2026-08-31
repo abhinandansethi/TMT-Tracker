@@ -44,6 +44,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ITEMS = ROOT / "data" / "items.json"
 CACHE = ROOT / "pipeline" / "brief_cache.json"
+CLIENTS = ROOT / "pipeline" / "clients.json"
 
 # Same honest identifying UA the engine fetches with (Principle 2): not a browser
 # spoof, but not a crawler-signature token either — passes the gov.in Akamai WAFs.
@@ -329,6 +330,39 @@ def needs_brief(it, cache, force=False):
                 and prev.get("prompt_version") == PROMPT_VERSION)
 
 
+def client_matched(items) -> set:
+    """Ids of items that match a client's watch keywords, by the SAME rule the dashboard uses:
+    each keyword is a regex tested against the item's short title, one-line descriptor, official
+    title and type. Kept identical on purpose — an item the Clients tab shows the partner and an
+    item this pipeline briefs must be the same set, or the tab fills with metadata boilerplate
+    while the briefs land on rows nobody opened.
+
+    That is not hypothetical. Before this existed, the twelve client matches without a brief were
+    the Telecommunications (User Identification) Rules 2026, the Dark Patterns Guidelines, two
+    CCPA dark-pattern orders, Press Note 3 and CERT-In CISG-2026-03 — the six most client-facing
+    documents in the tracker, shown to the partner as "DPIIT has issued Press Note 3 (2026)."
+    """
+    try:
+        roster = json.loads(CLIENTS.read_text()).get("clients", [])
+    except Exception:
+        return set()
+    rxs = []
+    for cl in roster:
+        for k in (cl.get("watch") or {}).get("keywords") or []:
+            try:
+                rxs.append(re.compile(k, re.I))
+            except re.error:
+                pass                      # a bad pattern is the roster's problem, not a crash here
+    if not rxs:
+        return set()
+    out = set()
+    for it in items:
+        hay = " ".join(str(it.get(f) or "") for f in ("short", "line", "title", "type"))
+        if any(rx.search(hay) for rx in rxs):
+            out.add(it.get("id"))
+    return out
+
+
 def select(items, args, cache=None):
     if args.ids:
         want = set(args.ids)
@@ -339,10 +373,15 @@ def select(items, args, cache=None):
         # Default (and --all) is every instrument and judgment with a document. The cache makes
         # this cheap: a run only briefs what is new or stale, so coverage fills in across runs.
         chosen = [i for i in items if i.get("lane") in ("instruments", "judgments") and doc_url_of(i)]
-    # Undated rows sorted below every dated one, so a capped run could never reach them — 105
-    # items were unreachable under any limit short of the whole corpus. Keep them last, but
-    # reachable once the dated backlog is cleared.
-    chosen.sort(key=lambda i: (i.get("date") or "0000-00-00"), reverse=True)
+    # Client-matched items first, then newest. Date order alone is the wrong priority: it ranks
+    # by when a venue published, not by whether anyone is waiting to read it, so a run that does
+    # not finish leaves exactly the Clients tab bare. Undated rows still sort below dated ones
+    # within each group — 105 were unreachable under any limit short of the whole corpus — but a
+    # client match now outranks recency, so the partner-facing view fills first.
+    matched = client_matched(items)
+    if args.clients:
+        chosen = [i for i in chosen if i.get("id") in matched]
+    chosen.sort(key=lambda i: (i.get("id") in matched, i.get("date") or "0000-00-00"), reverse=True)
     # The cap must limit WORK, not selection. Truncating before the freshness test spent the
     # whole budget on already-briefed items, which made a capped run a silent no-op: the sweep's
     # --limit 40 currently briefs nothing while hundreds remain outstanding.
@@ -358,6 +397,9 @@ def main():
     ap.add_argument("--all", action="store_true", help="every instrument/judgment with a document (the default)")
     ap.add_argument("--actionable", action="store_true", help="restrict to actionable instruments only")
     ap.add_argument("--ids", nargs="*", help="brief only these item ids")
+    ap.add_argument("--clients", action="store_true",
+                    help="brief only what the client roster matches — the Clients tab, filled "
+                         "in one short run instead of waiting out the whole backlog")
     ap.add_argument("--limit", type=int, default=0, help="cap how many items to brief")
     ap.add_argument("--force", action="store_true", help="re-brief even if a fresh cache entry exists")
     ap.add_argument("--delay", type=float, default=1.0,

@@ -24,6 +24,12 @@ on:
         description: "Max items to brief this run (0 = no limit, work the whole backlog)"
         required: false
         default: "0"
+      scope:
+        description: "What to brief"
+        type: choice
+        required: false
+        default: all
+        options: [all, clients]
       force:
         description: "Re-brief everything, including items already briefed under the current prompt"
         type: boolean
@@ -77,6 +83,7 @@ jobs:
           # as a command in a step that holds both API keys and a repo-write token.
           LIMIT: ${{ inputs.limit }}
           FORCE: ${{ inputs.force }}
+          SCOPE: ${{ inputs.scope }}
         run: |
           if [ -z "${OPENAI_API_KEY}" ] && [ -z "${ANTHROPIC_API_KEY}" ]; then
             echo "::error::No LLM key configured. Add OPENAI_API_KEY or ANTHROPIC_API_KEY as a repository secret."
@@ -91,6 +98,14 @@ jobs:
           if [ "$FORCE" = "true" ]; then
             ARGS="$ARGS --force"
           fi
+          # "clients" briefs only what the client roster matches — the Clients tab filled in a
+          # couple of minutes rather than a whole-backlog run. Compared against a fixed string,
+          # never interpolated, for the same reason as LIMIT above.
+          case "$SCOPE" in
+            clients) ARGS="$ARGS --clients" ;;
+            ''|all)  ;;
+            *) echo "::error::scope must be 'all' or 'clients' (got '$SCOPE')"; exit 1 ;;
+          esac
           echo "running: pipeline/brief.py $ARGS"
           python pipeline/brief.py $ARGS
 
@@ -99,7 +114,7 @@ jobs:
           BEFORE: ${{ steps.before.outputs.count }}
           # Only an uncapped run is expected to clear the backlog; a capped one is a slice by
           # design and must not be failed for leaving the rest.
-          CAPPED: ${{ inputs.limit != '' && inputs.limit != '0' }}
+          CAPPED: ${{ (inputs.limit != '' && inputs.limit != '0') || inputs.scope == 'clients' }}
         run: |
           python - <<'PY'
           import json, os, pathlib, sys
