@@ -64,9 +64,54 @@ def _field(row: dict, field: str) -> str:
     return str(row.get(field, ""))
 
 
-def _row_included(row: dict, source: dict) -> bool:
-    """Deterministic scope filters. A filtered row is out of subject scope by design, so it
-    is counted and reported but never quarantined as if it were malformed.
+# A listing title short enough that a subject filter cannot safely judge it. CCI and CCPA both
+# print bare party names ("In matter Of Pladis India Pvt. Ltd."), while the document's own title
+# carries the subject ("Misleading Advertisement and Unfair Trade Practice By ..."). Dropping on
+# a title like that is a guess, and a coverage audit found it can cut either way.
+_TERSE_WORDS = 6
+_PARTY_ONLY = re.compile(
+    r"^(in\s+(the\s+)?(re|matter)\s+of[:\s]*)?[^,;]{0,80}?"
+    r"(pvt\.?|private|ltd\.?|limited|llp|inc\.?|corp\.?|company|&\s*(anr|ors)\.?)\s*\.?$", re.I)
+
+
+PROBE_PATH = Path(__file__).resolve().parents[2] / "data" / "filter_probe.json"
+PROBE_BUDGET = 12          # documents probed per source per sweep; the rest queue for next run
+# HEADING REGION ONLY, and the reason is the whole design. The premise of the probe is narrow:
+# this venue truncates its listing title, and the document's own heading carries the subject the
+# listing dropped. Reading further than the heading tests a different and false premise — that a
+# subject word appearing anywhere in the document means the document is about that subject. It
+# does not. Measured on the first attempt at 20k chars: a CCI order about a consumer's car
+# finance dispute was pulled in on the word "payment", one about electrical fittings on "cable",
+# and four unrelated Supreme Court matters on "dot". A regex meant for a title has no business
+# reading twenty pages of prose.
+PROBE_CHARS = 1200
+# Below this many characters the document was not really read — CCPA orders are frequently
+# scanned images whose text layer is blank. A regex that finds nothing in an empty extraction
+# looks exactly like a regex that found nothing in a real document, and treating the two alike
+# would turn "we could not read it" into "we checked, it is out of scope". That is the silent
+# drop this whole probe exists to prevent, so an unreadable document is never a verdict.
+MIN_PROBE_CHARS = 200
+
+
+def _title_too_terse(title: str) -> bool:
+    """True when the title is a bare party name or too short to carry a subject."""
+    t = re.sub(r"\s+", " ", (title or "")).strip()
+    if not t:
+        return True
+    meaningful = [w for w in re.findall(r"[A-Za-z]{3,}", t)
+                  if w.lower() not in ("the", "and", "for", "with", "matter", "case", "versus")]
+    return len(meaningful) < _TERSE_WORDS or bool(_PARTY_ONLY.match(t))
+
+
+def _row_included(row: dict, source: dict) -> tuple[bool, bool]:
+    """Deterministic scope filters. Returns (included, uncertain).
+
+    A filtered row is out of subject scope by design, so it is counted and reported but never
+    quarantined as if it were malformed. `uncertain` marks a drop the filter could not make
+    confidently — the row failed on a title too terse to carry a subject — so the sweep can
+    report it instead of discarding it silently. A subject filter reading a truncated listing
+    title is guessing, and a guess that drops a client-relevant order is the failure this
+    tracker exists to prevent.
 
     row_exclude matters for the Gazette: a ministry is not a subject. Ministry of
     Communications covers both telecommunications and the Department of Posts, and Post
@@ -75,11 +120,97 @@ def _row_included(row: dict, source: dict) -> bool:
     if exc:
         blob = " ".join(_field(row, f) for f in exc.get("fields", ["title"]))
         if re.search(exc["regex"], blob, re.I):
-            return False
+            return False, False          # an explicit exclusion is a confident drop
     flt = source.get("row_filter")
     if not flt:
-        return True
-    return bool(re.search(flt["regex"], _field(row, flt.get("field", "title")), re.I))
+        return True, False
+    field = flt.get("field", "title")
+    value = _field(row, field)
+    if re.search(flt["regex"], value, re.I):
+        return True, False
+    return False, (field == "title" and _title_too_terse(value))
+
+
+def _filter_notes(ing: dict) -> List[str]:
+    """Health lines for terse-title drops the source has no probe for."""
+    u = ing.get("unsure") or []
+    if not u:
+        return []
+    return [f"{len(u)} in-window row(s) dropped on a title too terse to judge — this venue's "
+            f"listing is all the subject there is, so a human should spot-check: "
+            + "; ".join(u[:3])]
+
+
+def _probe_notes(p: dict) -> List[str]:
+    """Health lines for the probe. A line prefixed '!' is an anomaly, not routine behaviour."""
+    out: List[str] = []
+    n_in, n_out = len(p.get("in") or []), len(p.get("out") or [])
+    if n_in or n_out:
+        line = (f"{n_in + n_out} row(s) had a title too terse to judge, so the linked document "
+                f"was read instead: {n_in} in scope, {n_out} confirmed out")
+        if n_in:
+            line += " — kept: " + "; ".join(p["in"][:3])
+        out.append(line)
+    if p.get("newly_unjudged"):
+        out.append(f"! {len(p['newly_unjudged'])} row(s) with a terse title link to a document "
+                   f"with no text layer (scanned image) — NOT judged, not in the ledger, needs a "
+                   f"human eye: " + "; ".join(p["newly_unjudged"][:3]))
+    if p.get("unjudged"):
+        out.append(f"{len(p['unjudged'])} known row(s) remain unjudged: terse title, scanned "
+                   f"document, listed on Audit for a human to open: " + "; ".join(p["unjudged"][:3]))
+    if p.get("deferred"):
+        out.append(f"! {len(p['deferred'])} terse-title row(s) queued for the next sweep "
+                   f"(per-sweep probe budget reached)")
+    if p.get("unreadable"):
+        out.append(f"! {len(p['unreadable'])} terse-title row(s) could not be read and were not "
+                   f"judged — retried next sweep: " + "; ".join(p["unreadable"][:2]))
+    return out
+
+
+def _in_window(row: dict, window_start, backfill_since) -> bool:
+    """Would the date window keep this row? Rows it drops anyway are never worth a fetch."""
+    d = str(row.get("date") or "")
+    if window_start and d and d < str(window_start):
+        return False
+    if backfill_since and d and d < backfill_since:
+        return False
+    return True
+
+
+def _load_probe() -> dict:
+    """Verdicts already reached, keyed by document URL, so each document is fetched once ever."""
+    try:
+        return json.loads(PROBE_PATH.read_text())
+    except Exception:
+        return {}
+
+
+def _save_probe(cache: dict) -> None:
+    PROBE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tmp = PROBE_PATH.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(cache, indent=1, sort_keys=True, ensure_ascii=False))
+    tmp.replace(PROBE_PATH)
+
+
+def _doc_text(url: str, source: dict) -> str:
+    """First pages of the linked document as text. Same fetch path as everything else, so the
+    declared-host check and robots.txt still gate it."""
+    r = get(url, tolerant_tls=source.get("tolerant_tls", False),
+            extra_headers=source.get("http_headers"),
+            source_id=source["id"], allowed_domains=source.get("allowed_domains"))
+    body = r.content or b""
+    if body[:5] == b"%PDF-":
+        import io
+        from pypdf import PdfReader
+        out = []
+        for page in PdfReader(io.BytesIO(body)).pages:
+            out.append(page.extract_text() or "")
+            if sum(len(x) for x in out) > PROBE_CHARS:
+                break
+        return " ".join(out)[:PROBE_CHARS]
+    text = body.decode("utf-8", "replace")
+    text = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", text)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", text))[:PROBE_CHARS]
 
 
 class Sweeper:
@@ -131,6 +262,9 @@ class Sweeper:
                     info.append(f"{ing['pre_window']} row(s) predate window_start")
                 if ing["filtered"]:
                     info.append(f"{ing['filtered']} row(s) outside this source's subject filter")
+                for line in _probe_notes(ing.get("probed") or {}):
+                    (notes if line.startswith("!") else info).append(line.lstrip("! "))
+                info.extend(_filter_notes(ing))
                 owned = self.ledger.count_for(sid) + self.ledger.sightings_for(sid)
                 # rows that were in scope and in window but never landed = silently gated out.
                 # That is a defect, not a quiet week, so it must read EMPTY and never QUIET.
@@ -216,6 +350,9 @@ class Sweeper:
                 info.append(f"{ing['pre_window']} row(s) predate window_start — not ledgered")
             if ing["filtered"]:
                 info.append(f"{ing['filtered']} row(s) outside this source's subject filter")
+            for line in _probe_notes(ing.get("probed") or {}):
+                (notes if line.startswith("!") else info).append(line.lstrip("! "))
+            info.extend(_filter_notes(ing))
             if source.get("role") == "crosscheck" and fresh and not backfill_since:
                 notes.append(f"crosscheck caught {fresh} item(s) the primary sources missed")
 
@@ -270,6 +407,17 @@ class Sweeper:
                 first_run: bool = False):
         sid, fresh, activated, pre_window = source["id"], 0, 0, 0
         filtered = sighted = 0
+        # Opt-in per source, never a global heuristic. A source earns `filter_probe` only where
+        # the venue is KNOWN to publish a listing title too short to carry the subject while the
+        # document itself states it — CCPA does exactly that. Turning it on everywhere was tried
+        # and produced only false positives; see PROBE_CHARS.
+        probe_enabled = bool(source.get("filter_probe"))
+        probe = _load_probe()                # url -> verdict, so a document is fetched once ever
+        probe_budget = source.get("probe_budget", PROBE_BUDGET)
+        probed = {"in": [], "out": [], "deferred": [], "unreadable": [],
+                  "unjudged": [], "newly_unjudged": []}
+        unsure: List[str] = []               # terse drops at venues with no probe to appeal to
+        probe_dirty = False
         window_start = self.registry.get("window_start")
         crosscheck = source.get("role") == "crosscheck"
         # Lagging feeds and aggregators only act on recent rows: their old rows are
@@ -279,7 +427,57 @@ class Sweeper:
             from datetime import timedelta
             horizon = (self.today - timedelta(days=source.get("crosscheck_horizon_days", 14))).isoformat()
         for row in rows:
-            if not _row_included(row, source):
+            included, uncertain = _row_included(row, source)
+            if not included and uncertain and not probe_enabled:
+                # No evidence this venue truncates, so there is no document heading to appeal to.
+                # The drop stands, but it is counted and named rather than made invisible.
+                unsure.append(str(row.get("title", ""))[:120]
+                              if _in_window(row, window_start, backfill_since) else None)
+            elif not included and uncertain:
+                # The title was too terse to judge, so ask the document instead of guessing.
+                # Only rows the window would otherwise keep are worth a fetch — an archive row
+                # is dropped by date regardless, so probing it would be load for nothing.
+                title = str(row.get("title", ""))[:140]
+                url = str(row.get("url") or "")
+                rdate = str(row.get("date") or "")
+                if not (url and _in_window(row, window_start, backfill_since)):
+                    pass                                   # dropped by the window anyway
+                elif url in probe:
+                    verdict = probe[url].get("in_scope")
+                    if verdict is None:
+                        # Known-unreadable: already fetched once and found to have no text layer.
+                        # Not refetched every sweep, but never allowed to pass as "out of scope".
+                        probed["unjudged"].append(title)
+                    else:
+                        included = bool(verdict)
+                        probed["in" if included else "out"].append(title)
+                elif (len(probed["in"]) + len(probed["out"]) + len(probed["unreadable"])
+                      + len(probed["newly_unjudged"])) >= probe_budget:
+                    # Bounded per sweep so a listing that suddenly floods cannot turn one sweep
+                    # into hundreds of fetches. The remainder queues and is reported, not lost.
+                    probed["deferred"].append(title)
+                else:
+                    try:
+                        text = _doc_text(url, source)
+                        if len(text.strip()) < MIN_PROBE_CHARS:
+                            probe[url] = {"in_scope": None, "title": title, "date": rdate,
+                                          "reason": f"no extractable text ({len(text.strip())} chars) "
+                                                    f"— scanned image, needs a human eye",
+                                          "checked": now_ist(), "source": sid}
+                            probed["newly_unjudged"].append(title)
+                        else:
+                            hit = re.search(source["row_filter"]["regex"], text, re.I)
+                            included = bool(hit)
+                            probe[url] = {"in_scope": included, "title": title, "date": rdate,
+                                          "matched": (hit.group(0)[:60] if hit else None),
+                                          "chars": len(text.strip()),
+                                          "checked": now_ist(), "source": sid}
+                            probed["in" if included else "out"].append(title)
+                        probe_dirty = True
+                    except Exception as e:
+                        # A fetch that errored is a transient — not cached, retried next sweep.
+                        probed["unreadable"].append(f"{title} ({type(e).__name__})")
+            if not included:
                 filtered += 1  # out of subject scope by design, e.g. another ministry
                 continue
             clean, reason = vl.gate(row, source, self.today)
@@ -380,8 +578,11 @@ class Sweeper:
                 fresh += 1
             else:
                 activated += 1
+        if probe_dirty:
+            _save_probe(probe)
         return {"fresh": fresh, "activated": activated, "pre_window": pre_window,
-                "filtered": filtered, "sighted": sighted}
+                "filtered": filtered, "sighted": sighted, "probed": probed,
+                "unsure": [u for u in unsure if u]}
 
     @staticmethod
     def _seq_key(clean: dict, source: dict) -> Optional[str]:

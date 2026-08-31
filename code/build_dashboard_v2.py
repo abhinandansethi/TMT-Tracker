@@ -564,6 +564,21 @@ items_by_src: dict[str, list[dict[str, Any]]] = {}
 for it in items["items"]:
     items_by_src.setdefault(it["source_id"], []).append(it)
 
+# Rows the engine saw, could not judge, and therefore did NOT ledger. An auditor checking for
+# misses needs these more than the successes: they are the only place a real miss can hide.
+try:
+    _probe = json.loads((ROOT / "data" / "filter_probe.json").read_text())
+except Exception:
+    _probe = {}
+unjudged_by_src: dict[str, list[dict[str, Any]]] = {}
+for _u, _v in _probe.items():
+    if _v.get("in_scope") is None:
+        unjudged_by_src.setdefault(_v.get("source", ""), []).append(
+            {"d": _v.get("date"), "t": _v.get("title"), "doc": _u,
+             "why": _v.get("reason") or "could not be read"})
+for _lst in unjudged_by_src.values():
+    _lst.sort(key=lambda x: x.get("d") or "", reverse=True)
+
 audit_groups: list[dict[str, Any]] = []
 _audit_seen_ids: set[str] = set()
 for st in STRATA:
@@ -591,6 +606,7 @@ for st in STRATA:
                 "doc": i.get("doc_url") or i.get("pdf_url"), "page": i.get("page_url"),
                 "lane": i.get("lane", "instruments"),
             } for i in got],
+            "unjudged": unjudged_by_src.get(s["id"], []),
         })
     if src_entries:
         audit_groups.append({"key": st, "label": STRATUM_LABEL[st], "sources": src_entries})
@@ -818,7 +834,7 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
 .alane.instruments{background:#E9F3EA;color:#276B2E}
 .alane.judgments{background:#EAF0F4;color:#1B6288}
 .alane.signals{background:var(--ochre-wash);color:#7A5E0E}
-.anone{font-size:12px;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:3px;padding:8px 12px}
+.aunj{margin:10px 0 0;padding:9px 11px;border:1px solid var(--warnb,#c9a227);border-radius:6px;background:var(--warnbg,rgba(201,162,39,.07))}.auh{font-weight:600;font-size:12px;letter-spacing:.02em}.aum{font-size:11.5px;opacity:.8;margin:3px 0 7px;line-height:1.45}.alane.unj{background:var(--warnb,#c9a227);color:#1b1b1b;font-weight:700}.anone{font-size:12px;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:3px;padding:8px 12px}
 .averify{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-top:10px;line-height:1.7}
 .cl-none{color:var(--faint);font-style:italic}
 .cl-draft{margin-top:14px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:3px}
@@ -1297,7 +1313,8 @@ function wcNote(r, label) {
   let h = '<div class="note wc"><div class="lbl">' + (label || 'What changed') + '</div>';
   if (ai) {
     h += '<div class="body ai">' + esc(r.llm.brief) + (r.llm.so_what ? ' ' + esc(r.llm.so_what) : '') +
-         ' <span class="aitag">AI brief · ' + esc(r.llm.confidence || '') + ' · verify</span></div>';
+         ' <span class="aitag">AI brief · ' + esc(r.llm.confidence || '') +
+         (r.llm.read_as === 'scan' ? ' · read from scan' : '') + ' · verify</span></div>';
   }
   if (det) h += '<div class="body">' + esc(det) + '</div>';
   // The provision itself, quoted from the Act. This is statutory text, so it is shown verbatim
@@ -1521,6 +1538,15 @@ $('#notlive').innerHTML = D.coverage.notlive.map(n => '<div class="nl">' + esc(n
               : (sc.st === 'bad'
                 ? '<div class="anone">This source has been FAILING ' + String.fromCharCode(8212) + ' the tracker cannot currently read the venue, so this lane is blind, not silent. Anything the venue published' + (sc.checked ? ' since ' + esc(sc.checked) : '') + ' is unverified until the source recovers.</div>'
                 : '<div class="anone">Nothing was scraped from this link in the window. That is a claim, and it is checkable: open the live listing and confirm the venue really published nothing new. If it did, this tracker missed it ' + String.fromCharCode(8212) + ' report it.</div>')) +
+            ((sc.unjudged || []).length
+              ? '<div class="aunj"><div class="auh">' + pl(sc.unjudged.length, 'row') + ' seen but NOT judged</div>' +
+                '<div class="aum">The venue listed these under a name too short to tell what they are about, and the linked document could not be read to settle it. They are not in the ledger and they were not ruled out ' + String.fromCharCode(8212) + ' this is the one place a genuine miss can hide, so open them.</div>' +
+                sc.unjudged.map(u =>
+                  '<div class="aitem"><span class="ad">' + (u.d ? fmt(u.d) : String.fromCharCode(8212)) + '</span>' +
+                  '<span class="alane unj">?</span>' +
+                  '<a href="' + esc(u.doc) + '" target="_blank" rel="noopener" title="' + esc(u.why || '') + '">' + esc(u.t) + '</a>' +
+                  '</div>').join('') + '</div>'
+              : '') +
             '<div class="averify">Audit check: open the source link ' + String.fromCharCode(8594) + ' list what the venue shows for the window ' + String.fromCharCode(8594) + ' compare with the rows above. Hover a row for the official title as the venue prints it.</div>' +
           '</div></div>';
       }).join('') + '</div>').join('');

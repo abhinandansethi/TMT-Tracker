@@ -1,0 +1,26 @@
+{
+ "https://ccpa.doca.gov.in/checkuploaddocs.php?updocs=./uploads/Bectors.pdf&unique_id=": {
+  "checked": "2026-08-31T12:01:56+05:30",
+  "date": "2026-06-09",
+  "in_scope": null,
+  "reason": "no extractable text (0 chars) — scanned image, needs a human eye",
+  "source": "ccpa_orders",
+  "title": "In the matter of: Mrs. Bectors Food Specialities Ltd."
+ },
+ "https://ccpa.doca.gov.in/checkuploaddocs.php?updocs=./uploads/Oriens.pdf&unique_id=": {
+  "checked": "2026-08-31T12:01:57+05:30",
+  "date": "2026-06-09",
+  "in_scope": null,
+  "reason": "no extractable text (0 chars) — scanned image, needs a human eye",
+  "source": "ccpa_orders",
+  "title": "In the matter of: Oriens Global Marketing Pvt. Ltd."
+ },
+ "https://ccpa.doca.gov.in/checkuploaddocs.php?updocs=./uploads/ab108991b63f5b9f2f088f1f9cdfb846f2d29a76d145d63595dfc9a206acda07.pdf&unique_id=": {
+  "checked": "2026-08-31T12:01:52+05:30",
+  "date": "2026-08-14",
+  "in_scope": null,
+  "reason": "no extractable text (0 chars) — scanned image, needs a human eye",
+  "source": "ccpa_orders",
+  "title": "In matter Of Pavitra Rishta Match Making LLP"
+ }
+}

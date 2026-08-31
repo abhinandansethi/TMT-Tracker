@@ -2028,7 +2028,51 @@
         "field": "title",
         "regex": "(telecom|telecommunication|broadband|spectrum|internet|online|digital|e-?commerce|marketplace|platform|software|technolog|semiconductor|optoelectronic|electronics|handset|smartphone|feature phone|set[- ]?top box|\\bSEP\\b|standard.essential.patent|\\bOTT\\b|broadcast|media|television|\\bDTH\\b|cable\\b|newspaper|publish|social\\s?media|cloud|fintech|payment|data\\s+protection|intermediar|\\bIT Act\\b|information technology|copyright|licen[cs]|\\bDoT\\b|\\bTRAI\\b|TDSAT|MeitY|dark\\s?pattern|influencer|endorsement|direct[\\s-]?selling|misleading advertisement|wireless|Google|\\bMeta\\b|Facebook|WhatsApp|\\bAmazon\\b|\\bApple\\b|Microsoft|Flipkart|Meesho|ShopClues|Clues Network|Reliance Jio|\\bJio\\b|Airtel|Bharti|Vodafone|Idea Cellular|\\bBSNL\\b|Bharat Sanchar Nigam|\\bMTNL\\b|\\bZee\\b|Star India|\\bSony\\b|Netflix|\\bUber\\b|\\bOla\\b|Swiggy|Zomato|Eternal|MakeMyTrip|Eros International|Twitter|X Corp|ByteDance|TikTok|Nazara|Paytm|PhonePe|Razorpay|\\bIntel\\b|Samsung|Ericsson|\\bNokia\\b|Qualcomm|\\bOPPO\\b|\\bVivo\\b|Xiaomi|Realme|OnePlus|Micromax|\\biBall\\b|\\bLava\\b|Karbonn|Hewlett[- ]?Packard|LG Electronics|Panasonic|Lenovo|Motorola|Foxconn)"
       },
-      "quirks": "Migrated host ccpa.doca.gov.in (valid TLS). Page 1 (newest 25) already spans back before window_start, so no pagination needed daily. PDFs via checkuploaddocs.php gateway (direct /uploads/ 404s). TMT row_filter keeps e-commerce/platform/direct-selling/dark-pattern matters (Flipkart, Amazon, dark patterns). robots 404 -> no restriction. Verified live 27-08-2026, identifying UA."
+      "quirks": "Migrated host ccpa.doca.gov.in (valid TLS). Page 1 (newest 25) already spans back before window_start, so no pagination needed daily. PDFs via checkuploaddocs.php gateway (direct /uploads/ 404s). TMT row_filter keeps e-commerce/platform/direct-selling/dark-pattern matters (Flipkart, Amazon, dark patterns). robots 404 -> no restriction. Verified live 27-08-2026, identifying UA.",
+      "filter_probe": {
+        "why": "CCPA lists many orders by respondent name alone ('In the matter of: Oriens Global Marketing Pvt. Ltd.') while the order's own heading names the subject ('Misleading advertisement and unfair trade practice by ...'). Where the listing title is too terse to judge, the heading of the linked order is read instead of guessing.",
+        "region": "heading"
+      }
+    },
+    {
+      "id": "ccpa_guidelines",
+      "stratum": "tech_data",
+      "regulator": "CCPA",
+      "name": "Guidelines & Advisories",
+      "url": "https://ccpa.doca.gov.in/guidelines.php",
+      "page_url": "https://ccpa.doca.gov.in/guidelines.php",
+      "status": "live",
+      "method": "static_html",
+      "lane": "instruments",
+      "parser": {
+        "strategy": "html_table",
+        "row_selector": "table.views-table tr",
+        "title_cell": 0,
+        "link_selector": "a[href]",
+        "row_floor": 8,
+        "undated_ok": true
+      },
+      "date_formats": [
+        "DD/MM/YYYY",
+        "YYYY-MM-DD"
+      ],
+      "pagination": {
+        "scheme": "none"
+      },
+      "allowed_domains": [
+        "ccpa.doca.gov.in"
+      ],
+      "default_type": "guideline",
+      "row_filter": {
+        "field": "title",
+        "regex": "(telecom|telecommunication|broadband|spectrum|internet|online|digital|e-?commerce|marketplace|platform|software|technolog|semiconductor|optoelectronic|electronics|handset|smartphone|feature phone|set[- ]?top box|\\bSEP\\b|standard.essential.patent|\\bOTT\\b|broadcast|media|television|\\bDTH\\b|cable\\b|newspaper|publish|social\\s?media|cloud|fintech|payment|data\\s+protection|intermediar|\\bIT Act\\b|information technology|copyright|licen[cs]|\\bDoT\\b|\\bTRAI\\b|TDSAT|MeitY|dark\\s?pattern|influencer|endorsement|direct[\\s-]?selling|misleading advertisement|wireless|Google|\\bMeta\\b|Facebook|WhatsApp|\\bAmazon\\b|\\bApple\\b|Microsoft|Flipkart|Meesho|ShopClues|Clues Network|Reliance Jio|\\bJio\\b|Airtel|Bharti|Vodafone|Idea Cellular|\\bBSNL\\b|Bharat Sanchar Nigam|\\bMTNL\\b|\\bZee\\b|Star India|\\bSony\\b|Netflix|\\bUber\\b|\\bOla\\b|Swiggy|Zomato|Eternal|MakeMyTrip|Eros International|Twitter|X Corp|ByteDance|TikTok|Nazara|Paytm|PhonePe|Razorpay|\\bIntel\\b|Samsung|Ericsson|\\bNokia\\b|Qualcomm|\\bOPPO\\b|\\bVivo\\b|Xiaomi|Realme|OnePlus|Micromax|\\biBall\\b|\\bLava\\b|Karbonn|Hewlett[- ]?Packard|LG Electronics|Panasonic|Lenovo|Motorola|Foxconn)"
+      },
+      "quirks": "Standing shelf of CCPA guidelines and advisories, undated on the venue. Added after a coverage check found ccpa_orders covered only ccpa-orders.php despite being named 'Orders & Advisories' — this page carries the dark-pattern guidelines and the e-commerce self-audit advisory, which ccpa_orders never saw.",
+      "role": "primary",
+      "filter_probe": {
+        "why": "CCPA lists many orders by respondent name alone ('In the matter of: Oriens Global Marketing Pvt. Ltd.') while the order's own heading names the subject ('Misleading advertisement and unfair trade practice by ...'). Where the listing title is too terse to judge, the heading of the linked order is read instead of guessing.",
+        "region": "heading"
+      }
     },
     {
       "id": "dpiit_press_notes",

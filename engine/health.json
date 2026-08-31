@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-31T03:32:27+05:30",
+ "generated": "2026-08-31T12:02:06+05:30",
  "sources": {
   "trai_regulations": {
    "status": "QUIET",
@@ -556,23 +556,26 @@
    "notes": [],
    "info": [
     "164 row(s) predate window_start — not ledgered",
-    "1066 row(s) outside this source's subject filter"
+    "1066 row(s) outside this source's subject filter",
+    "6 in-window row(s) dropped on a title too terse to judge — this venue's listing is all the subject there is, so a human should spot-check: Ms. Meher Mansi Tatineni and Hensel Electric India Private Limited; XYZ Vs. Jindal Stainless Limited and Ors.; Rajeev Bakshi Vs M/s Nissan Motor lndia Pvt. Ltd"
    ],
-   "checked": "2026-08-31T03:32:18+05:30",
+   "checked": "2026-08-31T12:02:05+05:30",
    "consecutive_failures": 0
   },
   "ccpa_orders": {
-   "status": "OK",
+   "status": "WARN",
    "rows_seen": 25,
    "new": 0,
    "ledgered_total": 8,
    "newest_visible": "2026-08-28",
-   "notes": [],
+   "notes": [
+    "3 row(s) with a terse title link to a document with no text layer (scanned image) — NOT judged, not in the ledger, needs a human eye: In matter Of Pavitra Rishta Match Making LLP; In the matter of: Mrs. Bectors Food Specialities Ltd.; In the matter of: Oriens Global Marketing Pvt. Ltd."
+   ],
    "info": [
     "2 row(s) predate window_start — not ledgered",
     "15 row(s) outside this source's subject filter"
    ],
-   "checked": "2026-08-31T03:32:21+05:30",
+   "checked": "2026-08-31T12:01:57+05:30",
    "consecutive_failures": 0
   },
   "delhihc_judgments": {
@@ -659,340 +662,45 @@
   },
   "sc_judgments": {
    "status": "FILTERED",
-   "rows_seen": 275,
+   "rows_seen": 47,
    "new": 0,
    "ledgered_total": 0,
    "newest_visible": "2026-08-25",
    "notes": [],
    "info": [
-    "275 row(s) outside this source's subject filter",
-    "all 275 row(s) belong to other subjects; nothing in scope yet"
+    "47 row(s) outside this source's subject filter",
+    "4 in-window row(s) dropped on a title too terse to judge — this venue's listing is all the subject there is, so a human should spot-check: N. KASINATHAN VS. VIJAYAKUMAR - SLP(C) No. 20529/2018 - Diary Number 21444 / 2018; AMARJEET KAUR VS. RAJKUMAR - T.P.(C) No. 2440/2026 - Diary Number 49010 / 2026; THE CHIEF ENGINEER VS. MALKAYYA - C.A. No. 11063/2026 - Diary Number 19617 / 2026",
+    "all 47 row(s) belong to other subjects; nothing in scope yet"
    ],
-   "checked": "2026-08-31T03:32:27+05:30",
+   "checked": "2026-08-31T12:02:06+05:30",
+   "consecutive_failures": 0
+  },
+  "ccpa_guidelines": {
+   "status": "OK",
+   "rows_seen": 13,
+   "new": 0,
+   "ledgered_total": 9,
+   "newest_visible": null,
+   "notes": [],
+   "info": [
+    "4 row(s) outside this source's subject filter"
+   ],
+   "checked": "2026-08-31T12:01:58+05:30",
    "consecutive_failures": 0
   }
  },
  "provenance": {
-  "requests": 58,
+  "requests": 1,
   "by_source": {
-   "asci": {
-    "hosts": [
-     "www.ascionline.in"
-    ],
-    "requests": 1
-   },
-   "cbfc": {
-    "hosts": [
-     "cbfcindia.gov.in"
-    ],
-    "requests": 1
-   },
-   "cci_orders": {
-    "hosts": [
-     "www.cci.gov.in"
-    ],
-    "requests": 1
-   },
-   "ccpa_orders": {
-    "hosts": [
-     "ccpa.doca.gov.in"
-    ],
-    "requests": 1
-   },
-   "certin_advisories": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "certin_directions": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "certin_guidelines": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "certin_vuln": {
-    "hosts": [
-     "www.cert-in.org.in"
-    ],
-    "requests": 1
-   },
-   "dpiit_press_notes": {
-    "hosts": [
-     "www.dpiit.gov.in"
-    ],
-    "requests": 1
-   },
-   "gazette_communications": {
-    "hosts": [
-     "egazette.gov.in"
-    ],
-    "requests": 1
-   },
-   "gazette_meity": {
-    "hosts": [
-     "egazette.gov.in"
-    ],
-    "requests": 5
-   },
-   "gazette_mib": {
-    "hosts": [
-     "egazette.gov.in"
-    ],
-    "requests": 5
-   },
-   "inspace_publications": {
-    "hosts": [
-     "www.inspace.gov.in"
-    ],
-    "requests": 1
-   },
-   "meity_acts_policies": {
-    "hosts": [
-     "www.meity.gov.in"
-    ],
-    "requests": 1
-   },
-   "meity_gazettes": {
-    "hosts": [
-     "www.meity.gov.in"
-    ],
-    "requests": 1
-   },
-   "meity_guidelines": {
-    "hosts": [
-     "www.meity.gov.in"
-    ],
-    "requests": 1
-   },
-   "meity_orders_notices": {
-    "hosts": [
-     "www.meity.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_acts_policy": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_advisories": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_broadcasting": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_digital_media": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_orders_notices": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "mib_other_comms": {
-    "hosts": [
-     "mib.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_itsars": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_latest": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_sas": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "nccs_sc": {
-    "hosts": [
-     "nccs.gov.in"
-    ],
-    "requests": 1
-   },
-   "prgi": {
-    "hosts": [
-     "prgi.gov.in"
-    ],
-    "requests": 1
-   },
    "sc_judgments": {
     "hosts": [
      "www.sci.gov.in"
     ],
     "requests": 1
-   },
-   "tdsat_notices": {
-    "hosts": [
-     "tdsat.gov.in"
-    ],
-    "requests": 1
-   },
-   "tdsat_orders": {
-    "hosts": [
-     "tdsat.gov.in"
-    ],
-    "requests": 1
-   },
-   "tec_circulars": {
-    "hosts": [
-     "www.tec.gov.in"
-    ],
-    "requests": 1
-   },
-   "tec_gazette_standards": {
-    "hosts": [
-     "www.tec.gov.in"
-    ],
-    "requests": 1
-   },
-   "tec_whatsnew": {
-    "hosts": [
-     "www.tec.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_consultations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_directions": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_miscellaneous": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_open_consultations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_press_releases": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_recommendations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_regulations": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_rss": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_bcs": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_broadband": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_fea": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_nsl": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_standing_qos": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_tariff_broadcasting": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_tariff_telecom": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
-   },
-   "trai_whats_new": {
-    "hosts": [
-     "trai.gov.in"
-    ],
-    "requests": 1
    }
   },
   "hosts": [
-   "cbfcindia.gov.in",
-   "ccpa.doca.gov.in",
-   "egazette.gov.in",
-   "mib.gov.in",
-   "nccs.gov.in",
-   "prgi.gov.in",
-   "tdsat.gov.in",
-   "trai.gov.in",
-   "www.ascionline.in",
-   "www.cci.gov.in",
-   "www.cert-in.org.in",
-   "www.dpiit.gov.in",
-   "www.inspace.gov.in",
-   "www.meity.gov.in",
-   "www.sci.gov.in",
-   "www.tec.gov.in"
+   "www.sci.gov.in"
   ],
   "undeclared": []
  }

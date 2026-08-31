@@ -92,7 +92,7 @@ Validation belongs to `validate.py`, always.
    `url`, `status: "live"`, `parser` (`strategy` plus its selectors and `row_floor`),
    `date_formats` (only the formats that site actually uses, so a stray number can never be read
    as a date), `allowed_domains`, `default_type`, and optionally `pagination`, `type_rules`,
-   `type_map`, `tripwire`, `stale_after_days`, `row_filter`, `item_flags`, `http_headers`,
+   `type_map`, `tripwire`, `stale_after_days`, `row_filter`, `filter_probe`, `item_flags`, `http_headers`,
    `tolerant_tls`, `role: "crosscheck"`, and a `quirks` note recording what you learned the hard
    way.
 2. **Fixture**: capture the live page into `fixtures/<id>.<ext>`, extension matching what the
@@ -140,6 +140,29 @@ days in the future and not before 2000. Undated rows pass only where the source 
 `undated_ok` (document shelves). A failure writes `{at, source_id, reason, raw}` to the
 `quarantine` table. Rows removed by a `row_filter` are out of scope by design and are not
 quarantined.
+
+**Terse titles (`filter_probe`).** A `row_filter` reads the listing title, and some venues print
+a title too short to carry a subject — CCPA lists many orders as bare respondent names ("In the
+matter of: Oriens Global Marketing Pvt. Ltd."). Dropping on a title like that is a guess. So a
+drop is classified: if the title has fewer than six meaningful words, or reads as a bare company
+name, the drop is *uncertain*, and what happens next depends on the source.
+
+* With `filter_probe` set (CCPA only), the engine reads the **heading region** of the linked
+  document — first 1200 characters — and re-runs the same regex there. Verdicts are cached
+  per URL in `data/filter_probe.json`, so each document is fetched once ever, and no more than
+  `probe_budget` (12) are fetched per source per sweep. Only rows the date window would keep are
+  ever probed.
+* Read no further than the heading. Applying the probe to whole documents was tried and produced
+  only false positives: a CCI order about a car-finance dispute matched on "payment", one about
+  electrical fittings on "cable", and four unrelated Supreme Court matters on "dot". A regex
+  written for a title cannot judge twenty pages of prose.
+* A document with no extractable text — CCPA orders are often scanned images — is **never** read
+  as "out of scope". It is cached with `in_scope: null`, reported, and listed on the Audit tab
+  under "seen but NOT judged" so a human can open it. First sighting raises a note (WARN);
+  afterwards it is a standing info line, and the document is not re-fetched.
+* Without `filter_probe` there is no document heading to appeal to, so in-window terse drops are
+  counted and **named** in health rather than made invisible. CCI shows 6 and the Supreme Court 4;
+  a partner spot-checks those rather than trusting a silent filter.
 
 Tripwires (`tripwires.py`): `floor` (below it means FAILED), `sequence` (a number missing from
 both the page and the ledger is a missed instrument), `monotonic` (shelves only grow), `staleness`
