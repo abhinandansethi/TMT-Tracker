@@ -9,6 +9,7 @@ Visual system copied verbatim from build_dashboard.py (v1) — same type, same s
 """
 import base64
 import json
+import sys
 import os
 import re
 from datetime import datetime, timezone, timedelta
@@ -31,6 +32,40 @@ default_clients = json.loads(clients_path.read_text()).get("clients", []) if cli
 # LLM briefs (optional): pipeline/brief.py reads each instrument's PDF and writes a substantive
 # brief here, keyed by item id. Absent by default; when present, the Clients tab shows it in
 # place of the deterministic metadata brief. Purely additive — a missing cache changes nothing.
+# Act-text reference lane. Quotes what a cited provision actually says, from Acts published by
+# regulators already on the coverage list. Absent cache -> the page simply shows no provisions.
+try:
+    sys.path.insert(0, str(ROOT / "pipeline"))
+    import acts as _acts
+    _ACTS_OK = any((ROOT / "data" / "act_text").glob("*.json"))
+except Exception:
+    _acts, _ACTS_OK = None, False
+
+
+def cited_provisions(it: dict[str, Any]) -> list[dict[str, Any]]:
+    """Provisions this instrument points at, quoted verbatim with their source.
+
+    Two distinct references, and conflating them is what made the old line wrong: the
+    ENABLING provision is the power used, the COMMENCED provision is what actually changed."""
+    if not (_acts and _ACTS_OK):
+        return []
+    meta = it.get("meta") or {}
+    out, seen = [], set()
+    for label, src in (("Commences", (it.get("short") or "") + " " + (it.get("title") or "")),
+                       ("Made under", meta.get("impacted_rule") or "")):
+        if label == "Commences" and not re.search(r"commencement|enforcement", src, re.I):
+            continue
+        try:
+            p = _acts.provision_for(src)
+        except Exception:
+            p = None
+        if p and p["ref"] not in seen:
+            seen.add(p["ref"])
+            out.append({"label": label, "ref": p["ref"], "act": p["act"],
+                        "text": p["text"][:900], "url": p["url"]})
+    return out
+
+
 brief_cache_path = ROOT / "pipeline" / "brief_cache.json"
 brief_cache = json.loads(brief_cache_path.read_text()) if brief_cache_path.exists() else {}
 lines_map = json.loads((DATA / "row_lines.json").read_text())
@@ -305,6 +340,7 @@ def build_row(it: dict[str, Any]) -> dict[str, Any]:
         # gazette provenance: who issued it and what class of instrument it is
         "issuer": issuer(meta), "gkind": gazette_kind(meta),
         "ruleIsAmend": rule_is_amendment(meta.get("impacted_rule")),
+        "prov": cited_provisions(it),
         "gcat": (meta.get("category") or "").strip() or None,
         "pr": it.get("announced_by_pr"),
         "deadline": it.get("deadline"), "flags": it.get("flags", []),
@@ -756,6 +792,11 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
 .note.wc .body{max-width:900px}
 .note.wc .ai{margin-top:6px;color:#37474f}
 .aitag{display:inline-block;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:20px;padding:1px 7px;margin-left:4px;white-space:nowrap}
+.prov{margin-top:10px;padding:10px 0 2px;border-top:1px dashed var(--rule2)}
+.prov .pk{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);margin-bottom:6px}
+.prov blockquote{margin:0;padding:0 0 0 14px;border-left:2px solid var(--ochre);font-family:var(--serif);font-size:15px;line-height:1.6;color:var(--ink);max-width:820px}
+.prov .psrc{font-family:var(--mono);font-size:10px;color:var(--mute);margin-top:6px}
+.prov .psrc a{color:var(--mute)}
 /* audit tab: per-link scraped-document ledger */
 .asrc{border:1px solid var(--rule2);border-radius:4px;background:#fff;margin-top:10px}
 .asrc .ahead{display:grid;grid-template-columns:14px minmax(180px,1.1fr) minmax(0,1.4fr) 110px 24px;gap:12px;align-items:center;padding:10px 14px;cursor:pointer}
@@ -1259,6 +1300,13 @@ function wcNote(r, label) {
          ' <span class="aitag">AI brief · ' + esc(r.llm.confidence || '') + ' · verify</span></div>';
   }
   if (det) h += '<div class="body">' + esc(det) + '</div>';
+  // The provision itself, quoted from the Act. This is statutory text, so it is shown verbatim
+  // with its source — never paraphrased, and never produced by a model.
+  (r.prov || []).forEach(function (p) {
+    h += '<div class="prov"><div class="pk">' + esc(p.label) + ' ' + esc(p.ref) + ' — ' +
+         esc(p.act) + '</div><blockquote>' + esc(p.text) + '</blockquote>' +
+         '<div class="psrc">Quoted from <a href="' + esc(p.url) + '" target="_blank" rel="noopener">the Act as published</a></div></div>';
+  });
   return h + '</div>';
 }
 function acts(r) {

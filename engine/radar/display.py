@@ -268,7 +268,13 @@ def descriptor(it: Dict[str, Any], today: str) -> str:
         if meta.get("impacted_rule"):
             r = short_rule(meta["impacted_rule"])
             if r and not re.match(r"(?i)^nil$", r):
-                bits.append("amends " + r)
+                # The gazette's impacted_rule is the ENABLING provision — the power the
+                # instrument is made under — unless the gazette itself marks it an amendment.
+                # 27 of 28 entries are enabling provisions, so "amends" misstated nearly all of
+                # them: rules made under s.56(2) do not amend s.56(2).
+                amends = re.search(r"\bamendment\b|change in substance",
+                                   meta["impacted_rule"], re.I)
+                bits.append(("amends " if amends else "under ") + r)
         if str(meta.get("impact", "")).lower().startswith("action"):
             bits.append("action required")
     elif it.get("lane") == "judgments":
