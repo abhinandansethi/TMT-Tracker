@@ -8,3 +8,4 @@ feedparser
 pypdf
 anthropic
 openai
+pymupdf

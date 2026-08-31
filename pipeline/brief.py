@@ -38,7 +38,7 @@ Usage:
     TMT_BRIEF_MODEL=claude-sonnet-5 python3 pipeline/brief.py   # cheaper model for a large batch
 """
 from __future__ import annotations
-import argparse, datetime, hashlib, io, json, os, re, sys, time
+import argparse, base64, datetime, hashlib, io, json, os, re, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -63,9 +63,14 @@ def _resolve_provider():
 
 PROVIDER = _resolve_provider()
 MODEL = os.environ.get("TMT_BRIEF_MODEL") or ("gpt-5-mini" if PROVIDER == "openai" else "claude-opus-5")
+# Vision model for scanned documents. Only the OpenAI path is wired today; the Anthropic path
+# would need image content blocks, so a scan simply stays unbriefed there rather than pretending.
+VISION_MODEL = os.environ.get("TMT_VISION_MODEL", "gpt-4o-mini")
 EFFORT = os.environ.get("TMT_BRIEF_EFFORT", "medium")   # low | medium | high | xhigh | max
 MAX_CHARS = 18000
 MAX_FETCH_SECONDS = 90          # hard wall-clock cap per document
+VISION_PAGES = 4                # pages rendered for a scanned document (the operative part)
+VISION_DPI = 150                # legible for a model without ballooning the payload
 MAX_BYTES = 40_000_000          # refuse absurd payloads rather than buffer them                                        # ~first dozen pages; enough for the operative part
 
 # Bumped whenever SYSTEM/SCHEMA change: cached briefs written under an older prompt are
@@ -210,6 +215,59 @@ def extract_text(url):
     return text[:MAX_CHARS]
 
 
+def render_pages(body: bytes, pages: int = VISION_PAGES, dpi: int = VISION_DPI):
+    """PNG bytes for the first pages of a PDF that has no text layer.
+
+    Many regulators (CCPA, IN-SPACe, CBFC) publish scans, where the PDF carries images and no
+    extractable characters. Rasterising and letting a vision model read the page is still
+    reading the fetched document — the same act as parsing its text layer — not recall from
+    memory. It is marked as such in the cache so the provenance is never ambiguous."""
+    import fitz
+    doc = fitz.open(stream=body, filetype="pdf")
+    out = []
+    for i in range(min(pages, doc.page_count)):
+        out.append(doc[i].get_pixmap(dpi=dpi).tobytes("png"))
+    return out
+
+
+def fetch_raw(url):
+    """The document bytes, under the same wall-clock and size bounds as extract_text."""
+    import requests
+    deadline = time.monotonic() + MAX_FETCH_SECONDS
+    r = requests.get(url, headers=UA, timeout=20, stream=True)
+    r.raise_for_status()
+    chunks, total = [], 0
+    for chunk in r.iter_content(65536):
+        chunks.append(chunk); total += len(chunk)
+        if total > MAX_BYTES:
+            raise ValueError("document too large")
+        if time.monotonic() > deadline:
+            raise ValueError("fetch exceeded wall clock")
+    return b"".join(chunks)
+
+
+def call_openai_vision(client, it, images):
+    """Brief a scanned document by reading rendered page images."""
+    content = [{"type": "text", "text": build_user_prompt(it, "(scanned document — read the page images below)")}]
+    for png in images:
+        content.append({"type": "image_url",
+                        "image_url": {"url": "data:image/png;base64," + base64.b64encode(png).decode()}})
+    resp = client.chat.completions.create(
+        model=VISION_MODEL,
+        messages=[{"role": "system", "content": SYSTEM + "\n\nThe document is a SCAN with no text "
+                   "layer; you are reading page images. If the scan is too poor to read the "
+                   "operative part, say so and set confidence low rather than guessing."},
+                  {"role": "user", "content": content}],
+        response_format={"type": "json_schema",
+                         "json_schema": {"name": "instrument_brief", "strict": True, "schema": SCHEMA}},
+    )
+    choice = resp.choices[0]
+    if getattr(choice.message, "refusal", None):
+        raise RuntimeError(f"model declined: {choice.message.refusal[:120]}")
+    data = json.loads(choice.message.content)
+    return {k: data[k] for k in ("brief", "so_what", "confidence")}
+
+
 def build_user_prompt(it, text):
     hdr = [f"Instrument: {it.get('title')}",
            f"Regulator: {it.get('regulator')}",
@@ -345,13 +403,30 @@ def main():
         if fetched and args.delay:
             time.sleep(args.delay)
         fetched += 1
+        text, images = None, None
         try:
             text = extract_text(url)
         except Exception as e:
-            print(f"  skip  {iid}  {title}  — {e}", flush=True)
-            failed += 1
-            continue
+            # A scan is not an unreadable document, it is a document with no text layer. Render
+            # the pages and read them, rather than reporting a gap we can actually close.
+            scanned = "no extractable text" in str(e)
+            if scanned and PROVIDER == "openai" and not args.dry_run:
+                try:
+                    images = render_pages(fetch_raw(url))
+                except Exception as e2:
+                    print(f"  skip  {iid}  {title}  — scan, and rendering failed: {e2}", flush=True)
+                    failed += 1
+                    continue
+            else:
+                print(f"  skip  {iid}  {title}  — {e}"
+                      + (" (scan; vision needs the openai provider)" if scanned else ""), flush=True)
+                failed += 1
+                continue
 
+        if args.dry_run and text is None:
+            print(f"  scan  {iid}  {title}  — no text layer; would be read as page images", flush=True)
+            done += 1
+            continue
         if args.dry_run:
             print(f"\n===== {iid}  {title} =====")
             print(f"  url: {url}")
@@ -361,7 +436,11 @@ def main():
             continue
 
         try:
-            brief = call_llm(client, it, text)
+            if images:
+                brief = call_openai_vision(client, it, images)
+                brief["read_as"] = "scan"     # provenance: read from page images, not a text layer
+            else:
+                brief = call_llm(client, it, text)
         except Exception as e:
             print(f"  fail  {iid}  {title}  — {e}", flush=True)
             failed += 1
