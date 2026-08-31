@@ -10,14 +10,13 @@
 //
 // Credentials come from Vercel → Settings → Environment Variables (then redeploy):
 //   AUTH_USER, AUTH_PASS
-// If they are unset it falls back to the starter credentials below so the gate is never
-// accidentally open. CHANGE THESE: "1234" is a four-digit password guarding client-
-// confidential information, and this file lives in git.
+// There is deliberately NO fallback pair. An earlier version shipped starter credentials so the
+// gate could never be accidentally open, but that made it weakly closed by default: a short
+// password committed to git, guarding a client roster, with no rate limiting in front of it. If
+// the variables are absent the deployment refuses every request and says why — a misconfigured
+// deployment must be obviously broken, never quietly guessable.
 //
 // Edge Middleware is available on Hobby (free) as well as paid plans — no upgrade needed.
-
-const FALLBACK_USER = 'abhi';
-const FALLBACK_PASS = '1234';
 
 // Protect everything, including /api. Vercel's own internal paths are excluded so the
 // deployment can still serve its infrastructure requests.
@@ -25,14 +24,21 @@ export const config = {
   matcher: ['/((?!_vercel|_next/static|_next/image).*)'],
 };
 
-// Constant-time-ish comparison: avoids leaking the password length/prefix through timing.
-// (Marginal for a short password, but free to do correctly.)
+// Compares without leaking the password *prefix* through timing. It does still leak the
+// password *length* — the early length check returns measurably faster — which is a deliberate
+// trade for simplicity, not an oversight. Length alone is a weak signal; prefix would not be.
 function safeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
 }
+
+const UNCONFIGURED = new Response(
+  'This deployment has no credentials configured. Set AUTH_USER and AUTH_PASS in '
+  + 'Vercel → Settings → Environment Variables, then redeploy.',
+  { status: 503, headers: { 'Cache-Control': 'no-store' } },
+);
 
 const CHALLENGE = new Response('Authentication required.', {
   status: 401,
@@ -43,15 +49,18 @@ const CHALLENGE = new Response('Authentication required.', {
 });
 
 export default function middleware(request) {
-  const user = process.env.AUTH_USER || FALLBACK_USER;
-  const pass = process.env.AUTH_PASS || FALLBACK_PASS;
+  const user = process.env.AUTH_USER;
+  const pass = process.env.AUTH_PASS;
+  if (!user || !pass) return UNCONFIGURED.clone();
 
   const header = request.headers.get('authorization') || '';
   if (!header.startsWith('Basic ')) return CHALLENGE.clone();
 
   let decoded;
   try {
-    decoded = atob(header.slice(6));
+    // atob gives bytes, not text. Decode as UTF-8 to match the charset the challenge advertises,
+    // so a password containing non-ASCII characters authenticates instead of silently failing.
+    decoded = new TextDecoder().decode(Uint8Array.from(atob(header.slice(6)), (c) => c.charCodeAt(0)));
   } catch (e) {
     return CHALLENGE.clone();
   }

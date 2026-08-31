@@ -64,7 +64,9 @@ def _resolve_provider():
 PROVIDER = _resolve_provider()
 MODEL = os.environ.get("TMT_BRIEF_MODEL") or ("gpt-5-mini" if PROVIDER == "openai" else "claude-opus-5")
 EFFORT = os.environ.get("TMT_BRIEF_EFFORT", "medium")   # low | medium | high | xhigh | max
-MAX_CHARS = 18000                                        # ~first dozen pages; enough for the operative part
+MAX_CHARS = 18000
+MAX_FETCH_SECONDS = 90          # hard wall-clock cap per document
+MAX_BYTES = 40_000_000          # refuse absurd payloads rather than buffer them                                        # ~first dozen pages; enough for the operative part
 
 # Bumped whenever SYSTEM/SCHEMA change: cached briefs written under an older prompt are
 # regenerated rather than left in place, so a prompt fix actually reaches the page.
@@ -112,6 +114,15 @@ SCHEMA = {
     "required": ["brief", "so_what", "confidence"],
     "additionalProperties": False,
 }
+
+
+def write_cache(cache):
+    """Write the cache atomically. Path.write_text truncates before writing, so an interrupt in
+    that window leaves an empty file — after which this script reloads {} and re-bills every
+    brief, and the dashboard build dies on unparseable JSON. Write a sibling, then rename."""
+    tmp = CACHE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(cache, indent=2, ensure_ascii=False))
+    os.replace(tmp, CACHE)
 
 
 def load_json(p, default):
@@ -165,15 +176,31 @@ def extract_text(url):
     """Fetch a document and return its text, whether it is a PDF or an HTML page.
     Raises with a stated reason on anything unusable, so the caller can log why."""
     import requests
-    r = requests.get(url, headers=UA, timeout=45)
+    # requests' timeout= is per socket read, not a total budget: a server trickling one byte at a
+    # time holds the fetch open indefinitely (measured: 12.1s against a 1s timeout). Stream with a
+    # wall-clock deadline and a size cap so one slow host cannot consume the whole run.
+    deadline = time.monotonic() + MAX_FETCH_SECONDS
+    r = requests.get(url, headers=UA, timeout=20, stream=True)
     r.raise_for_status()
     ct = (r.headers.get("content-type") or "").lower()
-    body = r.content
+    chunks, total = [], 0
+    for chunk in r.iter_content(65536):
+        chunks.append(chunk); total += len(chunk)
+        if total > MAX_BYTES:
+            raise ValueError(f"document exceeds {MAX_BYTES // 1_000_000}MB — abandoning")
+        if time.monotonic() > deadline:
+            raise ValueError(f"fetch exceeded {MAX_FETCH_SECONDS}s wall clock (server trickling)")
+    body = b"".join(chunks)
 
-    if body[:5] == b"%PDF-" or "pdf" in ct or url.lower().endswith(".pdf"):
+    # Sniff the body before trusting the URL suffix: gov.in servers routinely answer a dead .pdf
+    # path with a 200 HTML error page, which a suffix-first rule parses as a broken PDF and
+    # reports as "no extractable text" instead of reading it.
+    if body[:5] == b"%PDF-":
         text, kind = _pdf_text(body), "pdf"
-    elif "html" in ct or body[:200].lstrip()[:1] == b"<":
+    elif body[:200].lstrip()[:1] == b"<" or "html" in ct:
         text, kind = _html_text(body), "html"
+    elif "pdf" in ct or url.lower().endswith(".pdf"):
+        text, kind = _pdf_text(body), "pdf"
     else:
         raise ValueError(f"unsupported document type (content-type={ct or 'none'})")
 
@@ -235,20 +262,35 @@ def call_llm(client, it, text):
     return call_openai(client, it, text) if PROVIDER == "openai" else call_claude(client, it, text)
 
 
-def select(items, args):
+def needs_brief(it, cache, force=False):
+    """True when this item has no current brief — the same test the run loop applies."""
+    if force:
+        return True
+    prev = cache.get(it["id"], {})
+    return not (prev.get("doc_hash") == doc_hash(it)
+                and prev.get("prompt_version") == PROMPT_VERSION)
+
+
+def select(items, args, cache=None):
     if args.ids:
         want = set(args.ids)
         chosen = [i for i in items if i.get("id") in want]
-    elif args.all:
-        chosen = [i for i in items if i.get("lane") in ("instruments", "judgments") and doc_url_of(i)]
     elif args.actionable:
         chosen = [i for i in items if is_actionable(i) and doc_url_of(i)]
     else:
-        # Default is every instrument and judgment with a document. The cache makes this cheap:
-        # each run only briefs what is new or stale, so coverage fills in across runs.
+        # Default (and --all) is every instrument and judgment with a document. The cache makes
+        # this cheap: a run only briefs what is new or stale, so coverage fills in across runs.
         chosen = [i for i in items if i.get("lane") in ("instruments", "judgments") and doc_url_of(i)]
-    chosen.sort(key=lambda i: (i.get("date") or ""), reverse=True)
+    # Undated rows sorted below every dated one, so a capped run could never reach them — 105
+    # items were unreachable under any limit short of the whole corpus. Keep them last, but
+    # reachable once the dated backlog is cleared.
+    chosen.sort(key=lambda i: (i.get("date") or "0000-00-00"), reverse=True)
+    # The cap must limit WORK, not selection. Truncating before the freshness test spent the
+    # whole budget on already-briefed items, which made a capped run a silent no-op: the sweep's
+    # --limit 40 currently briefs nothing while hundreds remain outstanding.
     if args.limit:
+        if cache is not None:
+            chosen = [i for i in chosen if needs_brief(i, cache, args.force)]
         chosen = chosen[: args.limit]
     return chosen
 
@@ -265,6 +307,7 @@ def main():
                          "runs at the de-minimis, non-disruptive load the legal analysis records.")
     ap.add_argument("--dry-run", action="store_true", help="extract text and print the prompt; make NO API call (needs no credentials)")
     args = ap.parse_args()
+    args.delay = max(0.0, args.delay)   # a negative sleep would kill a run hours in
 
     feed = load_json(ITEMS, {})
     items = feed.get("items", []) if isinstance(feed, dict) else feed
@@ -272,7 +315,7 @@ def main():
         sys.exit(f"no items in {ITEMS} — run a sweep + export first")
 
     cache = load_json(CACHE, {})
-    chosen = select(items, args)
+    chosen = select(items, args, cache)
     print(f"[brief] {len(chosen)} item(s) selected · provider={PROVIDER} model={MODEL} · dry_run={args.dry_run}")
 
     client = None
@@ -305,7 +348,7 @@ def main():
         try:
             text = extract_text(url)
         except Exception as e:
-            print(f"  skip  {iid}  {title}  — {e}")
+            print(f"  skip  {iid}  {title}  — {e}", flush=True)
             failed += 1
             continue
 
@@ -320,13 +363,13 @@ def main():
         try:
             brief = call_llm(client, it, text)
         except Exception as e:
-            print(f"  fail  {iid}  {title}  — {e}")
+            print(f"  fail  {iid}  {title}  — {e}", flush=True)
             failed += 1
             continue
         cache[iid] = {**brief, "model": MODEL, "provider": PROVIDER, "doc_hash": h,
                       "prompt_version": PROMPT_VERSION,
                       "generated_at": datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).strftime("%Y-%m-%d")}
-        CACHE.write_text(json.dumps(cache, indent=2, ensure_ascii=False))  # checkpoint each success
+        write_cache(cache)   # checkpoint each success, atomically
         print(f"  ok   [{done + 1:>3}/{len(chosen)}] {iid}  {title}  [{brief['confidence']}]", flush=True)
         done += 1
 

@@ -57,39 +57,76 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Record the pre-run brief count
+        # Snapshotted so the coverage step can assert the run actually achieved something.
+        id: before
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, pathlib
+          p = pathlib.Path("pipeline/brief_cache.json")
+          print(f"count={len(json.loads(p.read_text())) if p.exists() else 0}")
+          PY
+
       - name: Brief the backlog
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Dispatch inputs are free text from whoever pressed the button. They are bound to env
+          # vars and quoted below, NEVER interpolated into this script with ${{ }} — GitHub
+          # substitutes those textually before bash parses the line, so a crafted value would run
+          # as a command in a step that holds both API keys and a repo-write token.
+          LIMIT: ${{ inputs.limit }}
+          FORCE: ${{ inputs.force }}
         run: |
           if [ -z "${OPENAI_API_KEY}" ] && [ -z "${ANTHROPIC_API_KEY}" ]; then
             echo "::error::No LLM key configured. Add OPENAI_API_KEY or ANTHROPIC_API_KEY as a repository secret."
             exit 1
           fi
           ARGS=""
-          if [ "${{ inputs.limit }}" != "0" ] && [ -n "${{ inputs.limit }}" ]; then
-            ARGS="--limit ${{ inputs.limit }}"
-          fi
-          if [ "${{ inputs.force }}" = "true" ]; then
+          case "$LIMIT" in
+            ''|0) ;;                                    # unset or 0 -> no cap, work the backlog
+            *[!0-9]*) echo "::error::limit must be a non-negative whole number (got '$LIMIT')"; exit 1 ;;
+            *) ARGS="--limit $LIMIT" ;;
+          esac
+          if [ "$FORCE" = "true" ]; then
             ARGS="$ARGS --force"
           fi
           echo "running: pipeline/brief.py $ARGS"
           python pipeline/brief.py $ARGS
 
-      - name: Report coverage
+      - name: Report coverage and assert progress
+        env:
+          BEFORE: ${{ steps.before.outputs.count }}
         run: |
           python - <<'PY'
-          import json, pathlib
+          import json, os, pathlib, sys
+          sys.path.insert(0, "pipeline")
+          import brief as B
           cache = json.loads(pathlib.Path("pipeline/brief_cache.json").read_text()) if pathlib.Path("pipeline/brief_cache.json").exists() else {}
           items = json.loads(pathlib.Path("data/items.json").read_text())["items"]
-          scope = [i for i in items
-                   if i.get("lane") in ("instruments", "judgments")
-                   and (i.get("doc_url") or i.get("pdf_url") or i.get("page_url"))]
-          done = sum(1 for i in scope if i["id"] in cache)
-          lens = [len(v["brief"]) for v in cache.values() if v.get("brief")]
-          avg = sum(lens) / len(lens) if lens else 0
-          print(f"briefed {done}/{len(scope)} items in scope · average brief {avg:.0f} chars")
-          print(f"::notice::Briefs cover {done} of {len(scope)} items; average length {avg:.0f} characters")
+          scope = [i for i in items if i.get("lane") in ("instruments", "judgments") and B.doc_url_of(i)]
+          # Count only briefs that are actually current: same document AND same prompt version.
+          # Bare key presence overstates — it counts entries a prompt bump has already invalidated.
+          fresh = [i for i in scope
+                   if cache.get(i["id"], {}).get("doc_hash") == B.doc_hash(i)
+                   and cache.get(i["id"], {}).get("prompt_version") == B.PROMPT_VERSION]
+          by_lane = {}
+          for i in scope:
+              lane = i.get("lane")
+              d = by_lane.setdefault(lane, [0, 0])
+              d[1] += 1
+              if i in fresh: d[0] += 1
+          for lane, (got, tot) in sorted(by_lane.items()):
+              print(f"{lane:12s} {got}/{tot} briefed")
+          added = len(cache) - int(os.environ.get("BEFORE") or 0)
+          print(f"cache grew by {added} entries this run")
+          print(f"::notice::Briefs current for {len(fresh)}/{len(scope)} items " +
+                " · ".join(f"{k} {v[0]}/{v[1]}" for k, v in sorted(by_lane.items())))
+          # A run that briefed nothing is a failure, not a quiet success: a bad key, a provider
+          # outage or a WAF blocking every host all look identical without this.
+          if added <= 0 and len(fresh) < len(scope):
+              sys.exit(f"::error::Ran to completion but added no briefs, with "
+                       f"{len(scope) - len(fresh)} still outstanding — treat this run as failed")
           PY
 
       - name: Commit the briefs
@@ -105,7 +142,7 @@ jobs:
             for i in 1 2 3; do
               git push && break
               echo "push rejected (attempt $i) — rebasing onto the remote and retrying"
-              git pull --rebase || exit 1
               [ "$i" = 3 ] && { echo "::error::could not push after 3 attempts"; exit 1; }
+              git pull --rebase || exit 1
             done
           fi

@@ -47,6 +47,24 @@ module.exports = async (req, res) => {
     return res.status(405).json({ ok: false, message: 'POST only.' });
   }
 
+  // CSRF guard. The browser re-sends Basic Auth on cross-site requests, so authentication alone
+  // does not prove the partner intended this. A cross-site HTML form can only send
+  // urlencoded/multipart/text-plain, and a cross-site fetch setting a JSON content-type is
+  // preflighted — so insisting on JSON keeps drive-by dispatches out.
+  const ctype = String(req.headers['content-type'] || '').toLowerCase();
+  if (!ctype.startsWith('application/json')) {
+    return res.status(415).json({
+      ok: false,
+      message: 'Send Content-Type: application/json. This endpoint changes state, so it does not '
+        + 'accept form-style submissions.',
+    });
+  }
+  // Same-origin only, where the browser tells us. Absent header = non-browser caller (curl), allowed.
+  const site = String(req.headers['sec-fetch-site'] || '');
+  if (site && site !== 'same-origin' && site !== 'none') {
+    return res.status(403).json({ ok: false, message: `Cross-site request refused (${site}).` });
+  }
+
   const token = findToken(process.env);
   const repo = findRepo(process.env);
 
@@ -69,16 +87,24 @@ module.exports = async (req, res) => {
   // Allow-list, never a caller-supplied filename: an arbitrary workflow name from the request
   // body would let anyone reaching this endpoint run any workflow in the repository.
   const WORKFLOWS = { sweep: 'sweep.yml', briefs: 'briefs.yml' };
-  let wanted = 'sweep';
+  let body;
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-    if (body.workflow && Object.prototype.hasOwnProperty.call(WORKFLOWS, body.workflow)) {
-      wanted = body.workflow;
-    } else if (body.workflow) {
-      return res.status(400).json({ ok: false,
-        message: `Unknown workflow "${body.workflow}". Allowed: ${Object.keys(WORKFLOWS).join(', ')}.` });
-    }
-  } catch (e) { /* no body, or unparseable — fall through to the default sweep */ }
+    body = typeof req.body === 'string' ? (req.body.trim() ? JSON.parse(req.body) : {}) : (req.body || {});
+  } catch (e) {
+    // Unparseable JSON must not silently dispatch the default — say so.
+    return res.status(400).json({ ok: false, message: 'Request body is not valid JSON.' });
+  }
+  if (body === null || typeof body !== 'object') body = {};
+
+  // Resolve once, to a string. Coercing twice let a non-string (e.g. ["briefs"]) pass the
+  // allow-list check and then mismatch the later ===, dispatching one workflow while the reply
+  // named the other.
+  const asked = body.workflow;
+  const wanted = asked === undefined ? 'sweep' : (typeof asked === 'string' ? asked : null);
+  if (wanted === null || !Object.prototype.hasOwnProperty.call(WORKFLOWS, wanted)) {
+    return res.status(400).json({ ok: false,
+      message: `Unknown workflow ${JSON.stringify(asked)}. Allowed: ${Object.keys(WORKFLOWS).join(', ')}.` });
+  }
 
   const branch = process.env.VERCEL_GIT_COMMIT_REF || 'main';
   const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOWS[wanted]}/dispatches`;
