@@ -236,6 +236,43 @@ TYPE_LABEL = {"consultation_notice": "Consultation", "consultation_paper": "Cons
   "rules": "Rules", "direction": "Direction", "recommendation": "Recommendation", "manual": "Manual",
   "order": "Order", "do_letter": "Letter", "policy": "Policy", "other": "Other"}
 
+# The Gazette of India classifies every notification by part and section, and that code says
+# what kind of instrument it is — statutory rule, statutory order, or a non-statutory notice.
+# It is more informative than the word "notification", so decode it rather than drop it.
+GAZETTE_PART = {
+    "Part I-Section 1": "a non-statutory notification",
+    "Part I-Section 2": "a personnel notification",
+    "Part II-Section 3-Sub-Section (i)": "a general statutory rule",
+    "Part II-Section 3-Sub-Section (ii)": "a statutory order or notification",
+}
+
+
+def gazette_kind(meta: dict[str, Any]) -> Optional[str]:
+    ps = (meta.get("part_section") or "").strip()
+    return GAZETTE_PART.get(ps)
+
+
+def issuer(meta: dict[str, Any]) -> Optional[str]:
+    """Who actually issued it. 'e-Gazette' is the venue, not the author."""
+    mini = (meta.get("ministry") or "").strip()
+    dept = (meta.get("department") or "").strip()
+    if not mini or mini.lower() == "not applicable":
+        return None
+    if dept and dept.lower() != "not applicable":
+        return f"{mini} ({dept})"
+    return mini
+
+
+def clean_rule(v: Optional[str]) -> Optional[str]:
+    """The gazette's own text carries PDF-extraction artifacts — 'Sub -section' with a stray
+    space is the common one. Normalise so the page does not reproduce the glitch."""
+    if not v:
+        return v
+    v = re.sub(r"\bSub\s+-\s*section\b", "sub-section", v, flags=re.I)
+    v = re.sub(r"\s+-\s*section\b", "-section", v, flags=re.I)
+    return re.sub(r"\s{2,}", " ", v).strip()
+
+
 def build_row(it: dict[str, Any]) -> dict[str, Any]:
     meta = it.get("meta") or {}
     # a gazette entry has no direct PDF (its citation is the permanent Gazette ID), so the
@@ -257,7 +294,10 @@ def build_row(it: dict[str, Any]) -> dict[str, Any]:
         # dual links: the document itself and the official landing page
         "doc": doc, "page": it.get("page_url"),
         "gid": meta.get("gazette_id"), "impact": meta.get("impact"),
-        "effective": meta.get("effective_date"), "rule": meta.get("impacted_rule"),
+        "effective": meta.get("effective_date"), "rule": clean_rule(meta.get("impacted_rule")),
+        # gazette provenance: who issued it and what class of instrument it is
+        "issuer": issuer(meta), "gkind": gazette_kind(meta),
+        "gcat": (meta.get("category") or "").strip() or None,
         "pr": it.get("announced_by_pr"),
         "deadline": it.get("deadline"), "flags": it.get("flags", []),
         "memo": MEMOS.get(it["id"]),
@@ -1169,16 +1209,35 @@ function whatChanged(r) {
     : /(rule|regulation|notif)/.test(t) ? 'has notified' : /direction/.test(t) ? 'has issued a direction on'
     : /advisory/.test(t) ? 'has issued an advisory on' : /press.?note/.test(t) ? 'has issued'
     : /consult|draft/.test(t) ? 'has floated for consultation' : 'has published';
-  const p = [(r.reg || 'The regulator') + ' ' + verb + ' ' + (r.short || r.official) + '.'];
+  // A gazette entry knows who issued it and what class of instrument it is. Leading with that
+  // tells the reader something the heading did not; leading with "e-Gazette has notified <title>"
+  // just rewrites the heading as a sentence, which is what made these lines uninformative.
+  const p = [];
+  if (r.issuer) {
+    p.push('Issued by the ' + r.issuer + (r.gkind ? ' as ' + r.gkind : '') +
+           (r.gcat && /extra/i.test(r.gcat) ? ' in an extraordinary gazette' : '') + '.');
+  } else {
+    p.push((r.reg || 'The regulator') + ' ' + verb + ' ' + (r.short || r.official) + '.');
+  }
   const rt = (r.rule && !/^\s*nil\s*$/i.test(r.rule)) ? ruleTextOf(r.rule) : '';
-  if (rt) p.push('It amends ' + rt + '.');
-  if (r.effective) p.push('In force from ' + fmt(r.effective) + '.');
+  // A commencement notification brings a provision into force; it does not amend it. Fold the
+  // effective date into that clause rather than restating "in force" in the next sentence.
+  const commences = /commencement|enforcement|bring.*into force/i.test(r.short + ' ' + r.official);
+  let dated = false;
+  if (rt) {
+    if (commences) {
+      p.push('Brings ' + rt + ' into force' + (r.effective ? ' on ' + fmt(r.effective) : '') + '.');
+      dated = !!r.effective;
+    } else {
+      p.push('Amends ' + rt + '.');
+    }
+  }
+  if (r.effective && !dated) p.push('In force from ' + fmt(r.effective) + '.');
   if (r.deadline && !r.effective) p.push((/consult|draft/i.test(r.type) ? 'Comments close ' : 'Deadline: ') + fmt(r.deadline) + '.');
   if (r.impact && /action/i.test(r.impact)) p.push('The Gazette marks it action-required.');
-  // p[0] only rewrites the heading as a sentence. With nothing after it there is no fact to
-  // report, and printing it anyway is padding that costs the reader a line and teaches them
-  // the field is worthless. Say nothing instead.
-  return p.length > 1 ? p.join(' ') : null;
+  // A lone p[0] that merely rewrites the heading is padding — say nothing instead. But the
+  // gazette issuer sentence carries facts the heading does not, so it stands on its own.
+  return (p.length > 1 || r.issuer) ? p.join(' ') : null;
 }
 function wcNote(r, label) {
   const det = whatChanged(r);
