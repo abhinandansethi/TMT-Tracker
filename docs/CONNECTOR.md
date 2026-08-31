@@ -70,6 +70,7 @@ Every instrument and judgment comes back in this shape:
   "deadline": null,
   "impact": "Actionable",
   "amends": "Sub-section (2) of section 56 of the Telecommunications Act, 2023 (44 of 2023)",
+  "_amends_note": "MISNAMED FOR HISTORICAL REASONS. The gazette field is the ENABLING provision — the power the instrument is made under — except where the gazette itself marks it 'Amendment'/'Change in Substance'. 27 of 28 gazette entries are enabling provisions. Read it as 'made under' unless the amendment marker is present; the dashboard labels it accordingly.",
   "gazette_id": "CG-DL-E-21082026-275657",
   "part_section": "Part II-Section 3-Sub-Section (i)",
   "parties": null,
@@ -85,6 +86,10 @@ Every instrument and judgment comes back in this shape:
   published on. A gazette entry's **`document_url`** is the stable e-Gazette PDF
   (`egazette.gov.in/WriteReadData/<year>/<n>.pdf`, built from the Gazette ID); its permanent
   citation is the **`gazette_id`**, carried alongside.
+- **`amends`** is the gazette's own `impacted_rule`, and the name flatters it: for all but a
+  handful of entries it is the provision the instrument is **made under** (a rule-making,
+  commencement or notification power), not one it changes. Treat it as an enabling provision
+  unless it carries an explicit `Amendment` / `Change in Substance` marker.
 - **`effective_date`** / **`deadline`** are the dates your workflow keys client obligations off.
 - **`citation`** is a ready-to-paste provenance line.
 

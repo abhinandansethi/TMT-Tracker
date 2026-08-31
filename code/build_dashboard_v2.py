@@ -263,6 +263,13 @@ def issuer(meta: dict[str, Any]) -> Optional[str]:
     return mini
 
 
+def rule_is_amendment(v: Optional[str]) -> bool:
+    """True only when the gazette itself marks the entry as an amendment. Otherwise the field
+    names the provision the instrument is MADE UNDER (a rule-making, commencement or
+    notification power) — calling that 'amends' misstates what the instrument did."""
+    return bool(v) and bool(re.search(r"\bamendment\b|change in substance", v, re.I))
+
+
 def clean_rule(v: Optional[str]) -> Optional[str]:
     """The gazette's own text carries PDF-extraction artifacts — 'Sub -section' with a stray
     space is the common one. Normalise so the page does not reproduce the glitch."""
@@ -297,6 +304,7 @@ def build_row(it: dict[str, Any]) -> dict[str, Any]:
         "effective": meta.get("effective_date"), "rule": clean_rule(meta.get("impacted_rule")),
         # gazette provenance: who issued it and what class of instrument it is
         "issuer": issuer(meta), "gkind": gazette_kind(meta),
+        "ruleIsAmend": rule_is_amendment(meta.get("impacted_rule")),
         "gcat": (meta.get("category") or "").strip() or None,
         "pr": it.get("announced_by_pr"),
         "deadline": it.get("deadline"), "flags": it.get("flags", []),
@@ -1191,7 +1199,7 @@ function metaCells(r) {
   const m = [['Source', r.venue], ['Issued', r.date ? fmt(r.date) : 'Not dated on venue']];
   if (r.effective) m.push(['In force', fmt(r.effective)]);
   m.push(r.deadline && !r.effective ? [/consult|draft/i.test(r.type) ? 'Comments' : 'Lapses', fmt(r.deadline)] : null);
-  if (r.rule) m.push(['Amends', r.rule]);
+  if (r.rule) m.push([r.ruleIsAmend ? 'Amends' : 'Made under', r.rule]);
   if (r.gid) m.push(['Gazette ID', r.gid]);
   if (r.impact) m.push(['Impact', r.impact]);
   m.push(['Status', (r.flags || []).includes('needs_verification') ? 'Gazette pending' : 'On official venue']);
@@ -1223,16 +1231,18 @@ function whatChanged(r) {
   // A commencement notification brings a provision into force; it does not amend it. Fold the
   // effective date into that clause rather than restating "in force" in the next sentence.
   const commences = /commencement|enforcement|bring.*into force/i.test(r.short + ' ' + r.official);
-  let dated = false;
-  if (rt) {
-    if (commences) {
-      p.push('Brings ' + rt + ' into force' + (r.effective ? ' on ' + fmt(r.effective) : '') + '.');
-      dated = !!r.effective;
-    } else {
-      p.push('Amends ' + rt + '.');
-    }
+  if (rt) p.push((r.ruleIsAmend ? 'Amends ' : 'Made under ') + rt + '.');
+  // The effect: what is actually different once this takes effect. For a commencement
+  // notification that is the provision it switches on — named in the title, not in the
+  // enabling-provision field — so pull it from there rather than misreport the power used.
+  const named = commences && (r.short + ' ' + r.official)
+    .match(/\bsections?\s+\d+[A-Z]?(?:\s*\([0-9a-z]+\))*/i);
+  if (commences && named) {
+    p.push('Effect: ' + named[0].replace(/^s/, 'S') + ' takes effect' +
+           (r.effective ? ' from ' + fmt(r.effective) : '') + '.');
+  } else if (r.effective) {
+    p.push('Effect: operative from ' + fmt(r.effective) + '.');
   }
-  if (r.effective && !dated) p.push('In force from ' + fmt(r.effective) + '.');
   if (r.deadline && !r.effective) p.push((/consult|draft/i.test(r.type) ? 'Comments close ' : 'Deadline: ') + fmt(r.deadline) + '.');
   if (r.impact && /action/i.test(r.impact)) p.push('The Gazette marks it action-required.');
   // A lone p[0] that merely rewrites the heading is padding — say nothing instead. But the
