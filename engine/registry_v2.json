@@ -2098,7 +2098,7 @@
       ],
       "default_type": "press_note",
       "decision_reason": "RESOLVED 2026-08-27: the pause assumed only a browser spoof could reach this host. Live testing shows the Akamai edge blocks only crawler-signature UA tokens (python-requests, embedded +mailto:); the conventional honest 'Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)' identified-agent form is served HTTP 200. That form names us truthfully and claims no browser, so no spoof arises. Now uses the engine's honest default UA (contact in the From header). robots.txt is honoured; access footing is the source's own permissive robots/terms per the legal analysis.",
-      "quirks": "WordPress REST v2 top-level array; title.rendered/date/link. PDF binary not in API (detail page captured as doc-url). Uses the engine's honest default UA (no per-source header); reachable 200, no browser spoof."
+      "quirks": "WordPress REST v2 top-level array; title.rendered/date/link. PDF binary not in API (detail page captured as doc-url). Uses the engine's honest default UA (no per-source header); reachable 200, no browser spoof. Terms review 2026-09-03: the CMS host in allowed_domains (cms-dpiit.digifootprint.gov.in) now resolves to a PRIVATE address (10.193.73.156) from outside, so its policy pages cannot be re-verified and any document link pointing at it cannot be fetched; the listing on www.dpiit.gov.in (robots Allow: /) is unaffected. Open the SPA policy routes by hand."
     },
     {
       "id": "sc_judgments",

@@ -1,0 +1,1515 @@
+{
+ "summary": {
+  "sources": 51,
+  "hosts": 16,
+  "read": 16,
+  "verdicts": {
+   "allowed_with_conditions": 12,
+   "silent": 4
+  },
+  "forbidding_found": 0,
+  "changed": 0,
+  "gaps": 86,
+  "policy_pages_read": 78,
+  "prior_date": "27 August 2026",
+  "review_date": "3 September 2026"
+ },
+ "hosts": [
+  {
+   "host": "trai.gov.in",
+   "sources": [
+    {
+     "id": "trai_regulations",
+     "regulator": "TRAI",
+     "name": "Regulations",
+     "url": "https://trai.gov.in/release-publication/regulations",
+     "stratum": "telecom",
+     "type": "regulation",
+     "method": "static_html",
+     "covers": "TRAI regulations under s.36 of the TRAI Act (telecom stratum, default type regulation), listed at /release-publication/regulations with regular Regulation_DDMMYYYY.pdf filenames; gazetted instruments.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_directions",
+     "regulator": "TRAI",
+     "name": "Directions & Orders",
+     "url": "https://trai.gov.in/release-publication/directions",
+     "stratum": "telecom",
+     "type": "direction",
+     "method": "static_html",
+     "covers": "TRAI directions and interleaved non-tariff orders under s.13, listed at /release-publication/directions (default type direction); no separate orders page exists there.",
+     "lane": "instruments",
+     "held": 1,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_tariff_telecom",
+     "regulator": "TRAI",
+     "name": "Telecom Tariff Orders",
+     "url": "https://trai.gov.in/telecom/telecom-tariff",
+     "stratum": "telecom",
+     "type": "tariff_order",
+     "method": "static_html",
+     "covers": "Telecom tariff orders under s.11(2) at /telecom/telecom-tariff (default type tariff_order), with directions cross-listed and deduped against trai_directions.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_tariff_broadcasting",
+     "regulator": "TRAI",
+     "name": "Broadcasting Tariff Orders",
+     "url": "https://trai.gov.in/broadcasting/tariff-orders",
+     "stratum": "telecom",
+     "type": "tariff_order",
+     "method": "static_html",
+     "covers": "Broadcasting tariff orders at /broadcasting/tariff-orders (default type tariff_order); low-frequency shelf, last item 2024.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_consultations",
+     "regulator": "TRAI",
+     "name": "Consultation Papers",
+     "url": "https://trai.gov.in/release-publication/consultation",
+     "stratum": "telecom",
+     "type": "consultation_paper",
+     "method": "static_html",
+     "covers": "Consultation papers at /release-publication/consultation (default type consultation_paper); items link to detail pages with the PDF one hop deeper; not gazetted, so the archive rests on fair dealing.",
+     "lane": "instruments",
+     "held": 1,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "trai_open_consultations",
+     "regulator": "TRAI",
+     "name": "Open Consultations (deadline register)",
+     "url": "https://trai.gov.in/open-consultation",
+     "stratum": "telecom",
+     "type": "consultation_paper",
+     "method": "static_html",
+     "covers": "Single-page deadline register of open consultations at /open-consultation, used only as a metadata cross-check against trai_consultations.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_metadata_only",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_recommendations",
+     "regulator": "TRAI",
+     "name": "Recommendations",
+     "url": "https://trai.gov.in/release-publication/recommendation",
+     "stratum": "telecom",
+     "type": "recommendation",
+     "method": "static_html",
+     "covers": "TRAI recommendations to Government under s.11(1)(a) at /release-publication/recommendation (default type recommendation); generally not gazetted.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "trai_press_releases",
+     "regulator": "TRAI",
+     "name": "Press Releases",
+     "url": "https://trai.gov.in/notifications/press-release",
+     "stratum": "telecom",
+     "type": "press_release",
+     "method": "static_html",
+     "covers": "Press releases at /notifications/press-release (default type press_release), including clarifications with legal effect that appear only here; page one must be the unparameterised URL.",
+     "lane": "signals",
+     "held": 52,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_whats_new",
+     "regulator": "TRAI",
+     "name": "What's New (cross-check)",
+     "url": "https://trai.gov.in/what-s-new",
+     "stratum": "telecom",
+     "type": "notification",
+     "method": "static_html",
+     "covers": "Sitewide What's New aggregator at /what-s-new (default type notification), stored as metadata only and used as a parser cross-check.",
+     "lane": "signals",
+     "held": 1,
+     "prior_overall": "include_metadata_only",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_standing_qos",
+     "regulator": "TRAI",
+     "name": "Standing Directions — Quality of Service",
+     "url": "https://trai.gov.in/release-publication/standing-directions/quality-of-Service",
+     "stratum": "telecom",
+     "type": "direction",
+     "method": "static_html",
+     "covers": "Standing directions of the Quality of Service division (default type direction); first 13 rows server-rendered, older rows behind JS load-more.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_standing_broadband",
+     "regulator": "TRAI",
+     "name": "Standing Directions — Broadband & Policy Analysis",
+     "url": "https://trai.gov.in/release-publication/standing-directions/broadband-and-policy-analysis",
+     "stratum": "telecom",
+     "type": "direction",
+     "method": "static_html",
+     "covers": "Standing directions of the Broadband & Policy Analysis division (default type direction); rows are Download links dated from the Direction_DDMMYYYY.pdf filename.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_standing_bcs",
+     "regulator": "TRAI",
+     "name": "Standing Directions — Broadcasting & Cable",
+     "url": "https://trai.gov.in/release-publication/standing-directions/broadcasting-and-cable-services",
+     "stratum": "telecom",
+     "type": "direction",
+     "method": "static_html",
+     "covers": "Standing directions of the Broadcasting & Cable Services division (default type direction); same row/filename structure as the other divisions.",
+     "lane": "instruments",
+     "held": 1,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_standing_fea",
+     "regulator": "TRAI",
+     "name": "Standing Directions — Financial & Economic Analysis",
+     "url": "https://trai.gov.in/release-publication/standing-directions/financial-and-economic-analysis",
+     "stratum": "telecom",
+     "type": "direction",
+     "method": "static_html",
+     "covers": "Standing directions of the Financial & Economic Analysis division (default type direction); same row/filename structure.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_standing_nsl",
+     "regulator": "TRAI",
+     "name": "Standing Directions — Network, Spectrum & Licensing",
+     "url": "https://trai.gov.in/release-publication/standing-directions/network-spectrum-and-licensing",
+     "stratum": "telecom",
+     "type": "direction",
+     "method": "static_html",
+     "covers": "Standing directions of the Network, Spectrum & Licensing division (default type direction); same row/filename structure.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_rss",
+     "regulator": "TRAI",
+     "name": "TRAI sitewide RSS (lag cross-check)",
+     "url": "https://trai.gov.in/rss.xml",
+     "stratum": "telecom",
+     "type": "notification",
+     "method": "rss",
+     "covers": "Sitewide RSS feed at /rss.xml (default type notification), verified ~6 weeks lagging, used only as a metadata lag cross-check and never as a trigger.",
+     "lane": "signals",
+     "held": 27,
+     "prior_overall": "include_metadata_only",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "trai_miscellaneous",
+     "regulator": "TRAI",
+     "name": "Miscellaneous releases (orders, debarments)",
+     "url": "https://trai.gov.in/release-publication/miscellaneous",
+     "stratum": "telecom",
+     "type": "order",
+     "method": "static_html",
+     "covers": "Miscellaneous releases at /release-publication/miscellaneous (default type order) mixing gazetted orders with non-gazetted items such as debarments; host intermittently times out.",
+     "lane": "instruments",
+     "held": 3,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Access is allowed: the pages are silent on automated access, the Hyperlinking Policy expressly grants direct linking without prior permission, robots.txt allows every path we fetch with no Crawl-delay, and the tracker's identifying User-Agent, robots enforcement, ~1 req/s and human-triggered runs sit comfortably within IT Act ss.43/66 as the prior analysis reasoned. The conditions attach not to fetching but to the optional PDF archive and any onward use, because TRAI's Copyright Policy conditions reproduction on permission by email and prominent attribution, and its Hyperlinking Policy forbids framing. Metadata storage engages none of this; the archive is defensible under s.52(1)(q)(i) for gazetted instruments and fair dealing for the rest while kept internal, and a single courtesy email closes the residual exposure.",
+   "access_terms": "(a) Automated access, crawling, bots, rate limits, bulk download: SILENT on all three captured pages. Not one of them mentions robots, crawlers, spiders, scraping, harvesting, data mining, automated retrieval, systematic access or load. /disclaimer is an as-is, no-warranty, use-at-own-risk notice (\"The use of website is at the User's sole risk\", https://trai.gov.in/disclaimer) that also points users to the Gazette of India for the authoritative text of regulations and tariff orders. /terms-conditions is accuracy/liability boilerplate under Indian law and Indian-court jurisdiction (\"should not be construed as a statement of law\", https://trai.gov.in/terms-conditions) plus an external-links notice. /website-policy is the only page that speaks to how the site may be used: its Hyperlinking Policy affirmatively permits direct (deep) linking to hosted information with no prior permission, asks (not requires) to be informed of links, and forbids loading TRAI pages into frames on another site, requiring them to open in a new browser window. Its Privacy Policy discloses server-side logging of IP address, domain, browser, OS, visit time and pages visited, with no attempt to identify individuals unless an attempt to damage the site is detected. Nothing on any page conditions access on registration, login, human-only use, or a User-Agent.",
+   "reuse_terms": "(b) The Copyright Policy on https://trai.gov.in/website-policy says material \"may be reproduced free of charge after taking proper permission by sending a mail\" to TRAI; reproduction must be accurate, not derogatory or misleading; where material is published or issued to others the source must be prominently acknowledged; and the permission does not extend to any material identified as third-party copyright, for which the copyright holder must be approached. The footer on every page carries a general \"Copyright (c) 2024 TRAI. All rights reserved\" notice. /disclaimer and /terms-conditions contain no reuse or licence terms. This is a reproduction condition: it bears on the optional internal PDF archive and on any onward circulation of TRAI text, not on fetching a listing page or reading a PDF. The prior analysis's position stands: bibliographic metadata is fact (EBC v Modak) and outside the clause; gazetted regulations, tariff orders and directions are Official Gazette matter under Copyright Act s.52(1)(q)(i), which a website policy cannot curtail; non-gazetted CPs, recommendations, press releases and debarments rest on s.52(1)(a) fair dealing for research (ANI Media v OpenAI, interim) while kept internal; one courtesy email obtains the standing permission the policy invites.",
+   "robots": "Sweep record: robots.txt HTTP 200 with 52 rules under a single User-agent: * group (matches the prior verbatim of 18 Allow + 34 Disallow lines, all Drupal internals/admin/auth/search/oembed), no Crawl-delay, no Disallow covering any of the 16 listing paths or /sites/default/files/ PDFs; prior verdict allows_our_path for every TRAI source.",
+   "robots_fresh": {},
+   "anything_forbidding": "None directed at fetching. The only prohibitive language on the captured pages is (1) the Hyperlinking Policy's statement that TRAI does not permit its pages to be loaded into frames on another site (a display/embedding restriction, irrelevant to a tracker that links out), and (2) the Copyright Policy's requirement of prior permission by email before reproducing material (a reuse condition on republication/archiving, not a bar on access). Neither page contains any express prohibition on automated access, retrieval, crawling or scraping, and no robots Disallow covers our paths.",
+   "changed": "No material change. The three policy pages are the same three the 27 Aug analysis relied on, all still HTTP 200, and the operative wording it quoted is present verbatim: the Hyperlinking Policy's no-prior-permission deep-link grant and no-framing rule, and the Copyright Policy's free-of-charge reproduction after permission by email with accuracy, attribution and third-party carve-outs. The site footer now reads \"Last Updated: 2 September, 2026\" (was 25 August, 2026), but that is the sitewide content timestamp, not a policy edit: the sweep raised zero flags and zero errors, and the policy texts differ from the prior description in nothing of substance. Robots rule count (52) is consistent with the prior verbatim (18 Allow + 34 Disallow). Minor cosmetic note only: /website-policy says the site is hosted by NIC while the footer says designed and developed by TRAI, which has no legal bearing.",
+   "conditions": [
+    "Keep any PDF archive strictly internal to the firm; do not republish, circulate to clients or productise TRAI text without first sending the permission email TRAI's Copyright Policy invites (reproduction is offered free of charge).",
+    "Send that one courtesy email now to obtain standing permission; it also covers the non-gazetted shelves (consultation papers, recommendations, press releases, debarments) that otherwise rely on fair dealing under an interim authority.",
+    "Prominently acknowledge TRAI as source on any onward use of archived material, and reproduce it accurately, never in a derogatory or misleading context.",
+    "Do not archive or redistribute any item TRAI marks as third-party copyright; that material is expressly outside TRAI's permission.",
+    "Link out to TRAI pages; never load them in frames or iframes in the tracker UI (express no-framing rule); optionally notify TRAI of the links as the policy requests.",
+    "For trai_open_consultations, trai_whats_new and trai_rss store metadata only; archive PDFs at the item's primary venue.",
+    "Continue to honour robots.txt, keep the honest identifying User-Agent, and stay at ~1 req/s with retries rather than tighter loops on trai_miscellaneous, whose host intermittently times out."
+   ],
+   "gaps": [
+    "robots.txt itself was not captured as text in this sweep; only the summary line (200, 52 rules) is on disk, so byte-identity with the 27 Aug verbatim is inferred from the rule count, not re-read.",
+    "The Hindi versions of /disclaimer, /terms-conditions and /website-policy were not captured; the English text governs per both pages' own discrepancy clause, so this is low-risk but unverified.",
+    "Footer links 'Help', 'Web Information Manager', 'Feedback' and 'RTI' were not captured; none is a policy page and the prior analysis did not rely on them, but a human could open them once to confirm no additional access terms hide there.",
+    "The legacy 'Go to old website' site was not swept; if any listing still resolves to the old host, its policy pages are unread.",
+    "The sitemap.xml referenced by robots.txt was not captured (not needed for a policy read)."
+   ],
+   "pages_read": [
+    "https://trai.gov.in/disclaimer (HTTP 200, 6,429 chars, read in full)",
+    "https://trai.gov.in/terms-conditions (HTTP 200, 6,445 chars, read in full)",
+    "https://trai.gov.in/website-policy (HTTP 200, 8,444 chars, read in full: Hyperlinking Policy, Copyright Policy, Privacy Policy)"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [
+    "https://trai.gov.in/disclaimer",
+    "https://trai.gov.in/website-policy",
+    "https://trai.gov.in/terms-conditions"
+   ],
+   "regulators": [
+    "TRAI"
+   ]
+  },
+  {
+   "host": "nccs.gov.in",
+   "sources": [
+    {
+     "id": "nccs_latest",
+     "regulator": "NCCS",
+     "name": "Latest Updates",
+     "url": "https://nccs.gov.in/home/latestUpdates/1",
+     "stratum": "telecom",
+     "type": "notification",
+     "method": "static_html",
+     "covers": "NCCS 'Latest Updates' feed (https://nccs.gov.in/home/latestUpdates/1) — telecom-stratum notifications from the National Centre for Communication Security, DoT; cross-lists the SAS/SC circulars, PDF filenames contain literal spaces.",
+     "lane": "signals",
+     "held": 17,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "nccs_sas",
+     "regulator": "NCCS",
+     "name": "Circulars — Security Assurance Standards",
+     "url": "https://nccs.gov.in/home/circularsSas/1",
+     "stratum": "telecom",
+     "type": "circular",
+     "method": "static_html",
+     "covers": "NCCS 'Circulars — Security Assurance Standards' (https://nccs.gov.in/home/circularsSas/1) — telecom-stratum circulars on security assurance standards for telecom equipment.",
+     "lane": "instruments",
+     "held": 6,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "nccs_sc",
+     "regulator": "NCCS",
+     "name": "Circulars — Security Certification (ComSec)",
+     "url": "https://nccs.gov.in/home/circularsSc/1",
+     "stratum": "telecom",
+     "type": "circular",
+     "method": "static_html",
+     "covers": "NCCS 'Circulars — Security Certification (ComSec)' (https://nccs.gov.in/home/circularsSc/1) — telecom-stratum circulars on the security certification scheme; internship/administrative rows are routed to the routine regex.",
+     "lane": "instruments",
+     "held": 1,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "nccs_itsars",
+     "regulator": "NCCS",
+     "name": "Notified ITSARs",
+     "url": "https://nccs.gov.in/home/itsars",
+     "stratum": "telecom",
+     "type": "itsar",
+     "method": "static_html",
+     "covers": "NCCS 'Notified ITSARs' (https://nccs.gov.in/home/itsars) — binding Indian Telecom Security Assurance Requirements; every new ITSAR is treated as substantive.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Access: nothing on the captured Terms of Use restricts automated access, retrieval or scraping, and robots.txt is absent (404), so a robots Disallow covering /home/latestUpdates, /home/circularsSas, /home/circularsSc or /home/itsars cannot exist; the pages are openly published by a DoT body with an RTI s.4 dissemination duty, so fetching at ~1 req/s with an identifying UA faces no express prohibition. Reuse: the site grants an express, no-permission-needed reproduction licence, but subject to accuracy, non-derogatory use, prominent source acknowledgement, and a third-party-copyright carve-out — those are conditions on the PDF archive and outward extracts, not on fetching. Metadata (titles, dates, URLs) is uncopyrightable fact (EBC v Modak). This matches the 27 Aug 'include_with_conditions' baseline; the only unverified element is the websitePolicies page, which affects the strength of the licence argument but not the absence of an access prohibition.",
+   "access_terms": "Silent. The Terms of Use page says nothing about automated access, crawling, bots, scraping, rate/load, or systematic retrieval. It contains only: a disclaimer that content is for dissemination to the public and not a statement of law; contents may change without notice; a liability exclusion; a note that the official Act/Rules text prevails over the website; and a statement that outbound links are for convenience only. No hyperlinking or framing clause appears on this page (the inbound-hyperlink permission clause the 27 Aug analysis mentioned lives on /home/footer/websitePolicies, which was not captured). Robots.txt is 404, so no path restriction exists either.",
+   "reuse_terms": "Express permissive licence with conditions. https://nccs.gov.in/home/footer/termsOfUse: material \"may be reproduced free of charge\" — no prior-permission requirement. Conditions: reproduce accurately, not in a derogatory manner or misleading context; where published or issued to others \"the source must be prominently acknowledged\"; the permission does not extend to material identified as third-party copyright, for which authorisation must be sought from the copyright holder. Governed by Indian law, exclusive jurisdiction of Indian courts. Site footer attributes content management to DoT and hosting to C-DOT. These conditions bear on the internal PDF archive and any outward extract, not on fetching.",
+   "robots": "robots.txt returns HTTP 404 (nginx default) on both apex and www — unavailable, no restrictions per RFC 9309; no sitemap.xml.",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured",
+   "changed": "No material change on the page captured. The termsOfUse text matches what the 27 Aug analysis recorded: reproduction \"free of charge\" with no permission requirement, acknowledgement and third-party carve-out conditions, and no automated-access clause; robots.txt still 404. What could NOT be re-verified: the 27 Aug analysis relied on a second page, /home/footer/websitePolicies, for (a) the coexisting permission-required 'Copyright policy' version that grounded the contra-proferentem point and (b) the inbound-hyperlinking permission clause. That page was not captured this sweep (the footer link 'Websites Policies' is present on the captured page but the sweep only checked termsOfUse), so whether the contradictory version still stands is unconfirmed. The 27 Aug conclusions on that point are carried forward as baseline, not re-verified.",
+   "conditions": [
+    "Fetch with GET only (prior survey found HEAD returns 401 without WWW-Authenticate — a method-level rejection, not an access control; do not attempt workarounds).",
+    "Keep ~1 req/s and honest identifying UA; URL-encode PDF filenames containing spaces (nccs_latest quirk).",
+    "Metadata dashboard: include freely — facts attract no copyright.",
+    "PDF archive: internal/unpublished only; store accurate, unaltered copies; do not present in a derogatory or misleading context.",
+    "Any outward extract or republication must prominently acknowledge NCCS/DoT as source, per the termsOfUse acknowledgement condition.",
+    "Do not rely on the reproduction licence for any document marked as third-party copyright (e.g. vendor test reports, standards bodies' material embedded in ITSARs) — seek the holder's authorisation before reproducing outward.",
+    "Keep the dashboard internal; if it is ever externalised, re-check /home/footer/websitePolicies for the inbound-hyperlink permission clause the 27 Aug analysis flagged, and link out rather than iframe.",
+    "Re-capture /home/footer/websitePolicies at the next sweep to confirm whether the permission-required 'Copyright policy' version still coexists with the permissive termsOfUse wording."
+   ],
+   "gaps": [
+    "https://nccs.gov.in/home/footer/websitePolicies — linked in the site footer as 'Websites Policies' and relied on by the 27 Aug analysis (contradictory permission-required copyright version; Hyperlinking Policy requiring prior permission for inbound links) but not captured this sweep; a human should open it.",
+    "Footer links 'Accessibility Help', 'Right To Information', 'Web Information Manager', 'Feedback', 'Contact Us' — not captured; unlikely to carry access terms but not verified.",
+    "No Privacy Policy, Copyright Policy, Disclaimer or Hyperlinking Policy page was captured as a separate URL for this host; if such pages exist under /home/footer/*, they were not checked.",
+    "Hindi-language variant of the Terms of Use ('Switch to Hindi') not captured; assumed identical in substance."
+   ],
+   "pages_read": [
+    "https://nccs.gov.in/home/footer/termsOfUse (captured 2026-09, HTTP 200, 3,855 chars, read in full)"
+   ],
+   "http": 200,
+   "content_type": "text/html;charset=UTF-8",
+   "policy_pages": [
+    "https://nccs.gov.in/home/footer/termsOfUse"
+   ],
+   "regulators": [
+    "NCCS"
+   ]
+  },
+  {
+   "host": "tec.gov.in",
+   "sources": [
+    {
+     "id": "tec_whatsnew",
+     "regulator": "TEC",
+     "name": "What's New",
+     "url": "https://www.tec.gov.in/whats-new",
+     "stratum": "telecom",
+     "type": "circular",
+     "method": "static_html",
+     "covers": "The 'What's New' updates listing on www.tec.gov.in (telecom stratum, default type circular) - a signals lane of announcements and pointers rather than instruments, dormant since 22-12-2025 and watched for MTCTE ER notifications; always fetched on the www host because bare tec.gov.in has a broken TLS chain.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "tec_circulars",
+     "regulator": "TEC",
+     "name": "Circulars",
+     "url": "https://www.tec.gov.in/circulars",
+     "stratum": "telecom",
+     "type": "circular",
+     "method": "static_html",
+     "covers": "The single-page full archive (~127 rows) of TEC circulars on www.tec.gov.in/circulars (telecom stratum, default type circular), scanned as a full table every run because it is not strictly date-sorted, with most document hrefs needing URL-encoding before download.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "tec_gazette_standards",
+     "regulator": "TEC",
+     "name": "Gazette-notified standards",
+     "url": "https://www.tec.gov.in/gazette-notified-standards",
+     "stratum": "telecom",
+     "type": "gazette_notification",
+     "method": "static_html",
+     "covers": "The gazette-notified-standards table on www.tec.gov.in (telecom stratum, default type gazette_notification): standards that become mandatory on Official Gazette notification, each row carrying the standard's own PDF (the citation) and a shared gazette-notification link, dated from the Notification Date column.",
+     "lane": "instruments",
+     "held": 42,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Access: nothing captured on this host prohibits automated retrieval - the three policy pages are silent on crawling/scraping, robots.txt (200) affirmatively permits all paths, and the listing pages are anonymous HTTP 200; the site describes itself as built to disseminate information to the public. A \"not_allowed\" finding would require an express prohibition on automated access or a robots Disallow covering /whats-new, /circulars or /gazette-notified-standards, and none exists. Metadata capture (title/date/link) reproduces no protected expression. The conditions attach only to the optional PDF archive, because the host publishes contradictory reuse terms (free reproduction on /terms-conditions vs prior-permission on /copyright-policy, and per the prior analysis an implied-licence denial on the uncaptured /legal-disclaimer), and to any outward publication of deep links given the inbound-hyperlink permission clause. Verdict is unchanged from the 27 Aug overall of include_with_conditions.",
+   "access_terms": "No captured page addresses automated access, crawling, scraping, request rate or load; all three are silent on how the site may be accessed. The only access-adjacent clauses are: (1) the Hyper Linking Policy on https://www.tec.gov.in/website-policies - \"Prior permission is required before hyperlinks are directed from any website/portal to this site\" - an inbound-linking rule addressed to third-party websites that link in, engaged only if the tracker's dashboard were published externally with deep links, not by fetching; (2) the Terms & Conditions statement that the site was \"developed to disseminate information to the general public\" (https://www.tec.gov.in/terms-conditions), plus a not-a-statement-of-law / no-liability disclaimer and Indian-law governing-law clause. No framing clause on this host. Nothing on any captured page conditions access on human use, browser use, or permission.",
+   "reuse_terms": "Two captured pages give conflicting reuse positions. https://www.tec.gov.in/terms-conditions is permissive: \"Material featured on this website may be reproduced free of charge\", subject to accurate reproduction, no derogatory or misleading use, prominent source acknowledgement, and a carve-out for third-party copyright material for which the department/copyright holder's authorisation must be sought. https://www.tec.gov.in/copyright-policy is restrictive: contents \"may not be reproduced partially or fully, without due permission\" from TEC, with source acknowledgement required if referred to from another website and no misleading/objectionable use. The website-policies page has no reuse clause. The footer on all three carries a bare \"All rights reserved\" notice. The prior analysis also relied on a third, more restrictive /legal-disclaimer page (express denial of implied licence); that page is not in this capture (see gaps). These are reproduction conditions bearing on the optional PDF archive, not on fetching or on the metadata dashboard.",
+   "robots": "Sweep record: robots.txt HTTP 200, \"1 rule(s) for us\" - per the 27 Aug analysis that single rule is 'User-agent: *' with an empty Disallow, i.e. allow all paths, no Crawl-delay; robots_verdict allows_our_path for all three listings.",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured. The only prohibitory language is directed at reproduction (copyright-policy: no reproduction without permission) and at inbound hyperlinking from other websites (website-policies: prior permission for hyperlinks to this site). Neither addresses automated access, retrieval, crawling or scraping; the sweep's tos flags list is empty; robots.txt permits all paths.",
+   "changed": "No material change. The two copyright statements the prior analysis quoted (permissive /terms-conditions, restrictive /copyright-policy) are present verbatim in the captured text; the website-policies Hyper Linking Policy prior-permission clause persists (contact adic1.tec@gov.in); robots position unchanged (200, one permissive rule); all three policy pages still 200; no new scraping/automation clause has appeared. Footer shows \"Last reviewed and updated on 03-09-2026\" and a 2026 copyright line, but the substantive policy text matches the prior record. The one difference is in coverage, not the site: the prior analysis relied on a fourth page, /legal-disclaimer (express implied-licence denial), which this capture did not fetch, so its continued presence and wording could not be re-verified from disk.",
+   "conditions": [
+    "Keep the honest identifying User-Agent, robots.txt enforcement and ~1 request/second, human-triggered fetching; always use the www host (bare tec.gov.in has a broken TLS chain).",
+    "Metadata dashboard (title/date/type/link) may be run freely - no reproduction condition is engaged by bibliographic facts.",
+    "PDF archive: treat as a strictly internal, unpublished fair-dealing copy (Copyright Act s.52(1)(a)(i)); do not rely on the permissive /terms-conditions clause as a licence while the restrictive /copyright-policy (and, per the prior analysis, /legal-disclaimer) stand. For tec_gazette_standards, the gazette notification PDF is additionally covered by s.52(1)(q)(i); confirm per row whether the standard's own PDF is gazette-published or merely referenced.",
+    "Send one courtesy email to adic1.tec@gov.in (the address named in the Hyper Linking Policy) seeking permission to reproduce TEC material for internal reference and, if the dashboard is ever externalised, for hyperlinks to the site. Until then keep the tracker internal.",
+    "Where any TEC material is quoted or extracted onward, reproduce it accurately, acknowledge TEC as source prominently, and do not use it in a misleading or derogatory context; obtain separate authorisation for any material marked as third-party copyright.",
+    "Link out to TEC documents rather than iframing or embedding; do not direct external deep links to the site without the prior permission the Hyper Linking Policy requires.",
+    "Fallback if the partner will not rely on fair dealing against a public body's express implied-licence denial: run all three TEC sources metadata-only and disable the PDF archive for this host."
+   ],
+   "gaps": [
+    "https://www.tec.gov.in/legal-disclaimer - listed in the site footer ('Legal Disclaimer') and relied on by the 27 Aug analysis for the express implied-licence denial, but not captured in policy_text/index.json; a human should open it to confirm the wording still stands.",
+    "https://www.tec.gov.in/accessibility-statement (footer 'Accessibility Statement') and the Sitemap link - not captured; unlikely to carry access or reuse terms but not verified.",
+    "The captured website-policies text is corrupted mid-page: the CMAP, Web Content Review, Content Archival and hosting paragraphs have sentence fragments missing (e.g. 'All informatio; section', 'possesses ssystems'). The Hyper Linking and Privacy sections are intact; a human should read the page live to confirm no access clause sits in the garbled portion.",
+    "The raw robots.txt bytes are not in the capture; the position rests on the sweep summary ('200, 1 rule(s) for us') and the prior analysis's verbatim record (empty Disallow). Re-fetching /robots.txt live would close this.",
+    "www.mtcte.tec.gov.in (tec_essential_requirements in the 27 Aug analysis, with its own website_policy prior-permission and anti-framing clauses) is a different host: not in this capture, not in the sweep record for tec.gov.in, and not present in registry_v2.json - it needs its own read if it is to be relied on."
+   ],
+   "pages_read": [
+    "https://www.tec.gov.in/copyright-policy",
+    "https://www.tec.gov.in/terms-conditions",
+    "https://www.tec.gov.in/website-policies"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [
+    "https://www.tec.gov.in/copyright-policy",
+    "https://www.tec.gov.in/website-policies",
+    "https://www.tec.gov.in/terms-conditions"
+   ],
+   "regulators": [
+    "TEC"
+   ]
+  },
+  {
+   "host": "tdsat.gov.in",
+   "sources": [
+    {
+     "id": "tdsat_notices",
+     "regulator": "TDSAT",
+     "name": "Notices / Circulars",
+     "url": "https://tdsat.gov.in/writereaddata/Delhi/docs/notices.php",
+     "stratum": "telecom",
+     "type": "court_notice",
+     "method": "static_html",
+     "covers": "The TDSAT Registry noticeboard at /writereaddata/Delhi/docs/notices.php (regulator TDSAT, stratum telecom, default_type court_notice, method static_html): ~430 rows of sitting/non-sitting notices, holiday declarations, room reallocations and registry circulars parsed on raw bytes because the HTML is malformed, with rare substantive Practice Directions interleaved; a signals-lane, metadata-only source.",
+     "lane": "signals",
+     "held": 20,
+     "prior_overall": "include_metadata_only",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "tdsat_orders",
+     "regulator": "TDSAT",
+     "name": "Judgments & orders",
+     "url": "https://tdsat.gov.in/Delhi/services/dailyorderlist.php",
+     "stratum": "telecom",
+     "type": "court_order",
+     "method": "post_form",
+     "covers": "The TDSAT judgments and daily-orders lane at /Delhi/services/dailyorderlist.php (regulator TDSAT, stratum telecom, default_type court_order, method post_form): a cookieless, session-less, CSRF-free urlencoded POST over a short date window returning ~39 largely procedural daily orders per day with substantive judgments interleaved, item links being javascript handlers carrying a base64 filing number.",
+     "lane": "judgments",
+     "held": 182,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "silent",
+   "verdict_reason": "The host publishes nothing on access or reuse: the one captured policy URL is a 404, the site's own pages offer no policy links, robots.txt does not exist, and the prior analysis confirmed the real policy pages (/Delhi/policies.php, /Delhi/disclaimer.php) contain no scraping, automation, hyperlinking or copyright terms. 'Not allowed' would require an express prohibition on automated access or a robots Disallow covering /writereaddata/Delhi/docs/ or /Delhi/services/ — none exists. Silence plus the absent robots file means fetching with an identifying UA at ~1 req/s on human trigger circumvents nothing (s.43 IT Act not made out), reinforced by RTI s.4 proactive disclosure and open justice, exactly as the 27 Aug analysis concluded (access_verdict permissible for both sources). Reproduction is likewise governed by statute rather than site terms: q(iv) covers full-text order PDFs; notices stay metadata-only. This is not could_not_verify because the sweep record and the prior analysis together support a position; it is not 'allowed' because no site text grants anything — the permission is statutory and implied, not express.",
+   "access_terms": "Silence. The only captured page for this host is https://tdsat.gov.in/disclaimer.php, which returned HTTP 404 with a stock Apache body (\"The requested URL was not found on this server.\") and no policy content. The sweep found no policy links in the notices listing's own footer (policy_links: []), no flags, no errors; the listing itself served HTTP 200 text/html. The prior 27 Aug analysis, which did reach the site's actual policy pages (/Delhi/policies.php at HTTP 200 and /Delhi/disclaimer.php at HTTP 200), found no terms restricting access, no automation or scraping clause, no hyperlinking or framing rule, and no X-Robots-Tag or meta robots on the notices/orders paths; the sub-policy links on /Delhi/policies.php were HTML-commented-out and their targets 404. Nothing on this host addresses automated access, crawling, load, hyperlinking or framing.",
+   "reuse_terms": "Silence on the captured page (404). The prior analysis established that no copyright policy exists (the Copyright Policy link on /Delhi/policies.php is commented out and /cat_web1/Delhi/services/copyright.php returned 404 on 27 Aug), that /Delhi/disclaimer.php is liability-only boilerplate (\"only for information purpose\"), and that the footer says merely that contents are published and managed by TDSAT Delhi with no reproduction restriction. Reuse therefore rests on statute, not site text: s.52(1)(q)(iv) Copyright Act 1957 for the tribunal's judgments and orders (tdsat_orders, the proviso being untriggered because TDSAT has posted no prohibition), and EBC v Modak plus s.52(1)(a) fair dealing for the administrative Registry notices (tdsat_notices), which are not 'orders' within q(iv). No attribution requirement, licence or third-party carve-out is published.",
+   "robots": "robots.txt HTTP 404 — unavailable, so no User-agent or Disallow directive exists and, per RFC 9309, any resource on the host may be accessed (sweep record for both tdsat_notices and tdsat_orders; consistent with the prior 27 Aug fresh fetch).",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured",
+   "changed": "No material change. Robots position identical (404, no restrictions), notices listing still HTTP 200, no policy links offered by the site, no flags. Two capture-level differences worth noting rather than substantive ones: (1) this sweep probed /disclaimer.php at the site root, which 404s, whereas the prior analysis read /Delhi/disclaimer.php (HTTP 200, boilerplate) and /Delhi/policies.php (HTTP 200, empty of terms) — neither of those was re-captured, so the 'no terms, no copyright policy' finding is carried forward from 27 Aug rather than re-verified today; (2) the sweep record for tdsat_orders carries no HTTP status of its own (it defers to tdsat_notices as same host), so the POST lane's continued reachability is from the 27 Aug probe. Registry now also lists a 'planned' duplicate id tdsat_daily_orders on the same URL, not live, so out of scope here.",
+   "conditions": [
+    "Standing monitoring item: if TDSAT ever posts a prohibition on reproducing its orders (e.g. the commented-out Copyright Policy is activated), the s.52(1)(q)(iv) proviso is triggered and the tdsat_orders PDF archive must be re-assessed.",
+    "Keep tdsat_notices metadata-only; do not extend the q(iv) footing to administrative Registry notices. A substantive Practice Direction, if archived, is lifted by hand and rests on s.52(1)(a) fair dealing (and q(i) if gazette-published).",
+    "Maintain the short date window on the POST lane, honest identifying User-Agent, ~1 req/s, human-triggered only; no login attempts; link out rather than iframe.",
+    "On the next sweep, capture /Delhi/policies.php and /Delhi/disclaimer.php (not root /disclaimer.php) so the 'no terms' finding is re-verified from live text rather than carried forward."
+   ],
+   "gaps": [
+    "https://tdsat.gov.in/Delhi/policies.php — the 'Website Policies' page the prior analysis relied on (HTTP 200 on 27 Aug, 1,326 bytes, no terms) was not captured in this sweep.",
+    "https://tdsat.gov.in/Delhi/disclaimer.php — the actual disclaimer page (HTTP 200 on 27 Aug, liability boilerplate) was not captured; the sweep probed root /disclaimer.php instead, which 404s.",
+    "https://tdsat.gov.in/cat_web1/Delhi/services/copyright.php — 404 on 27 Aug; not re-probed. A human should confirm it still 404s, since its appearance would trigger the q(iv) proviso.",
+    "https://tdsat.gov.in/Delhi/services/dailyorderlist.php — the POST lane's own HTTP status was not recorded in this sweep (tos deferred to tdsat_notices as same host); reachability rests on the 27 Aug probe.",
+    "https://tdsat.gov.in/ home page footer — the sweep record notes no policy links but does not preserve the footer text itself; a human should eyeball the footer for any newly added Copyright/Terms link."
+   ],
+   "pages_read": [
+    "https://tdsat.gov.in/disclaimer.php (captured file /private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/https_tdsat_gov_in_disclaimer_php.txt — HTTP 404, 76 chars, stock Apache 'Not Found' body only; no policy text)"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [
+    "https://tdsat.gov.in/disclaimer.php"
+   ],
+   "regulators": [
+    "TDSAT"
+   ]
+  },
+  {
+   "host": "meity.gov.in",
+   "sources": [
+    {
+     "id": "meity_gazettes",
+     "regulator": "MeitY",
+     "name": "Gazette Notifications (WP-JSON API)",
+     "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Gazettes%20Notifications&sort=acf&order=DESC&search=",
+     "stratum": "tech_data",
+     "type": "gazette_notification",
+     "method": "json_api",
+     "covers": "WP-JSON 'Gazettes Notifications' listing (stratum tech_data, default_type gazette_notification): gazette-published MeitY instruments such as DPDP Rules and IT Act s.79A notifications; full corpus in one call, monotonic tripwire; known stale (newest row 16-12-2025), so e-Gazette/PIB are the real-time net. allowed_domains: meity.gov.in, www.meity.gov.in, cms-meity.digifootprint.gov.in.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "meity_acts_policies",
+     "regulator": "MeitY",
+     "name": "Acts & Policies (WP-JSON API)",
+     "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Act%20and%20policies&sort=acf&order=DESC&search=",
+     "stratum": "tech_data",
+     "type": "rules",
+     "method": "json_api",
+     "covers": "WP-JSON 'Act and policies' listing (tech_data, default_type rules with type_rules for draft_rules/policy/rules): primary Acts, subordinate rules, policies and consultation drafts including the Mar-2026 draft IT Rules amendments; type string is case-sensitive. Same allowed_domains.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "meity_orders_notices",
+     "regulator": "MeitY",
+     "name": "Orders & Notices (WP-JSON API)",
+     "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Orders%20and%20Notices&sort=acf&order=DESC&search=",
+     "stratum": "tech_data",
+     "type": "order",
+     "method": "json_api",
+     "covers": "WP-JSON 'Orders and Notices' listing (tech_data, default_type order, 'notice' rows typed notification): mostly internal administration (delegations, work distribution) with occasional binding orders. Same allowed_domains.",
+     "lane": "instruments",
+     "held": 5,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "meity_guidelines",
+     "regulator": "MeitY",
+     "name": "Guidelines (WP-JSON API)",
+     "url": "https://www.meity.gov.in/cms/wp-json/document/documents?type=Guideline&limit=50&sort=date&order=DESC&search=",
+     "stratum": "tech_data",
+     "type": "guideline",
+     "method": "json_api",
+     "covers": "WP-JSON 'Guideline' listing (tech_data, default_type guideline, signals lane): MeitY's grants-and-schemes administration library of proformas, annexures and DPR templates, not an instrument venue; type value must be the singular 'Guideline' and sort=date. Same allowed_domains.",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "robots.txt grants blanket Allow: / for all agents; the site's own Terms of use, Hyper Link, Copyright and Privacy pages contain no prohibition on automated access, and the Hyper Link Policy expressly permits direct linking without permission; the Copyright Policy is an express licence to reproduce, which covers the optional internal PDF archive subject to accuracy, non-misleading use, attribution and a third-party carve-out. 'Allowed' rather than plain is warranted because (i) the reproduction licence carries conditions the archive must honour, (ii) the Akamai edge filter means access depends on using an honest non-crawler-token UA rather than a spoofed browser, (iii) bare primary-Act PDFs rest on fair dealing plus the express licence rather than s.52(1)(q)(i), and (iv) the Website Policy page could not be read today, so its 'no automation clause' finding is carried over from 27 Aug. Same verdict as the 27 Aug baseline (include_with_conditions / permissible_qualified access).",
+   "access_terms": "(a) No access or automation term exists on this host. The 'Terms of use' page (3133) is a bare NIC/MeitY disclaimer about accuracy, liability, external links and viruses - e.g. \"The contents of this website are for information purposes only\" (https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3133) - and imposes no condition on method, volume, rate or agent type. The Hyper Link Policy (3368) affirmatively permits direct linking to hosted information: \"no prior permission is required for the same\" (https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3368); its only prohibition is loading MeitY pages into frames on another site, plus a request (not a condition) to be told about links. The Privacy Policy (3404) records that the site logs IP address, domain, browser type, OS, visit time and pages visited and makes no attempt to link them to individuals \"unless an attempt to damage the site has been detected\" (https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3404); it states the site uses no cookies. None of the captured pages mentions crawling, scraping, harvesting, data mining, bots or automated retrieval. robots.txt is a blanket Allow: / for all agents, covering /cms/wp-json/document/documents. The only access friction is technical, not textual: the Akamai edge, which the 27 Aug analysis verified blocks only crawler-signature UA tokens and serves an honest identifying UA at HTTP 200; today's five CMS-API captures were all HTTP 200, consistent with that finding.",
+   "reuse_terms": "(b) The Copyright Policy (3202) is the standard permissive Government of India licence: material \"may be reproduced free of charge in any format or media\" (https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3202) without specific permission, subject to three conditions - reproduce accurately, do not use in a derogatory manner or misleading context, and prominently acknowledge the source where the material is published or issued to others - and one carve-out: the permission does not extend to material explicitly identified as third-party copyright, for which the holder's authorisation is needed. This is an express owner licence bearing on the optional internal PDF archive, not on fetching. It sits alongside the statutory bases the 27 Aug analysis established: s.52(1)(q)(i) for gazette-notified subordinate instruments (meity_gazettes and gazetted rules in meity_acts_policies), and s.52(1)(a) fair dealing for private research (ANI Media v OpenAI) as backstop; bare primary-Act PDFs in meity_acts_policies fall outside (q)(i)/(q)(ii) and rest on the express licence plus fair dealing only. Metadata (title, date, type, URL) is unprotected fact under EBC v Modak. The named Web Information Manager for copyright and hyperlink matters is Ms. Tulika Pandey, Scientist G, webmaster@meity.gov.in.",
+   "robots": "HTTP 200 on 2026-09-03; body exactly 'User-agent: *\\r\\nAllow: /' (23 bytes). No Disallow, no Crawl-delay, no Sitemap. Byte-identical to the 27 Aug capture of www.meity.gov.in/robots.txt. Allows every path including /cms/wp-json/document/documents and /cms/wp-json/wp/v2/pages. robots_fresh.json keys the capture as 'meity.gov.in' and does not record whether the www or apex hostname was fetched; on 27 Aug the apex returned HTTP 000 and www was treated as the controlling file - the body today is the same either way.",
+   "robots_fresh": {
+    "http": 200,
+    "body": "User-agent: *\r\nAllow: /"
+   },
+   "anything_forbidding": "Nothing forbids automated access or retrieval. The only express prohibition on the host is the Hyper Link Policy's ban on loading MeitY pages into frames on a third-party site, which the tracker does not do (it links out, it does not frame). The Copyright Policy's conditions (accuracy, no derogatory/misleading use, source acknowledgement, third-party carve-out) are conditions on reproduction, relevant to the PDF archive, not prohibitions on fetching. No robots Disallow exists. The Akamai WAF's rejection of crawler-token UAs is an unpublished technical filter contradicted by the operator's own Allow: / and is passed by an honest identifier, so it is not a term.",
+   "changed": "No substantive change. robots.txt is byte-identical (Allow: /). The text of the Terms of use (3133), Hyper Link Policy (3368), Copyright Policy (3202) and Privacy Policy (3404) as captured today matches the characterisation in the 27 Aug analysis: bare disclaimer, deep-linking permitted with framing forbidden, permissive GoI reproduction licence, no automation clause. One evidential regression rather than a policy change: the Website Policy page (4095) today returned only {\"banner_image\": 17313} - the capture extracted the page's custom fields and this page has no text field, so its content was not seen today. On 27 Aug it was read as containing no crawling/scraping clause, corroborated by the 25 Aug sweep of all 50 CMS pages; that position stands but rests on the earlier read. The registry is unchanged: the same four live sources, all with the 27 Aug decision_reason (honest default UA, no browser spoof, robots honoured). The sweep records show the listing endpoints answering application/json with no policy links to walk, and the SPA homepage offering none - which is why the CMS API was the only route to the policy text. No new meity.gov.in source has been added since 27 Aug.",
+   "conditions": [
+    "Fetch with the engine's honest identifying User-Agent that avoids the Akamai trigger tokens (literal bot/crawler/spider, embedded URL scheme, contact-email pattern); never present a spoofed browser string.",
+    "Honour robots.txt (currently Allow: /) on every run; re-check it before each run as the engine already does.",
+    "Rate: ~1 request/second, human-triggered; each listing is one full-corpus call per run, so load is de minimis.",
+    "Link out to MeitY documents; never load MeitY pages into frames on any firm-facing page (Hyper Link Policy's only prohibition).",
+    "PDF archive, if enabled, stays internal and unpublished; store copies unaltered (accuracy condition) and never present them in a misleading context.",
+    "Carry prominent attribution on every archived item, e.g. 'Source: MeitY / Gazette of India, <title>, <date>. Retrieved <URL> on <date>.'",
+    "Exclude from the archive any document explicitly marked as third-party copyright; the MeitY licence does not extend to it.",
+    "Per-document basis for the archive: gazette-notified instruments rely on s.52(1)(q)(i); policies, drafts, orders and guidelines rely on the express MeitY licence plus s.52(1)(a) fair dealing; for a bare primary Act PDF (meity_acts_policies) either pair it with the firm's own note/commentary or accept the fair-dealing posture - it is the weakest archive category.",
+    "Treat any x-robots-tag: noindex on the API as an indexing directive only: never expose these endpoints or their contents in a public search index.",
+    "Optional courtesy consistent with the Hyper Link Policy's request: notify webmaster@meity.gov.in (Web Information Manager, Ms. Tulika Pandey) that the tracker links to MeitY documents."
+   ],
+   "gaps": [
+    "Website Policy (WordPress page 4095): today's capture holds only {\"banner_image\": 17313}. A human should open https://www.meity.gov.in/cms/wp-json/wp/v2/pages/4095 in a browser and read the raw JSON 'content.rendered' field and any child-page links, and/or open the rendered page https://www.meity.gov.in/website-policy (a Next.js SPA that renders from this API), to confirm it is a hub page with no automated-access clause as found on 27 Aug.",
+    "Rendered SPA pages were not captured: confirm by hand that https://www.meity.gov.in/terms-of-use, /hyper-link-policy, /copyright-policy and /privacy-policy display the same text as the API custom fields captured today (the API fields are the source of truth, but the rendered page is what a visitor is bound by).",
+    "robots_fresh.json does not record whether robots was fetched from www.meity.gov.in or the apex host; the 27 Aug note says the apex returned HTTP 000 and www is controlling. Open https://www.meity.gov.in/robots.txt by hand to confirm the 23-byte Allow: / file is still what the www host serves.",
+    "Today's capture log does not record the User-Agent string the targeted pass used or any response headers (in particular x-robots-tag). Confirm the engine's default honest UA was used for the five HTTP 200s, and re-check the x-robots-tag header on a document-listing call with a browser dev-tools network panel or the engine's own header logging.",
+    "The 27 Aug WAF finding (honest UA served HTTP 200; only crawler-token UAs get 403) was not separately re-tested today; today's five 200s on the CMS API are consistent with it but were not a controlled test across UA variants."
+   ],
+   "pages_read": [
+    "https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3133 (Terms of use, HTTP 200, 1389 chars, captured 2026-09-03)",
+    "https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3368 (Hyper Link Policy, HTTP 200, 1381 chars)",
+    "https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3202 (Copyright Policy, HTTP 200, 951 chars)",
+    "https://www.meity.gov.in/cms/wp-json/wp/v2/pages/4095 (Website Policy, HTTP 200 but only 46 chars: {\"banner_image\": 17313} - an empty field shell, no policy text captured)",
+    "https://www.meity.gov.in/cms/wp-json/wp/v2/pages/3404 (Privacy Policy, HTTP 200, 1534 chars)",
+    "robots.txt for meity.gov.in (HTTP 200, body 'User-agent: *\\r\\nAllow: /', captured 2026-09-03 in robots_fresh.json; log line 'robots meity.gov.in: 200')",
+    "Sweep records: tos_report.json (four meity_* entries, listing content-type application/json, tos note 'listing is not HTML; no page to walk' / same_host_as meity_gazettes) and tos_home.json (home https://www.meity.gov.in/, policy_pages {} - the SPA homepage offered no policy links)",
+    "Baseline: engine/audit/legal_analysis_2026-08-27.json per_source entries meity_gazettes, meity_acts_policies, meity_orders_notices, meity_guidelines and their signoff rows; engine/registry_v2.json live entries for the same four ids"
+   ],
+   "http": 200,
+   "content_type": "application/json; charset=UTF-8",
+   "policy_pages": [],
+   "regulators": [
+    "MeitY"
+   ]
+  },
+  {
+   "host": "cert-in.org.in",
+   "sources": [
+    {
+     "id": "certin_advisories",
+     "regulator": "CERT-In",
+     "name": "Advisories (CIAD)",
+     "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBADVLIST02&year=2026",
+     "stratum": "tech_data",
+     "type": "advisory",
+     "method": "static_html",
+     "covers": "The yearly CERT-In Advisories (CIAD) listing served by the legacy s2cMainServlet (pageid=PUBADVLIST02&year=YYYY): non-binding s.70B(4)(d) vendor patch bulletins (Apple, SAP, Oracle etc.), numbered sequentially per year, tech_data stratum, default type 'advisory'; rows are regex-matched on raw bytes and the year parameter must roll over each January.",
+     "lane": "signals",
+     "held": 16,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "certin_vuln",
+     "regulator": "CERT-In",
+     "name": "Vulnerability Notes (CIVN)",
+     "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=VLNLIST02&year=2026",
+     "stratum": "tech_data",
+     "type": "advisory",
+     "method": "static_html",
+     "covers": "The yearly CERT-In Vulnerability Notes (CIVN) listing (pageid=VLNLIST02&year=YYYY): non-binding CVE bulletins about third-party products (Chrome, Mozilla, Cisco), same servlet family and per-year sequential numbering as CIAD, tech_data stratum, default type 'advisory'; year parameter rolls over each January.",
+     "lane": "signals",
+     "held": 30,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "certin_guidelines",
+     "regulator": "CERT-In",
+     "name": "Security Guidelines (CISG)",
+     "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=GUIDLNVIEW01",
+     "stratum": "tech_data",
+     "type": "guideline",
+     "method": "static_html",
+     "covers": "The CERT-In Security Guidelines (CISG) listing (pageid=GUIDLNVIEW01): authoritative best-practice guidance documents identified by refcode=CISG-YYYY-N rather than VLCODE, tech_data stratum, default type 'guideline'.",
+     "lane": "instruments",
+     "held": 1,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "certin_directions",
+     "regulator": "CERT-In",
+     "name": "s.70B(6) Directions",
+     "url": "https://www.cert-in.org.in/Directions70B.jsp",
+     "stratum": "tech_data",
+     "type": "direction",
+     "method": "static_html",
+     "covers": "The Directions70B.jsp table of binding directions issued under s.70B(6) of the IT Act 2000 (e.g. the 2022 six-hour incident-reporting direction): rare, always substantive, tech_data stratum, default type 'direction'.",
+     "lane": "instruments",
+     "held": 6,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible_qualified"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Nothing on the host forbids what the tracker does. On access: the captured Terms of Use and Website Policies pages contain no prohibition on automated access, retrieval or scraping and no acceptable-use clause at all; there is no robots.txt (soft-404), so no Disallow covers our paths; the listings are served at HTTP 200 without authentication; and CERT-In is a statutory body whose site exists, in its own words, to inform the public. \"Not allowed\" would require an express anti-automation clause or a robots Disallow, and neither exists. This is silence-plus-open-publication, which the 27 Aug analysis reasonably read as implied permission for polite, human-triggered, ~1 req/s fetching with an honest User-Agent. The conditions attach only to the optional PDF archive: CERT-In's Copyright Policy, as read on 27 Aug (not re-captured today), grants reproduction free of charge but asks for prior permission by email and carves out third-party material; that is a reuse condition, not an access restriction, and it is satisfied by keeping the archive internal on a fair-dealing basis and sending the single standing permission email. The verdict is 'allowed_with_conditions' rather than 'allowed' because the reuse condition is real, and rather than 'silent' because the robots position and the prior-read Copyright Policy together give a positive basis, not mere absence of evidence.",
+   "access_terms": "Silent. Neither captured page says anything about automated access, crawling, bots, load, rate, bulk retrieval, hyperlinking or framing. The Terms of Use (https://www.cert-in.org.in/s2cMainServlet?pageid=TERMSOFUSE) is three sentences: external links are provided for information only and CERT-In does not guarantee them; CERT-In excludes liability for loss arising from use of the site; and the terms are \"governed by and construed in accordance with the Indian Laws\" with disputes subject to Indian courts. The Website Policies page (https://www.cert-in.org.in/s2cMainServlet?pageid=WEBSITEPOLIC) is an index stating the site was built \"to provide information to the general public\" and listing eight sub-policies by name (Copyright, Hyperlinking, Privacy, Content Review, Content Archival, Contribution/Moderation/Approval, Security, Monitoring) without their text. No user-conduct, acceptable-use or anti-automation clause exists on either page; the only operative terms are a liability exclusion and a governing-law/jurisdiction clause. Hyperlinking and framing are not addressed on the captured pages (the Hyperlinking Policy itself was not captured; see gaps).",
+   "reuse_terms": "Silent on the captured pages. The Website Policies index names a \"Copyright Policy\" as a link but its text is not in the capture; the Terms of Use contains no licence, attribution requirement, permission requirement or third-party carve-out. What is known about reuse comes only from the prior 27 Aug analysis, which read the Copyright Policy (pageid=COPYRIGHTPOCY) and recorded that material may be reproduced free of charge after taking permission by email to webmaster@cert-in.org.in, that the grant does not extend to material identified as third-party copyright, and that the Hyperlinking Policy permits deep linking without prior permission. Those clauses could not be re-verified from today's capture. On the substantive law the prior position stands unchanged: metadata (title, date, type, URL) is unprotected fact under EBC v Modak; the documents themselves are Government works (Copyright Act s.17(d)) and an internal PDF archive is defensible as s.52(1)(a)(i) private-use/research fair dealing, with the permission email perfecting the express-licence route. The reproduction condition bears on the PDF archive only, not on fetching the listings.",
+   "robots": "Sweep records \"robots.txt 200 — not enforceable, no restrictions\"; consistent with the 27 Aug finding that /robots.txt is a soft-404 (HTTP 200, text/html, generic 'requested URL is not found' page identical to a bogus control path), i.e. no robots.txt exists and no Disallow can cover our paths.",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured. The only restrictive-sounding language is the liability exclusion in the Terms of Use (\"Under no circumstances will CERT-In be liable...\") and the governing-law clause; neither restricts access, automation or copying. Sweep flags for the host: none.",
+   "changed": "No material change. The Terms of Use text matches the prior description (no scraping clause, liability exclusion, Indian law and courts); the Website Policies index still lists the same sub-policy set. The robots position is unchanged (soft-404, no directives). Both pages carry a footer \"Last Updated On September 03, 2026\" equal to the capture date and identical across both pages, which reads as a server-generated stamp rather than evidence of an edit. The one difference from the prior work is evidential, not substantive: the 27 Aug analysis re-verified the Copyright Policy and relied on the Hyperlinking Policy, and neither of those sub-pages is in today's capture, so the reproduction-permission clause and the deep-linking permission are carried forward from 27 Aug rather than re-read now.",
+   "conditions": [
+    "Fetching the four listings: no condition beyond the tracker's standing practice (honest identifying User-Agent, ~1 req/s, human-triggered, GET only, no auth bypass). Treat the host's robots.txt as absent, not as a policy file: because the server returns HTTP 200 with an HTML error page for every unknown path, make sure the robots parser does not try to read that HTML as directives.",
+    "Metadata dashboard (title, date, type, link): include freely; bibliographic facts attract no copyright (EBC v Modak). CIAD/CIVN metadata is near-pure fact (CVE IDs, product names, dates).",
+    "Optional PDF archive: keep strictly internal and unpublished, relying on s.52(1)(a)(i) private-use/research fair dealing for Government works; do not put archived documents on any client-facing or public surface.",
+    "Send one standing courtesy email to webmaster@cert-in.org.in requesting permission to reproduce CERT-In material for the firm's internal reference (the Copyright Policy, as read on 27 Aug, grants this free of charge on request) and retain the reply on file. Re-open the Copyright Policy by hand first to confirm the clause is unchanged, since it was not captured today.",
+    "For CIAD advisories and CIVN notes, do not republish any embedded third-party vendor material (screenshots, vendor text) that falls outside CERT-In's reuse grant; internal holding is not publication, but outward extracts should be limited to CERT-In's own text and the underlying facts.",
+    "Link out to the CERT-In page for each item; do not frame or iframe CERT-In pages. Acknowledge CERT-In as source on any outward extract.",
+    "Requests are attributable to the firm's egress IP (CERT-In logs visitor IPs per the Privacy Policy as read on 27 Aug); keep the User-Agent honest and the volume modest so the pattern is defensible on its face."
+   ],
+   "gaps": [
+    "Copyright Policy (https://www.cert-in.org.in/s2cMainServlet?pageid=COPYRIGHTPOCY) — linked from the Website Policies index but not captured; the 27 Aug analysis relied on it for the free-of-charge-after-email reproduction grant and the third-party carve-out. A human should open it to confirm the clause is unchanged before relying on the permission-email route.",
+    "Hyperlinking Policy — linked from the Website Policies index, not captured; the prior analysis cited its express deep-linking permission (no prior permission required). Re-read by hand to confirm.",
+    "Privacy Policy, Security Policy and Monitoring Policy — linked from the index, not captured; the prior 25 Aug keyword sweep found their only 'unauthorised' language concerned malicious attempts and user-data security, not ordinary retrieval, and they are also the source of the IP-logging point. Not re-verified today.",
+    "Content Review Policy, Content Archival Policy, Contribution/Moderation/Approval Policy, and the footer 'Help' page — linked but not captured; low relevance to access or reuse, but not read today.",
+    "The robots.txt body itself is not in the capture; today's position rests on the sweep summary line plus the 27 Aug soft-404 finding.",
+    "Registry source certin_govt_guidelines (https://www.cert-in.org.in/guidelinesgovtentities.jsp) is status 'planned', not live, so it is outside this read; the host-level conclusions would apply to it when wired, but its page was not part of the sweep."
+   ],
+   "pages_read": [
+    "https://www.cert-in.org.in/s2cMainServlet?pageid=WEBSITEPOLIC",
+    "https://www.cert-in.org.in/s2cMainServlet?pageid=TERMSOFUSE"
+   ],
+   "http": 200,
+   "content_type": "text/html;charset=ISO-8859-1",
+   "policy_pages": [
+    "https://www.cert-in.org.in/s2cMainServlet?pageid=WEBSITEPOLIC",
+    "https://www.cert-in.org.in/s2cMainServlet?pageid=TERMSOFUSE"
+   ],
+   "regulators": [
+    "CERT-In"
+   ]
+  },
+  {
+   "host": "mib.gov.in",
+   "sources": [
+    {
+     "id": "mib_acts_policy",
+     "regulator": "MIB",
+     "name": "Acts/Policies/Guidelines",
+     "url": "https://mib.gov.in/en/documents/notification/acts-policy-guidelines",
+     "stratum": "media",
+     "type": "guideline",
+     "method": "static_html",
+     "covers": "MIB's Acts/Policies/Guidelines listing at https://mib.gov.in/en/documents/notification/acts-policy-guidelines (media stratum, default_type guideline, html_table with title/date/type columns, up to 15 pages; quirks: ALWAYS /en/ prefix, venue's own type column governs, slow Drupal host so retries matter; allowed_domains mib.gov.in, pib.gov.in, www.pib.gov.in).",
+     "lane": "instruments",
+     "held": 5,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "mib_orders_notices",
+     "regulator": "MIB",
+     "name": "Orders & Notices",
+     "url": "https://mib.gov.in/en/documents/notification/notices",
+     "stratum": "media",
+     "type": "notification",
+     "method": "static_html",
+     "covers": "MIB's Orders & Notices listing at https://mib.gov.in/en/documents/notification/notices (media, default_type notification, html_table title/date, up to 10 pages; quirks: /en/ page intermittently times out so retries cover, unprefixed URL serves Hindi titles; allowed_domains mib.gov.in, pib.gov.in, www.pib.gov.in).",
+     "lane": "instruments",
+     "held": 4,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "mib_other_comms",
+     "regulator": "MIB",
+     "name": "Other Communications (advisories, OMs)",
+     "url": "https://mib.gov.in/en/documents/notification/Other-communication",
+     "stratum": "media",
+     "type": "advisory",
+     "method": "static_html",
+     "covers": "MIB's Other Communications listing at https://mib.gov.in/en/documents/notification/Other-communication (media, default_type advisory, html_table, up to 10 pages; quirks: advisories to broadcasters/OTT, OMs and court-order circulations land here; allowed_domains mib.gov.in, pib.gov.in, www.pib.gov.in).",
+     "lane": "—",
+     "held": 0,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "mib_digital_media",
+     "regulator": "MIB",
+     "name": "Digital Media Wing (IT Rules Part III)",
+     "url": "https://mib.gov.in/en/ministry/our-wings/digital-media",
+     "stratum": "media",
+     "type": "advisory",
+     "method": "static_html",
+     "covers": "MIB Digital Media Wing page at https://mib.gov.in/en/ministry/our-wings/digital-media for IT Rules 2021 Part III instruments and OTT advisories (media, default_type advisory, Drupal cols-4/cols-5 tables, lane: signals because 18 of 20 items were PIB press releases; allowed_domains mib.gov.in, pib.gov.in, www.pib.gov.in).",
+     "lane": "signals",
+     "held": 24,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "mib_broadcasting",
+     "regulator": "MIB",
+     "name": "Broadcasting Wing documents",
+     "url": "https://mib.gov.in/en/ministry/our-wings/broadcating-wing",
+     "stratum": "media",
+     "type": "circular",
+     "method": "static_html",
+     "covers": "MIB Broadcasting Wing documents at https://mib.gov.in/en/ministry/our-wings/broadcating-wing (MIB's own typo) for cable TV, uplinking/downlinking and CRS material (media, default_type circular, cols-4 undated shelf rows + cols-5 dated rows, no pagination; allowed_domains mib.gov.in, pib.gov.in, www.pib.gov.in).",
+     "lane": "instruments",
+     "held": 46,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    },
+    {
+     "id": "mib_advisories",
+     "regulator": "MIB",
+     "name": "Advisories",
+     "url": "https://mib.gov.in/en/documents/notification/advisories",
+     "stratum": "media",
+     "type": "advisory",
+     "method": "static_html",
+     "covers": "MIB's dedicated Advisories listing at https://mib.gov.in/en/documents/notification/advisories (media, default_type advisory, table.cols-6, up to 9 pages; quirk: date column is upload/republish date, instrument date often rides in the title as DD.MM.YYYY; allowed_domains mib.gov.in only).",
+     "lane": "instruments",
+     "held": 4,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Fetching is not prohibited: there is no robots.txt (403 -> RFC 9309 no restriction, no Disallow covering our paths), no reachable clause restricting automated access, and the listings are served openly at HTTP 200 to an anonymous GET, which together with the RTI Act 2005 s.4(1)(b)/(2) proactive-disclosure duty MIB discharges through these very listings gives a strong implied permission so that IT Act s.43(a)/(b) 'without permission' is not made out; ~1 req/s serial, human-triggered, with backoff is proportionate under s.47 and not a s.43(e)/(f) disruption; s.66 mens rea is absent for an honest identifying-UA crawler storing metadata for legal research. The conditions attach because (i) the Copyright Policy expressly restricts reproduction without permission, which bites the optional PDF archive (defensible only under s.52(1)(a) fair dealing per ANI v. OpenAI, interim, plus s.52(1)(q)(i)/(q)(iv) document-by-document), not the metadata (EBC v. Modak); (ii) the Terms & Condition tab is still unverified, so the absence of an anti-automation term is inferred from silence on the readable pages rather than positively established; (iii) the host runs active bot-fingerprinting and drops connections under rapid requests, so backoff and an honest UA are load-bearing for the good-faith posture. This is the same position the 27-Aug analysis reached for all six sources and nothing captured today moves it in either direction.",
+   "access_terms": "Silent. No page captured today on mib.gov.in says anything about crawling, spiders, robots, scraping, harvesting, automated or bulk retrieval, data mining or rate limits. The Copyright Policy on https://mib.gov.in/en/privacy-policy addresses reproduction only; the Privacy Statement's sole 'automatically' is the boilerplate that the site does not automatically capture personal information; the Disclaimer on https://mib.gov.in/en/disclaimer and the Disclaimer tab of https://mib.gov.in/en/website-policy disclaim liability for accuracy, external links and viruses and say nothing about access. The only access-facing signal is technical, not contractual: the host's WAF returns 403 for robots.txt (and, per the 25-Aug survey recorded in the prior analysis, for .txt paths generally, under any User-Agent) and injects an fp/fingerprint.html bot-fingerprinting iframe into the 403 page. The listing pages we fetch served HTTP 200 text/html to an anonymous GET (tos_report), with no login, paywall or access control. The governing-law sentence on the copyright page ('governed by and construed in accordance with the Indian Laws', exclusive jurisdiction of Indian courts) is the only 'terms and conditions' language actually reachable, and it attaches to the reproduction terms.",
+   "reuse_terms": "Express and restrictive. The Copyright Policy on https://mib.gov.in/en/privacy-policy (Last Updated 07 Jul 2025; identical Hindi text at https://mib.gov.in/privacy-policy) states that contents \"may not be reproduced partially or fully, without due permission\" of MIB; where material is referred to as part of another website the source must be acknowledged; reproduction must be accurate and not derogatory or misleading; the permission does not extend to third-party-copyright material (MIB also declares no third-party content is used); Indian law and exclusive Indian jurisdiction apply. This clause is verbatim the same text the 27-Aug analysis recorded. It bears on the optional internal PDF archive (literal copying), not on fetching or on the metadata dashboard: title/date/type/URL are facts and short titles with no copyright under EBC v. Modak (2008) 1 SCC 1, so the dashboard needs no permission; the archive rests on Copyright Act 1957 s.52(1)(a) fair dealing for private use including research (ANI Media v. OpenAI, Delhi HC, 24 Jul 2026, interim/prima facie) host-wide, and on s.52(1)(q)(i) document-by-document for PDFs that are the gazette-notified instrument itself (broadcasting/cable-TV instruments, IT Rules Part III amendments; NOT bare Acts on mib_acts_policy), and on s.52(1)(q)(iv) for court orders circulated via mib_other_comms. The registry's allowed_domains also admit pib.gov.in/www.pib.gov.in for five of the six sources; PIB's terms were not part of this host read and are not covered here.",
+   "robots": "https://mib.gov.in/robots.txt -> HTTP 403 Forbidden today (robots_fresh.json), body a generic '403 Forbidden / You don't have permission to access this resource.' HTML 2.0 page with a hidden <iframe src=\"fp/fingerprint.html\">. No User-agent, Allow or Disallow directive exists on the host. Byte-for-byte the same response the 27-Aug analysis recorded (282 B, same iframe). Under RFC 9309 s.2.3.1.3 an unavailable (4xx) robots.txt means a crawler MAY access any resource, so no rule covers /en/documents/notification/* or /en/ministry/our-wings/*; the engine's robots module records it as 'robots.txt 403 — unavailable, no restrictions (RFC 9309)' for all six sources (tos_report). The 403 is host-general (WAF blocks .txt paths for browser, curl, Googlebot and empty UAs alike per the 25-Aug survey), not a bot-targeted refusal, so it is not evidence of an intent to exclude crawlers; the fingerprinting iframe is, however, evidence that the host actively profiles clients, which is why an honest identifying UA plus backoff matters on this host.",
+   "robots_fresh": {
+    "http": 403,
+    "body": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>403 Forbidden</title>\n</head><body>\n<h1>Forbidden</h1>\n<p>You don't have permission to access this resource.</p>\n<iframe style=\"visibility:hidden; display:none\" src=\"fp/fingerprint.html\"></iframe></body><�\u0000\u0000\u0000\u0000\u0000\u0000"
+   },
+   "anything_forbidding": "Nothing forbidding automated access or retrieval was found: no robots Disallow (no robots file at all), no anti-crawl/anti-scrape clause on any reachable page, no login or paywall on the fetched listings. The only express prohibition is the reproduction restriction in the Copyright Policy (https://mib.gov.in/en/privacy-policy), which is a reuse condition on copying the PDFs, not a bar on fetching; it does not reach the metadata dashboard. The Terms & Condition tab of https://mib.gov.in/en/website-policy remains unread (AJAX-only, four 'Loading content ...' placeholders today; the direct /en/terms-conditions path is 404), so it is still not positively established that the host carries no anti-automation clause — the same unquantified gap the 27-Aug analysis flagged.",
+   "changed": "No substantive change. (1) robots.txt: identical 403 body, still no directives — same RFC 9309 'no restriction' position. (2) Copyright Policy: verbatim identical restrictive clause; the page's own Last Updated stamp (07 Jul 2025) predates 27 Aug. (3) Website Policy: same Disclaimer-only render, same four AJAX placeholders, page Last Updated 22 Apr 2024; the Terms & Condition, Cookie Policy and Hyperlinking Policy tabs are exactly as unretrievable as before. (4) Direct guesses /en/terms-conditions and /en/copyright-policy are 404 shells (1,307 chars) — the prior analysis reported the AJAX source endpoints as empty shells/HTTP 500, so the retrieval failure mode has shifted from 500 to 404 on the guessed paths but the result (no text) is the same. (5) New today only in coverage, not substance: the unprefixed Hindi pages (/privacy-policy, /website-policy, /disclaimer) were captured and carry the same content; /en/disclaimer was captured as a standalone page and matches the Disclaimer tab. (6) The six live sources, their URLs, quirks and allowed_domains are unchanged from the prior per_source entries; no new mib.gov.in source has been added since 27 Aug (mib_engage is 'watch' on a different subdomain and mib_whatsnew is 'planned' — neither is live). The prior verdict for every mib.gov.in source (access permissible_qualified / reproduction permissible_qualified / include_with_conditions) stands on today's evidence.",
+   "conditions": [
+    "Fetch only the /en/-prefixed listing and wing pages at ~1 request/second, serially, human-triggered, with exponential backoff on timeouts/connection drops (mib_orders_notices intermittently times out; mib_broadcasting dropped a connection on 27 Aug) — never retry rapidly after a drop, which is what would engage IT Act s.43(e)/(f).",
+    "Send the engine's honest identifying firm User-Agent with a From-header contact mailbox; do not spoof a browser. The host injects fp/fingerprint.html on its 403 page — if MIB's WAF starts refusing the honest UA on the listing paths, pause the host and seek written permission rather than working around it.",
+    "Keep robots-as-gate enabled so that if mib.gov.in ever publishes a real robots.txt (i.e. the 403 turns into a 200 with directives) the engine honours it automatically.",
+    "Metadata dashboard (title, date, document type, URL): include freely — facts and short titles carry no copyright (EBC v. Modak) and the restrictive Copyright Policy does not reach them.",
+    "Optional PDF archive: per-host flag OFF by default. If enabled, strictly internal/access-controlled, no client-facing or external circulation, never republished — basis s.52(1)(a) fair dealing for private use/research (ANI Media v. OpenAI, Delhi HC 24 Jul 2026, interim); annotate s.52(1)(q)(i) document-by-document for PDFs that are the gazette-notified instrument (broadcasting/cable-TV instruments, IT Rules Part III amendments) and s.52(1)(q)(iv) for court orders circulated via mib_other_comms. Bare Acts on mib_acts_policy fall outside (q)(i) and outside (q)(ii) without commentary — fair dealing only.",
+    "Prefer the e-Gazette lane (gazette_mib, s.52(1)(q)(i) on statute) over mib.gov.in's copy for any gazette-notified instrument, as the 27-Aug analysis already directs.",
+    "Attribution on every stored item: 'Source: MIB, <title>, <date>; retrieved from <URL> on <date>' — this satisfies the Copyright Policy's acknowledgement requirement and its accurate/not-misleading requirement.",
+    "Link out to MIB pages; never iframe or embed them (the unread Hyperlinking Policy tab may carry a no-framing rule as sibling ministries' pages do).",
+    "Never present tracked text as authoritative without verifying against the e-Gazette record or the issuing body (mib_advisories dates are upload dates; instrument dates ride in titles).",
+    "Five of the six sources also admit pib.gov.in/www.pib.gov.in in allowed_domains (linked documents may resolve there); PIB's own terms were not covered by this host read and should be checked under the pib.gov.in host position before archiving PIB-hosted PDFs.",
+    "Re-run this host read when the Terms & Condition tab becomes readable (see gaps); if it turns out to contain an express anti-automation clause, re-assess the host — that clause, not the copyright policy, would be the one that could change the verdict."
+   ],
+   "gaps": [
+    "Terms & Condition tab on https://mib.gov.in/en/website-policy — AJAX-loaded; today's capture shows four 'Loading content ...' placeholders and the direct paths /en/terms-conditions and /en/copyright-policy are 404 shells. A human should open https://mib.gov.in/en/website-policy in a browser, click the 'Terms & Condition' tab, and read it for any clause on crawling, scraping, automated retrieval, bulk download or data mining; alternatively open browser DevTools > Network while clicking the tab and note the XHR endpoint so the engine can fetch it directly next time.",
+    "Cookie Policy and Hyperlinking Policy tabs on the same page — same AJAX mechanism, same manual step; the Hyperlinking Policy matters for the link-out/no-framing condition (does MIB require prior permission for deep links, or forbid framing?).",
+    "robots.txt — https://mib.gov.in/robots.txt returns a WAF 403 to every client, so it cannot be confirmed from outside whether a robots file exists behind the WAF. A human cannot fix this by hand; the position rests on RFC 9309 (unavailable = no restriction). Worth re-probing periodically; a 200 with directives would be honoured automatically by robots-as-gate.",
+    "PIB terms — pib.gov.in/www.pib.gov.in appear in allowed_domains for five mib.gov.in sources but were outside this host read; the pib.gov.in host position governs any PDF that resolves there.",
+    "No positive statement of permission to crawl exists anywhere on the host; the access position is built on silence plus open HTTP 200 publication plus RTI s.4, and the s.43 'without permission' question for open public pages remains unsettled in Indian law (no binding appellate authority) — a residual that no page read can close."
+   ],
+   "pages_read": [
+    "https://mib.gov.in/en/privacy-policy (captured today, HTTP 200, 3,231 chars — carries the Copyright Policy and Privacy Statement; Last Updated 07 Jul 2025) — /private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/https_mib_gov_in_en_privacy_policy.txt",
+    "https://mib.gov.in/privacy-policy (captured today, HTTP 200, Hindi rendering of the same Copyright Policy/Privacy Statement; Last Updated 07 Jul 2025) — .../policy_text/https_mib_gov_in_privacy_policy.txt",
+    "https://mib.gov.in/en/website-policy (captured today, HTTP 200, 2,684 chars — only the Disclaimer tab renders; Terms & Condition, Cookie Policy and Hyperlinking Policy tabs are four 'Loading content ...' AJAX placeholders; Last Updated 22 Apr 2024) — .../policy_text/https_mib_gov_in_en_website_policy.txt",
+    "https://mib.gov.in/website-policy (captured today, HTTP 200, Hindi rendering, same Disclaimer-only shell with four AJAX placeholders) — .../policy_text/https_mib_gov_in_website_policy.txt",
+    "https://mib.gov.in/en/disclaimer (captured today, HTTP 200, 2,503 chars — liability/external-link/virus disclaimer; Last Updated 27 Dec 2024) — .../policy_text/https_mib_gov_in_en_disclaimer.txt",
+    "https://mib.gov.in/disclaimer (captured today, HTTP 200, Hindi rendering of the same disclaimer) — .../policy_text/https_mib_gov_in_disclaimer.txt",
+    "https://mib.gov.in/robots.txt — robots_fresh.json: HTTP 403, generic Forbidden body with hidden fp/fingerprint.html iframe, no directives",
+    "https://mib.gov.in/en/terms-conditions and https://mib.gov.in/en/copyright-policy — tos_cms.log: HTTP 404, 1,307-char shells (not captured as pages)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/index.json and robots_fresh.json",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_cms.log (mib.gov.in lines 9-13)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_report.json (entries mib_acts_policy, mib_orders_notices, mib_other_comms, mib_digital_media, mib_broadcasting, mib_advisories: robots '403 — unavailable, no restrictions (RFC 9309)', listing HTTP 200 text/html, policy_links [])",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_home.json (mib.gov.in: policy_pages {}, no flags)",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/audit/legal_analysis_2026-08-27.json (per_source entries mib_acts_policy, mib_advisories, mib_broadcasting, mib_orders_notices, mib_other_comms, mib_digital_media; gazette_mib cross-reference)",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/registry_v2.json (six live mib.gov.in sources; mib_engage is status watch on engage.mib.gov.in and mib_whatsnew is status planned — both excluded)"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [],
+   "regulators": [
+    "MIB"
+   ]
+  },
+  {
+   "host": "prgi.gov.in",
+   "sources": [
+    {
+     "id": "prgi",
+     "regulator": "PRGI",
+     "name": "Press Registrar General advisories/public notices",
+     "url": "https://prgi.gov.in/",
+     "stratum": "media",
+     "type": "advisory",
+     "method": "static_html_tls_tolerant",
+     "covers": "Press Registrar General of India (statutory office under the Press and Registration of Periodicals Act 2023, successor to RNI, under MIB) advisories and public notices, taken from the homepage link-shelf with advisory PDFs at /sites/default/files/YYYY-MM/advisory_no._*.pdf (undated on the shelf; TLS-tolerant fetch for an intermittent broken chain).",
+     "lane": "instruments",
+     "held": 5,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Nothing on the captured pages or in the robots record forbids what the tracker does: the Terms & Conditions are silent on automated access, robots.txt allows the homepage shelf and /sites/default/files/ paths (only /search/ and Drupal internals are disallowed), the homepage serves HTTP 200 to anonymous GET, and the prior analysis additionally recorded an express deep-linking permission on /website-policy. Reuse is governed by an express free-reproduction licence subject to accuracy, non-misleading use and prominent attribution, which supports the internal PDF archive as long as those conditions are met and third-party-copyright items are excluded. It is \"with conditions\" rather than \"allowed\" because (a) the licence carries stated conditions, and (b) the restrictive /website-policy s.3 clause that conflicts with it could not be re-verified this sweep, so the contra-proferentem reading and the courtesy-email recommendation from 27 Aug still stand.",
+   "access_terms": "SILENT on automated access. The captured Terms & Conditions page contains no clause on crawling, bots, scraping, automated retrieval, bulk download, rate/load, or hyperlinking; it is a disclaimer page only. Its content is: a statement that the site is for public information and is not to be construed as a statement of law; a liability exclusion; a variance clause that the Act/Rules prevail; a note that links to other sites are provided for public convenience with no endorsement; the reproduction licence (see reuse_terms); Indian governing law and exclusive jurisdiction of Indian courts. The site-level access text the prior analysis relied on (deep-linking permitted without prior permission; no framing; consent to monitoring) lives on /website-policy, which was NOT captured this sweep, so the only access position verifiable from the captured text is silence. Nearest clause on the page: \"Links to other websites ... are provided for public convenience only\" (https://prgi.gov.in/terms-conditions).",
+   "reuse_terms": "EXPRESS LICENCE with conditions. https://prgi.gov.in/terms-conditions: \"Material featured on this website may be reproduced free of charge.\" Conditions attached in the same passage: (1) reproduce accurately; (2) not in a derogatory manner or misleading context; (3) where published or issued to others, the source must be prominently acknowledged; (4) the permission does not extend to material identified as third-party copyright, for which authorisation must be obtained from the department/copyright holder concerned. Footer: content owned and managed by PRGI / MIB / Government of India (government work). The prior analysis recorded a CONFLICTING restrictive clause in /website-policy s.3 (reproduction not permitted without PRGI permission); that page was not captured, so the conflict can be neither confirmed nor cleared from this sweep's text.",
+   "robots": "Sweep record: robots.txt HTTP 200, \"44 rule(s) for us\" (a single User-agent: * group); verbatim not re-captured this sweep, but the 27 Aug verbatim is stock Drupal (Disallow /core/, /profiles/, /admin/, /user/*, /node/add/, /comment/reply/, /filter/tips, /media/oembed, /search/ plus /index.php/ twins) - none covers the homepage shelf or /sites/default/files/; the one live rule to honour is Disallow: /search/.",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured. The only restrictive language is a reproduction condition (accuracy, no misleading/derogatory use, prominent attribution, third-party carve-out), which bears on the PDF archive and any republication, not on fetching. There is no express prohibition on automated access, retrieval or scraping, and no robots Disallow covering our paths.",
+   "changed": "no material change. The /terms-conditions reproduction licence and its conditions match the 27 Aug quotation word for word; the page shows \"Last Updated: 02-Sep-2026\" but that is a site-wide footer stamp, not evidence of a policy edit. robots.txt still returns 200 with the same stock-Drupal group the prior analysis described (the sweep counts 44 rules; no verbatim to diff). Sweep flags and errors are empty. What DID change is the evidence base, not the site: the prior analysis also relied on /website-policy (deep-linking permission, anti-framing, monitoring consent, and the restrictive s.3 copyright clause); this sweep followed only the footer's Terms & Conditions link, so those points are carried forward from 27 Aug rather than re-read.",
+   "conditions": [
+    "Never fetch via /search/ (live robots Disallow); harvest only from the homepage shelf and /sites/default/files/ paths, and keep the /index.php/ twins out of the path inventory.",
+    "Send an honest identifying User-Agent and keep to ~1 request/second, human-triggered; expect access to be logged (monitoring consent recorded on /website-policy in the prior analysis).",
+    "PDF archive: reproduce advisories accurately and unaltered, never in a misleading or derogatory context, with prominent PRGI / MIB attribution wherever an item is issued or shown to others.",
+    "Exclude from the archive any PRGI document identified as third-party copyright; the licence expressly does not extend to it.",
+    "Do not iframe or frame PRGI pages (anti-framing clause recorded on /website-policy on 27 Aug; open links in a new window/tab).",
+    "Before scaling the PDF archive, re-read /website-policy by hand to confirm whether the restrictive s.3 copyright clause still stands, and consider the one-line courtesy email to PRGI's Web Information Manager that the 27 Aug analysis recommended to resolve the licence conflict and the link-notification ask together.",
+    "Continue the TLS-tolerant fetch for the intermittent broken certificate chain; this is a transport quirk, not an access control."
+   ],
+   "gaps": [
+    "https://prgi.gov.in/website-policy - offered in the site footer ('Website Policy') and relied on by the 27 Aug analysis for the deep-linking permission, the anti-framing clause, the monitoring-consent statement and the restrictive s.3 copyright clause; NOT captured this sweep (the crawler followed only the Terms & Conditions footer link). A human should open it.",
+    "robots.txt verbatim - the sweep records only status 200 and a rule count (44); the rule text was not stored, so the 'allows our path' position rests on the 27 Aug verbatim.",
+    "Homepage (https://prgi.gov.in/) body text - not in the policy_text capture; any inline notice on the document shelf itself was not read.",
+    "No separate Hyperlinking Policy, Copyright Policy or Privacy Policy page was captured or offered by the footer; if PRGI publishes these as distinct pages (as MIB does), they are unverified.",
+    "The two captured URLs are one page under two aliases, so this host's policy read rests on a single page."
+   ],
+   "pages_read": [
+    "https://prgi.gov.in/terms-conditions (HTTP 200, 4,210 chars, read in full)",
+    "https://prgi.gov.in/index.php/terms-conditions (HTTP 200, 4,210 chars, read in full; byte-identical to the above except the visitor counter, i.e. the same Drupal page under its /index.php/ alias, not a second policy)"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [
+    "https://prgi.gov.in/index.php/terms-conditions",
+    "https://prgi.gov.in/terms-conditions"
+   ],
+   "regulators": [
+    "PRGI"
+   ]
+  },
+  {
+   "host": "cbfcindia.gov.in",
+   "sources": [
+    {
+     "id": "cbfc",
+     "regulator": "CBFC",
+     "name": "Orders and Circulars",
+     "url": "https://cbfcindia.gov.in/cbfcAdmin/orders-and-circular.php",
+     "stratum": "media",
+     "type": "circular",
+     "method": "static_html",
+     "covers": "CBFC's 'Orders and Circulars' shelf page (https://cbfcindia.gov.in/cbfcAdmin/orders-and-circular.php) - an undated HTML table of Board administrative orders and circulars with PDF links, keyed on URL+title and dated by first_seen or the date inside the title; statutory Cinematograph instruments are NOT taken from here but surface via MIB/eGazette (stratum media, default_type circular, status live).",
+     "lane": "instruments",
+     "held": 11,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Fetching is not restricted by anything on this host: no robots.txt exists (RFC 9309 - no restriction), the listing is an open HTTP 200 public page, and the site's own Terms, Disclaimer and Copyright Policy are silent on automated access, crawling, scraping, load or systematic retrieval - so \"not allowed\" is not made out on either limb (no express prohibition, no Disallow). What the site does say is a reproduction condition: an all-rights-reserved Copyright Policy with a \"without due permission\" bar and no third-party carve-out. That bites the optional internal PDF archive, not the metadata tracker (titles/dates/URLs are unprotected facts, EBC v. Modak). Because CBFC orders are administrative acts of a statutory Board rather than court/tribunal orders or gazette matter, the s.52(1)(q) safe-harbours the prior analysis uses for other hosts do not apply here, leaving the archive resting only on s.52(1)(a) fair dealing (interim ANI v. OpenAI authority) plus closed-internal-store discipline - hence conditions rather than a clean 'allowed'. The 27 Aug overall of include_with_conditions stands.",
+   "access_terms": "SILENT on automated access. None of the three live pages mentions crawling, scraping, robots, automated retrieval, bulk download, rate/load, or systematic access. The Terms & Conditions page (https://cbfcindia.gov.in/cbfcAdmin/terms-and-conditions.php) is a pure accuracy/liability/governing-law notice: content \"should not be construed as a statement of law\" and disputes go to Indian courts; it also notes the site carries links to outside sites. The Disclaimer (https://cbfcindia.gov.in/cbfcAdmin/disclaimer.php) says the contents are \"for information purposes only\" and disclaims liability for accuracy and viruses. Hyperlinking: the Copyright Policy only asks that \"the source must be appropriately acknowledged\" when content is referred to from another website (https://cbfcindia.gov.in/cbfcAdmin/copyright-policy.php); the separate Hyperlinking Policy page listed in the footer was not captured. Framing: nothing on any captured page. The site footer (present on all three pages) lists Disclaimer, Terms & Conditions, Copyright Policy, Hyperlinking Policy and Privacy Policy as the site's policy set.",
+   "reuse_terms": "RESTRICTIVE, no licence and no third-party carve-out. The Copyright Policy (https://cbfcindia.gov.in/cbfcAdmin/copyright-policy.php) states contents \"may not be reproduced partially or fully, without due permission\" from CBFC, requires source acknowledgement when content is referred to from another website, and bars use \"in any misleading or objectionable context\". The footer on every page asserts COPYRIGHT (c) 2017 ALL RIGHTS RESERVED, CENTRAL BOARD OF FILM CERTIFICATION, and says content is published and managed by CBFC and hosted by Protean eGov Technologies. There is no NIC/GIGW-style permission-free-reproduction clause and no mention of third-party material. This clause bears on the internal PDF archive (reproduction), not on fetching the listing; metadata (titles, dates, URLs) is fact, not expression.",
+   "robots": "robots.txt returns HTTP 404 (generic Apache Not Found body) - no robots.txt exists, so under RFC 9309 there are no restrictions and no Disallow can cover /cbfcAdmin/orders-and-circular.php (sweep record: \"robots.txt 404 - unavailable, no restrictions\"; matches the 27 Aug live re-verify verbatim).",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured. The only prohibition anywhere in the six captured pages is the reproduction clause on the Copyright Policy (\"may not be reproduced partially or fully, without due permission\"), which restricts copying/republishing content, not accessing or retrieving the listing. The three root-level 404 pages contain only the server's generic Not Found text. The sweep recorded no flags and no errors for this host.",
+   "changed": "no material change. The Copyright Policy text captured now is verbatim identical to the clause quoted in the 27 Aug analysis; the Terms & Conditions and Disclaimer still impose no access or reuse restriction; robots.txt is still 404; the orders page still serves HTTP 200 text/html to an anonymous GET; the sweep raised no flags. Two housekeeping notes only: (1) the page footer now shows LAST UPDATED ON 02-09-2026, so the site was touched the day before this capture, but the policy text did not move; (2) the prior analysis also relied on /cbfcAdmin/hyperlinking-policy.php, which this capture did not include (see gaps) - its content cannot be re-confirmed from disk, though nothing in the captured pages suggests it changed.",
+   "conditions": [
+    "Metadata capture (title, date, type, URL) of /cbfcAdmin/orders-and-circular.php: include - facts/short titles, no copyright subsists (EBC v. Modak); no permission needed.",
+    "PDF archive: default OFF; if switched on, strictly internal, no client-facing or external circulation, no republication - the Copyright Policy's 'without due permission' clause has no third-party carve-out and no s.52(1)(q) safe-harbour reaches CBFC administrative orders, so the sole basis is s.52(1)(a) fair dealing (interim ANI v. OpenAI) - the weakest reproduction footing among the tracker's hosts.",
+    "Attribute every item ('Source: CBFC, <title>, <date>, <URL>') - the Copyright Policy expressly requires acknowledgement of source when content is referred to from another site.",
+    "Never present CBFC content 'in any misleading or objectionable context' (Copyright Policy) - quote titles verbatim, do not re-characterise an order.",
+    "Keep the honest identifying User-Agent, ~1 req/s serial, human-triggered only; continue enforcing robots.txt so that if CBFC ever publishes one it is honoured automatically.",
+    "Treat any F5 BIG-IP ASM 'Request Rejected' / support-ID block page as STOP-AND-ALERT, never a retry loop (carried over from 27 Aug: repeated WAF triggering is the one path by which access exposure could grow).",
+    "Do not iframe or frame the site; link out rather than embed.",
+    "Do not treat CBFC PDFs as authoritative statutory text - the Terms say content 'should not be construed as a statement of law'; verify Cinematograph instruments against eGazette/MIB before citing to a client.",
+    "Re-read /cbfcAdmin/hyperlinking-policy.php and /cbfcAdmin/privacy-policy.php by hand (not captured) before relying on the hyperlinking position in any client-facing note."
+   ],
+   "gaps": [
+    "https://cbfcindia.gov.in/cbfcAdmin/hyperlinking-policy.php - listed in the site footer and relied on by the 27 Aug analysis, but NOT in this capture; its text cannot be re-confirmed from disk.",
+    "https://cbfcindia.gov.in/cbfcAdmin/privacy-policy.php - listed in the site footer, not captured; unlikely to bear on scraping but should be opened by hand for completeness.",
+    "The three root-level URLs (/disclaimer.php, /terms-and-conditions.php, /copyright-policy.php) returned 404 - these are simply the wrong paths (the live policy pages sit under /cbfcAdmin/), not evidence of removed policies; no action needed beyond noting that the sweep's guessed root paths do not exist.",
+    "robots.txt itself is not in policy_text (only the sweep's one-line record of the 404); the verbatim body is preserved in the 27 Aug analysis.",
+    "The orders page https://cbfcindia.gov.in/cbfcAdmin/orders-and-circular.php was not captured as text here (the sweep records HTTP 200, text/html, no flags) - any on-page notice on the listing itself was not human-read in this pass; the 27 Aug read found none.",
+    "The two planned CBFC sources (imp_communication.php?type=film and ?type=gernal) are not live and were not swept; when wired, they are on the same host and the same policy set applies."
+   ],
+   "pages_read": [
+    "https://cbfcindia.gov.in/cbfcAdmin/copyright-policy.php (HTTP 200, 2,149 chars, read in full)",
+    "https://cbfcindia.gov.in/cbfcAdmin/terms-and-conditions.php (HTTP 200, 3,432 chars, read in full)",
+    "https://cbfcindia.gov.in/cbfcAdmin/disclaimer.php (HTTP 200, 2,976 chars, read in full)",
+    "https://cbfcindia.gov.in/copyright-policy.php (HTTP 404 - generic Apache 'Not Found' body only)",
+    "https://cbfcindia.gov.in/terms-and-conditions.php (HTTP 404 - generic 'Not Found' body only)",
+    "https://cbfcindia.gov.in/disclaimer.php (HTTP 404 - generic 'Not Found' body only)"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [
+    "https://cbfcindia.gov.in/disclaimer.php",
+    "https://cbfcindia.gov.in/terms-and-conditions.php",
+    "https://cbfcindia.gov.in/copyright-policy.php",
+    "https://cbfcindia.gov.in/cbfcAdmin/copyright-policy.php",
+    "https://cbfcindia.gov.in/cbfcAdmin/terms-and-conditions.php",
+    "https://cbfcindia.gov.in/cbfcAdmin/disclaimer.php"
+   ],
+   "regulators": [
+    "CBFC"
+   ]
+  },
+  {
+   "host": "ascionline.in",
+   "sources": [
+    {
+     "id": "asci",
+     "regulator": "ASCI",
+     "name": "Advisories (self-regulatory)",
+     "url": "https://www.ascionline.in/advisories/",
+     "stratum": "media",
+     "type": "advisory",
+     "method": "static_html",
+     "covers": "The Advertising Standards Council of India's /advisories/ link-shelf (stratum: media, default_type: advisory) — a self-regulatory body's advisories, most of which are republished copies of other regulators' documents; ASCI codes are incorporated by reference into the Cable TV Rules advertising code, dates ride in row text, and a JS show-more hides older rows.",
+     "lane": "signals",
+     "held": 1,
+     "prior_overall": "include_metadata_only",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible_qualified"
+    }
+   ],
+   "verdict": "silent",
+   "verdict_reason": "Nothing on the captured page addresses automated access, and robots.txt does not disallow /advisories/ — so there is no express prohibition that would make fetching \"not allowed\", but there is also no express grant on the pages captured (the prior analysis's affirmative \"index, follow\" robots meta on /advisories/ was not re-captured in this sweep, so I do not rely on it here). The site's only \"terms\" is an unfinished draft confined to personal data. Fetching with an identifying UA at ~1 req/s, robots enforced, human-triggered, sits within the prior \"permissible_qualified\" access position; the live constraint on this host remains reproduction (private rightsholder, all rights reserved, no s.52(1)(q) route), which governs the PDF archive rather than the fetch.",
+   "access_terms": "Silent. The captured Privacy Policy page (including the \"ASCI Terms of Use\" draft embedded at its foot) says nothing about automated access, crawling, scraping, request volume, hyperlinking or framing. The embedded terms text deals only with personal-data collection, cookies, Google Analytics, third-party disclosure and members-area password security, and still carries editorial markers (bracketed reviewer notes, an \"[ OR ]\" alternative paragraph, an unresolved \"(link)\" placeholder, and an unfilled last-updated date), so it reads as an unpublished draft rather than a binding instrument. Hyperlinking is not restricted; the page itself notes the site links out to other websites.",
+   "reuse_terms": "No licence, attribution rule, permission requirement or third-party carve-out anywhere on the captured page. The only reuse-relevant text is the footer copyright line, \"2026 © ASCI. All Rights Reserved\" (https://www.ascionline.in/asci-privacy-policy/). ASCI is a private, industry-funded non-profit, so this is a private all-rights-reserved assertion with no government-works or Official Gazette exception available — it bears on the optional PDF archive of whole advisories, not on fetching or on the metadata (title/date/type/link) dashboard.",
+   "robots": "Sweep record: robots.txt HTTP 200, \"1 rule(s) for us\" — the prior analysis read the file as a malformed 22-line Disallow block orphaned above any User-agent line, followed by a valid \"User-agent: * / Disallow:\" (empty) group; under both readings /advisories/ is allowed (the orphaned block lists /advice-resource/, which does not prefix-match /advisories/).",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured — the Privacy Policy and its embedded draft Terms of Use contain no prohibition on automated access, retrieval, scraping or load, and no robots Disallow covers /advisories/. The only restrictive language is the footer \"All Rights Reserved\" copyright notice, which is a reproduction condition, not an access restriction.",
+   "changed": "no material change. The 27 Aug analysis found no scraping clause anywhere (terms URLs 404, WP REST enumeration of 54 pages found no terms page, only the unfinished draft inside the Privacy Policy); the 3 Sep capture of that same page confirms the draft is still unfinished (same editorial markers, same unfilled date) and still silent on access and reuse. The copyright footer still reads 2026 © ASCI All Rights Reserved. Sweep: home 200, advisories 200 text/html, no flags, no errors. The footer now also lists Cookies, Unacceptable Contact and Transparency pages, which the sweep did not capture (see gaps) — none is a terms-of-use page by name.",
+   "conditions": [
+    "Track METADATA ONLY (title, date, type, link) for ASCI — do not enable the PDF archive: ASCI is a private all-rights-reserved rightsholder with no government-works or Official Gazette exception, and the prior analysis found only the interim ANI v. OpenAI fair-dealing authority as a basis, which is too thin for archiving whole advisories.",
+    "Do not let ASCI advisory text or substantive extracts reach any client-facing or public output without ASCI's permission; metadata and links only.",
+    "Keep the honest identifying User-Agent, robots.txt enforcement and ~1 req/s pacing; fetch only the server-rendered /advisories/ rows (no JS-driven show-more interaction is needed).",
+    "No framing/iframing of ASCI pages; link out to the original.",
+    "Re-check this host periodically: its only terms document is an unpublished draft embedded in the Privacy Policy and could be replaced by binding terms without notice; also re-capture the /advisories/ robots meta tag and robots.txt text on the next sweep so the affirmative-indexing leg of the access argument rests on current evidence."
+   ],
+   "gaps": [
+    "Footer links to Cookies, Unacceptable Contact, Transparency and Refund Policy (E-learning) pages were not captured by the sweep — a human should open the Cookies and Unacceptable Contact pages to confirm they contain no access or reuse language (unlikely by name, but unverified).",
+    "robots.txt text itself was not captured this sweep (only the summary 'robots.txt 200, 1 rule(s) for us'); the detailed allow/disallow reading is carried over from the 27 Aug analysis.",
+    "The /advisories/ page's <meta name='robots' content='index, follow'> tag, which the 27 Aug analysis used as an affirmative indexing invitation, was not re-captured on 3 Sep.",
+    "No dedicated terms-of-use page exists on the site: /terms-of-use/, /terms-and-conditions/, /terms/, /disclaimer/, /copyright/, /website-terms/ all returned 404 on 27 Aug; the sweep did not re-test them, so a human could re-confirm they are still absent.",
+    "The captured 'ASCI Terms of Use' is an unfinished draft (reviewer notes, '[ OR ]' alternative, '(link)' placeholder, blank last-updated date); if ASCI ever finalises it, the current silence on access could change."
+   ],
+   "pages_read": [
+    "https://www.ascionline.in/asci-privacy-policy/ (HTTP 200, 14,204 chars, read in full — the only policy page the site's own footer offered and the only one the sweep captured)"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [
+    "https://www.ascionline.in/asci-privacy-policy/"
+   ],
+   "regulators": [
+    "ASCI"
+   ]
+  },
+  {
+   "host": "inspace.gov.in",
+   "sources": [
+    {
+     "id": "inspace_publications",
+     "regulator": "IN-SPACe",
+     "name": "Publications (NGP, guidelines, advisories)",
+     "url": "https://www.inspace.gov.in/api/now/sp/page?id=inspace_publications",
+     "stratum": "telecom",
+     "type": "guideline",
+     "method": "json_api",
+     "covers": "IN-SPACe (Dept of Space) publications shelf — NGP, guidelines, advisories, policy papers — read as one JSON call to https://www.inspace.gov.in/api/now/sp/page?id=inspace_publications; stratum telecom, default_type guideline, status live, method json_api; items are undated JS object literals inside a widget client_script (first_seen dating), attachment URLs are sys_id-only; allowed_domains inspace.gov.in and www.inspace.gov.in.",
+     "lane": "instruments",
+     "held": 41,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Fetching is permitted: robots.txt (200, head confirmed identical today) contains no Disallow covering /api/now/sp/page or /inspace?id=..., the host publishes no Terms of Use and no clause of any kind restricts automated access, the endpoint is anonymous and public, and load is one JSON call per human-triggered run. The verdict is not a clean 'allowed' because (a) the robots file is a malformed allow-list whose evident intent does not enumerate the internal page-render API we call (an ambiguity the prior analysis said to cure by switching to the documented portal URL, which has not been done), and (b) the reuse licence that underwrites the optional PDF archive is conditional (accuracy, acknowledgement if issued outward, third-party-copyright carve-out) and could not be re-read today. Position carried forward from the 27 Aug evidence, which today's partial capture is consistent with and does not contradict.",
+   "access_terms": "No access or automation terms exist on this host. Today: the targeted pass's anchor probe on www.inspace.gov.in returned an empty list and the sweep found no policy pages (tos_home policy_pages is {}; tos_report notes the listing is JSON with no HTML page to walk), so no policy prose was captured on 3 Sep. Baseline (27 Aug): the footer 'Terms of Use' link (sec=tou) has no prose behind it — the footer-widget payload carried only Hyperlinking Policy, Disclaimer, Copyright Policy and Privacy Policy, and a term scan (scrap/crawl/spider/robot/harvest/data mining/automated/systematic/bulk) returned zero hits. The Hyperlinking Policy permits direct deep linking without prior permission but disallows loading IN-SPACe pages into frames. The listing endpoint is anonymous (user.logged_in=false), no login, token or paywall — implied permission under s.43 IT Act reinforced by RTI s.4 proactive disclosure; ~1 req/s single-call load is de minimis.",
+   "reuse_terms": "Not re-captured today (see gaps). Baseline (27 Aug, fetched verbatim then): the Copyright Policy in the portal footer widget on www.inspace.gov.in is the standard permissive GoI grant — material belongs to IN-SPACe/DoS and \"may be reproduced free of charge in any format or media\" (footer Copyright Policy, www.inspace.gov.in), subject to accurate, non-derogatory, non-misleading reproduction and prominent source acknowledgement wherever material is published or issued to others; sole carve-out is material explicitly identified as third-party copyright. No commercial or research-only limit. This bears on the optional internal PDF archive (express licence; s.52(1)(a) fair dealing backstop), not on fetching. The metadata dashboard needs no exception (no copyright in facts, EBC v Modak).",
+   "robots": "https://www.inspace.gov.in/robots.txt -> HTTP 200 today. The captured opening bytes (single 'User-agent: *' group, 'Allow:  /inspace', then per-page Allow lines /inspace?id=inspace_index ... inspace_space_ind, truncated at 'annou') are byte-identical to the opening of the 1,340-byte file recorded verbatim on 27 Aug, whose tail was: Allow lines for the Hindi mirror, Allow: /sitemap.do, Sitemap: https://www.inspace.gov.in/sitemap.do, and a single 'Disallow: /$pwd_reset.do?sysparm_url=ss_default'. The tail was NOT re-captured today (opening bytes only), so the absence of any new Disallow is inferred from the identical head plus the sweep's '32 rule(s) for us' count matching the prior rule count, not proven. Under RFC 9309 the path we fetch, /api/now/sp/page, matches no Disallow, so access is permitted; but the file is drafted as an allow-list lacking 'Disallow: /', and our internal API path is not among the enumerated Allow lines — the 27 Aug verdict 'ambiguous' (strict-RFC allowed vs evident-intent not invited) stands unchanged.",
+   "robots_fresh": {
+    "http": 200,
+    "body": "User-agent: *\r\nAllow:  /inspace\r\nAllow:  /inspace?id=inspace_index\r\nAllow:  /inspace?id=inspace_about_inspace\r\nAllow:  /inspace?id=inspace_vision\r\nAllow:  /inspace?id=inspace_orgstruct\r\nAllow:  /inspace?id=inspace_board\r\nAllow:  /inspace?id=inspace_chairman\r\nAllow:  /inspace?id=inspace_team\r\nAllow:  /inspace?id=inspace_chairman_message\r\nAllow:  /inspace?id=inspace_contact_us\r\nAllow:  /inspace?id=inspace_rellinks\r\nAllow:  /inspace?id=inspace_citizen_charter\r\nAllow:  /inspace?id=inspace_media\r\nAllow:  /inspace?id=inspace_intl_coop\r\nAllow:  /inspace?id=inspace_space_ind\r\nAllow:  /inspace?id=annou"
+   },
+   "anything_forbidding": "Nothing forbids the tracker's fetch. There is no express prohibition on automated access, crawling, harvesting or systematic retrieval anywhere on the host (no Terms of Use prose exists; zero scraping-term hits in the recovered policies), and the only robots Disallow is the ServiceNow password-reset endpoint, which we never touch. The only restrictive terms found are reuse conditions (accurate reproduction, acknowledgement if issued outward, third-party-copyright carve-out) and the Hyperlinking Policy's no-framing rule, none of which bears on fetching.",
+   "changed": "No verifiable change. Robots: still HTTP 200 and the captured opening bytes match the 27 Aug verbatim text exactly; the listing endpoint still returns HTTP 200 application/json (tos_report). Policy prose (Copyright, Hyperlinking, Disclaimer, Privacy, and the empty Terms of Use) was not re-fetched today because the policies live in a ServiceNow footer widget rather than in crawlable anchors (anchor probe returned []), so continuity of the express reuse licence is assumed from the baseline, not confirmed. No new inspace.gov.in source has been added to the registry since 27 Aug; inspace_publications is still the sole live source and still points at the internal /api/now/sp/page endpoint rather than the documented /inspace?id=inspace_publications portal URL the 27 Aug conditions recommended.",
+   "conditions": [
+    "Prefer the documented portal URL https://www.inspace.gov.in/inspace?id=inspace_publications over the internal /api/now/sp/page?id=inspace_publications endpoint, to sit inside the robots allow-list's evident intent — after verifying the publications object literals remain extractable from that render (registry_v2.json still uses the API path).",
+    "Keep the optional PDF archive internal and unpublished; if any IN-SPACe material is ever issued outward, reproduce it accurately and prominently acknowledge IN-SPACe/DoS as source (Copyright Policy conditions).",
+    "Flag at ingest any publication explicitly marked as third-party copyright — it falls outside the IN-SPACe/DoS reuse licence and needs separate authorisation before archiving.",
+    "Link out to IN-SPACe pages and attachments; never iframe them (Hyperlinking Policy no-framing rule).",
+    "Validate Content-Type/body rather than HTTP status — this host returns 200 ServiceNow login/portal stubs at conventional policy paths; treat any non-JSON or logged-in-required response as a failed fetch.",
+    "Continue the honest identifying User-Agent, robots enforcement, ~1 request/second and human-triggered runs; never touch /$pwd_reset.do (the sole Disallow)."
+   ],
+   "gaps": [
+    "Policy prose not re-verified today: open https://www.inspace.gov.in/ in a browser, scroll to the footer and click Copyright Policy, Hyperlinking Policy, Disclaimer, Privacy Policy and Terms of Use in turn (they render from a ServiceNow footer widget, not from crawlable hrefs — the automated anchor probe returned []). Confirm the Copyright Policy still grants free reproduction with the accuracy/acknowledgement conditions and the third-party carve-out, and that Terms of Use is still empty (no scraping clause has appeared).",
+    "robots.txt tail not re-captured: open https://www.inspace.gov.in/robots.txt and read to the end; confirm the only Disallow is still /$pwd_reset.do?sysparm_url=ss_default and that no 'Disallow: /' or Disallow on /api/ or /inspace has been added since 27 Aug (today's capture is opening bytes only, ending at 'annou').",
+    "Engineering verification for condition 1: open https://www.inspace.gov.in/inspace?id=inspace_publications in a browser with devtools and confirm the publications list (NGP, Indian Space Policy, GSaaS paper, EO consultation paper) is present in the widget client_script of that portal render, so the fetch can be moved off the internal API path.",
+    "Confirm the non-www host inspace.gov.in still does not resolve (it did not on 27 Aug), so allowed_domains' bare 'inspace.gov.in' entry is harmless and www.inspace.gov.in remains the only host."
+   ],
+   "pages_read": [
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/index.json (no entry with host inspace.gov.in — nothing captured for this host today)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/robots_fresh.json (inspace.gov.in: HTTP 200, opening bytes only)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_cms.log ('robots inspace.gov.in: 200' and 'inspace anchors: []')",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_report.json (inspace_publications: listing HTTP 200 application/json, robots '200, 32 rule(s) for us', tos note 'listing is not HTML; no page to walk')",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_home.json (inspace.gov.in: home https://www.inspace.gov.in/, policy_pages {}, no flags, no errors)",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/audit/legal_analysis_2026-08-27.json (per_source[44] inspace_publications and the signoff row)",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/registry_v2.json (inspace_publications)"
+   ],
+   "http": 200,
+   "content_type": "application/json;charset=UTF-8",
+   "policy_pages": [],
+   "regulators": [
+    "IN-SPACe"
+   ]
+  },
+  {
+   "host": "egazette.gov.in",
+   "sources": [
+    {
+     "id": "gazette_communications",
+     "regulator": "e-Gazette",
+     "name": "Gazette — Ministry of Communications (DoT, TRAI)",
+     "url": "https://egazette.gov.in/SearchMinistry.aspx",
+     "stratum": "telecom",
+     "type": "gazette_notification",
+     "method": "aspnet_postback",
+     "covers": "The Gazette of India SearchMinistry.aspx listing filtered to the Ministry of Communications (DoT and TRAI; postal instruments excluded by subject filter), stratum telecom, default type gazette_notification — the statutory publication venue that also lawfully recovers DoT and UIDAI instruments whose own portals restrict fetching.",
+     "lane": "instruments",
+     "held": 16,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "gazette_meity",
+     "regulator": "e-Gazette",
+     "name": "Gazette — Ministry of Electronics and IT",
+     "url": "https://egazette.gov.in/SearchMinistry.aspx",
+     "stratum": "tech_data",
+     "type": "gazette_notification",
+     "method": "aspnet_postback",
+     "covers": "The Gazette of India SearchMinistry.aspx listing filtered to the Ministry of Electronics and IT, stratum tech_data, default type gazette_notification — the real-time net for MeitY instruments (DPDP Rules phases, IT Rules amendments, s.79A) while MeitY's own WP-JSON venue is stale/paused.",
+     "lane": "instruments",
+     "held": 12,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "gazette_mib",
+     "regulator": "e-Gazette",
+     "name": "Gazette — Ministry of Information and Broadcasting",
+     "url": "https://egazette.gov.in/SearchMinistry.aspx",
+     "stratum": "media",
+     "type": "gazette_notification",
+     "method": "aspnet_postback",
+     "covers": "The Gazette of India SearchMinistry.aspx listing filtered to the Ministry of Information and Broadcasting, stratum media, default type gazette_notification — gazette-notified broadcasting, Cable TV and IT Rules Part III instruments, reproducible under statute rather than under mib.gov.in's restrictive copyright policy.",
+     "lane": "instruments",
+     "held": 1,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "silent",
+   "verdict_reason": "The host publishes no terms of any kind: its sole policy page is an empty placeholder carrying only an attribution footer, there is no robots.txt, and no automated-access, scraping, reuse or hyperlinking clause exists anywhere in the capture. \"Not allowed\" would require an express prohibition on automated access/retrieval or a robots Disallow covering our path; neither exists. \"Allowed\" cannot be stated from the captured pages alone because the express free-public-access statement the 27 Aug analysis relied on lives on the About Us page, which was not captured this sweep. The evidence therefore supports the prior \"include\" posture (RFC 9309 unavailable-robots rule; open HTTP 200 with no authentication or access control; ASP.NET session token auto-issued to any anonymous visitor; IT Act s.8 statutory-channel character; RTI Act s.4 proactive disclosure; reproduction on s.52(1)(q)(i)) and nothing captured now cuts against it, but the site itself is silent, and that is what should be recorded.",
+   "access_terms": "Silence. The only policy page the host offers, https://egazette.gov.in/Disclaimer.aspx, contains no terms at all — its entire captured text is a four-line attribution footer naming the \"Department of Publication\" and the Ministry of Housing and Urban Affairs. There is no clause on automated access, crawling, scraping, data mining, bulk download, load, hyperlinking or framing anywhere in the capture. The listing page itself (SearchMinistry.aspx) offered no policy links in its footer, and the homepage walk found no terms-of-use, website-policy, hyperlinking-policy or copyright-policy page on the host. Automation terms therefore do not exist on this host, as the 27 Aug analysis also found.",
+   "reuse_terms": "Silence on the captured pages: no licence, no attribution requirement, no permission clause, no third-party carve-out. The only reuse-relevant material the prior analysis relied on sits on the About Us page (an assertion that the Controller of Publications holds the Gazette's copyright alongside a loose \"public domain\" phrase), and that page is NOT in this capture. The reuse position for the PDF archive was and remains statutory, not site-based: Copyright Act 1957 s.52(1)(q)(i) permits reproduction of any matter published in an Official Gazette other than a bare Act of a Legislature, with s.52(1)(a) fair dealing (ANI Media v. OpenAI, Delhi HC, 24 Jul 2026, interim) as backstop; the metadata dashboard needs no exception at all (EBC v. Modak). Nothing captured now bears on that either way.",
+   "robots": "robots.txt HTTP 404 — unavailable, no restrictions (RFC 9309 s.2.3.1.3); no User-agent line and no Disallow directive exists on the host, so nothing can cover /SearchMinistry.aspx. Matches the 27 Aug and 25 Aug records (stock IIS 404 page, 1245 bytes).",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured",
+   "changed": "no material change. On 27 Aug Disclaimer.aspx rendered only a pagenotfound.png placeholder with no text; the 3 Sep capture yields 105 characters of attribution footer (Directorate of Printing / Department of Publication / M/o Housing and Urban Affairs / Government of India) and nothing else — the same empty placeholder page, with the page chrome now captured as text. robots.txt is still 404. No new policy pages have appeared (homepage walk still finds only Disclaimer.aspx; listing footer still offers none). No flags or errors in either sweep record. The prior verdict for all three sources — access permissible, reproduction permissible under s.52(1)(q)(i), overall \"include\", residual risk low — is not contradicted by anything captured.",
+   "conditions": [
+    "Keep the PDF archive internal/private; do not republish externally or client-facing, even though s.52(1)(q)(i) permits publication of gazette matter.",
+    "Per-document check at ingest: a bare Act of a Legislature reproduced without commentary falls outside s.52(1)(q)(i) and (q)(ii) — flag it and rely on s.52(1)(a) fair dealing only.",
+    "Watch for third-party copyright material embedded in a gazette notification (rare) and treat it separately.",
+    "Validate Content-Type and body before ingest: session-less/deep requests bounce to error.aspx and Disclaimer.aspx is a soft-404 placeholder, so never trust HTTP status alone.",
+    "Use the honest identifying User-Agent; there is no bot-block on this host and no reason to present a browser string.",
+    "Do not rely on the About Us 'public domain' wording as a copyright licence; rest reproduction on s.52(1)(q)(i) and assume Government copyright subsists.",
+    "Verify against the e-Gazette record (authoritative under IT Act s.8) before citing tracked Gazette text as authoritative.",
+    "Maintain ~1 request/second, human-triggered, a few runs a day — the load that keeps IT Act s.43(e)/(f) and s.47 factors unengaged."
+   ],
+   "gaps": [
+    "About Us page (the page the 27 Aug analysis relied on for the express free-public-access statement, the Controller's copyright assertion and the 'public domain' phrase) was not captured — a human should open it and confirm the wording is unchanged before the next audit.",
+    "No terms-of-use, website-policy, copyright-policy or hyperlinking-policy page exists on the host per both sweeps; this is a genuine absence, not a capture failure, but a human should confirm no such page has since been added to the homepage footer.",
+    "Disclaimer.aspx: the capture is a 105-character attribution footer only; a human should open it in a browser to confirm it still renders the pagenotfound placeholder image with no disclaimer text (the sweep cannot read an image).",
+    "The SearchMinistry.aspx listing itself and its postback result pages are session-scoped (token in URL path, Referer required) and were not captured as policy text; their footers should be eyeballed once for any newly added policy link.",
+    "error.aspx (the soft-404 bounce target) was not captured; if it ever starts carrying terms text the ingest validation condition should be revisited.",
+    "robots.txt returns a stock IIS 404 — recorded in the sweep, not as a captured page; no policy content to read."
+   ],
+   "pages_read": [
+    "https://egazette.gov.in/Disclaimer.aspx (captured text file, 105 chars, HTTP 200 — read in full)",
+    "sweep record tos_report.json entries gazette_communications / gazette_meity / gazette_mib (robots 404, HTTP 200, listing footer offered no policy links, no flags, no errors)",
+    "sweep record tos_home.json entry egazette.gov.in (homepage walk found exactly one policy page, Disclaimer.aspx, 99 chars of text; no flags, no errors)",
+    "prior baseline: engine/audit/legal_analysis_2026-08-27.json per_source gazette_communications, gazette_meity, gazette_mib (all fields)",
+    "engine/registry_v2.json live sources 57, 58, 59"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=utf-8",
+   "policy_pages": [
+    "https://egazette.gov.in/Disclaimer.aspx"
+   ],
+   "regulators": [
+    "e-Gazette"
+   ]
+  },
+  {
+   "host": "cci.gov.in",
+   "sources": [
+    {
+     "id": "cci_orders",
+     "regulator": "CCI",
+     "name": "Antitrust Orders",
+     "url": "https://www.cci.gov.in/antitrust/orders/list",
+     "stratum": "tech_data",
+     "type": "order",
+     "method": "json_api",
+     "covers": "CCI 'Antitrust Orders' (regulator CCI, stratum tech_data, default_type order, status live): the DataTables JSON feed at /antitrust/orders/list returning the full corpus of ~1234 adjudicatory antitrust orders (s.26/27/48; combination s.31 orders on the analogous path) with PDFs at /images/antitrustorder/en/orderNNN.pdf, routed to the judgments lane and row-filtered to orders naming digital/telecom/media parties.",
+     "lane": "judgments",
+     "held": 4,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "\"Not allowed\" would need an express prohibition on automated access/retrieval or a robots Disallow over our paths; neither exists — robots.txt affirmatively permits every path we fetch (its six Disallows target three consultation/internship image directories we never touch), the captured Disclaimer is silent on automation and reuse, and the listing is openly served at 200 with no login. The conditions arise from the reproduction side only: the baseline's reading of the (uncaptured) Copyright Policy's prior-permission clause, which governs onward publication of order text and is answered by keeping the PDF archive internal, plus the Hyperlink Policy's no-framing rule.",
+   "access_terms": "Silent. None of the three captured pages says anything about automated access, crawling, load, or scraping. The Disclaimer (https://www.cci.gov.in/contents/disclaimer) is confined to accuracy/liability: content \"should not be construed as a statement of law or used for any legal purposes\" and CCI/NISG accepts no liability for loss \"arising out of or in connection with the use of this Portal\"; governed by Indian law, Indian courts. The two /legal-framwork/act pages describe the Competition Act and carry no terms. Every page's footer offers Disclaimer, Copyright Policy, Hyper Linking Policy, Terms and Conditions, Privacy Policy — of these only the Disclaimer was captured. Hyperlinking/framing: the Hyper Linking Policy (which the 27 Aug read found permits deep linking without prior permission but forbids loading CCI pages in frames) was not captured this sweep, so the no-framing position rests on the baseline.",
+   "reuse_terms": "Nothing on reuse or copyright appears on the captured text beyond the footer line \"Copyright © 2026 Competition Commission of India, Government of India.\" The Copyright Policy page (/contents/copyright) was NOT captured; the 27 Aug baseline read it as the restrictive NIC variant — material may be reproduced free of charge after taking proper permission by email, with prominent source acknowledgement wherever material is published or issued to others. That is a reproduction condition bearing on the optional PDF archive and any onward publication, not on fetching. The baseline's statutory footing stands unchanged: metadata is fact (EBC v Modak); s.27/s.31 orders are quasi-judicial orders within Copyright Act s.52(1)(q)(iv), with s.52(1)(a) fair dealing as backstop; no prohibition on reproduction is stamped on CCI orders.",
+   "robots": "Sweep: https://www.cci.gov.in/robots.txt HTTP 200, 6 rules for User-agent * — consistent with the 27 Aug verbatim file (Disallow only /images/combination_pre_filling_form_consultations/, /images/internship/, /images/stakeholdersconsultations/ and their /public/ mirrors; no Crawl-delay, no Sitemap); none covers /antitrust/orders/list, /combination/orders-section31 or /images/antitrustorder/ — allows our paths.",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured — the only restrictive language is the Disclaimer's warning that content should not be \"used for any legal purposes\" (https://www.cci.gov.in/contents/disclaimer), which is a liability/reliance caveat, not an access or copying restriction; note the Disclaimer is visibly a copy-pasted template (refers to \"CCI/NISG\" and advises verifying with \"the relevant State Rural Livelihoods Mission\"), which weakens any argument that it was drafted to govern this site's use.",
+   "changed": "no material change. Robots position identical (200, same six Disallows, none touching our paths). The Disclaimer text captured on 2026-09-02 matches the boilerplate the baseline quoted from the Terms and Conditions page (same \"statement of law\"/Indian-law wording), so the policy set appears unchanged. The listing endpoint still returns HTTP 200 application/json. What differs is coverage, not content: this sweep captured only the Disclaimer plus two non-policy Act pages, whereas the baseline read Copyright, Hyperlink and Terms pages directly — so the reuse and no-framing findings are carried forward from 27 Aug rather than re-verified.",
+   "conditions": [
+    "Fetch only the order paths (/antitrust/orders/list JSON, /combination/orders-section31, /images/antitrustorder/en/ and /images/combinationorder/ PDFs); never request the three robots-Disallowed directories /images/combination_pre_filling_form_consultations/, /images/internship/, /images/stakeholdersconsultations/ or their /public/ mirrors.",
+    "Keep ~1 req/sec, GET only, honest identifying User-Agent, human-triggered runs.",
+    "Store metadata openly; keep the optional order-PDF archive internal and unpublished; do not republish or externally distribute CCI order text without first sending the acknowledgement/permission email the Copyright Policy contemplates (one standing courtesy email suffices belt-and-braces); attribute CCI as source wherever material is shown.",
+    "Do not load CCI pages in frames — link out to the source URL instead.",
+    "Treat site content as non-authoritative per the Disclaimer: verify any order against the official PDF before citing to a client."
+   ],
+   "gaps": [
+    "https://www.cci.gov.in/contents/copyright (Copyright Policy) — offered in every footer, relied on by the 27 Aug analysis for the prior-permission reproduction clause, not captured this sweep; a human should open it to confirm the clause is unchanged.",
+    "https://www.cci.gov.in/contents/hyperlinks (Hyper Linking Policy) — source of the deep-link permission and no-framing rule; not captured.",
+    "https://www.cci.gov.in/contents/termncond (Terms and Conditions) — not captured; baseline says pure liability boilerplate, and the Disclaimer captured here carries the same text, but not re-verified.",
+    "https://www.cci.gov.in/contents/privacypolicy (Privacy Policy) — footer link, not captured; baseline scan found no automation term.",
+    "robots.txt itself was not stored in policy_text this sweep — only the summary 'robots.txt 200, 6 rule(s)'; the six-rule count matches the 27 Aug verbatim file but the lines were not re-read.",
+    "The two /legal-framwork/act captures are the Competition Act description pages, not policy pages — the sweep's footer-link matcher picked them up; they contribute nothing to the terms question and the home walk apparently did not follow the actual policy links in the footer.",
+    "The listing endpoint /antitrust/orders/list is JSON with no HTML page to walk (tos_report note), so any terms shown on the human-facing /antitrust/orders page were not captured."
+   ],
+   "pages_read": [
+    "https://www.cci.gov.in/legal-framwork/act (200, 2083 chars) — NOT a policy page: the Competition Act 2002 / 2023 Amendment description page with two PDF links; captured because the footer/link finder matched it, contains no terms of any kind",
+    "https://www.cci.gov.in/combination/legal-framwork/act (200, 2457 chars) — same Act page under the Combination menu; identical substance, no terms",
+    "https://www.cci.gov.in/contents/disclaimer (200, 2744 chars) — liability disclaimer: NIC-hosted portal, accuracy not warranted, no liability for loss from use of data, external links not endorsed, Indian law and courts; nothing on automation or reuse",
+    "Sweep records: tos_report.json (cci_orders listing is application/json, 'no page to walk'; robots.txt 200 with 6 rules) and tos_home.json (home walk found the three pages above, no flags, no errors)",
+    "Prior baseline: engine/audit/legal_analysis_2026-08-27.json per_source[47] cci_orders and signoff.approved entry"
+   ],
+   "http": 200,
+   "content_type": "application/json",
+   "policy_pages": [
+    "https://www.cci.gov.in/legal-framwork/act",
+    "https://www.cci.gov.in/combination/legal-framwork/act",
+    "https://www.cci.gov.in/contents/disclaimer"
+   ],
+   "regulators": [
+    "CCI"
+   ]
+  },
+  {
+   "host": "ccpa.doca.gov.in",
+   "sources": [
+    {
+     "id": "ccpa_orders",
+     "regulator": "CCPA",
+     "name": "Orders & Advisories",
+     "url": "https://ccpa.doca.gov.in/ccpa-orders.php?page_no=1",
+     "stratum": "tech_data",
+     "type": "order",
+     "method": "static_html",
+     "covers": "CCPA 'Orders & Advisories' (regulator CCPA, stratum tech_data, default_type order, static_html): page 1 of https://ccpa.doca.gov.in/ccpa-orders.php?page_no=1 (newest 25 orders/directions, already spanning the window so no daily pagination), order PDFs via the checkuploaddocs.php gateway, TMT title row_filter keeping e-commerce/platform/direct-selling/dark-pattern matters; allowed_domains [ccpa.doca.gov.in]; quirks note robots 404 -> no restriction and live verification 27-08-2026 with identifying UA.",
+     "lane": "instruments",
+     "held": 9,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible"
+    },
+    {
+     "id": "ccpa_guidelines",
+     "regulator": "CCPA",
+     "name": "Guidelines & Advisories",
+     "url": "https://ccpa.doca.gov.in/guidelines.php",
+     "stratum": "tech_data",
+     "type": "guideline",
+     "method": "static_html",
+     "covers": "CCPA 'Guidelines & Advisories' (regulator CCPA, stratum tech_data, default_type guideline, static_html): the standing, undated shelf at https://ccpa.doca.gov.in/guidelines.php carrying the dark-pattern guidelines and the e-commerce self-audit advisory that ccpa_orders never saw; same TMT title row_filter; allowed_domains [ccpa.doca.gov.in]. NEW since 27 Aug - no entry in legal_analysis_2026-08-27.json; the host position below is applied to it.",
+     "lane": "instruments",
+     "held": 9,
+     "prior_overall": "no prior analysis",
+     "prior_access": "—",
+     "prior_repro": "—"
+    }
+   ],
+   "verdict": "silent",
+   "verdict_reason": "The host is verifiably silent, not merely un-captured: robots.txt is 404 (no Disallow can apply), the footer's policy links are dead href=\"#\" placeholders, the conventional policy filenames 404, and the site's own pages offer no policy links - all confirmed today and identical to 27 Aug. 'Not allowed' requires an express prohibition on automated access or a covering robots Disallow; neither exists. With no terms and no robots bar, fetching ~1 req/s with an identifying UA, human-triggered, is lawful on the implied-permission footing the 27 Aug analysis set (permissible_qualified; overall include_with_conditions; residual risk medium for reliability, low for legality), and that position carries forward unchanged to both ccpa_orders and the new ccpa_guidelines. The silence means the PDF archive has no site licence and rests on statutory s.52 exceptions - (q)(iv) for penalty orders, (a) fair dealing (and (q)(i) where gazetted) for guidelines/advisories - which is why the conditions below matter.",
+   "access_terms": "None exist. robots.txt returns HTTP 404 today (body: \"The requested URL was not found on this server.\" at https://ccpa.doca.gov.in/robots.txt), so under RFC 9309 s.2.3.1.3 no Disallow can cover /ccpa-orders.php, /guidelines.php or /checkuploaddocs.php. The homepage footer's 'Website policies', 'Terms and Conditions', 'Help' and 'Web Information Manager' anchors are all href=\"#\" placeholders, and the four conventional .php policy filenames all 404. There is no browsewrap, no terms of use and no clause on automated access, retrieval, crawling or rate anywhere reachable on the host. The listing page (ccpa-orders.php) is served openly at HTTP 200 text/html with no login, and the 27 Aug review verified it bot-neutral (200 to Chrome, to an honest identifier and to no-UA alike). Access therefore rests, as on 27 Aug, on implied permission from open publication by a public authority under the RTI Act 2005 s.4 proactive-disclosure duty; IT Act s.43(a)/(b) 'without permission' is not made out, s.43(e)/(f) disruption is not engaged at ~1 req/s human-triggered, and no term exists to breach.",
+   "reuse_terms": "None exist. The host publishes no copyright policy, no reuse licence and no reproduction prohibition; the only ownership statement is the footer legend \"Website Content Managed by Ministry of Consumer Affairs, Food & Public Distribution\" (https://ccpa.doca.gov.in/), naming NIC as designer/host. Reuse therefore rests entirely on statute, exactly as on 27 Aug: (A) the metadata dashboard (title, party, date, type, link) is bare fact with no copyright under EBC v Modak; (B) the optional internal PDF archive - for ccpa_orders, final penalty orders under s.21 CPA 2019 are quasi-judicial and fall within Copyright Act s.52(1)(q)(iv) absent a marked prohibition; administrative safety notices/advisories fall back to s.52(1)(a) fair dealing (private use/research, ANI Media v OpenAI) plus government-work character under s.17(d). For the new ccpa_guidelines source the documents are guidelines and advisories, i.e. administrative rather than adjudicatory, so (q)(iv) is the weaker fit and the operative basis is s.52(1)(a) fair dealing with an internal, unpublished archive; where a guideline was Gazette-notified (CCPA guidelines under s.18(2)(l) CPA 2019 frequently are, e.g. the dark-pattern guidelines), s.52(1)(q)(i) would additionally apply - to be checked per document by looking for a Gazette legend on the PDF. There is no permissive GoI clause to rely on and no prior-permission clause to negotiate.",
+   "robots": "https://ccpa.doca.gov.in/robots.txt -> HTTP 404 today (Apache 'Not Found' HTML, captured in robots_fresh.json and tos_cms.log line 16). Unavailable robots under RFC 9309 s.2.3.1.3 = crawler may access any resource; no Disallow covers any tracker path. Same status as 27 Aug ('robots.txt 404 - unavailable, no restrictions'), recorded identically in tos_report.json for both sources and in registry quirks ('robots 404 -> no restriction').",
+   "robots_fresh": {
+    "http": 404,
+    "body": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n</body></html>\n"
+   },
+   "anything_forbidding": "Nothing. No robots directive (404), no terms page, no copyright/reuse page, no automation or scraping clause, no login, no WAF challenge observed in today's capture (listing 200 text/html). The dead href=\"#\" footer links are placeholders, not a hidden policy; probes of the standard policy filenames 404 rather than soft-404. The only caution is not a prohibition: the 27 Aug review recorded the host's TLS certificate notAfter 8 Sep 2026 (five days from today); the tracker's valid-TLS requirement means the adapter will stop if NIC does not renew, which is the correct behaviour - never fetch with verification disabled.",
+   "changed": "Materially nothing on the host. robots.txt still 404; the same four footer anchors are still href=\"#\"; the same four .php policy probes still 404; the footer legend still reads 'Last Updated: 08-04-2026' (the exact text the 27 Aug analysis quoted), so the site has not been edited since the baseline; the listing still serves HTTP 200 text/html with no policy links. What did change is on our side: registry_v2.json now carries a second live source on this host, ccpa_guidelines (guidelines.php), added after a coverage check and absent from the 27 Aug analysis - it inherits the host position with the reproduction nuance for administrative guidelines noted above. Not re-verified today: the TLS certificate (last seen expiring 8 Sep 2026) and the state of the old doca.gov.in host (under maintenance, cert expired 26 Aug, blanket 403 on 27 Aug) - neither affects the legal posture, only reachability.",
+   "conditions": [
+    "Adapter targets https://ccpa.doca.gov.in only (allowed_domains already so confined); never the old doca.gov.in host.",
+    "Require valid TLS at all times; never fetch with certificate verification disabled. Watch the ccpa.doca.gov.in certificate around 8 Sep 2026 (notAfter recorded 27 Aug) - if it lapses, the source stops until NIC renews; do not work around it.",
+    "Keep the honest identifying User-Agent, ~1 request/second, human-triggered only; page 1 of ccpa-orders.php plus guidelines.php, no crawling beyond the listings.",
+    "Treat any 403/WAF/CAPTCHA response as STOP-and-alert, never a retry loop (firm-wide principle in the 27 Aug signoff).",
+    "Validate Content-Type and body before ingest - order PDFs come through the checkuploaddocs.php gateway (direct /uploads/ paths 404), so check application/pdf and a non-trivial body rather than trusting HTTP 200.",
+    "Treat the host as mid-migration/unstable: gate the adapter on reachability and a row-floor and expect URL/structure churn (unchanged condition from 27 Aug).",
+    "Metadata (title, party, date, type, link) open on the dashboard; any PDF archive strictly internal, unpublished, no onward republication - fair dealing under s.52(1)(a) is the backstop and is only defensible for a private research archive.",
+    "For ccpa_guidelines specifically: default archive basis is s.52(1)(a) fair dealing plus government-work character, not s.52(1)(q)(iv); per document, note any Gazette legend (which would add s.52(1)(q)(i)) and any express reproduction restriction printed on the PDF.",
+    "Re-check the footer anchors on each sweep; the moment 'Website policies' or 'Terms and Conditions' resolves to a real page, capture it and re-run this analysis before the next fetch."
+   ],
+   "gaps": [
+    "Open https://ccpa.doca.gov.in/ in a browser, scroll to the footer, and click 'Website policies' and 'Terms and Conditions' by hand: the static capture only sees href=\"#\"; confirm no JavaScript modal or client-side route loads policy text that a non-JS fetch cannot see.",
+    "Open https://ccpa.doca.gov.in/guidelines.php in a browser and confirm it serves HTTP 200 text/html with a guidelines list and that its PDFs go through checkuploaddocs.php - today's sweep recorded ccpa_guidelines only as 'same host as ccpa_orders' with no separate HTTP status or content type.",
+    "Check the TLS certificate on https://ccpa.doca.gov.in (browser padlock or openssl s_client) - the 27 Aug review recorded notAfter 8 Sep 2026, five days from today; nothing in today's capture re-verifies it.",
+    "Open the parent Department of Consumer Affairs website (https://consumeraffairs.nic.in/ and, if restored from maintenance, https://doca.gov.in/) and read its Website Policies / Terms & Conditions / Copyright pages by hand: the CCPA footer names the Ministry as content manager, so a departmental policy could arguably be said to cover the sub-site; on 27 Aug doca.gov.in was under maintenance with an expired certificate and blanket 403, so this could not be read then or today.",
+    "For ccpa_guidelines, open two or three guideline PDFs by hand (e.g. the dark-pattern guidelines and the e-commerce self-audit advisory) and note whether each bears a Gazette notification legend or any printed reproduction restriction - this decides whether s.52(1)(q)(i) is available in addition to fair dealing for the archive.",
+    "Not a gap on this host but noted for completeness: /private/tmp/.../policy_text/cms_dpiit_robots.txt concerns cms-dpiit.digifootprint.gov.in (resolves to private 10.193.73.156, fetch refused) and has no bearing on ccpa.doca.gov.in."
+   ],
+   "pages_read": [
+    "https://ccpa.doca.gov.in/#footer (homepage footer capture, HTTP 200, 1757 chars) -> /private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/https_ccpa_doca_gov_in_footer.txt",
+    "https://ccpa.doca.gov.in/robots.txt (HTTP 404, Apache Not Found body) -> /private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/robots_fresh.json",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/index.json (only one ccpa.doca.gov.in entry: the footer capture)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_cms.log lines 16-22 (robots 404; six footer anchors, four of them href='#'; probes of website-policies.php, terms-and-conditions.php, disclaimer.php, copyright-policy.php all 404)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_report.json entries ccpa_orders (HTTP 200, text/html; charset=UTF-8, policy_links []) and ccpa_guidelines (tos.same_host_as ccpa_orders, no separate HTTP status recorded)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_home.json key ccpa.doca.gov.in (home https://ccpa.doca.gov.in/, policy_pages {}, no flags, no errors)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/cms_dpiit_robots.txt (read as instructed; concerns cms-dpiit.digifootprint.gov.in only, not this host)",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/audit/legal_analysis_2026-08-27.json per_source[48] ccpa_orders plus signoff.approved ccpa_orders row, principles and new_sources_to_build mentions",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/registry_v2.json sources ccpa_orders and ccpa_guidelines (both status live)"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [],
+   "regulators": [
+    "CCPA"
+   ]
+  },
+  {
+   "host": "dpiit.gov.in",
+   "sources": [
+    {
+     "id": "dpiit_press_notes",
+     "regulator": "DPIIT",
+     "name": "FDI Press Notes",
+     "url": "https://www.dpiit.gov.in/cms/wp-json/wp/v2/documents?search=press%20note&per_page=100&orderby=date&order=desc",
+     "stratum": "tech_data",
+     "type": "press_note",
+     "method": "json_api",
+     "covers": "DPIIT (Ministry of Commerce & Industry) FDI Press Notes: the WordPress REST v2 documents API on www.dpiit.gov.in filtered to titles beginning 'Press Note', stratum tech_data, lane instruments, default_type press_note; JSON gives title/date/link only, the PDF binary is not in the API (detail page captured as doc-url); uses the engine's honest default UA, robots honoured; allowed_domains = www.dpiit.gov.in and cms-dpiit.digifootprint.gov.in.",
+     "lane": "instruments",
+     "held": 1,
+     "prior_overall": "include",
+     "prior_access": "permissible",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Access to www.dpiit.gov.in is expressly permitted: robots.txt re-verified today as a blanket 'Allow: /', the consumed listing is the site's own public JSON API served 200 to an identifying UA, and the 27 Aug read of the Terms of use and the other policy pages found no automated-access restriction of any kind — so the 'not allowed' threshold (express prohibition or covering Disallow) is nowhere near met. The verdict carries conditions rather than a bare 'allowed' because the policy pages could not be re-read today (the CMS host is private-addressed), the site offers no reuse licence at all (empty copyright policy), so the internal PDF archive rests on s.52(1)(q)(i)/(a) rather than permission, and the Hyperlink Policy imposes a live no-framing rule. Position is set from the 27 Aug evidence plus today's robots and listing captures; the gaps below are for a human to close by hand.",
+   "access_terms": "No access/automation term exists on the evidence. (1) robots.txt on www.dpiit.gov.in, re-captured today at HTTP 200, reads in full \"User-agent: * Allow: /\" (https://www.dpiit.gov.in/robots.txt) — an express blanket permission with no Disallow, no Crawl-delay, no named-agent block. (2) The 27 Aug analysis read the site's Terms of use (CMS slug terms-of-use) and found a pure NIC/DPIIT disclaimer — information-purposes-only, no liability — with no acceptance mechanism, no use conditions and no anti-automation clause; a keyword scan (scrap/crawl/spider/robot/harvest/data mining/automated/bulk/systematic/extract/indexing) across terms-of-use, hyper-link-policy, copyright-policy, cookie-policy and privacy-policy returned nothing. (3) The listing the tracker consumes is the site's own public, unauthenticated wp-json CMS API on www.dpiit.gov.in, served HTTP 200 application/json to the honest identifying UA (sweep record); no login, token or bypassed control. (4) The only adjacent restriction is the Hyperlink Policy's rule that \"we do not permit our pages to be loaded into frames\" (https://cms-dpiit.digifootprint.gov.in/cms/wp-json/wp/v2/pages?slug=hyper-link-policy, as read on 27 Aug) — a display condition, not a retrieval one; the same policy expressly permits direct linking without prior permission. Fetching www.dpiit.gov.in at ~1 req/s, human-triggered, with robots enforced is therefore expressly permitted by robots and unrestricted by terms. Note on hosts: the tracker's URL and its actual traffic go only to www.dpiit.gov.in (robots Allow: /). cms-dpiit.digifootprint.gov.in appears in allowed_domains but resolves to a private 10.x address, so the fetcher refuses it by design; it is where the policy text lives, not a host the tracker reaches — its presence in allowed_domains is inert for fetching (any API link pointing there would be refused, not followed) and it cannot be used from outside NIC's network for re-verification.",
+   "reuse_terms": "DPIIT publishes no copyright-policy text: the 27 Aug read found the CMS copyright_policy_content field empty, so there is neither a prior-permission clause nor a permissive GoI reuse licence. Reuse therefore rests on statute, not on site terms. (A) Dashboard metadata (press-note number, title, date, link) are bare facts with no copyright (EBC v Modak). (B) The optional internal PDF archive: FDI Press Notes are Government of India works (s.17(d) Copyright Act 1957); where a press note is gazetted, s.52(1)(q)(i) permits reproduction outright; where an individual note is not itself gazetted, the fallback is s.52(1)(a) fair dealing for private use/research (ANI Media v OpenAI, Delhi HC, interim) on a work published for public access, defensible only while the archive stays internal and unpublished. The Hyperlink Policy's no-framing rule and its request to be informed of links are the only site-authored conditions bearing on presentation; the general GoI norm of acknowledging the source applies if DPIIT text is ever quoted outward.",
+   "robots": "https://www.dpiit.gov.in/robots.txt — HTTP 200 today; full body \"User-agent: *\\r\\nAllow: /\\r\\n\". Identical to the 27 Aug verbatim (\"User-agent: *\\nAllow: /\", fetched twice that day via 302 from dpiit.gov.in). Verdict: allows our path (/cms/wp-json/wp/v2/documents and /static/uploads/ PDFs) — no Disallow anywhere. The CMS host cms-dpiit.digifootprint.gov.in robots.txt was unreachable today (ConnectTimeout; host resolves to 10.193.73.156, a non-public address); the engine's robots module records it as 'no restrictions / check: allowed', and the fetcher separately refuses the host as non-public — so no request is ever made there regardless of robots.",
+   "robots_fresh": {
+    "http": 200,
+    "body": "User-agent: *\r\nAllow: /\r\n"
+   },
+   "anything_forbidding": "Nothing forbids automated access or retrieval. No robots Disallow; no anti-scraping, crawling, bulk-download or automated-access clause on any policy page the prior read examined; no acceptance/browsewrap mechanism. The sole prohibition found on the host is the Hyperlink Policy's ban on loading DPIIT pages into frames — the tracker links out and does not iframe, so it is not engaged. A soft condition (not a prohibition): the Hyperlink Policy asks to be informed of links to the portal.",
+   "changed": "Nothing substantive changed. robots.txt is the same 'Allow: /' at HTTP 200. The listing API on www.dpiit.gov.in still serves HTTP 200 application/json to the honest UA (sweep). What differs is evidential reach, not content: on 27 Aug the policy pages were read from the CMS (cms-dpiit.digifootprint.gov.in) and quoted; today that host resolved to a private 10.193.73.156 address and the fetcher refused all six slug probes (terms-of-use, hyper-link-policy, copyright-policy, privacy-policy, disclaimer, website-policies), so none of the policy text could be re-captured. The homepage sweep confirms the SPA shell exposes no policy links (policy_pages {}), so no footer route was available as an alternative either. There is no evidence the policy text was altered; there is simply no fresh copy of it. Registry also unchanged: dpiit_press_notes live, allowed_domains still lists both www.dpiit.gov.in and the CMS host.",
+   "conditions": [
+    "Fetch only www.dpiit.gov.in (the wp-json documents API and /static/uploads/ PDFs) with the honest identifying UA at ~1 req/s, human-triggered, robots enforced — never attempt cms-dpiit.digifootprint.gov.in, which is a private-address host the fetcher already refuses; consider removing it from allowed_domains so its presence does not imply it is a fetch target.",
+    "Keep any press-note PDF archive strictly internal and unpublished: no site licence exists (copyright policy empty), so archiving relies on s.52(1)(q)(i) for gazetted notes and s.52(1)(a) fair dealing (interim ANI authority) otherwise; the archive stays optional and off by default until the fair-dealing footing is settled if the partner wants comfort.",
+    "Link out to DPIIT pages; never iframe or frame them (Hyperlink Policy no-framing rule); optionally send DPIIT the courtesy notice of linking the Hyperlink Policy requests.",
+    "If DPIIT material is quoted outward, acknowledge DPIIT / Government of India as source; metadata on the dashboard needs no attribution beyond the link.",
+    "Per-document, prefer the gazette lane (e-Gazette record) as the citation source for a press note where it has been gazetted; treat the DPIIT PDF as the convenience copy.",
+    "Operational: pin the adapter to the wp-json routes on www.dpiit.gov.in and monitor for CMS/SPA changes; validate Content-Type application/json before ingest so a SPA shell or maintenance page is not parsed as a listing."
+   ],
+   "gaps": [
+    "Policy text not re-verified today: all six CMS slug probes (terms-of-use, hyper-link-policy, copyright-policy, privacy-policy, disclaimer, website-policies) on cms-dpiit.digifootprint.gov.in were refused because the host resolves to 10.193.73.156 (private); it is unreachable from outside NIC's network by any means, so re-verification cannot go through that host at all.",
+    "Human check by hand, in a browser, the SPA routes on the public host — e.g. https://www.dpiit.gov.in/terms-of-use, https://www.dpiit.gov.in/hyperlink-policy (or hyper-link-policy), https://www.dpiit.gov.in/copyright-policy, https://www.dpiit.gov.in/privacy-policy, https://www.dpiit.gov.in/website-policies — and read the rendered text (the page content is hydrated client-side from the CMS, so a plain fetch returns an empty shell and the footer offers no links, per tos_home.json).",
+    "Alternatively try, in a browser or with the honest UA, the same-host CMS proxy path used for the listing but for pages: https://www.dpiit.gov.in/cms/wp-json/wp/v2/pages?slug=terms-of-use (and the other five slugs) — if www.dpiit.gov.in proxies /cms/wp-json/ for pages as it does for documents, this yields the policy JSON without touching the private host; record HTTP code and the ACF/content fields.",
+    "Confirm the copyright_policy_content field is still empty (no new GoI reuse licence or prior-permission clause has been added since 27 Aug) — this is the one change that would alter the PDF-archive footing.",
+    "Confirm the Hyperlink Policy still contains only the no-framing rule and the courtesy-notice request, with no new anti-automation or bulk-download wording.",
+    "Registry hygiene for a human to decide: whether cms-dpiit.digifootprint.gov.in should stay in allowed_domains given the fetcher can never reach it (harmless but misleading)."
+   ],
+   "pages_read": [
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/index.json (no entry with host dpiit.gov.in — zero policy pages captured for this host today)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/robots_fresh.json (dpiit.gov.in: HTTP 200, 'User-agent: *\\r\\nAllow: /\\r\\n')",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/policy_text/cms_dpiit_robots.txt (CMS host refused: resolves to 10.193.73.156; robots ConnectTimeout)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_cms.log (robots dpiit.gov.in 200; six FetchRefused on cms-dpiit.digifootprint.gov.in/cms/wp-json/wp/v2/pages?slug= terms-of-use, hyper-link-policy, copyright-policy, privacy-policy, disclaimer, website-policies)",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_report.json (entry 49 dpiit_press_notes: listing HTTP 200 application/json, 'robots.txt 200, 1 rule(s) for us', tos note 'listing is not HTML; no page to walk')",
+    "/private/tmp/claude-501/-Users-abhinandansethi-Desktop-TMT-Tracker/03bbe2ca-bd09-4d69-b044-319e7d648969/scratchpad/tos_home.json (dpiit.gov.in: home https://www.dpiit.gov.in/, policy_pages {}, no flags, no errors)",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/audit/legal_analysis_2026-08-27.json (per_source entry 49 dpiit_press_notes; signoff new_sources_to_build and summary mentions)",
+    "/Users/abhinandansethi/Desktop/TMT Tracker/engine/registry_v2.json (dpiit_press_notes, status live)"
+   ],
+   "http": 200,
+   "content_type": "application/json; charset=UTF-8",
+   "policy_pages": [],
+   "regulators": [
+    "DPIIT"
+   ]
+  },
+  {
+   "host": "sci.gov.in",
+   "sources": [
+    {
+     "id": "sc_judgments",
+     "regulator": "Supreme Court",
+     "name": "Latest Orders",
+     "url": "https://www.sci.gov.in/latest-orders/",
+     "stratum": "tech_data",
+     "type": "judgment",
+     "method": "static_html",
+     "covers": "The Supreme Court of India's public 'Latest Orders' listing at https://www.sci.gov.in/latest-orders/ (stratum tech_data, default_type judgment): server-rendered rows of party names, SLP/C.A. and diary numbers, order date and a view-pdf link per order, parsed by regex over the view-pdf anchors with a tight TMT court-filter, and optionally the order PDF for a private internal archive; the CAPTCHA-gated case-number search endpoints are not fetched.",
+     "lane": "judgments",
+     "held": 2,
+     "prior_overall": "include_with_conditions",
+     "prior_access": "permissible_qualified",
+     "prior_repro": "permissible"
+    }
+   ],
+   "verdict": "allowed_with_conditions",
+   "verdict_reason": "Nothing on the captured pages or in robots.txt prohibits automated retrieval of /latest-orders/: robots allows the path expressly, and the Terms, Privacy and Disclaimer text is entirely silent on automation, so an honest-UA, ~1 req/s, human-triggered fetch of a listing the Court publishes for public access is within both the machine-readable and the written permissions (consistent with the prior s.43 IT Act analysis of express plus implied permission). 'Not allowed' would require an express prohibition on automated access or a Disallow covering our path, and neither exists. The verdict is conditioned rather than plain 'allowed' because the Copyright Policy attaches a source-acknowledgement and no-misleading-context condition to any reproduction, which governs the optional PDF archive and onward use, and because the prior analysis's operational limits (stay off the CAPTCHA-gated search endpoints; honour court-specific reporting restrictions under the s.52(1)(q)(iv) 'unless prohibited by the court' limb) remain live and were not re-verified by this sweep.",
+   "access_terms": "Silent on automated access. None of the three pages mentions crawling, scraping, robots, bots, automated retrieval, systematic downloading, bulk access, rate or load, framing, or inbound hyperlinking. The only 'terms' language is the Website Policies page's Terms and Conditions: the site is designed by NIC with content from the Supreme Court, the documents are for reference only and are not legal documents, users should verify against the original record, liability is excluded, Indian law and Indian courts govern, and the site takes no responsibility for outbound links to other departments or courts (the hyperlink language is entirely about SCI linking out, not about others linking in). The Privacy Policy states the server logs visitor address, domain, browser, date/time and pages accessed for statistics and that the site uses no cookies - which is descriptive of logging, not a restriction on access. The Disclaimer says the contents are \"only for general information or use\" (https://www.sci.gov.in/disclaimer/) and excludes warranties and liability; it imposes no access condition. There is no registration, click-through, or acceptance step described anywhere. The Legal Aid page is about a fee schedule for MIG litigants and has no bearing on website use.",
+   "reuse_terms": "Reproduction is permitted subject to conditions, not gated on prior permission. The Copyright Policy on https://www.sci.gov.in/website-policies/ says content \"shall not be reproduced partially or fully, without duly & prominently acknowledging the source\", adds that contents may not be used in a misleading, objectionable or derogatory context, and carves out third-party copyright material, for which permission must be sought from the owner. Nothing on any page identifies court orders or judgments as third-party material; the footer states content is owned by the Supreme Court of India and developed/hosted by NIC. No licence name (e.g. GODL) is invoked and no non-commercial limit is stated. The Disclaimer adds only that original records prevail over what is published and that the site may not be up to date - relevant to how the archive is labelled, not to whether it may exist.",
+   "robots": "Sweep record: www.sci.gov.in/robots.txt HTTP 200 with 2 rules applying to us; prior verbatim (27 Aug) is User-agent: * / Disallow: /wp-admin/ / Allow: /wp-admin/admin-ajax.php - /latest-orders/ and / fall outside the single Disallow, no Crawl-delay.",
+   "robots_fresh": {},
+   "anything_forbidding": "none found on the pages captured - the only restrictive language is the reproduction condition (acknowledge source, no misleading/derogatory context, third-party carve-out), which bears on the PDF archive and any onward use, not on fetching the listing.",
+   "changed": "No material change. The Copyright Policy clause the 27 Aug analysis quoted is present verbatim; the Terms and Conditions and Privacy Policy sections still contain no scraping, automation, or bulk-access clause, matching the prior 'terms_scraping_clause: None found'. robots.txt still returns 200 with the same two rules. Two non-material observations: (1) every captured page carries a site-wide footer stamp 'Last Updated: Sep 02, 2026', which is a template stamp rather than evidence the policy text itself changed - the text matches; (2) the pages now embed a 'SuSahayak' AI-assistant chatbot panel with its own disclaimer that mirrors the site disclaimer word-for-word and adds nothing on access or reuse. The 27 Aug operational findings (main.sci.gov.in NXDOMAIN, siwp_captcha on the case-number search endpoints) were not re-tested by this sweep, which only captured policy pages; the registry already points at www.sci.gov.in/latest-orders/, so the host repoint condition is satisfied.",
+   "conditions": [
+    "Fetch only the public /latest-orders/ listing (and, if used, the homepage latest-orders block); never the CAPTCHA-gated /judgements-case-no/ or /daily-order-case-no/ search endpoints, and never attempt to solve or bypass a CAPTCHA.",
+    "Keep honouring robots.txt (Disallow: /wp-admin/) with the identifying User-Agent at ~1 req/s, human-triggered - the terms are silent on automation, so the tracker's own restraint is what keeps this within implied permission.",
+    "Any reproduced content, including the PDF archive and any brief or export derived from it, must prominently acknowledge 'Supreme Court of India' (www.sci.gov.in) as source and must not be used in a misleading, objectionable or derogatory context.",
+    "Keep the PDF archive internal to the firm; do not republish order PDFs. If any third-party copyright material appears on the site, obtain the owner's permission before reproducing it - orders/judgments are not identified as third-party material.",
+    "Honour order-specific reporting or anonymisation restrictions (POCSO, in-camera, matrimonial) before archiving or briefing an order - the s.52(1)(q)(iv) exception is subject to the court's own prohibition.",
+    "Label archived orders as reference copies: the Website Policies and Disclaimer state the online documents are for reference only and the original record prevails, so certified copies remain the authoritative text."
+   ],
+   "gaps": [
+    "robots.txt was not re-captured verbatim in this sweep (the record only says '200, 2 rule(s) for us'); the rule text relied on is the 27 Aug verbatim - worth one manual glance at https://www.sci.gov.in/robots.txt to confirm it is unchanged.",
+    "The fetch target https://www.sci.gov.in/latest-orders/ and the homepage were not captured as text, so any page-level notice on the listing itself (e.g. a per-order 'not for reporting' marker or a new access banner) has not been read.",
+    "The CAPTCHA status of the case-number search endpoints and the NXDOMAIN status of main.sci.gov.in were not re-tested; they underpin the 'stay on /latest-orders/' condition.",
+    "No standalone Terms of Use, Copyright Policy, Hyperlinking Policy or Help page exists as a separate URL - the policy text lives only as sections within /website-policies/; the footer 'Help', 'Web Information Manager' and Hindi-language policy pages were not captured and could in principle carry additional wording.",
+    "The 'Last Updated: Sep 02, 2026' footer stamp is site-wide; if a human wants certainty that the policy text has not been edited, compare the live /website-policies/ page against this capture rather than trusting the stamp.",
+    "Individual order PDFs may carry their own reporting restrictions that the listing metadata does not surface; these must be checked per order at archive time, not at the policy-page level."
+   ],
+   "pages_read": [
+    "https://www.sci.gov.in/website-policies/ (HTTP 200, 10,611 chars) - Terms and Conditions, Privacy Policy, Site Visit data, Cookies, Copyright Policy sections",
+    "https://www.sci.gov.in/disclaimer/ (HTTP 200, 7,669 chars) - general-information / no-warranty / virus / external-link disclaimer",
+    "https://www.sci.gov.in/legal-aid/ (HTTP 200, 20,977 chars) - Middle Income Group Legal Aid Scheme page; nothing about use of the website at all, the sweep picked it up because the footer link text contains 'Legal'"
+   ],
+   "http": 200,
+   "content_type": "text/html; charset=UTF-8",
+   "policy_pages": [
+    "https://www.sci.gov.in/legal-aid/",
+    "https://www.sci.gov.in/disclaimer/",
+    "https://www.sci.gov.in/website-policies/"
+   ],
+   "regulators": [
+    "Supreme Court"
+   ]
+  }
+ ]
+}
