@@ -1,0 +1,139 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://tmt-radar.local/scans/schema.json",
+ "title": "Scan definition (scans/<id>.json)",
+ "description": "What a partner asks a scan to watch, plus every source the scan proposed, gated, approved or rejected — with the gate's evidence. Committed by the scan workflow and edited only through it. `id`, `created`, `updated` and `no_discover` are filled in by `pipeline/scan/run.py create`; everything else comes from the partner. This file documents the contract; `run.validate_definition` enforces it by hand so the pipeline carries no jsonschema dependency.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": ["id", "name", "intent", "jurisdictions"],
+ "properties": {
+  "id": {
+   "type": "string",
+   "pattern": "^[a-z0-9][a-z0-9-]{1,59}$",
+   "not": {"enum": ["schema", "tmt-india"]},
+   "description": "Slug; doubles as the file name and the data/scans/<id>/ directory. Also the shape the workflow's scan_id input is validated against. `schema` (this file) and `tmt-india` (the built-in vetted tracker) are reserved and refused by run.py and api/scans.js."
+  },
+  "name": {"type": "string", "minLength": 3, "maxLength": 120},
+  "intent": {
+   "type": "string",
+   "minLength": 20,
+   "maxLength": 1500,
+   "description": "The partner's question in their own words. Drives discovery and relevance; shown on the scan page."
+  },
+  "jurisdictions": {
+   "type": "array",
+   "minItems": 1,
+   "maxItems": 60,
+   "items": {"type": "string", "minLength": 1, "maxLength": 40},
+   "description": "ISO codes or plain names; the model is told both and the UI renders a flag when it recognises a code."
+  },
+  "topics": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 80}},
+  "industries": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 80}},
+  "clients": {
+   "type": "array",
+   "description": "Names the relevance step rates each development against. A string is a client watching the whole intent; an object narrows the scope. Every consumer reads the name through one helper (clientName), so both shapes are one shape.",
+   "items": {
+    "oneOf": [
+     {"type": "string", "minLength": 1, "maxLength": 120},
+     {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+       "name": {"type": "string", "minLength": 1, "maxLength": 120},
+       "scope": {"type": "string", "maxLength": 500}
+      }
+     }
+    ]
+   }
+  },
+  "sources": {
+   "type": "array",
+   "description": "Every candidate the scan has ever considered, in every state. Only `approved` sources are fetched; `rejected` and `pending` stay listed with their reason, because coverage that hides what it declined is not honest coverage. On input (the edit dialog, a hand-typed definition) an entry may be a bare URL string; run.py coerces it to {url} before validating, and the committed file always holds objects.",
+   "items": {
+    "oneOf": [
+     {"type": "string", "pattern": "^https?://", "maxLength": 2000},
+     {"$ref": "#/$defs/source"}
+    ]
+   }
+  },
+  "budget": {
+   "type": "object",
+   "description": "Caps the run agrees to before it starts. Keys mirror pipeline/scan/common.Budget.DEFAULTS, and those defaults are CEILINGS: a partner may lower a cap, never raise one, and delay_seconds cannot go below 1.0 s outside a dry run (the legal basis in docs §8 rests on these bounds). run.py clamps an over-ceiling value and records the clamp in health; api/scans.js refuses it with a message. Every cap that drops work is reported in health.",
+   "additionalProperties": false,
+   "properties": {
+    "max_sources": {"type": "number", "minimum": 0, "maximum": 12},
+    "max_new_per_run": {"type": "number", "minimum": 0, "maximum": 60},
+    "max_doc_chars": {"type": "number", "minimum": 0, "maximum": 30000},
+    "delay_seconds": {"type": "number", "minimum": 1, "description": "Floor 1.0 s. The dry-run fixture in pipeline/scan/fixtures uses 0 and is not validated against this schema; a committed definition never goes below 1."},
+    "max_candidates": {"type": "number", "minimum": 0, "maximum": 25},
+    "max_pages_per_source": {"type": "number", "minimum": 0, "maximum": 1}
+   }
+  },
+  "demo": {
+   "type": "boolean",
+   "description": "True for the shipped example scan whose sources are fixtures under reserved .test hosts; the UI labels it and the workflow never fetches it live."
+  },
+  "no_discover": {
+   "type": "boolean",
+   "description": "True when the scan was created with discovery off (only the partner's own sources were gated). Recorded by run.py create so the edit dialog can show how the scan was made; api/scans.js passes it both as a dispatch input and inside the definition."
+  },
+  "created": {"type": "string", "description": "ISO-8601 with offset, IST — common.now_ist()."},
+  "updated": {"type": "string", "description": "Bumped on every create/run that writes the definition."}
+ },
+ "$defs": {
+  "source": {
+   "type": "object",
+   "required": ["url"],
+   "additionalProperties": true,
+   "properties": {
+    "url": {"type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2000},
+    "name": {"type": "string", "maxLength": 200},
+    "host": {"type": "string", "maxLength": 253},
+    "jurisdiction": {"type": "string", "maxLength": 40},
+    "kind": {"type": "string", "enum": ["gazette", "regulator", "ministry", "court", "parliament", "standards", "other"]},
+    "status": {
+     "type": "string",
+     "enum": ["approved", "pending", "rejected"],
+     "description": "approved: fetched on every run. pending: the gate could not decide (typically ToS language) and a human must. rejected: never fetched; `reason` says why."
+    },
+    "tier": {
+     "type": "string",
+     "enum": ["vetted", "discovered"],
+     "description": "vetted is reserved for the TMT India registry sources (adapter, fixture, floor, legal analysis) and is derived by the gate from registry membership — never copied from a candidate or a partner's definition. Anything a scan gates automatically — partner-typed or model-proposed — is discovered, and the label is never dropped."
+    },
+    "proposed_by": {"type": "string", "enum": ["partner", "discovery"]},
+    "rationale": {"type": "string", "maxLength": 1000},
+    "confidence": {"type": "string", "enum": ["high", "medium", "low", ""]},
+    "reason": {"type": "string", "maxLength": 1000, "description": "Why a source is pending or rejected. Absent on approved sources."},
+    "gate": {
+     "type": "object",
+     "description": "Evidence the gate collected, in the order it checked: fetch, robots, terms, extraction. Absent evidence is null, never a placeholder — a source the gate declined to fetch (robots.txt) has reachable null and extract null, because no parse ran. Shape owned by pipeline/scan/gate.py.",
+     "properties": {
+      "reachable": {"type": ["boolean", "null"], "description": "true: fetched. false: the network refused. null: not attempted (our own rules stopped the fetch — robots.txt, an undeclared host, a non-public address)."},
+      "http": {"type": ["integer", "null"], "description": "Status of the final response; null when nothing was fetched."},
+      "content_type": {"type": ["string", "null"], "description": "Media type of the final response, without parameters; null when nothing was fetched."},
+      "robots": {"type": ["string", "null"], "description": "'allowed' or 'disallowed'; null when the check never ran. The dry run writes 'dry-run: not checked'."},
+      "robots_note": {"type": "string", "maxLength": 200, "description": "The engine's one-line reading of the site's robots.txt (why the path was allowed)."},
+      "final_url": {"type": "string", "description": "Present only when the fetch was redirected; the URL the evidence describes."},
+      "hops": {"type": "array", "items": {"type": "string"}, "description": "The redirect chain followed (at most 5), each hop re-checked against the declared host, the public-address rule and robots.txt."},
+      "tos": {
+       "type": "object",
+       "properties": {
+        "checked": {"type": "array", "items": {"type": "string"}, "description": "Policy pages fetched and scanned. Empty for a non-HTML listing, which has no footer to follow."},
+        "flags": {"type": "array", "items": {"type": "object", "required": ["url", "text"], "properties": {"url": {"type": "string"}, "text": {"type": "string", "maxLength": 200}}}, "description": "Sentences with anti-automation language, each with the page it was found on. Any flag parks the source pending for a human read."},
+        "errors": {"type": "array", "items": {"type": "object", "required": ["url", "error"], "properties": {"url": {"type": "string"}, "error": {"type": "string"}}}, "description": "Policy pages that could not be read. Present only when there were any; 'no flags' must never be mistaken for 'terms read and fine'."}
+       }
+      },
+      "extract": {
+       "type": ["object", "null"],
+       "description": "The extraction test's counts. null until the extractor actually ran, so a robots-refused, unreachable, HTTP-error or ToS-pending source never shows '0 rows parsed'.",
+       "properties": {"rows": {"type": "integer"}, "dated": {"type": "integer"}, "floor": {"type": "integer"}}
+      },
+      "checked": {"type": "string", "description": "When the gate ran — common.now_ist()."}
+     }
+    }
+   }
+  }
+ }
+}

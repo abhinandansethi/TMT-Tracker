@@ -1,0 +1,18 @@
+{
+ "name": "EU Pay Transparency Directive Scan",
+ "intent": "Advise multinational-employer clients on national transposition of the Pay Transparency Directive (EU) 2023/970; surface new obligations, reporting thresholds and deadlines by country.",
+ "jurisdictions": ["IT", "DE", "FR", "ES"],
+ "topics": ["Pay equity", "Employment"],
+ "industries": [],
+ "clients": ["Accenture", {"name": "Annalise.ai", "scope": "employees in Germany and France only"}],
+ "sources": [
+  {"url": "https://gazette.example.test/serie-generale",
+   "name": "Gazzetta Ufficiale — Serie Generale (fixture)",
+   "jurisdiction": "IT"},
+  {"url": "https://ministry.example.test/labour/pay-transparency",
+   "name": "Federal labour ministry — pay transparency page (fixture)",
+   "jurisdiction": "DE"}
+ ],
+ "budget": {"max_sources": 4, "max_new_per_run": 10, "delay_seconds": 0},
+ "demo": true
+}

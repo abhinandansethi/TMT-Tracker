@@ -2,7 +2,7 @@
 
 A regulatory tracker for the TMT team. Detection is deterministic and local: the firm machine
 reaches every gov.in venue directly, so a registry-driven engine (`engine/`, zero LLM) sweeps
-**52 live sources on demand** — triggered by hand from the dashboard's **Update now** button or
+**51 live sources on demand** — triggered by hand from the dashboard's **Update now** button or
 `engine/run_sweep.sh`, never on a hidden schedule — and is the primary lane. A cloud session can
 run the same sweep as a cross-check.
 
@@ -17,9 +17,9 @@ The engine sorts what it finds into **three lanes**:
   instruments ledger and never memo-triggering; tagged `lane: signals` in the data feed, with the
   reported-but-unpublished leads highlighted on the Signals tab.
 
-Coverage spans three strata (17 regulators, 52 venues live):
+Coverage spans three strata (16 regulators, 51 venues live):
 
-- **telecom** (28 venues): TRAI (16 listings incl. all five standing-direction divisions and the
+- **telecom** (27 venues): TRAI (16 listings incl. all five standing-direction divisions and the
   sitewide RSS as a lag cross-check), NCCS latest/SAS/ComSec/ITSARs, TEC circulars, gazette-notified
   standards and What's New, TDSAT notices and orders, IN-SPACe, and
   the Ministry-of-Communications e-Gazette lane.
@@ -72,6 +72,49 @@ title plus one factual line saying what the instrument does. Documents that mere
 another instrument are folded into it rather than listed twice. The page also carries the
 pipeline state (registry, classification, validation gates, short-title map, rules shelf) inside
 its embedded JSON, so a scheduled cloud session needs nothing but the artifact URL.
+
+## Scans — horizon scanning for any practice, any jurisdiction
+
+The TMT India tracker above is the first and deepest **scan**: 51 hand-vetted sources, each with an
+adapter, a fixture, a floor and a per-site legal analysis. The **Scans** tab lets a partner build
+another one for any subject — *"national transposition of the Pay Transparency Directive across
+DE, FR, IT, ES"* — in Harvey's Horizon Scanning shape: describe it (or fill the form), the model
+proposes the official venues, a deterministic gate checks each one (reachable, robots.txt allows,
+no anti-automation language in its terms, listing parses above a floor), the approved ones are
+read, every development gets a summary whose every paragraph quotes a verbatim passage that code
+verifies, a relevance level with a *why* and an *action*, and a weekly digest that cites the
+developments it draws on. Design and data contract: `docs/horizon-design.md`.
+
+What stays true for a scan, exactly as for the tracker: coverage is the whole world (a scan's
+Coverage panel lists what it fetches, what it rejected and why); health is earned by evidence;
+**nothing runs on a schedule** — a scan runs when a person presses *Run scan*; discovered sources
+are labelled *discovered*, never *vetted*; a document that cannot be read is never scored.
+
+Where the pieces live:
+
+    scans/<id>.json                    a scan's definition and its gated source list (committed by the workflow)
+    data/scans/<id>/                   developments.json, digest.json, health.json, text/<dev>.txt
+    pipeline/scan/                     common · discover · gate · extract · enrich · digest · run  (each: --selftest)
+    .github/workflows/scan.yml         dispatch-only: create | run | delete a scan; commits scans/ and data/scans/
+    api/scans.js                       the page's Create / Run / Edit button → dispatches scan.yml
+    api/propose.js                     "What do you want this scan to track?" → a proposal to confirm
+    api/ask.js · api/draft.js          Ask a development a question / draft an email or memo, grounded on the stored text
+    code/build_scans.py                builds dist/scans.html and dist/scan/<id>.html (Vercel runs it after the tracker build)
+
+Secrets: `OPENAI_API_KEY` as a repository secret (the workflow) **and** as a Vercel environment
+variable (Ask, Draft, Propose). Without the Vercel one those three buttons say so and the page
+falls back to its deterministic templates. Ask and Draft fetch the stored document text from the
+deployment's own origin and decide "own" from Vercel's `VERCEL_URL` family — a deployment served
+from a custom domain also needs `TMT_OWN_HOST=<that domain>`, or those two buttons answer with a
+clear 500 rather than guess. The first, deepest scan ships as a labelled demo
+(`scans/eu-pay-transparency-directive-scan.json`, fixture hosts, cannot be run live); delete it
+from the Scans page once a real scan exists.
+
+Try it without a key or a network:
+
+    TMT_SCAN_ROOT=/tmp/x TMT_SCAN_DRY_RUN=1 engine/.venv/bin/python -m pipeline.scan.run \
+        create --from-json pipeline/scan/fixtures/demo-definition.json --no-discover --dry-run
+    TMT_SCAN_ROOT=/tmp/x engine/.venv/bin/python code/build_scans.py --out /tmp/x/dist
 
 ## Architecture - three lanes, minimal LLM
 
@@ -155,7 +198,7 @@ its embedded JSON, so a scheduled cloud session needs nothing but the artifact U
       tracker.py                       CLI: sweep, backfill, selftest, audit, compliance,
                                        import-baseline, export, health, fetch-pdfs
       radar/                           fetch, parse, validate, classify, tripwires, ledger, core
-      registry_v2.json                 single source of truth: 52 live sources, per-source adapter
+      registry_v2.json                 single source of truth: 51 live sources, per-source adapter
                                        config, validation gates, classification regexes
       fixtures/                        saved page captures, the offline selftest corpus
       ledger.db / ledger.jsonl         canonical SQLite store plus append-only mirror
@@ -170,6 +213,8 @@ its embedded JSON, so a scheduled cloud session needs nothing but the artifact U
     data/signals.json                  unpublished-instrument signals
     docs/TMT-Radar-legal-basis.pdf     per-source legal basis: access + copyright, reasoned apart
     docs/CONNECTOR.md                  partner-pipeline integration contract (API / feed / MCP)
+    docs/horizon-design.md             the Scans layer: design, data contract, what Harvey does and what we keep
+    scans/ · data/scans/ · pipeline/scan/ · code/build_scans.py · api/   the Scans layer (see "Scans" above)
     engine/radar_api.py                read-only localhost connector over the same ledger
     pipeline/pipeline.py               reference client-alert pipeline: feed -> client match -> draft emails
     pipeline/clients.json              sample client roster (watch-lists); replace with the firm's

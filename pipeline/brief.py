@@ -178,7 +178,7 @@ def _html_text(body):
     return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
-def extract_text(url):
+def extract_text(url, max_chars=None):
     """Fetch a document and return its text, whether it is a PDF or an HTML page.
     Raises with a stated reason on anything unusable, so the caller can log why."""
     import requests
@@ -213,7 +213,9 @@ def extract_text(url):
     if len(text) < 120:
         raise ValueError(f"no extractable text from {kind} "
                          f"({len(text)} chars — scanned image, or the body is script-rendered)")
-    return text[:MAX_CHARS]
+    # brief.py wants ~12 pages for a one-sentence brief; the scan layer wants more so that a
+    # citation can point past the recitals. Callers choose; the default is unchanged.
+    return text[:(max_chars or MAX_CHARS)]
 
 
 def render_pages(body: bytes, pages: int = VISION_PAGES, dpi: int = VISION_DPI):

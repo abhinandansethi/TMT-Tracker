@@ -1,0 +1,199 @@
+# TMT Regulatory Radar — Scans: create, run or delete one horizon scan.
+#
+# The Scans layer (docs/horizon-design.md) lets a partner point the tracker at any question:
+# discover official sources, gate them, read them, enrich each development with a cited
+# summary, write the weekly digest. All of that runs here, in minutes, and is committed, so the
+# scan page stays static and every run is in git history.
+#
+# Trigger: a human, always. There is deliberately NO schedule, for the same reason sweep.yml and
+# briefs.yml have none: this job fetches listings and documents from government servers, which
+# is collection, and the per-source legal analysis (engine/audit/, docs/TMT-Radar-legal-basis.pdf)
+# rests on that load being occasional and human-initiated rather than unattended and repetitive.
+# Fetches are paced by the scan's delay_seconds on top of model latency, so the load stays at
+# the de-minimis rate that analysis describes. Harvey's "scans run every hour" is exactly what
+# we do not do. Do not add a `schedule:` trigger without revisiting it.
+
+name: scan
+run-name: "Scan ${{ inputs.action }} ${{ inputs.scan_id }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "What to do"
+        type: choice
+        required: true
+        options: [create, run, delete]
+      scan_id:
+        description: "Scan id (run and delete; optional for create, where it is derived from the name)"
+        required: false
+        default: ""
+      scan:
+        description: "Scan definition as JSON (create only; see scans/schema.json)"
+        required: false
+        default: ""
+      no_discover:
+        description: "Create: gate only the partner's own sources, skip model discovery"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+# One queue per scan: two runs of the same scan would race on the same ledger, while different
+# scans touch different files and the rebase-and-retry push below untangles the commit order.
+# (An expression in a top-level concurrency key is evaluated by GitHub, not by a shell — the
+# injection concern below is about run: bodies only.)
+concurrency:
+  group: tmt-scan-${{ inputs.scan_id }}
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    # Discovery + gating + up to 60 documents read and enriched, paced 1.5s apart: well under
+    # an hour. The cap is a backstop against a trickling server, not an expectation.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate inputs
+        # Dispatch inputs are free text from whoever pressed the button. They are bound to env
+        # vars and quoted below, NEVER interpolated into this script with ${{ }} — GitHub
+        # substitutes those textually before bash parses the line, so a crafted value would run
+        # as a command in a step that holds the API key and a repo-write token. Same rule as
+        # briefs.yml; the scan JSON is the largest free-text input this repo accepts, so it is
+        # also bounded in size and parsed before anything downstream sees it.
+        env:
+          ACTION: ${{ inputs.action }}
+          SCAN_ID: ${{ inputs.scan_id }}
+          SCAN: ${{ inputs.scan }}
+        run: |
+          case "$ACTION" in
+            create|run|delete) ;;
+            *) echo "::error::action must be create, run or delete (got '$ACTION')"; exit 1 ;;
+          esac
+          if [ -n "$SCAN_ID" ] && ! printf '%s\n' "$SCAN_ID" | grep -Eq '^[a-z0-9][a-z0-9-]{1,59}$'; then
+            echo "::error::scan_id must match ^[a-z0-9][a-z0-9-]{1,59}$"; exit 1
+          fi
+          if [ "$ACTION" != "create" ] && [ -z "$SCAN_ID" ]; then
+            echo "::error::scan_id is required for $ACTION"; exit 1
+          fi
+          if [ "$ACTION" = "create" ]; then
+            if [ -z "$SCAN" ]; then
+              echo "::error::create needs the scan definition in the 'scan' input"; exit 1
+            fi
+            if [ "${#SCAN}" -gt 60000 ]; then
+              echo "::error::scan definition is ${#SCAN} characters; the limit is 60000"; exit 1
+            fi
+            # Parsed from the environment, never echoed into a command line.
+            python -c 'import json, os; json.loads(os.environ["SCAN"])' \
+              || { echo "::error::scan definition is not valid JSON"; exit 1; }
+            printf '%s' "$SCAN" > "$RUNNER_TEMP/scan.json"
+          fi
+
+      - name: Run the scan command
+        id: run
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ACTION: ${{ inputs.action }}
+          SCAN_ID: ${{ inputs.scan_id }}
+          NO_DISCOVER: ${{ inputs.no_discover }}
+        run: |
+          if [ "$ACTION" != "delete" ] && [ -z "${OPENAI_API_KEY}" ]; then
+            echo "::error::OPENAI_API_KEY is not configured. Add it as a repository secret."
+            exit 1
+          fi
+          # SCAN_ID has already been matched against ^[a-z0-9][a-z0-9-]{1,59}$ above; it is
+          # still passed as a quoted array element, not spliced into a string.
+          # The summary is written by run.py to a file of our choosing, not grepped out of the
+          # merged log: a log line is something a fetched page could one day forge, a file
+          # only run.py writes is not.
+          SUMMARY_OUT="$RUNNER_TEMP/summary.json"
+          rm -f "$SUMMARY_OUT"
+          ARGS=()
+          case "$ACTION" in
+            create)
+              ARGS=(create --from-json "$RUNNER_TEMP/scan.json" --summary-out "$SUMMARY_OUT")
+              if [ "$NO_DISCOVER" = "true" ]; then ARGS+=(--no-discover); fi ;;
+            run)    ARGS=(run --id "$SCAN_ID" --summary-out "$SUMMARY_OUT") ;;
+            delete) ARGS=(delete --id "$SCAN_ID" --summary-out "$SUMMARY_OUT") ;;
+          esac
+          echo "running: python -m pipeline.scan.run ${ARGS[*]}"
+          # Exit 1 means a source FAILED after everything was written; the results must still
+          # be committed, so the failure is deferred to the last step rather than lost here.
+          set +e
+          python -m pipeline.scan.run "${ARGS[@]}" 2>&1 | tee "$RUNNER_TEMP/scan.log"
+          RC="${PIPESTATUS[0]}"
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, pathlib, re
+          p = pathlib.Path(os.environ["RUNNER_TEMP"]) / "summary.json"
+          try:
+              s = json.loads(p.read_text() or "{}")
+          except Exception:
+              s = {}
+          if not isinstance(s, dict):
+              s = {}
+          # The id lands in the commit message. It is re-validated here against the same shape
+          # the first step enforced on scan_id, whatever wrote the summary file, and falls back
+          # to 'unknown' rather than to anything unvalidated.
+          sid = s.get("id") or os.environ.get("SCAN_ID") or "unknown"
+          if not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,59}", str(sid)) or sid in ("schema", "tmt-india"):
+              sid = "unknown"
+          print(f"id={sid}")
+          if s.get("action") in ("create", "run"):
+              print("::notice::" + f"scan {sid}: {s.get('new', 0)} new, {s.get('enriched', 0)} enriched, "
+                    f"{s.get('queued', 0)} queued, {s.get('high', 0)} high relevance, "
+                    f"{s.get('sources_ok', 0)} source(s) ok, {s.get('sources_failed', 0)} failed, "
+                    f"week {s.get('week', '?')}")
+          elif s.get("action") == "delete":
+              print("::notice::" + f"scan {sid}: removed {len(s.get('removed') or [])} path(s)")
+          else:
+              print("::warning::run.py wrote no summary file — see the step log")
+          PY
+
+      - name: Commit the scan
+        env:
+          ACTION: ${{ inputs.action }}
+          SCAN_ID: ${{ steps.run.outputs.id }}
+        run: |
+          git config user.name  "tmt-radar-scans"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- scans
+          # data/scans may not exist yet (first scan) or may just have been emptied (last delete);
+          # git add errors on a pathspec that matches neither the tree nor the index.
+          if [ -d data/scans ] || git ls-files --error-unmatch -- data/scans >/dev/null 2>&1; then
+            git add -A -- data/scans
+          fi
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "scan($SCAN_ID): $ACTION $(date -u '+%Y-%m-%d %H:%MZ')"
+            # The sweep and briefs lanes can commit while this runs; rebase rather than lose the work.
+            for i in 1 2 3; do
+              git push && break
+              echo "push rejected (attempt $i) — rebasing onto the remote and retrying"
+              [ "$i" = 3 ] && { echo "::error::could not push after 3 attempts"; exit 1; }
+              git pull --rebase || exit 1
+            done
+          fi
+
+      - name: Surface a failed source
+        env:
+          RC: ${{ steps.run.outputs.rc }}
+        run: |
+          if [ "$RC" != "0" ]; then
+            echo "::error::the scan command exited $RC — results were committed, but at least one source FAILED (see data/scans/<id>/health.json and the run log)"
+            exit "$RC"
+          fi

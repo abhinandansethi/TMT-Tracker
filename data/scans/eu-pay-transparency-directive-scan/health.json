@@ -1,0 +1,53 @@
+{
+ "generated": "2026-09-03T04:17:23+05:30",
+ "scan": "eu-pay-transparency-directive-scan",
+ "sources": {
+  "https://gazette.example.test/serie-generale": {
+   "status": "OK",
+   "rows_seen": 5,
+   "new": 5,
+   "newest_visible": "2026-08-28",
+   "notes": [],
+   "info": [
+    "extractor saw 5 candidate row(s)"
+   ],
+   "checked": "2026-09-03T04:17:23+05:30",
+   "name": "Gazzetta Ufficiale — Serie Generale (fixture)",
+   "tier": "discovered"
+  },
+  "https://ministry.example.test/labour/pay-transparency": {
+   "status": "OK",
+   "rows_seen": 2,
+   "new": 2,
+   "newest_visible": "2026-08-25",
+   "notes": [],
+   "info": [
+    "extractor saw 2 candidate row(s)"
+   ],
+   "checked": "2026-09-03T04:17:23+05:30",
+   "name": "Federal labour ministry — pay transparency page (fixture)",
+   "tier": "discovered"
+  }
+ },
+ "run": {
+  "new": 7,
+  "enriched": 7,
+  "queued": 0,
+  "read_failed": 0,
+  "enrich_failed": 0,
+  "ledgered_total": 7,
+  "week": "2026-W36"
+ },
+ "budget": {
+  "caps": {
+   "max_sources": 4,
+   "max_new_per_run": 10,
+   "max_doc_chars": 30000,
+   "delay_seconds": 0,
+   "max_candidates": 25,
+   "max_pages_per_source": 1
+  },
+  "dropped": []
+ },
+ "notes": []
+}

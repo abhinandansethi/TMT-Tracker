@@ -1,0 +1,85 @@
+{
+ "name": "EU Pay Transparency Directive Scan",
+ "intent": "Advise multinational-employer clients on national transposition of the Pay Transparency Directive (EU) 2023/970; surface new obligations, reporting thresholds and deadlines by country.",
+ "jurisdictions": [
+  "IT",
+  "DE",
+  "FR",
+  "ES"
+ ],
+ "topics": [
+  "Pay equity",
+  "Employment"
+ ],
+ "industries": [],
+ "clients": [
+  "Accenture",
+  {
+   "name": "Annalise.ai",
+   "scope": "employees in Germany and France only"
+  }
+ ],
+ "sources": [
+  {
+   "url": "https://gazette.example.test/serie-generale",
+   "name": "Gazzetta Ufficiale — Serie Generale (fixture)",
+   "host": "gazette.example.test",
+   "jurisdiction": "IT",
+   "proposed_by": "partner",
+   "tier": "discovered",
+   "rationale": "added by the partner",
+   "status": "approved",
+   "gate": {
+    "reachable": true,
+    "http": 200,
+    "robots": "dry-run: not checked",
+    "tos": {
+     "checked": [],
+     "flags": []
+    },
+    "extract": {
+     "rows": 5,
+     "dated": 4,
+     "floor": 2
+    },
+    "checked": "2026-09-03T04:17:23+05:30"
+   }
+  },
+  {
+   "url": "https://ministry.example.test/labour/pay-transparency",
+   "name": "Federal labour ministry — pay transparency page (fixture)",
+   "host": "ministry.example.test",
+   "jurisdiction": "DE",
+   "proposed_by": "partner",
+   "tier": "discovered",
+   "rationale": "added by the partner",
+   "status": "approved",
+   "gate": {
+    "reachable": true,
+    "http": 200,
+    "robots": "dry-run: not checked",
+    "tos": {
+     "checked": [],
+     "flags": []
+    },
+    "extract": {
+     "rows": 2,
+     "dated": 2,
+     "floor": 2
+    },
+    "checked": "2026-09-03T04:17:23+05:30"
+   }
+  }
+ ],
+ "budget": {
+  "max_sources": 4,
+  "max_new_per_run": 10,
+  "delay_seconds": 0
+ },
+ "demo": true,
+ "id": "eu-pay-transparency-directive-scan",
+ "created": "2026-09-03T04:17:23+05:30",
+ "updated": "2026-09-03T04:17:23+05:30",
+ "no_discover": true,
+ "discovery_notes": []
+}

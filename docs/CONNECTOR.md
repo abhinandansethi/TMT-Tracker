@@ -201,6 +201,16 @@ proxy and **every** document — MTCTE included — opens in the tab instead of 
 `GET {docProxy}/v1/doc?u=<doc url from the feed>` fetches the file server-side and re-serves it
 `application/pdf; inline`. It only proxies URLs that already appear in the feed (SSRF guard).
 
+## Scans — the same boundary, per scan
+
+A partner-created scan publishes the same kind of feed, one directory per scan:
+`data/scans/<id>/developments.json` (every development with its cited summary, obligations,
+relevance and `text_file`), `digest.json`, `health.json`, and `text/<dev>.txt` — the extracted
+document text every citation points into. `scans/<id>.json` is the scan's definition and its gated
+source list. The two boundary rules apply unchanged: a scan's coverage list is its whole world,
+and every draft is verified against the official text before it leaves the firm. Design and
+field-by-field contract: `docs/horizon-design.md` §4.
+
 ## MCP
 
 If your workflow speaks MCP, wrap the API: each endpoint above maps to one read-only tool

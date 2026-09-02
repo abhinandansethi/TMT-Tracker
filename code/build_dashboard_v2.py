@@ -750,11 +750,13 @@ input::placeholder{color:var(--ghost)}
 @media (max-width:760px){.upd-note{padding-left:22px;padding-right:22px}}
 .thead .r.jr,.row .line.jr{grid-template-columns:104px 128px minmax(0,1fr) 120px 24px}
 .tabs{background:var(--navy-d);padding:0 64px;display:flex;gap:2px}
-.tabs button{appearance:none;background:none;border:0;border-bottom:3px solid transparent;
+.tabs button,.tabs a.tab-link{appearance:none;background:none;border:0;border-bottom:3px solid transparent;
   padding:13px 18px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;
   color:#93B2C6;cursor:pointer}
 .tabs button.on{color:#fff;border-bottom-color:var(--ochre);background:rgba(255,255,255,.06)}
 .tabs button:hover{color:#fff}
+.tabs a.tab-link{display:inline-block;text-decoration:none;border-bottom:3px solid transparent;margin-left:auto}
+.tabs a.tab-link:hover{color:#fff}
 .view{display:none;padding:0 64px 90px}
 .view.on{display:block}
 .cl-eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--navy);margin-bottom:5px}
@@ -1056,6 +1058,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     <button data-v="signals">Signals</button>
     <button data-v="clients">Clients</button>
     <button data-v="audit">Audit</button>
+    <a class="tab-link" href="scans.html" title="Horizon scanning: build a scan for any practice or jurisdiction">Scans</a>
   </nav>
 
   <section class="view" id="v-instruments">
