@@ -1,4 +1,4 @@
-"""The scan orchestrator and CLI: create, run, delete, list.
+"""The scan orchestrator and CLI: create, run, delete, promote, list.
 
 Design: docs/horizon-design.md. This module owns the ledger semantics; the sibling modules
 (discover, gate, extract, enrich, digest) each do one step and never touch a file.
@@ -6,6 +6,8 @@ Design: docs/horizon-design.md. This module owns the ledger semantics; the sibli
     python -m pipeline.scan.run create --from-json scans/new.json [--no-discover] [--max-new N] [--dry-run]
     python -m pipeline.scan.run run --id eu-pay-transparency [--dry-run] [--max-new N]
     python -m pipeline.scan.run delete --id eu-pay-transparency
+    python -m pipeline.scan.run promote --id eu-pay-transparency --finding 3f9c1a7e2b
+    python -m pipeline.scan.run dismiss --id eu-pay-transparency --finding 3f9c1a7e2b
     python -m pipeline.scan.run list
     python -m pipeline.scan.run --selftest
 
@@ -25,6 +27,16 @@ Rules this file enforces, each learned from the engine the hard way:
 * A create reads less than a run: the partner is waiting on a page that does not exist yet, so
   the first run enriches FIRST_RUN_MAX_NEW documents and says how many it queued. See the
   constant for the measurement behind the number.
+* The Miscellaneous lane (`misc.py`) runs beside all of this and is held apart from it: it never
+  fetches, nothing it returns enters the ledger, and it can never fail the run — a web-search
+  failure is a note, because a lane that is not coverage cannot make the scan wrong. Its one door
+  into coverage is `promote`, which adds an official venue's URL as a *pending* source; the next
+  run gates that URL like any other candidate before a single row of it is read. `dismiss` is the
+  other half of triage: it sets a lead aside so later runs stop offering it, and touches nothing
+  else — the finding is kept, and coverage is not changed.
+* A note in health is a claim that something needs attention: the page renders health.notes as
+  the scan's problems. Counts, approvals and other routine outcomes go to health's own count
+  fields, to the source's `info`, or to the log — never to notes.
 * `--dry-run` swaps the four network-touching functions for fixture readers and the model for
   FakeClient, so the whole path can be exercised without a key or a socket. The swap is at
   module level (`fetch_listing`, `listing_rows`, `document_text`, `enrich_dev`, `discover_propose`,
@@ -48,6 +60,7 @@ from urllib.parse import urljoin, urlparse, urlunparse
 from . import common
 
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,59}$")
+FINDING_ID_RE = re.compile(r"^[0-9a-f]{10}$")   # misc.finding_id: 10 hex characters of the URL hash
 # Ids that match ID_RE but name something that is not a scan. Review finding: a scan named
 # "Schema" slugged to `schema`, and ScanPaths then overwrote scans/schema.json (the contract)
 # with the definition — and `delete --id schema` would have unlinked it. `tmt-india` is the
@@ -57,6 +70,12 @@ RESERVED_IDS = frozenset({"schema", "tmt-india"})
 SOURCE_STATUSES = ("approved", "pending", "rejected")
 TIERS = ("vetted", "discovered")
 SOURCE_KINDS = ("gazette", "regulator", "ministry", "court", "parliament", "standards", "other")
+# Who put a source in front of the gate. "miscellany" is a finding a partner promoted out of the
+# Miscellaneous lane (pipeline/scan/misc.py): that lane never fetches, so a promoted URL has had
+# nothing done to it yet — it enters as `pending` and is gated at the start of the next run, like
+# every other candidate. Promotion is the ONLY route from that lane into coverage.
+SOURCE_PROPOSERS = ("partner", "discovery", "miscellany")
+MISC_PROPOSED_BY = "miscellany"   # mirrors misc.PROPOSED_BY; kept local so this file loads without it
 # What a partner may write on a source (the create dialog's shape, and what /api/discover
 # returns for each candidate), and what the gate adds on top of it. The validator accepts both
 # groups because it re-checks the *committed* definition on every `run` — but only the first
@@ -65,7 +84,7 @@ SOURCE_KINDS = ("gazette", "regulator", "ministry", "court", "parliament", "stan
 SOURCE_KEYS_PARTNER = ("url", "name", "jurisdiction", "kind", "rationale")
 SOURCE_KEYS = SOURCE_KEYS_PARTNER + ("host", "status", "tier", "proposed_by", "confidence", "reason", "gate")
 TOP_KEYS = ("id", "name", "intent", "jurisdictions", "topics", "industries", "clients", "sources", "discovery_notes",
-            "budget", "demo", "no_discover", "created", "updated")
+            "budget", "demo", "no_discover", "no_misc", "created", "updated")
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 MAX_READ_ATTEMPTS = 3          # a document that will not read is given up on, loudly, not retried forever
 # How many developments a scan's FIRST run enriches, under the budget's own max_new_per_run.
@@ -97,6 +116,7 @@ class ScanPaths:
         self.developments = self.dir / "developments.json"
         self.digest = self.dir / "digest.json"
         self.health = self.dir / "health.json"
+        self.misc = self.dir / "misc.json"
         self.text_dir = self.dir / "text"
 
     def text_file(self, dev_id: str) -> Path:
@@ -228,8 +248,8 @@ def validate_definition(defn: Any) -> list[str]:
                     problems.append(f"sources[{i}].tier must be one of {list(TIERS)}")
                 if "kind" in s and s["kind"] not in SOURCE_KINDS:
                     problems.append(f"sources[{i}].kind must be one of {list(SOURCE_KINDS)}")
-                if "proposed_by" in s and s["proposed_by"] not in ("partner", "discovery"):
-                    problems.append(f"sources[{i}].proposed_by must be one of ['partner', 'discovery']")
+                if "proposed_by" in s and s["proposed_by"] not in SOURCE_PROPOSERS:
+                    problems.append(f"sources[{i}].proposed_by must be one of {list(SOURCE_PROPOSERS)}")
                 # "" is a real value: a source whose confidence was never assessed. An absence
                 # is not a low score — the same rule the page applies to relevance.
                 if "confidence" in s and s["confidence"] not in ("high", "medium", "low", ""):
@@ -256,7 +276,7 @@ def validate_definition(defn: Any) -> list[str]:
                 elif (isinstance(v, bool) or not isinstance(v, (int, float)) or v < 0
                       or (isinstance(v, float) and not math.isfinite(v))):
                     problems.append(f"budget.{k} must be a finite, non-negative number")
-    for k in ("demo", "no_discover"):
+    for k in ("demo", "no_discover", "no_misc"):
         if k in defn and not isinstance(defn[k], bool):
             problems.append(f"{k} must be a boolean")
     for k in ("created", "updated"):
@@ -312,12 +332,18 @@ def _default_gate(candidate: dict, budget: common.Budget, extractor: Callable) -
     return gate.assess(candidate, budget, extractor)
 
 
+def _default_misc(defn: dict, client, previous: Optional[dict]) -> tuple[dict, dict]:
+    from . import misc
+    return misc.scan(defn, client, previous=previous)
+
+
 fetch_listing = _default_fetch_listing
 listing_rows = _default_listing_rows
 document_text = _default_document_text
 enrich_dev = _default_enrich
 discover_propose = _default_discover
 gate_assess = _default_gate
+misc_scan = _default_misc
 
 
 def rows_and_report(result: Any) -> tuple[list[dict], dict]:
@@ -399,8 +425,115 @@ def _err(e: BaseException) -> str:
 
 
 # ----------------------------------------------------------------------------- the run
+def gate_promoted(defn: dict, client, budget: common.Budget, notes: list[str]) -> dict:
+    """Gate the sources promoted out of the Miscellaneous lane since the last run.
+
+    Returns {url: line} for the ones the gate APPROVED, so the caller can put that line on the
+    source's own health row. Defect this closes: every outcome, approval included, was appended
+    to the run's notes — which the page renders as the scan's problems — so a promotion that
+    worked perfectly reported itself in the ochre list. A rejection or a parked source is still
+    a note: that is news a partner has to act on.
+
+    Only those sources: `proposed_by` miscellany, still pending, and carrying no gate evidence at
+    all. That is exactly the state `promote` leaves a URL in — the lane never fetches, so nothing
+    has been done to it yet — and it is what promote means when it tells the partner the next run
+    will gate it: the URL is fetched with the honest UA, robots.txt and the terms scan are read,
+    the extraction floor is applied, and an approved venue is read in this same run.
+
+    A source pending for any other reason is left alone. The gate already looked at it and could
+    not decide (terms language, usually); that is a human's call, and a later run must not
+    quietly flip it."""
+    fresh = [s for s in defn.get("sources") or []
+             if s.get("proposed_by") == MISC_PROPOSED_BY and s.get("status") == "pending" and not s.get("gate")]
+    if not fresh:
+        return {}
+    extractor = bind_extractor(client, defn, budget)
+    cap_s = int(budget["max_sources"])
+    approved_n = sum(1 for s in defn.get("sources") or [] if s.get("status") == "approved")
+    approved_info: dict = {}
+    for src in fresh:
+        cand = {"url": src["url"], "name": src.get("name") or _host(src["url"]), "host": _host(src["url"]),
+                "jurisdiction": src.get("jurisdiction", ""),
+                "kind": src["kind"] if src.get("kind") in SOURCE_KINDS else "other",
+                "proposed_by": MISC_PROPOSED_BY, "tier": "discovered",
+                "rationale": src.get("rationale") or "promoted from the Miscellaneous lane"}
+        if approved_n >= cap_s:
+            src["reason"] = f"budget: max_sources={cap_s} already approved — not gated"
+            notes.append(f"promoted source not gated: {src['url']} — max_sources={cap_s} already approved")
+            continue
+        try:
+            decided = _normalise_source(gate_assess(cand, budget, extractor), cand, "gate returned no decision")
+        except Exception as e:
+            decided = _normalise_source({"status": "pending", "reason": f"gate unavailable: {_err(e)}"}, cand, "")
+        src.clear()
+        src.update(decided)
+        line = (f"promoted source gated {src['status']}: {src['url']}"
+                + (f" — {src['reason']}" if src.get("reason") else ""))
+        if src["status"] == "approved":
+            approved_n += 1
+            # Routine, and good: the venue was promoted, gated and is read in this same run.
+            # It belongs on that source's health row, where a reader looking at the venue sees
+            # how it got there — not in the problems list.
+            approved_info[src["url"]] = line
+        else:
+            notes.append(line)
+        common.log(f"gate {src['status']:8s} {src['url']} (promoted from miscellany)")
+    return approved_info
+
+
+def run_misc(defn: dict, paths: ScanPaths, client, notes: list[str]) -> dict:
+    """Run the Miscellaneous lane and write data/scans/<id>/misc.json. Never raises.
+
+    Nothing this lane produces is coverage — it is a list of leads read out of a web-search
+    provider's results, fetched from nobody — so its absence cannot make the scan wrong, and a
+    web-search failure must never cost the partner the lanes that are coverage. Every way this
+    can go wrong therefore ends in a note.
+
+    The counts keep one shape whatever happened — a skipped or failed lane says `skipped` and
+    carries its reason, rather than reporting zero findings, which a page would read as "we
+    looked and found nothing".
+
+    A note here is a claim that something went wrong: health.notes is what the page renders as
+    the scan's problems. So only the abnormal outcomes get one — the lane failed, the previous
+    file was unreadable, the findings could not be written, or the search itself errored. The
+    routine numbers travel as `health.misc` and in the SUMMARY, and the leads themselves are a
+    whole tab on the page. Defect this closes: "miscellany: N finding(s) outside coverage this
+    run …" was appended on every successful run, so a scan that worked perfectly reported a
+    problem — on every healthy run it ever had."""
+    none = {"found": 0, "new": 0, "promoted": 0, "dismissed": 0, "kept": 0, "stale": 0,
+            "dropped": 0, "total": 0, "skipped": True, "error": ""}
+    previous = None
+    try:
+        previous = common.load_json(paths.misc, None)
+    except Exception as e:
+        notes.append(f"miscellany: the previous misc.json is unreadable and was not merged: {_err(e)}")
+    try:
+        doc, counts = misc_scan(defn, client, previous)
+    except Exception as e:
+        notes.append(f"miscellany: lane failed and was skipped this run: {_err(e)}")
+        return dict(none, error=_err(e))
+    try:
+        common.atomic_write_json(paths.misc, doc)
+    except Exception as e:
+        notes.append(f"miscellany: findings could not be written to {paths.misc.name}: {_err(e)}")
+        return dict(none, error=_err(e))
+    if counts.get("error"):
+        notes.append(f"miscellany: {counts['error']}")
+    out = {"found": int(counts.get("found", 0)), "new": int(counts.get("new", 0)),
+           "promoted": int(counts.get("promoted", 0)), "dismissed": int(counts.get("dismissed", 0)),
+           "kept": int(counts.get("kept", 0)), "stale": int(counts.get("stale", 0)),
+           "dropped": int(counts.get("dropped", 0)), "total": len(doc.get("findings") or []),
+           "skipped": False, "error": str(counts.get("error") or "")}
+    common.log(f"miscellany: {out['found']} finding(s) outside coverage this run "
+               f"({out['new']} new, {out['kept']} kept from earlier runs and marked stale, "
+               f"{out['promoted']} promoted, {out['dismissed']} dismissed, {out['dropped']} dropped) — "
+               f"leads only; nothing here is fetched, cited or ledgered")
+    return out
+
+
 def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None,
-             notes: Optional[list[str]] = None, first_run: bool = False) -> tuple[dict, int]:
+             notes: Optional[list[str]] = None, first_run: bool = False,
+             no_misc: bool = False) -> tuple[dict, int]:
     """Fetch every approved source, ledger what is new, enrich up to the budget, write the
     digest. Returns (summary, exit_code). Everything is written before the exit code is
     decided, so a FAILED source never costs the run's other results.
@@ -425,6 +558,12 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
     any_failed = False
     new_devs: list[dict] = []
 
+    # Before anything is read: a URL promoted out of the Miscellaneous lane has never been
+    # fetched, so this is where the gate decides on it. Approved here means read in this run,
+    # and the approval is recorded on that source's own health row rather than in the run's
+    # notes, which the page reads as problems.
+    promoted_ok = gate_promoted(defn, client, budget, scan_notes)
+
     approved = [s for s in defn.get("sources") or [] if s.get("status") == "approved"]
     cap_sources = int(budget["max_sources"])
     if len(approved) > cap_sources:
@@ -440,6 +579,8 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         h = {"status": "FAILED", "rows_seen": 0, "new": 0, "newest_visible": None,
              "notes": [], "info": [], "checked": now,
              "name": src.get("name"), "tier": src.get("tier", "discovered")}
+        if url in promoted_ok:
+            h["info"].append(promoted_ok[url])
         sources_health[url] = h
         try:
             body, info = fetch_listing(url, budget["delay_seconds"], _declared_hosts(url))
@@ -526,6 +667,20 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
             h["info"].append("nothing new; newest item this venue shows is "
                              + (h["newest_visible"] or "undated"))
         common.log(f"{h['status']:6s} {url}  rows {h['rows_seen']}  new {h['new']}  newest {h['newest_visible'] or '—'}")
+
+    # The Miscellaneous lane, after the sources have been read: what is happening on this
+    # subject OUTSIDE the coverage list above. It is a search, never a fetch, and nothing it
+    # returns is a citable instrument or enters the ledger — so it runs here, where the set of
+    # approved hosts it must exclude is exactly the set this run just read, and it is allowed to
+    # fail without touching the exit code.
+    misc_counts: dict = {"found": 0, "new": 0, "promoted": 0, "kept": 0, "dropped": 0, "total": 0,
+                         "skipped": True, "error": ""}
+    if no_misc:
+        scan_notes.append("miscellany: skipped on this run (--no-misc); the existing misc.json was left as it was")
+    elif defn.get("no_misc"):
+        scan_notes.append("miscellany: the lane is switched off for this scan (no_misc)")
+    else:
+        misc_counts = run_misc(defn, paths, client, scan_notes)
 
     # Enrichment: the never-enriched backlog, newest first, up to the cap. Failed reads are
     # retried on later runs until MAX_READ_ATTEMPTS, then left with their error on record.
@@ -647,6 +802,11 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         "run": {"new": len(new_devs), "enriched": enriched, "queued": len(rest),
                 "read_failed": read_failed, "enrich_failed": enrich_failed,
                 "ledgered_total": len(items), "week": week},
+        # The Miscellaneous lane's own counts, kept apart from `run` because they are not
+        # coverage: found is what the search surfaced outside the coverage list this run, new is
+        # what the lane had never seen, promoted is how many findings a partner has moved into
+        # sources. A skipped or failed lane says so rather than reading as zero findings.
+        "misc": misc_counts,
         "budget": {"caps": dict(budget.v), "dropped": list(budget.dropped)},
         "notes": list(dict.fromkeys(scan_notes + list(budget.dropped) + [n for n in dg.get("notes", []) if n])),
     }
@@ -661,6 +821,7 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
                "sources_failed": sources_failed, "new": len(new_devs), "enriched": enriched,
                "queued": len(rest), "read_failed": read_failed, "enrich_failed": enrich_failed,
                "high": high, "ledgered_total": len(items), "week": week,
+               "misc": {k: misc_counts.get(k, 0) for k in ("found", "new", "promoted")},
                "exit": EXIT_FAILED_SOURCE if any_failed else EXIT_OK}
     for n in health["notes"]:
         common.log(f"note: {n}")
@@ -709,14 +870,16 @@ def _normalise_source(src: Any, cand: dict, reason_if_bad: str) -> dict:
 
 
 def create_scan(defn: dict, paths: ScanPaths, client, no_discover: bool,
-                max_new: Optional[int] = None) -> tuple[dict, int]:
+                max_new: Optional[int] = None, no_misc: bool = False) -> tuple[dict, int]:
     now = common.now_ist()
     existing = common.load_json(paths.definition, None)
     notes: list[str] = []
     if existing:
         defn["created"] = existing.get("created") or now
-        notes.append("definition replaced an existing one; the ledger under data/ was kept")
-        common.log(f"replacing existing definition {paths.definition} (ledger kept)")
+        # The log, not `notes`: an Edit and Save is a partner's own routine action with a healthy
+        # outcome, and health.notes is the page's problems list. Same defect as the miscellany
+        # count — every Save reported itself as a problem on the page it had just rebuilt.
+        common.log(f"replacing existing definition {paths.definition} (ledger kept; developments keep their ids)")
     else:
         defn["created"] = defn.get("created") or now
     defn["updated"] = now
@@ -728,6 +891,16 @@ def create_scan(defn: dict, paths: ScanPaths, client, no_discover: bool,
     # was a dispatch input only, never stored, so Edit always pre-ticked "discover" and a
     # "Save and re-run" silently re-enabled discovery on a scan created without it.
     defn["no_discover"] = bool(no_discover)
+    # Recorded the same way and for the same reason: the edit dialog must be able to show that
+    # this scan's Miscellaneous lane is off, and a later plain `run` must keep it off.
+    # Unlike no_discover, no_misc is NOT a dispatch input — it can only travel inside the
+    # definition — so an Edit that re-submits a definition the page read back without the key
+    # used to switch the lane back on for a scan whose partner had turned it off. Absent now
+    # means "unchanged", the same way `created` is preserved above: this create's own flag wins,
+    # then what the incoming definition says, then what the definition on disk already said.
+    if not isinstance(defn.get("no_misc"), bool) and isinstance(existing, dict):
+        defn["no_misc"] = bool(existing.get("no_misc"))
+    defn["no_misc"] = bool(no_misc) or bool(defn.get("no_misc"))
     coerce_sources(defn)
     partner = [_candidate_from_partner(s) for s in defn.get("sources") or []]
     # Written first, with partner sources visibly ungated, so a crash in discovery leaves a
@@ -1035,6 +1208,41 @@ def dry_discover(defn: dict, client, budget: common.Budget) -> list[dict]:
     return []
 
 
+# Canned search results for the Miscellaneous lane's dry run. Unlike discovery, the lane is NOT
+# skipped here: it runs its real code — normalisation, the coverage-host drop, dedupe, the cap and
+# the merge — over a canned answer, so the demo exercises the whole lane and produces a misc.json
+# a partner (and the promote CLI) can be shown. The hosts are reserved .test names; the one on
+# gazette.example.test is there to be dropped, because that host is coverage.
+DRY_MISC_FINDINGS = [
+    {"url": "https://boe.example.test/diario/2026/09/01/rd-812-2026", "host": "boe.example.test",
+     "title": "Real Decreto 812/2026 transposing Directive (EU) 2023/970",
+     "date": "2026-09-01", "jurisdiction": "ES", "kind": "official_venue",
+     "why": "Spain's official gazette publishes the transposition decrees this scan is about, and it is not on the coverage list.",
+     "snippet": "Real Decreto 812/2026, de 28 de agosto, por el que se transpone la Directiva (UE) 2023/970."},
+    {"url": "https://parlement.example.test/dossiers/transparence-salariale", "host": "parlement.example.test",
+     "title": "Dossier législatif — transparence salariale", "date": "", "jurisdiction": "FR",
+     "kind": "official_venue",
+     "why": "The French parliament's dossier page tracks the transposition bill; no French venue is covered yet.",
+     "snippet": "Projet de loi portant transposition de la directive (UE) 2023/970."},
+    {"url": "https://press.example.test/story/spain-pay-gap-deadline", "host": "press.example.test",
+     "title": "Spain sets first pay-gap reporting deadline for 2027", "date": "2026-09-02",
+     "jurisdiction": "ES", "kind": "secondary",
+     "why": "Reports the decree above and names the first reporting year.",
+     "snippet": "Employers with 100 or more staff must report by June 2027, the ministry said."},
+    {"url": "https://gazette.example.test/serie-generale/2026/118", "host": "gazette.example.test",
+     "title": "Decreto legislativo 118/2026", "date": "2026-08-12", "jurisdiction": "IT",
+     "kind": "official_venue", "why": "Already covered — dropped, because that is coverage, not miscellany.",
+     "snippet": ""},
+]
+
+
+def dry_misc(defn: dict, client, previous: Optional[dict]) -> tuple[dict, dict]:
+    from . import misc
+    canned = common.FakeClient(canned={misc.SCHEMA_NAME: {"findings": DRY_MISC_FINDINGS,
+                                                          "notes": ["Dry run: canned search results."]}})
+    return misc.scan(defn, canned, previous=previous)
+
+
 def _dry_digest(kw: dict) -> dict:
     """Canned digest that cites the ids it was actually shown, parsed back out of the prompt —
     so the demo digest exercises the verifier on real ids rather than on a hard-coded list."""
@@ -1066,22 +1274,24 @@ def enable_dry_run() -> common.FakeClient:
     """Route every network-touching step to the fixtures and return the fake model. The
     digest's schema name is ours; the sibling modules' names are not, which is why their steps
     are replaced wholesale rather than fed canned responses through the client."""
-    global fetch_listing, listing_rows, document_text, enrich_dev, discover_propose, gate_assess, _DRY
+    global fetch_listing, listing_rows, document_text, enrich_dev, discover_propose, gate_assess, misc_scan, _DRY
     fetch_listing = dry_fetch_listing
     listing_rows = dry_listing_rows
     document_text = dry_document_text
     enrich_dev = dry_enrich
     discover_propose = dry_discover
     gate_assess = dry_gate
+    misc_scan = dry_misc
     _DRY = True
     from . import digest as digest_mod
     return common.FakeClient(canned={digest_mod.NAME: _dry_digest})
 
 
 def restore_live() -> None:
-    global fetch_listing, listing_rows, document_text, enrich_dev, discover_propose, gate_assess, _DRY
+    global fetch_listing, listing_rows, document_text, enrich_dev, discover_propose, gate_assess, misc_scan, _DRY
     fetch_listing, listing_rows, document_text = _default_fetch_listing, _default_listing_rows, _default_document_text
     enrich_dev, discover_propose, gate_assess = _default_enrich, _default_discover, _default_gate
+    misc_scan = _default_misc
     _DRY = False
 
 
@@ -1149,7 +1359,8 @@ def cmd_create(args) -> int:
     # documents rather than the budget's full max_new_per_run and the page appears in minutes.
     # An explicit --max-new wins: a caller who named a number meant that number.
     max_new = args.max_new if getattr(args, "max_new", None) is not None else FIRST_RUN_MAX_NEW
-    summary, code = create_scan(defn, paths, client, no_discover=no_discover, max_new=max_new)
+    summary, code = create_scan(defn, paths, client, no_discover=no_discover, max_new=max_new,
+                                no_misc=bool(getattr(args, "no_misc", False)))
     summary["action"] = "create"
     _print_summary(summary, getattr(args, "summary_out", None))
     return code
@@ -1181,7 +1392,8 @@ def cmd_run(args) -> int:
     # clamp of delay_seconds=0 that a dry run never applies (review finding).
     for n in budget_notes(defn):
         print(f"run: {n}", file=sys.stderr)
-    summary, code = run_scan(defn, paths, client, max_new=args.max_new)
+    summary, code = run_scan(defn, paths, client, max_new=args.max_new,
+                             no_misc=bool(getattr(args, "no_misc", False)))
     summary["action"] = "run"
     _print_summary(summary, getattr(args, "summary_out", None))
     return code
@@ -1219,6 +1431,165 @@ def cmd_delete(args) -> int:
     _print_summary({"id": args.id, "action": "delete", "removed": removed, "exit": 0 if removed else EXIT_USAGE},
                    getattr(args, "summary_out", None))
     return EXIT_OK if removed else EXIT_USAGE
+
+
+def _finding_for(cmd: str, args) -> tuple:
+    """(paths, definition, misc document, finding) for the two commands that act on one finding,
+    or (None, None, None, None) after printing why not.
+
+    One function because `promote` and `dismiss` must refuse in exactly the same way and for the
+    same reasons: a mistyped scan id, a finding id that is not ten hex characters, a definition
+    that is missing or invalid, a lane that has never run, an id that is not in the file. Two
+    copies of this would drift, and the difference would show up as one door being stricter than
+    the other for no reason a partner could see."""
+    if not ID_RE.match(args.id or ""):
+        print(f"{cmd}: --id must match ^[a-z0-9][a-z0-9-]{{1,59}}$", file=sys.stderr)
+        return None, None, None, None
+    if _reserved(cmd, args.id):
+        return None, None, None, None
+    fid = (args.finding or "").strip().lower()
+    if not FINDING_ID_RE.match(fid):
+        print(f"{cmd}: --finding must be a 10-character finding id from misc.json (hex)", file=sys.stderr)
+        return None, None, None, None
+    paths = paths_for(args.id)
+    defn = common.load_json(paths.definition, None)
+    if not isinstance(defn, dict) or defn.get("id") != args.id:
+        print(f"{cmd}: no scan definition with id '{args.id}' at {paths.definition}", file=sys.stderr)
+        return None, None, None, None
+    problems = validate_definition(defn)
+    if problems:
+        for p in problems:          # every problem, not just the first: one pass to fix them all
+            print(f"{cmd}: definition invalid: {p}", file=sys.stderr)
+        return None, None, None, None
+    doc = common.load_json(paths.misc, None)
+    findings = (doc or {}).get("findings") if isinstance(doc, dict) else None
+    if not isinstance(findings, list) or not findings:
+        print(f"{cmd}: no Miscellaneous findings at {paths.misc} — run the scan first", file=sys.stderr)
+        return None, None, None, None
+    finding = next((f for f in findings if isinstance(f, dict) and f.get("id") == fid), None)
+    if finding is None:
+        print(f"{cmd}: no finding '{fid}' in {paths.misc.name} ({len(findings)} finding(s) there)", file=sys.stderr)
+        return None, None, None, None
+    return paths, defn, doc, finding
+
+
+def cmd_dismiss(args) -> int:
+    """Set one Miscellaneous finding aside: status `dismissed`, so later runs stop offering it.
+
+    The contract has had this status since the lane was designed, `misc.merge` has always
+    preserved it, and nothing could ever set it — so a lead a partner had judged irrelevant came
+    back, in the same place, on every run for ever. That is the defect this closes.
+
+    Any kind may be dismissed: judging a lead irrelevant is a reading of the subject, not of the
+    publisher, and the whole point of the lane is that a partner triages it. Nothing is deleted —
+    the finding stays in misc.json with its id, its first sighting and its link, so the judgement
+    is auditable and reversible by hand. What it does NOT do is touch coverage: a finding already
+    promoted has become a source, and this command refuses it rather than leave the lane and the
+    coverage list disagreeing about the same URL."""
+    paths, defn, doc, finding = _finding_for("dismiss", args)
+    if finding is None:
+        return EXIT_USAGE
+    fid = finding["id"]
+    url = finding.get("url") or ""
+    if finding.get("status") == "promoted":
+        print(f"dismiss: finding '{fid}' was promoted into this scan's coverage — dismissing the lead would "
+              f"not remove the source, and a lane that says 'set aside' about a URL the scan still fetches is "
+              f"worse than either answer. Remove it from the coverage list in Edit if it should not be read: "
+              f"{url}", file=sys.stderr)
+        return EXIT_USAGE
+    if finding.get("status") == "dismissed":
+        # Idempotent on purpose: two clicks, or a retried dispatch, must not read as a failure.
+        common.log(f"{fid} is already dismissed — nothing changed")
+        _print_summary({"id": args.id, "action": "dismiss", "finding": fid, "url": url,
+                        "status": "dismissed", "changed": False, "exit": EXIT_OK},
+                       getattr(args, "summary_out", None))
+        return EXIT_OK
+    finding["status"] = "dismissed"
+    common.atomic_write_json(paths.misc, doc)
+    common.log(f"dismissed {fid} → {url}")
+    common.log("the finding stays in misc.json with its id and first sighting; later runs keep the status, so "
+               "this lead is not offered again. Nothing was fetched, and the coverage list is unchanged.")
+    _print_summary({"id": args.id, "action": "dismiss", "finding": fid, "url": url,
+                    "status": "dismissed", "changed": True, "exit": EXIT_OK},
+                   getattr(args, "summary_out", None))
+    return EXIT_OK
+
+
+def cmd_promote(args) -> int:
+    """Move one Miscellaneous finding into the scan's coverage list, where the gate decides.
+
+    This is the ONLY route from that lane into coverage (docs/horizon-design.md; the lane itself
+    never fetches anything). It is one finding at a time, by hand, and it does not approve
+    anything: the URL is added as `pending` with `proposed_by: "miscellany"` and the finding's own
+    reason as the rationale, and the next run fetches it with the honest UA, reads robots.txt and
+    the terms, and applies the extraction floor before a single row of it can reach the ledger.
+
+    Only a finding of kind `official_venue` may be promoted. A press report or a commentary piece
+    is not a venue: putting a newspaper on a coverage list would put an unofficial retelling into
+    a ledger the whole product promises is made of primary instruments."""
+    paths, defn, doc, finding = _finding_for("promote", args)
+    if finding is None:
+        return EXIT_USAGE
+    fid = finding["id"]
+    kind = finding.get("kind")
+    if kind != "official_venue":
+        # Named, with the reason, because this refusal is the boundary the lane exists behind.
+        print(f"promote: finding '{fid}' is kind '{kind}', not 'official_venue' — only an official venue "
+              f"can be promoted into coverage. A press report, a trade-body item or a commentary piece is "
+              f"not where an instrument is published, and a ledger built on primary sources cannot cite one. "
+              f"Promote the official page it reports on instead: {finding.get('url', '')}", file=sys.stderr)
+        return EXIT_USAGE
+    url = finding.get("url") or ""
+    if not _is_url(url):
+        print(f"promote: finding '{fid}' has no usable http(s) URL", file=sys.stderr)
+        return EXIT_USAGE
+    existing = next((s for s in defn.get("sources") or []
+                     if isinstance(s, dict) and s.get("url") and canon_url(s["url"]) == canon_url(url)), None)
+    if existing:
+        # Nothing to do, and saying so is better than adding the URL twice: a second copy would be
+        # gated again and would double-count the venue on the coverage panel.
+        common.log(f"{url} is already on this scan's coverage list with status "
+                   f"'{existing.get('status', 'pending')}' — nothing added")
+        if finding.get("status") != "promoted":
+            finding["status"] = "promoted"
+            common.atomic_write_json(paths.misc, doc)
+        _print_summary({"id": args.id, "action": "promote", "finding": fid, "url": url,
+                        "status": existing.get("status", "pending"), "added": False, "exit": EXIT_OK},
+                       getattr(args, "summary_out", None))
+        return EXIT_OK
+    source = {
+        "url": url,
+        "name": common.norm_ws(finding.get("title") or "")[:200] or _host(url),
+        "host": _host(url),
+        "jurisdiction": common.norm_ws(finding.get("jurisdiction") or "")[:40],
+        # The lane's kinds (official_venue / secondary / commentary) are not the coverage list's
+        # kinds (gazette / regulator / court / …), and guessing between them would put a label on
+        # the coverage panel that nobody checked. "other" until a human or the gate says better.
+        "kind": "other",
+        "status": "pending",
+        "tier": "discovered",
+        "proposed_by": MISC_PROPOSED_BY,
+        "rationale": common.norm_ws(finding.get("why") or "")[:1000] or "Promoted from the Miscellaneous lane.",
+        "reason": "promoted from the Miscellaneous lane; not yet gated",
+    }
+    defn.setdefault("sources", []).append(source)
+    problems = validate_definition(defn)
+    if problems:
+        for p in problems:
+            print(f"promote: the promoted source would make the definition invalid: {p}", file=sys.stderr)
+        return EXIT_USAGE
+    defn["updated"] = common.now_ist()
+    common.atomic_write_json(paths.definition, defn)
+    finding["status"] = "promoted"
+    common.atomic_write_json(paths.misc, doc)
+    common.log(f"promoted {fid} → {url}")
+    common.log("added as a pending source. Nothing has been fetched from it: the Miscellaneous lane only "
+               "reads search results. The next run of this scan gates it — robots.txt, terms, extraction "
+               "floor — and only an approved source is ever read into the ledger.")
+    _print_summary({"id": args.id, "action": "promote", "finding": fid, "url": url,
+                    "status": "pending", "added": True, "exit": EXIT_OK},
+                   getattr(args, "summary_out", None))
+    return EXIT_OK
 
 
 def cmd_list(args) -> int:
@@ -1265,8 +1636,19 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--max-new", type=int, default=None, help="enrich at most N this run (below the budget)")
     d = sub.add_parser("delete", help="remove the definition and its data directory")
     d.add_argument("--id", required=True)
+    m = sub.add_parser("promote", help="move one Miscellaneous finding's URL into the scan's sources, to be gated")
+    m.add_argument("--id", required=True)
+    m.add_argument("--finding", required=True, metavar="FINDING_ID",
+                   help="a 10-character finding id from data/scans/<id>/misc.json (kind must be official_venue)")
+    x = sub.add_parser("dismiss", help="set one Miscellaneous finding aside so later runs stop offering it")
+    x.add_argument("--id", required=True)
+    x.add_argument("--finding", required=True, metavar="FINDING_ID",
+                   help="a 10-character finding id from data/scans/<id>/misc.json (any kind; not one already promoted)")
     sub.add_parser("list", help="every scan with its source and development counts")
-    for p in (c, r, d):
+    for p in (c, r):
+        p.add_argument("--no-misc", action="store_true",
+                       help="skip the Miscellaneous lane (the open-web search for things outside coverage)")
+    for p in (c, r, d, m, x):
         p.add_argument("--summary-out", metavar="FILE", default=None,
                        help="also write the SUMMARY JSON to FILE (the workflow reads this, not the log)")
     return ap
@@ -1284,6 +1666,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         return cmd_run(args)
     if args.cmd == "delete":
         return cmd_delete(args)
+    if args.cmd == "promote":
+        return cmd_promote(args)
+    if args.cmd == "dismiss":
+        return cmd_dismiss(args)
     if args.cmd == "list":
         return cmd_list(args)
     ap.print_help()
@@ -1308,9 +1694,16 @@ def _check_workflow() -> str:
         on = wf.get("on") if "on" in wf else wf.get(True)
         assert set(on) == {"workflow_dispatch"}, f"triggers: {list(on)}"
         inputs = on["workflow_dispatch"]["inputs"]
-        assert set(inputs) == {"action", "scan_id", "scan", "no_discover"}, list(inputs)
+        assert set(inputs) == {"action", "scan_id", "scan", "no_discover", "finding_id"}, list(inputs)
         assert inputs["action"]["type"] == "choice" and inputs["action"]["required"] is True
-        assert inputs["action"]["options"] == ["create", "run", "delete"]
+        # `dismiss` (run.py dismiss --id … --finding …) is wired into scan.yml separately — that
+        # file is not this module's to edit — so the four below are required and in order, and
+        # `dismiss` is the only addition this check will accept. When it IS there, it must be
+        # built exactly like promote: a quoted array element, never a shell interpolation.
+        opts = inputs["action"]["options"]
+        assert opts[:4] == ["create", "run", "delete", "promote"], opts
+        assert set(opts) <= {"create", "run", "delete", "promote", "dismiss"}, opts
+        assert inputs["finding_id"]["required"] is False and inputs["finding_id"]["default"] == ""
         assert inputs["no_discover"]["type"] == "boolean" and inputs["no_discover"]["default"] is False
         assert wf["permissions"] == {"contents": "write"}
         assert wf["concurrency"]["group"] == "tmt-scan-${{ inputs.scan_id }}"
@@ -1334,6 +1727,14 @@ def _check_workflow() -> str:
         assert "--summary-out" in run_step and "grep '^SUMMARY '" not in run_step, "summary must come from --summary-out"
         assert "re.fullmatch(r\"[a-z0-9][a-z0-9-]{1,59}\"" in run_step, "the summary id must be re-validated"
         assert "\"schema\", \"tmt-india\"" in run_step, "reserved ids must be refused as a commit-message id"
+        # promote: the finding id is shape-checked in the workflow before it reaches any command,
+        # exactly like scan_id, and is passed as a quoted array element.
+        validate = [x for x in steps if x.get("name") == "Validate inputs"][0]["run"]
+        assert "'^[0-9a-f]{10}$'" in validate and "finding_id is required for" in validate, validate
+        assert 'promote) ARGS=(promote --id "$SCAN_ID" --finding "$FINDING_ID"' in run_step, run_step
+        if "dismiss" in opts:
+            assert 'dismiss) ARGS=(dismiss --id "$SCAN_ID" --finding "$FINDING_ID"' in run_step, run_step
+            assert "dismiss" in validate, "dismiss must require finding_id like promote does"
         return "yaml"
     # Textual fallback: split the file at `run:` and make sure no input expression follows one.
     for chunk in re.split(r"\n\s+run:\s*\|", text)[1:]:
@@ -1341,7 +1742,8 @@ def _check_workflow() -> str:
         assert "${{ inputs." not in body and "${{ github.event.inputs" not in body
     for needle in ("workflow_dispatch:", "type: choice", "timeout-minutes: 60", "contents: write",
                    "tmt-scan-${{ inputs.scan_id }}", "cancel-in-progress: false", "::notice",
-                   "--summary-out", "re.fullmatch(r\"[a-z0-9][a-z0-9-]{1,59}\""):
+                   "--summary-out", "re.fullmatch(r\"[a-z0-9][a-z0-9-]{1,59}\"",
+                   "options: [create, run, delete, promote", "'^[0-9a-f]{10}$'"):
         assert needle in text, f"scan.yml lacks {needle}"
     assert "grep '^SUMMARY '" not in text
     return "text"
@@ -1379,6 +1781,11 @@ def selftest() -> None:
     # pipeline), so the two are checked against each other here rather than left to drift.
     schema = common.load_json(common.SCANS_DIR / "schema.json", None)
     if schema:
+        # The top-level key set too, not only the source's. Defect this closes: `discovery_notes`
+        # was in TOP_KEYS and in every definition run.py has ever written, but absent from a
+        # schema with additionalProperties false — so the committed contract rejected every file
+        # the pipeline produced, and nobody noticed because nothing validated against it.
+        assert set(schema["properties"]) == set(TOP_KEYS), sorted(set(schema["properties"]) ^ set(TOP_KEYS))
         src_schema = schema["$defs"]["source"]
         assert src_schema["additionalProperties"] is False, "the schema still lets any key onto a source"
         assert set(src_schema["properties"]) == set(SOURCE_KEYS), \
@@ -1386,7 +1793,16 @@ def selftest() -> None:
         assert tuple(src_schema["properties"]["kind"]["enum"]) == SOURCE_KINDS, src_schema["properties"]["kind"]
         assert tuple(src_schema["properties"]["status"]["enum"]) == SOURCE_STATUSES
         assert tuple(src_schema["properties"]["tier"]["enum"]) == TIERS
-        assert tuple(src_schema["properties"]["proposed_by"]["enum"]) == ("partner", "discovery")
+        assert tuple(src_schema["properties"]["proposed_by"]["enum"]) == SOURCE_PROPOSERS
+        # misc.json's contract lives in the same file; the lane's own vocabulary is checked
+        # against the module so the two cannot drift.
+        from . import misc as misc_mod
+        mf = schema["$defs"]["misc_finding"]
+        assert tuple(mf["properties"]["kind"]["enum"]) == tuple(misc_mod.KINDS), mf["properties"]["kind"]
+        assert tuple(mf["properties"]["status"]["enum"]) == misc_mod.STATUSES
+        assert set(mf["required"]) == set(mf["properties"]) and mf["additionalProperties"] is False
+        assert set(schema["$defs"]["misc"]["required"]) == {"generated", "query", "findings", "notes"}
+        assert misc_mod.PROPOSED_BY == MISC_PROPOSED_BY and MISC_PROPOSED_BY in SOURCE_PROPOSERS
     # sources given as URL strings (the edit dialog's shape) are coerced to {url} and accepted
     strs = dict(demo, sources=["https://gazette.example.test/serie-generale", {"url": "https://ministry.example.test/x"}, "ftp://no"])
     probs = validate_definition(strs)
@@ -1451,8 +1867,11 @@ def selftest() -> None:
         os.environ["TMT_SCAN_ROOT"] = tmp
         try:
             # 3. Full dry-run create (no discovery) against the fixtures.
-            rc = main(["create", "--from-json", str(FIXTURES / "demo-definition.json"), "--no-discover", "--dry-run"])
+            create_summary = Path(tmp) / "create-summary.json"
+            rc = main(["create", "--from-json", str(FIXTURES / "demo-definition.json"), "--no-discover",
+                       "--dry-run", "--summary-out", str(create_summary)])
             assert rc == 0, rc
+            summary_of_create = json.loads(create_summary.read_text(encoding="utf-8"))
             paths = paths_for("eu-pay-transparency-directive-scan")
             for p in (paths.definition, paths.developments, paths.health, paths.digest):
                 assert p.exists() and not p.with_suffix(".json.tmp").exists(), p
@@ -1486,6 +1905,30 @@ def selftest() -> None:
             g = health["sources"]["https://gazette.example.test/serie-generale"]
             assert g["rows_seen"] == 5 and g["new"] == 5 and g["newest_visible"] == "2026-08-28", g
             assert health["run"]["enriched"] == 7 and health["run"]["queued"] == 0
+            # The Miscellaneous lane ran as part of the create: misc.json is written beside the
+            # ledger, the finding published on a covered host is dropped (that is coverage, not
+            # miscellany) and the counts reach health and the summary.
+            assert paths.misc.exists() and not paths.misc.with_suffix(".json.tmp").exists(), paths.misc
+            mdoc = common.load_json(paths.misc)
+            assert [f["kind"] for f in mdoc["findings"]] == ["official_venue", "official_venue", "secondary"], mdoc["findings"]
+            assert not any(f["host"] == "gazette.example.test" for f in mdoc["findings"]), mdoc["findings"]
+            assert any("gazette.example.test is on this scan's coverage list" in n for n in mdoc["notes"]), mdoc["notes"]
+            assert mdoc["query"]["excluded_hosts"] == ["gazette.example.test", "ministry.example.test"], mdoc["query"]
+            assert all(f["status"] == "new" and f["first_seen"] == common.today_ist() for f in mdoc["findings"])
+            # Every finding this run's search returned carries the run's own stamp and is not
+            # stale; the page needs no rule of its own to tell a fresh lead from a kept one.
+            assert all(f["last_seen"] == mdoc["generated"] and f["stale"] is False for f in mdoc["findings"]), \
+                mdoc["findings"]
+            assert health["misc"] == {"found": 3, "new": 3, "promoted": 0, "dismissed": 0, "kept": 0,
+                                      "stale": 0, "dropped": 1, "total": 3, "skipped": False,
+                                      "error": ""}, health["misc"]
+            # A COUNT IS NOT A PROBLEM. health.notes is what the page renders in its problems
+            # list, so a healthy lane must put nothing there: the numbers are health.misc and the
+            # SUMMARY, and the leads are their own tab. Defect this closes: every successful run
+            # reported "miscellany: N finding(s) outside coverage this run …" as a problem.
+            assert not any(n.startswith("miscellany") for n in health["notes"]), health["notes"]
+            assert not any("outside coverage this run" in n for n in health["notes"]), health["notes"]
+            assert summary_of_create["misc"] == {"found": 3, "new": 3, "promoted": 0}, summary_of_create["misc"]
             dg = common.load_json(paths.digest)
             known = {d["id"] for d in devs}
             assert dg["week"] == common.iso_week() and dg["headline"] and len(dg["body"]) >= 2
@@ -1796,6 +2239,193 @@ def selftest() -> None:
                 assert common.load_json(np.digest)["headline"] == "Nothing new this week"
             finally:
                 globals()["gate_assess"], globals()["discover_propose"] = saved_gate, saved_disc
+
+            # 14. The Miscellaneous lane end to end. A lead outside coverage is promoted into the
+            #     definition, gated on the next run exactly like any other candidate, and once it
+            #     IS coverage the lane stops surfacing it — while keeping it, with its status.
+            import contextlib
+            import io
+            fc2 = enable_dry_run()
+            mp = paths_for("misc-demo")
+            create_scan(json.loads(json.dumps(dict(demo, name="Misc demo", id="misc-demo"))),
+                        mp, fc2, no_discover=True)
+            md = common.load_json(mp.misc)
+            by_url = {f["url"]: f for f in md["findings"]}
+            boe = by_url["https://boe.example.test/diario/2026/09/01/rd-812-2026"]
+            parl = by_url["https://parlement.example.test/dossiers/transparence-salariale"]
+            press = by_url["https://press.example.test/story/spain-pay-gap-deadline"]
+            assert all(f["status"] == "new" and len(f["id"]) == 10 for f in md["findings"]), md["findings"]
+
+            def _promote(fid: str) -> tuple:
+                err = io.StringIO()
+                with contextlib.redirect_stderr(err):
+                    rc = main(["promote", "--id", "misc-demo", "--finding", fid])
+                return rc, err.getvalue()
+
+            # Only an official venue can be promoted, and the refusal names why rather than
+            # printing "invalid": this is the boundary the whole lane exists behind.
+            rc, err = _promote(press["id"])
+            assert rc == EXIT_USAGE and "not 'official_venue'" in err and "not where an instrument is published" in err, err
+            assert _promote("0123456789")[0] == EXIT_USAGE, "an unknown finding id was accepted"
+            assert _promote("NOTHEXNOT")[0] == EXIT_USAGE, "a malformed finding id was accepted"
+            assert len(common.load_json(mp.definition)["sources"]) == 2, "a refused promote changed the definition"
+            assert common.load_json(mp.misc)["findings"] == md["findings"], "a refused promote changed misc.json"
+
+            # The two official venues go in as pending, carrying the finding's own words.
+            assert _promote(boe["id"])[0] == EXIT_OK and _promote(parl["id"])[0] == EXIT_OK
+            pdefn = common.load_json(mp.definition)
+            promoted = [s for s in pdefn["sources"] if s.get("proposed_by") == MISC_PROPOSED_BY]
+            assert len(promoted) == 2 and all(s["status"] == "pending" and "gate" not in s for s in promoted), promoted
+            assert promoted[0]["url"] == boe["url"] and promoted[0]["rationale"] == boe["why"], promoted[0]
+            assert promoted[0]["name"] == boe["title"] and promoted[0]["jurisdiction"] == "ES"
+            assert all(s["tier"] == "discovered" and s["kind"] == "other" for s in promoted), promoted
+            assert validate_definition(pdefn) == [], validate_definition(pdefn)
+            statuses = {f["id"]: f["status"] for f in common.load_json(mp.misc)["findings"]}
+            assert statuses[boe["id"]] == "promoted" and statuses[press["id"]] == "new", statuses
+            # Promoting the same finding twice adds nothing: one venue, one row on the coverage panel.
+            assert _promote(boe["id"])[0] == EXIT_OK
+            assert len([s for s in common.load_json(mp.definition)["sources"]
+                        if s.get("proposed_by") == MISC_PROPOSED_BY]) == 2
+
+            # 14b. dismiss: the other half of triage, and the status nothing could set before —
+            #      so a lead a partner had judged irrelevant came back every run for ever.
+            def _dismiss(fid: str, scan_id: str = "misc-demo") -> tuple:
+                err = io.StringIO()
+                with contextlib.redirect_stderr(err):
+                    rc = main(["dismiss", "--id", scan_id, "--finding", fid])
+                return rc, err.getvalue()
+
+            misc_before, defn_before = mp.misc.read_bytes(), mp.definition.read_bytes()
+            # The same refusals as promote, from the same code: a malformed or unknown finding
+            # id, a reserved scan id, a scan with no lane to triage.
+            assert _dismiss("0123456789")[0] == EXIT_USAGE, "an unknown finding id was accepted"
+            assert _dismiss("NOTHEXNOT")[0] == EXIT_USAGE, "a malformed finding id was accepted"
+            assert _dismiss(press["id"], "no-such-scan")[0] == EXIT_USAGE, "an unknown scan was accepted"
+            for rid in sorted(RESERVED_IDS):
+                assert _dismiss(press["id"], rid)[0] == EXIT_USAGE, rid
+            # A promoted finding is coverage now: refusing is the honest answer, because
+            # dismissing the lead would not remove the source.
+            rc, err = _dismiss(boe["id"])
+            assert rc == EXIT_USAGE and "was promoted into this scan's coverage" in err, err
+            assert mp.misc.read_bytes() == misc_before, "a refused dismiss changed misc.json"
+            # A secondary finding CAN be dismissed — judging a lead irrelevant is a reading of
+            # the subject, not of the publisher — and the definition is not touched by it.
+            assert _dismiss(press["id"])[0] == EXIT_OK
+            st = {f["id"]: f["status"] for f in common.load_json(mp.misc)["findings"]}
+            assert st[press["id"]] == "dismissed" and st[boe["id"]] == "promoted", st
+            assert mp.definition.read_bytes() == defn_before, "dismiss changed the coverage list"
+            # Idempotent: a second click, or a retried dispatch, is not a failure.
+            settled = mp.misc.read_bytes()
+            assert _dismiss(press["id"])[0] == EXIT_OK and mp.misc.read_bytes() == settled
+
+            saved_fetch = fetch_listing
+            try:
+                def stub_fetch(url, delay, allowed_hosts):
+                    """A listing for the promoted Spanish venue; nothing for the French one — so
+                    one promotion is approved and read in the same run and the other is rejected,
+                    which is the gate deciding, exactly as promote promised it would."""
+                    if _host(url) == "boe.example.test":
+                        return (FIXTURES / "listing.gazette.example.test.html").read_bytes(), {"http": 200, "fixture": "stub"}
+                    return dry_fetch_listing(url, delay, allowed_hosts)
+                globals()["fetch_listing"] = stub_fetch
+                assert run_scan(common.load_json(mp.definition), mp, fc2)[1] == EXIT_OK
+                gdefn = common.load_json(mp.definition)
+                states = {s["url"]: s["status"] for s in gdefn["sources"] if s.get("proposed_by") == MISC_PROPOSED_BY}
+                assert states[boe["url"]] == "approved" and states[parl["url"]] == "rejected", states
+                gh = common.load_json(mp.health)
+                # A promotion that worked is not a problem: the approval is on the venue's own
+                # health row, and only the rejection — which a partner must act on — is a note.
+                assert not any("promoted source gated approved" in n for n in gh["notes"]), gh["notes"]
+                assert any("promoted source gated approved" in i for i in gh["sources"][boe["url"]]["info"]), \
+                    gh["sources"][boe["url"]]
+                assert any("promoted source gated rejected" in n and "no listing fixture" in n for n in gh["notes"]), gh["notes"]
+                # Approved means read in this same run, through the ordinary source loop.
+                assert gh["sources"][boe["url"]]["status"] == "OK" and gh["sources"][boe["url"]]["new"] > 0, gh["sources"]
+                # And now that the venue is coverage, the lane drops it — while keeping the
+                # finding, with the status the partner gave it.
+                md2 = common.load_json(mp.misc)
+                boe2 = next(f for f in md2["findings"] if f["id"] == boe["id"])
+                assert boe2["status"] == "promoted" and boe2["first_seen"] == boe["first_seen"], boe2
+                assert any("boe.example.test is on this scan's coverage list" in n for n in md2["notes"]), md2["notes"]
+                assert any("no longer surface in search" in n and boe["id"] in n for n in md2["notes"]), md2["notes"]
+                # A kept lead is visible AS a kept lead: its last_seen is the earlier run's stamp,
+                # older than this file's own, so `stale` is true and the page can mark the row.
+                # `stale` comes from the set of ids the search returned, not from comparing the
+                # two stamps: these two runs land within a second of each other and now_ist()
+                # reads to the second, so a stamp comparison would have called this lead fresh.
+                assert boe2["stale"] is True and boe2["last_seen"] <= md2["generated"], boe2
+                assert all(f["stale"] is False and f["last_seen"] == md2["generated"]
+                           for f in md2["findings"] if f["id"] != boe["id"]), md2["findings"]
+                # A dismissed lead stays dismissed and is not re-listed as new by the next run.
+                press2 = next(f for f in md2["findings"] if f["id"] == press["id"])
+                assert press2["status"] == "dismissed" and press2["stale"] is False, press2
+                # Nothing new: the lane had seen both remaining leads before, and "new" means the
+                # lane had never seen the URL — not "first seen today".
+                assert gh["misc"] == {"found": 2, "new": 0, "promoted": 2, "dismissed": 1, "kept": 1,
+                                      "stale": 1, "dropped": 2, "total": 3, "skipped": False,
+                                      "error": ""}, gh["misc"]
+                # And still no routine note: a healthy lane says its numbers in health.misc.
+                assert not any(n.startswith("miscellany") for n in gh["notes"]), gh["notes"]
+
+                # Skippable, and skipping says so and leaves the findings alone.
+                before = mp.misc.read_bytes()
+                assert run_scan(common.load_json(mp.definition), mp, fc2, no_misc=True)[1] == EXIT_OK
+                sh = common.load_json(mp.health)
+                assert mp.misc.read_bytes() == before, "--no-misc rewrote misc.json"
+                assert sh["misc"]["skipped"] is True and any("skipped on this run (--no-misc)" in n for n in sh["notes"]), sh["misc"]
+
+                # A lane failure is a note, never an exit code: nothing here is coverage, so its
+                # absence cannot make the scan wrong.
+                saved_misc = misc_scan
+
+                def boom_misc(defn_, client_, previous):
+                    raise RuntimeError("web search unavailable")
+                try:
+                    globals()["misc_scan"] = boom_misc
+                    assert run_scan(common.load_json(mp.definition), mp, fc2)[1] == EXIT_OK
+                finally:
+                    globals()["misc_scan"] = saved_misc
+                bh = common.load_json(mp.health)
+                assert bh["misc"]["skipped"] is True and bh["misc"]["found"] == 0 \
+                    and "web search unavailable" in bh["misc"]["error"], bh["misc"]
+                assert any("lane failed and was skipped this run" in n for n in bh["notes"]), bh["notes"]
+                assert mp.misc.read_bytes() == before, "a failed lane rewrote misc.json"
+            finally:
+                globals()["fetch_listing"] = saved_fetch
+
+            # A scan created with the lane off never writes misc.json at all, and says so.
+            np2 = paths_for("no-misc-demo")
+            create_scan(json.loads(json.dumps(dict(demo, name="No misc demo", id="no-misc-demo"))),
+                        np2, fc2, no_discover=True, no_misc=True)
+            assert not np2.misc.exists(), "no_misc still wrote misc.json"
+            assert common.load_json(np2.definition)["no_misc"] is True
+            assert any("switched off for this scan" in n for n in common.load_json(np2.health)["notes"])
+            assert main(["promote", "--id", "no-misc-demo", "--finding", boe["id"]]) == EXIT_USAGE, \
+                "promote must refuse when there are no findings to promote from"
+            assert _dismiss(boe["id"], "no-misc-demo")[0] == EXIT_USAGE, \
+                "dismiss must refuse when there are no findings to triage"
+
+            # 14d. no_misc survives an Edit. A Save re-creates the scan from a definition the page
+            #      read back, and that definition may simply not carry the key — no_misc is not a
+            #      dispatch input, so there is no second channel for it. Absent must therefore
+            #      mean unchanged, exactly like `created`. Defect this closes: a Save silently
+            #      switched the open-web lane back on for a scan whose partner had turned it off.
+            edited = json.loads(json.dumps(dict(demo, name="No misc demo", id="no-misc-demo")))
+            assert "no_misc" not in edited
+            create_scan(edited, np2, fc2, no_discover=True)          # and no --no-misc flag either
+            assert common.load_json(np2.definition)["no_misc"] is True, "an Edit re-enabled the lane"
+            assert not np2.misc.exists(), "the lane ran on a scan whose partner had switched it off"
+            nh = common.load_json(np2.health)["notes"]
+            # The lane being off is why the tab is empty, so it is said. That a Save replaced the
+            # definition is not a problem — it is what Save does — so it is only in the log.
+            assert any("switched off for this scan" in n for n in nh), nh
+            assert not any("replaced an existing one" in n for n in nh), nh
+            # Turning it back on is still one Save away: a definition that says False means False.
+            back_on = json.loads(json.dumps(dict(demo, name="No misc demo", id="no-misc-demo", no_misc=False)))
+            create_scan(back_on, np2, fc2, no_discover=True)
+            assert common.load_json(np2.definition)["no_misc"] is False, "the lane could not be turned back on"
+            assert np2.misc.exists() and common.load_json(np2.misc)["findings"], "the lane did not run"
+            restore_live()
         finally:
             os.environ.pop("TMT_SCAN_ROOT", None)
             restore_live()
@@ -1811,7 +2441,15 @@ def selftest() -> None:
           f"first run reads {FIRST_RUN_MAX_NEW} of 25 and the backlog is picked up by the next run, partner kind/name/"
           f"rationale survive the gate (tier still discovered), no_discover gates 6 partner sources with 0 discovery calls, "
           f"FAILED source exit 1 (fetch and extractor error), GATED over budget, delete guarded, undated pair kept, "
-          f"enrich error retried then given up, robots read final, clamp noted, --summary-out; scan.yml checked via {how}")
+          f"enrich error retried then given up, robots read final, clamp noted, --summary-out; "
+          f"miscellany lane written beside the ledger (covered host dropped) with NO routine note in health "
+          f"(a healthy lane reports counts, not problems), promote refuses a non-official finding and moves an "
+          f"official one into sources, the next run gates it (one approved — noted on the venue's own health "
+          f"row, not in problems — and one rejected), a promoted venue stops being miscellany but keeps its "
+          f"status and is marked stale, dismiss refuses a bad id/reserved scan/promoted finding and is "
+          f"idempotent, a dismissed lead survives the next run and is not re-listed as new, --no-misc and "
+          f"no_misc skip the lane, no_misc survives an Edit that omits the key, a lane failure is a note not "
+          f"an exit code; scan.yml checked via {how}")
 
 
 if __name__ == "__main__":

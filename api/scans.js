@@ -1,4 +1,5 @@
-// Vercel serverless function — Create / Run / Delete a scan, and report what its runs are doing.
+// Vercel serverless function — Create / Run / Delete a scan, promote a Miscellaneous finding into
+// its coverage, and report what its runs are doing.
 //
 // The scan layer (docs/horizon-design.md §3) does all its real work on GitHub Actions, because
 // discovery, gating, fetching and enrichment take minutes and hit government sites, which is not
@@ -25,16 +26,44 @@
 // NOTE ON ACCESS: like /api/sweep this inherits the deployment's Edge auth (middleware.js). On an
 // unprotected deployment anyone with the URL could create scans that fetch arbitrary official
 // sites in the firm's name. Keep Vercel Deployment Protection on.
+//
+// WHY maxDuration IS 20 SECONDS HERE (vercel.json → functions). The rationale lives in this
+// comment because vercel.json cannot hold one: its schema sets additionalProperties:false at the
+// top level and inside every function entry, so there is no key to put a note in, and JSON has no
+// comments. The numbers there are:
+//   api/scans.js  20 — this function makes exactly ONE GitHub API call per request (a dispatch
+//                      POST, or the status GET) and does no model work. A second or two is
+//                      normal; 20 is generous headroom for a slow GitHub, and it is deliberately
+//                      short because these fetches carry no AbortSignal, so maxDuration is the
+//                      only thing that ends a hung call — and a partner pressing Run scan should
+//                      get an answer or an error, never a minute of spinner.
+//   api/sweep.js  20 — the same single dispatch POST to the same API, so the same number for the
+//                      same reason. Both were on the platform default (10s on Hobby) before, and
+//                      an undeclared default is a number nobody chose.
+//   api/ask.js, api/draft.js, api/propose.js, api/discover.js  60 — those call a model (and, for
+//                      ask/draft, fetch a source document first) and hold their own inner
+//                      timeouts; 60 is the ceiling those timeouts are set to fit inside.
 
 const TOKEN_NAMES = [
   'GITHUB_DISPATCH_TOKEN', 'TMT_TOKEN', 'TMT_DISPATCH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN',
 ];
 const WORKFLOW = 'scan.yml';
+// The status action can report on any workflow this deployment already dispatches, so the
+// dashboard's Update now can show the same live phases as a scan. Allow-listed by name, never
+// taken from the caller verbatim: a free-text workflow file would be a path the caller chose.
+const STATUS_WORKFLOWS = { scan: 'scan.yml', sweep: 'sweep.yml', briefs: 'briefs.yml' };
 // "status" is the odd one out: it dispatches nothing, it reads. A scan takes minutes on Actions,
 // and until this existed the partner had to watch GitHub to know whether their scan was running,
 // finished or had failed. It is on this endpoint rather than a new file because it needs exactly
 // the same token and repository discovery.
-const ACTIONS = ['create', 'run', 'delete', 'status'];
+// "promote" is the Miscellaneous lane's one door into coverage. That lane never fetches anything:
+// it reads the hosted web-search tool's results and links out, so nothing in it is a citable
+// instrument and nothing in it enters the ledger. When a finding turns out to be an official venue
+// the scan does not cover, promoting it adds that URL to the scan's sources — and then the same
+// deterministic Python gate that judges every other source decides (fetch with the honest
+// User-Agent, robots.txt, terms scan, extraction floor). This endpoint approves nothing; it
+// dispatches. Promotion is the ONLY route from Miscellaneous into coverage.
+const ACTIONS = ['create', 'run', 'delete', 'status', 'promote'];
 // How many runs "status" reports, and how many it asks GitHub for when filtering by scan_id
 // (the matching runs may sit behind other scans' runs).
 const MAX_RUNS = 10;
@@ -42,16 +71,30 @@ const MAX_RUNS = 10;
 // pipeline will accept as a file name under scans/ and data/scans/ without any further cleaning.
 const SCAN_ID = /^[a-z0-9][a-z0-9-]{1,59}$/;
 const MAX_SCAN_JSON = 60000;
+// A misc finding's id, as data/scans/<id>/misc.json writes it: a 10-character hash of the URL.
+// The id is all a promote carries — the URL, host and kind are read from misc.json by the
+// pipeline, so a caller cannot smuggle a different URL in behind an id the partner clicked.
+const FINDING_ID = /^[a-f0-9]{10}$/;
 // Ids that match SCAN_ID but name files the layer already owns: scans/schema.json is the
 // contract, tmt-india is the registry lane. REVIEWED DEFECT: a scan named "Schema" slugged to
 // `schema`, and ScanPaths wrote the definition over scans/schema.json (and delete unlinked it).
 // pipeline/scan/run.py holds the same set; keep the two identical.
 const RESERVED_IDS = new Set(['schema', 'tmt-india']);
-// Top-level fields run.validate_definition accepts (its TOP_KEYS plus no_discover, which travels
-// inside the definition as well as as a dispatch input). An unknown key fails there with exit 2
-// two minutes after we said "queued", so it fails here first.
+// Top-level fields run.validate_definition accepts (its TOP_KEYS; no_discover travels inside the
+// definition as well as as a dispatch input). An unknown key fails there with exit 2 two minutes
+// after we said "queued", so it fails here first.
+// REVIEWED DEFECT: `no_misc` and `discovery_notes` were missing from this list, and an Edit
+// re-submits the definition the page read back out of scans/<id>.json. Both are keys the
+// pipeline itself writes into every definition, so an Edit of a scan that had the Miscellaneous
+// lane switched off was refused outright — or, once the page dropped unknown keys, silently
+// re-enabled the lane and threw away discovery's account of what it searched for and did not
+// find, which the coverage panel is supposed to keep showing for as long as it is true.
 const TOP_KEYS = ['id', 'name', 'intent', 'jurisdictions', 'topics', 'industries', 'clients',
-  'sources', 'budget', 'demo', 'created', 'updated', 'no_discover'];
+  'sources', 'budget', 'demo', 'created', 'updated', 'no_discover', 'no_misc', 'discovery_notes'];
+// discovery_notes is written by the pipeline, not typed by a partner, so the cap is only there
+// to stop an absurd payload: one note per venue considered is the natural size.
+const MAX_DISCOVERY_NOTES = 200;
+const MAX_DISCOVERY_NOTE_CHARS = 1000;
 const SOURCE_STATUSES = ['approved', 'pending', 'rejected'];
 const TIERS = ['vetted', 'discovered'];
 // A source may arrive as a bare URL string or as an object. The object shape widened when
@@ -324,8 +367,17 @@ function definitionError(scan) {
     }
   }
   if (scan.demo !== undefined && typeof scan.demo !== 'boolean') return 'scan.demo must be true or false.';
-  if (scan.no_discover !== undefined && typeof scan.no_discover !== 'boolean') {
-    return 'scan.no_discover must be true or false when given.';
+  for (const k of ['no_discover', 'no_misc']) {
+    if (scan[k] !== undefined && typeof scan[k] !== 'boolean') {
+      return `scan.${k} must be true or false when given.`;
+    }
+  }
+  if (scan.discovery_notes !== undefined) {
+    const e = strList(scan.discovery_notes, 'discovery_notes', MAX_DISCOVERY_NOTE_CHARS);
+    if (e) return e;
+    if (scan.discovery_notes.length > MAX_DISCOVERY_NOTES) {
+      return `scan.discovery_notes: at most ${MAX_DISCOVERY_NOTES}.`;
+    }
   }
   for (const k of ['created', 'updated']) {
     if (scan[k] !== undefined && typeof scan[k] !== 'string') return `scan.${k} must be a string.`;
@@ -346,9 +398,9 @@ function validate(body) {
   // status reads GitHub; it dispatches nothing, so it takes an optional scan_id and nothing else.
   // Refusing the extra keys keeps a caller from believing a definition sent alongside was acted on.
   if (action === 'status') {
-    const extra = Object.keys(body).filter((k) => k !== 'action' && k !== 'scan_id');
+    const extra = Object.keys(body).filter((k) => k !== 'action' && k !== 'scan_id' && k !== 'workflow');
     if (extra.length) {
-      return { error: `status takes only scan_id (ignoring nothing: got ${extra.join(', ')}).` };
+      return { error: `status takes only scan_id and workflow (got ${extra.join(', ')}).` };
     }
     let statusId = null;
     if (body.scan_id !== undefined) {
@@ -356,7 +408,37 @@ function validate(body) {
       if (e) return { error: e };
       statusId = body.scan_id;
     }
-    return { action, scan_id: statusId, scan: null, no_discover: false };
+    // `workflow` lets the dashboard's Update now watch its own sweep with the same machinery.
+    // Matched against the allow-list, never used as a path: the caller names a key, not a file.
+    let wf = null;
+    if (body.workflow !== undefined) {
+      if (typeof body.workflow !== 'string' || !Object.prototype.hasOwnProperty.call(STATUS_WORKFLOWS, body.workflow)) {
+        return { error: `workflow must be one of: ${Object.keys(STATUS_WORKFLOWS).join(', ')}.` };
+      }
+      wf = body.workflow;
+    }
+    return { action, scan_id: statusId, scan: null, no_discover: false, finding: null, workflow: wf };
+  }
+
+  // promote takes a scan and one finding id and nothing else: no definition, no no_discover. A
+  // definition sent alongside would look acted upon and would not be, so it is refused, exactly
+  // as status refuses its extras.
+  if (action === 'promote') {
+    const extra = Object.keys(body).filter((k) => k !== 'action' && k !== 'scan_id' && k !== 'finding');
+    if (extra.length) {
+      return { error: `promote takes only scan_id and finding (got also: ${extra.join(', ')}). To change a `
+        + "scan's definition, use create." };
+    }
+    if (body.scan_id === undefined) {
+      return { error: 'promote needs scan_id — the scan whose Miscellaneous finding is being promoted.' };
+    }
+    const e = idError(body.scan_id, 'scan_id');
+    if (e) return { error: e };
+    if (typeof body.finding !== 'string' || !FINDING_ID.test(body.finding)) {
+      return { error: 'promote needs "finding": the 10-character id of the miscellaneous finding to promote '
+        + '(lowercase hex, exactly as it appears in that scan\'s misc.json).' };
+    }
+    return { action, scan_id: body.scan_id, scan: null, no_discover: false, finding: body.finding };
   }
 
   if (body.no_discover !== undefined && typeof body.no_discover !== 'boolean') {
@@ -393,6 +475,10 @@ function validate(body) {
   // The dispatch input is the authority; the same value is pinned inside the definition so the
   // workflow records how the scan was created and Edit can show it. A definition that carries
   // its own no_discover is honoured only when the input is silent.
+  // no_misc has no dispatch input on purpose: scan.yml does not declare one, and GitHub answers
+  // 422 for an input a workflow has not declared. It rides inside the definition, where
+  // run.py create reads it (`defn["no_misc"] = bool(no_misc) or bool(defn.get("no_misc"))`), so
+  // an Edit that keeps the lane switched off keeps it switched off.
   const noDiscover = body.no_discover !== undefined ? body.no_discover : Boolean(scan && scan.no_discover === true);
   if (scan) {
     scan = Object.assign({}, scan, { id: scanId, no_discover: noDiscover });
@@ -408,7 +494,7 @@ function validate(body) {
   if (!scanId) {
     return { error: `${action} needs scan_id.` };
   }
-  return { action, scan_id: scanId, scan, no_discover: noDiscover };
+  return { action, scan_id: scanId, scan, no_discover: noDiscover, finding: null };
 }
 
 function ghHeaders(token) {
@@ -433,9 +519,10 @@ function titleNames(title, scanId) {
 // empty list plus the reason, and the caller answers 200. The Scans page keeps its own
 // elapsed-time card for a scan it dispatched itself, and a red banner over a scan that is in fact
 // running would be a lie told by the status widget about the work, not about itself.
-async function runStatus(token, repo, scanId) {
+async function runStatus(token, repo, scanId, wf) {
+  wf = STATUS_WORKFLOWS[wf] || WORKFLOW;   // allow-listed above; an unknown name falls back to scan.yml
   const perPage = scanId ? 30 : MAX_RUNS;
-  const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW}/runs?per_page=${perPage}`;
+  const url = `https://api.github.com/repos/${repo}/actions/workflows/${wf}/runs?per_page=${perPage}`;
   let gh;
   try {
     gh = await fetch(url, { headers: ghHeaders(token) });
@@ -506,12 +593,13 @@ module.exports = async (req, res) => {
   }
 
   const branch = process.env.VERCEL_GIT_COMMIT_REF || 'main';
-  const actionsUrl = `https://github.com/${repo}/actions/workflows/${WORKFLOW}`;
+  const actionsUrl = `https://github.com/${repo}/actions/workflows/${STATUS_WORKFLOWS[v.workflow] || WORKFLOW}`;
 
   if (v.action === 'status') {
-    const s = await runStatus(token, repo, v.scan_id);
+    const s = await runStatus(token, repo, v.scan_id, v.workflow);
     const out = { ok: true, runs: s.runs, actionsUrl };
     if (v.scan_id) out.scan_id = v.scan_id;
+    if (v.workflow) out.workflow = v.workflow;
     if (s.message) out.message = s.message;
     return res.status(200).json(out);
   }
@@ -526,6 +614,13 @@ module.exports = async (req, res) => {
     scan: v.scan ? JSON.stringify(v.scan) : '',
     no_discover: v.no_discover ? 'true' : 'false',
   };
+  // `finding` is sent only for promote. GitHub answers 422 for an input the workflow does not
+  // declare, so a deployment whose scan.yml predates the promote action keeps working for
+  // create/run/delete/status; only promote itself needs the newer workflow.
+  // The request field is `finding`; the WORKFLOW INPUT is `finding_id` — scan.yml declares that
+  // name and validates it. Sending `finding` made GitHub 422 the dispatch on an undeclared input,
+  // so promote failed after passing every check on this side.
+  if (v.action === 'promote') inputs.finding_id = v.finding;
 
   let gh;
   try {
@@ -543,8 +638,15 @@ module.exports = async (req, res) => {
     const message = v.action === 'delete'
       ? 'Scan removal queued on GitHub Actions — it disappears from this page in a few minutes; '
         + 'the page refreshes itself.'
-      : 'Scan queued on GitHub Actions — results land here in a few minutes; the page refreshes itself.';
-    return res.status(202).json({ ok: true, message, scan_id: v.scan_id, actionsUrl });
+      : v.action === 'promote'
+        ? 'Promotion queued on GitHub Actions — the venue is added to this scan\'s sources and then goes '
+          + 'through the same gate as every other source (fetched with our identifying User-Agent, '
+          + 'robots.txt enforced, terms scanned, extraction floor applied). It joins coverage only if the '
+          + 'gate approves it, and the coverage panel shows the evidence either way.'
+        : 'Scan queued on GitHub Actions — results land here in a few minutes; the page refreshes itself.';
+    const out = { ok: true, message, scan_id: v.scan_id, actionsUrl };
+    if (v.finding) out.finding = v.finding;
+    return res.status(202).json(out);
   }
 
   // Report GitHub's own reason rather than a generic failure, plus what it usually means here.
@@ -558,7 +660,8 @@ module.exports = async (req, res) => {
     : gh.status === 422 ? ` GitHub only accepts a dispatch once .github/workflows/${WORKFLOW} exists on`
       + ' the DEFAULT branch with a workflow_dispatch trigger — a workflow that is only on a feature'
       + ' branch, or not yet merged, answers 422. It also answers 422 when the declared inputs do not'
-      + ' match {action, scan_id, scan, no_discover}, or the inputs exceed 65,535 characters.'
+      + ' match {action, scan_id, scan, no_discover} (plus finding, which only a promote sends and'
+      + ' only the newer workflow declares), or the inputs exceed 65,535 characters.'
     : '';
   return res.status(502).json({
     ok: false,

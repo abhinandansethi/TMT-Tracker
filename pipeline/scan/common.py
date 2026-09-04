@@ -31,7 +31,7 @@ SCHEMA_PATH = SCANS_DIR / "schema.json"
 sys.path.insert(0, str(ROOT / "pipeline"))
 sys.path.insert(0, str(ROOT / "engine"))
 
-CONTACT = os.environ.get("TMT_RADAR_CONTACT", "compliance@trilegal.com")
+CONTACT = os.environ.get("TMT_RADAR_CONTACT") or "compliance@trilegal.com"
 UA = {"User-Agent": "Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)",
       "From": CONTACT}
 
@@ -284,8 +284,13 @@ def polite_get(url: str, delay: float = 1.5, allowed_hosts: Optional[list[str]] 
 
 # ----------------------------------------------------------------------------- model access
 PROVIDER = "openai"   # the scan layer is OpenAI-only by decision; brief.py keeps its dual path
-MODEL = os.environ.get("TMT_SCAN_MODEL", "gpt-5.6-luna")          # volume: one call per candidate, per document
-MODEL_STRONG = os.environ.get("TMT_SCAN_MODEL_STRONG", "gpt-5.6-luna")   # judgement: discovery + digest
+# `get(k) or default`, never `get(k, default)`: scan.yml passes these from repository VARIABLES,
+# and GitHub substitutes an EMPTY STRING for a variable that is not set. get(k, default) returns
+# the default only when the key is absent, so an unset variable silently made the model "" and
+# every call failed with "this API key cannot use the model ''". Caught in one second by the
+# preflight below rather than twelve minutes in, which is the only reason this was cheap.
+MODEL = os.environ.get("TMT_SCAN_MODEL") or "gpt-5.6-luna"          # volume: one call per candidate, per document
+MODEL_STRONG = os.environ.get("TMT_SCAN_MODEL_STRONG") or "gpt-5.6-luna"   # judgement: discovery + digest
 # Both are repository VARIABLES on the workflow (scan.yml passes them through), so moving the
 # pipeline to another model is a setting, not an edit — and the volume knob can be pointed at a
 # cheaper model on its own if the per-document cost ever bites.
@@ -356,7 +361,11 @@ def preflight(client, models) -> None:
     seen, missing = [], []
     for m in dict.fromkeys(models):
         if not m:
-            continue
+            raise SystemExit(
+                "[scan] the model name is empty. TMT_SCAN_MODEL / TMT_SCAN_MODEL_STRONG are passed "
+                "from repository variables and GitHub sends an empty string for one that is not "
+                "set — either set them to a model the key can use, or remove them from the "
+                "workflow so the code's own default applies.")
         try:
             client.models.retrieve(m)
             seen.append(m)

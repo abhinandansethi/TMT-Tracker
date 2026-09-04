@@ -7,7 +7,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/tmt-radar-v2.html"
+      "destination": "/scans.html"
     }
   ],
   "headers": [
@@ -37,6 +37,12 @@
     },
     "api/discover.js": {
       "maxDuration": 60
+    },
+    "api/scans.js": {
+      "maxDuration": 20
+    },
+    "api/sweep.js": {
+      "maxDuration": 20
     }
   }
 }

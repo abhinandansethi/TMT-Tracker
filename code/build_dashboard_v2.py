@@ -696,6 +696,12 @@ TEMPLATE = r"""<meta charset="utf-8">
 <title>TMT Regulatory Radar</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0C3A55">
+<!-- What an open tab polls for while a sweep it started is still running: it fetches this page
+     uncached and compares this one string. It is the LAST SWEEP's stamp, deliberately, not the
+     build time — a rebuild that swept nothing (a copy edit, a redeploy) must never yank a reader
+     out of what they are reading to show them identical data. Parsing one meta tag also keeps the
+     poll cheap: the page's own JSON payload carries the whole registry. -->
+<meta name="tmt-stamp" content="__STAMP__">
 <link rel="icon" href="data:image/svg+xml;base64,__FAVICON_SVG__" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -733,6 +739,17 @@ input::placeholder{color:var(--ghost)}
   justify-content:space-between;gap:24px;flex-wrap:wrap}
 .wordmark{font-family:var(--serif);font-weight:400;font-size:29px;letter-spacing:.005em;color:#fff}
 .wordmark b{font-weight:600}
+a.wordmark{text-decoration:none;border:0;display:block}
+a.wordmark:hover{opacity:.9}
+/* This page used to be the whole product and is now one scan among several — the breadcrumb says
+   which one, and that it is the vetted one, so a partner never mistakes it for a scan they built. */
+.brand{display:flex;flex-direction:column;gap:3px}
+.whoami{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:#B9CEDC;display:flex;align-items:center;gap:7px}
+.whoami a{color:#B9CEDC;text-decoration:none;border-bottom:1px solid rgba(185,206,220,.4)}
+.whoami a:hover{color:#fff;border-bottom-color:#fff}
+.whoami .crumb{opacity:.55}
+.whoami b{color:#fff;font-weight:600}
+.whoami .vetted{background:rgba(230,241,235,.14);color:#CFE6DA;border:1px solid rgba(207,230,218,.35);border-radius:4px;padding:1px 6px;font-size:9.5px;letter-spacing:.08em}
 .updbar{display:flex;align-items:center;gap:16px}
 .updated{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:#B9CEDC}
 .updated span{color:#fff;font-weight:500}
@@ -747,7 +764,33 @@ input::placeholder{color:var(--ghost)}
 .upd-note.on{display:block}
 .upd-note a{color:var(--navy);text-decoration:underline;text-underline-offset:2px}
 .upd-note code{font-family:var(--mono);font-size:11px;background:#fff;border:1px solid var(--rule2);border-radius:3px;padding:1px 5px}
+.upd-note button.linkbtn{appearance:none;border:0;background:none;padding:0;font:inherit;color:inherit;
+  text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.upd-note.warn{background:var(--ochre-wash);color:#5B4507;border-bottom-color:#E4D19A}
+.upd-note.warn a{color:#5B4507}
+.upd-note.bad{background:var(--alarm-wash);color:var(--alarm);border-bottom-color:#E7C8C1}
+.upd-note.bad a{color:var(--alarm)}
 @media (max-width:760px){.upd-note{padding-left:22px;padding-right:22px}}
+
+/* The sweep, while it is running: a dispatched sweep takes about twelve minutes and the page a
+   partner is looking at knows nothing about it. This bar is the whole wait, in their language. */
+.sweepbar{display:none;padding:12px 64px;background:var(--panel);border-bottom:1px solid var(--rule2);
+  font-size:12.5px;line-height:1.55;color:var(--ink)}
+.sweepbar.on{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+.sweepbar.failed{background:var(--alarm-wash);border-bottom-color:#E7C8C1}
+.sweepbar .sb-main{flex:1;min-width:260px}
+.sweepbar .sb-state{font-weight:600}
+/* The estimate is set apart from the observed line, so a reader can see which sentence is a fact
+   about the run and which is the clock talking. */
+.sweepbar .sb-est{display:block;margin-top:3px;color:var(--mute);font-style:italic;font-size:12px}
+.sweepbar .sb-el{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--mute);white-space:nowrap}
+.sweepbar .sb-act{display:flex;gap:12px;align-items:center}
+.sweepbar .sb-retry{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--navy);border:0;padding:6px 12px}
+.sweepbar .sb-log{font-size:10.5px;color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.sweepbar .sb-x{appearance:none;border:0;background:none;cursor:pointer;color:var(--off);font-size:15px;line-height:1;padding:2px 6px}
+.sweepbar .sb-x:hover{color:var(--alarm)}
+@media (max-width:760px){.sweepbar{padding-left:22px;padding-right:22px}}
 .thead .r.jr,.row .line.jr{grid-template-columns:104px 128px minmax(0,1fr) 120px 24px}
 .tabs{background:var(--navy-d);padding:0 64px;display:flex;gap:2px}
 .tabs button,.tabs a.tab-link{appearance:none;background:none;border:0;border-bottom:3px solid transparent;
@@ -1042,7 +1085,10 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
 
 <div class="sheet">
   <div class="head">
-    <div class="wordmark">TMT <b>Regulatory Radar</b></div>
+    <div class="brand">
+      <a class="wordmark" href="/" title="All scans">TMT <b>Regulatory Radar</b></a>
+      <div class="whoami"><a href="/">Scans</a><span class="crumb">&rsaquo;</span><b>TMT India</b><span class="vetted">Vetted</span></div>
+    </div>
     <div class="updbar">
       <div class="updated">Last updated <span id="upd"></span></div>
       <button id="updnow" type="button" title="Run a fresh sweep">Update now</button>
@@ -1050,6 +1096,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
   </div>
   <div class="stale-bar" id="stalebar"></div>
   <div class="upd-note" id="updnote"></div>
+  <div class="sweepbar" id="sweepbar"></div>
 
   <nav class="tabs">
     <button class="on" data-v="coverage">Coverage</button>
@@ -1058,7 +1105,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     <button data-v="signals">Signals</button>
     <button data-v="clients">Clients</button>
     <button data-v="audit">Audit</button>
-    <a class="tab-link" href="scans.html" title="Horizon scanning: build a scan for any practice or jurisdiction">Scans</a>
+    <a class="tab-link" href="/" title="All scans — horizon scanning for any practice or jurisdiction">&larr; All scans</a>
   </nav>
 
   <section class="view" id="v-instruments">
@@ -1159,37 +1206,221 @@ $('#upd').textContent = D.updated;
 // sweep itself. Behaviour is "both": if the partner has wired their pipeline endpoint
 // (window.TMT_CONFIG.pipelineEndpoint, or the deploy-time updateConfig), the button triggers
 // that pipeline; with actionsUrl it opens the hosted workflow page; with neither it explains how to refresh.
+//
+// The defect this closes: pressing the button printed "Sweep requested. Reload this page once it
+// finishes." and left the partner to guess when that was — twelve minutes of nothing, then a
+// manual reload, or a CI page to go and watch. A sweep is now a state this page HOLDS: a bar with
+// the elapsed time and an honest, clock-derived guess at the step, a failure it reports rather
+// than swallows, and a page that loads the result by itself the moment it lands.
 (function(){
   const cfg = Object.assign({}, D.updateConfig || {}, (window.TMT_CONFIG || {}));
-  const btn = $('#updnow'), note = $('#updnote');
+  const btn = $('#updnow'), note = $('#updnote'), bar = $('#sweepbar');
   if (!btn) return;
   // The tooltip must not promise a sweep the page cannot start.
   if (!cfg.pipelineEndpoint && !cfg.actionsUrl) btn.title = 'How to refresh this page';
-  const say = (html) => { note.innerHTML = html; note.classList.add('on'); };
+  const say = (html, kind) => { note.className = 'upd-note on' + (kind ? ' ' + kind : ''); note.innerHTML = html; };
+  // The run log is the affordance of LAST resort, and it is worded that way: a partner should
+  // never have to open a CI page to know what is happening — that is what the bar is for — so this
+  // appears where something has gone wrong, or where this page cannot start the sweep itself.
   const ghLink = () => cfg.actionsUrl
-    ? ' You can still run it yourself: <a href="' + esc(cfg.actionsUrl) + '" target="_blank" rel="noopener">open the sweep workflow</a> and press <b>Run workflow</b>.'
+    ? ' You can still run it yourself: <a href="' + esc(cfg.actionsUrl) + '" target="_blank" rel="noopener">open the run log</a> and start it there.'
     : ' On the firm machine, run <code>engine/run_sweep.sh</code>.';
-  btn.addEventListener('click', async () => {
-    if (cfg.pipelineEndpoint) {
-      btn.disabled = true; btn.textContent = 'Updating…';
-      say('Asking the pipeline to run a sweep…');
-      try {
-        const res = await fetch(cfg.pipelineEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'sweep', source: 'tmt-radar-dashboard' }) });
-        let msg = '';
-        try { msg = ((await res.json()) || {}).message || ''; } catch (e) { msg = ''; }
-        // Report exactly what happened — never claim a sweep started unless the endpoint said so.
-        say(res.ok ? esc(msg || 'Sweep requested. Reload this page once it finishes.')
-                   : esc(msg || ('The trigger endpoint returned ' + res.status + '.')) + ghLink());
-      } catch (e) {
-        say('No sweep trigger is reachable from this page.' + ghLink());
-      } finally { btn.disabled = false; btn.textContent = 'Update now'; }
+
+  // ---- the sweep this browser started ---------------------------------------------------------
+  // One record, in this browser only, like the tracker's client list. It is dropped as soon as the
+  // page it was waiting for arrives.
+  const SKEY = 'tmt_sweep_pending_v1';
+  const STALE_MS = 90 * 60 * 1000;      // far past the longest sweep we have measured
+  const STATUS_MS = 15000, STAMP_MS = 20000, TICK_MS = 1000;
+  const readP = () => { try { const v = JSON.parse(localStorage.getItem(SKEY) || 'null');
+    return (v && typeof v === 'object' && v.dispatched_at) ? v : null; } catch (e) { return null; } };
+  const writeP = v => { try { v ? localStorage.setItem(SKEY, JSON.stringify(v)) : localStorage.removeItem(SKEY); } catch (e) {} };
+
+  // What a sweep is probably doing. The status endpoint reports three words — queued, in_progress,
+  // completed — and never which STEP is running, so the bar states what it OBSERVES as fact and
+  // fills the long middle with an estimate derived from the clock against the shape of sweep.yml:
+  // about two minutes before the runner has the code and the dependencies, then the fetching of
+  // every source (which dominates, with a politeness delay per host), then the briefs, then about
+  // two minutes committing and rebuilding this page. Every estimate is worded as one.
+  const PHASES = [{ to: 2, what: 'setting up' }, { to: 8, what: 'checking every source' },
+                  { to: 10.5, what: 'writing the briefs' }, { to: Infinity, what: 'publishing' }];
+  const phaseAt = m => { for (let i = 0; i < PHASES.length; i++) { if (m < PHASES[i].to) return PHASES[i].what; } return 'publishing'; };
+  const aboutMins = m => (m < 1 ? 'just started' : m < 1.5 ? 'about a minute in' : 'about ' + Math.round(m) + ' minutes in');
+  const elapsed = iso => {
+    const t = Date.parse(iso || ''); if (!isFinite(t)) return '';
+    const s = Math.max(0, Math.round((Date.now() - t) / 1000)), m = Math.floor(s / 60);
+    if (m >= 60) return Math.floor(m / 60) + 'h ' + (m % 60) + 'm elapsed';
+    return (m ? m + 'm ' + (s % 60) + 's' : s + 's') + ' elapsed';
+  };
+
+  let runInfo = null;                   // the last status answer for this sweep, or null
+  let ticker = null, statusTimer = null, stampTimer = null, landed = false;
+
+  function story(p) {
+    const st = runInfo || {};
+    const status = String(st.status || ''), concl = String(st.conclusion || '');
+    const known = !!status, done = status === 'completed';
+    const bad = done && !!concl && concl !== 'success';
+    // Measured from when the RUN began where that is known: a sweep that sat in a queue for four
+    // minutes is not four minutes into checking sources.
+    const started = Date.parse(st.created_at || '') || Date.parse(p.dispatched_at || '');
+    const mins = isFinite(started) ? Math.max(0, (Date.now() - started) / 60000) : 0;
+    if (bad) return { bad: true, terminal: true, state: 'The sweep stopped',
+      line: 'It finished as ' + concl.replace(/_/g, ' ') + '. Nothing was committed, so nothing below has changed — this page is still the snapshot from ' + (D.updated || 'the last sweep') + '.', est: '' };
+    if (done) return { terminal: true, state: 'Publishing',
+      line: 'The sweep finished. Publishing the new version — this page loads it by itself, usually within a couple of minutes.', est: '' };
+    if (!known) return { state: 'Sweep started',
+      // Say only what is actually known: it was started from here, this is how long ago, and the
+      // run's own state cannot be seen. No step is guessed on top of an unknown run state.
+      line: 'Started from this page. Live run status is off on this deployment, so the timer here is this page’s own clock, not the run’s.',
+      est: 'A sweep usually takes about twelve minutes end to end. This page loads the result by itself when it lands.' };
+    if (['queued', 'waiting', 'requested', 'pending'].indexOf(status) >= 0)
+      return { state: 'Waiting for a runner', line: 'Nothing has been fetched yet.', est: '' };
+    return { state: 'Sweep running', line: '',
+      est: aboutMins(mins) + '; usually ' + phaseAt(mins) + ' around now. That is an estimate from the clock — the run reports that it is running, not which step it is on.' };
+  }
+
+  function drawBar() {
+    const p = readP();
+    if (!p) { bar.className = 'sweepbar'; bar.innerHTML = ''; stop(); return; }
+    // Something went wrong that this page cannot see. Stop pretending to watch it.
+    if (Date.now() - Date.parse(p.dispatched_at || 0) > STALE_MS) {
+      writeP(null); bar.className = 'sweepbar'; bar.innerHTML = '';
+      say('A sweep was started here more than 90 minutes ago and has still not landed.' + ghLink(), 'warn');
+      stop(); return;
+    }
+    const s = story(p);
+    const log = (s.bad || !runInfo || !runInfo.status) && (runInfo && runInfo.html_url || cfg.actionsUrl);
+    bar.className = 'sweepbar on' + (s.bad ? ' failed' : '');
+    bar.innerHTML = '<div class="sb-main"><span class="sb-state">' + esc(s.state) + '.</span> ' + esc(s.line)
+      + (s.est ? '<span class="sb-est">' + esc(s.est) + '</span>' : '') + '</div>'
+      + '<div class="sb-act"><span class="sb-el" data-since="' + esc(p.dispatched_at) + '">' + esc(elapsed(p.dispatched_at)) + '</span>'
+      + (s.bad ? '<button type="button" class="sb-retry" id="sb-retry">Try again</button>' : '')
+      + (log ? '<a class="sb-log" href="' + esc((runInfo && runInfo.html_url) || cfg.actionsUrl) + '" target="_blank" rel="noopener">Open the run log</a>' : '')
+      + '<button type="button" class="sb-x" id="sb-x" aria-label="Stop watching this sweep" title="Stop watching this sweep — the result still appears when it lands">×</button></div>';
+    const rb = $('#sb-retry'); if (rb) rb.addEventListener('click', () => { runInfo = null; startSweep(true); });
+    $('#sb-x').addEventListener('click', () => { writeP(null); drawBar(); });
+    // Stop polling a terminal state: a finished sweep has nothing more to report, and a failed one
+    // will never land, so neither timer has anything left to do.
+    schedule(!s.terminal, !s.bad);
+  }
+
+  function schedule(wantStatus, canStillLand) {
+    const vis = !document.hidden, on = !!readP();
+    const wantClock = on && vis;
+    if (ticker && !wantClock) { clearInterval(ticker); ticker = null; }
+    if (statusTimer && !(on && vis && wantStatus)) { clearInterval(statusTimer); statusTimer = null; }
+    if (stampTimer && !(on && canStillLand && !landed)) { clearInterval(stampTimer); stampTimer = null; }
+    if (!on) return;
+    if (wantClock && !ticker) ticker = setInterval(() => {
+      const el = $('.sweepbar .sb-el'); if (el) el.textContent = elapsed(el.dataset.since);
+    }, TICK_MS);
+    if (vis && wantStatus && !statusTimer) { statusTimer = setInterval(pollStatus, STATUS_MS); pollStatus(); }
+    if (canStillLand && !landed && !stampTimer) stampTimer = setInterval(checkStamp, STAMP_MS);
+  }
+  function stop() { [ticker, statusTimer, stampTimer].forEach(t => t && clearInterval(t)); ticker = statusTimer = stampTimer = null; }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { stop(); } else { drawBar(); } });
+
+    // Live status comes from /api/scans action "status", asking it for the SWEEP workflow: the
+  // endpoint takes an allow-listed workflow name, so this page watches its own run with exactly
+  // the machinery the Scans page uses for a scan. (It used to be able to ask only about scan.yml,
+  // which made every phase below dead code on this page.)
+  // reads runs at all. It filters SERVER-SIDE to the scan workflow and takes no workflow argument
+  // (api/scans.js: `const WORKFLOW = 'scan.yml'`), so this page cannot ask it for sweep runs. It
+  // therefore polls unfiltered and matches the sweep's own run-name on display_title, which is the
+  // fallback the design allows: on a deployment whose endpoint reports other workflows this starts
+  // working with no change here, and until then no run matches, runInfo stays null, and the bar
+  // says plainly that live status is off rather than borrowing a scan run's state.
+  const SWEEP_TITLE = /sweep/i;
+  async function pollStatus() {
+    const p = readP(); if (!p) return;
+    let data = null;
+    try {
+      const res = await fetch('/api/scans', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'status', workflow: 'sweep' }) });
+      if (!res.ok) return;                       // not configured, or refused: the bar stays honest
+      data = await res.json();
+    } catch (e) { return; }
+    const runs = (data && Array.isArray(data.runs)) ? data.runs : [];
+    const since = Date.parse(p.dispatched_at || 0) - 120000;   // two minutes' slack for clock skew
+    const mine = runs.filter(r => SWEEP_TITLE.test(String(r.display_title || '')) && Date.parse(r.created_at || 0) >= since);
+    if (mine.length) runInfo = mine[0];
+    drawBar();
+  }
+
+  // The page picking up its own result: fetch THIS page uncached and compare the stamp the builder
+  // embedded. It is the last sweep's stamp, so a rebuild that swept nothing never disturbs a reader.
+  async function checkStamp() {
+    if (landed) return;
+    try {
+      const res = await fetch(location.pathname + location.search, { cache: 'no-store' });
+      if (!res.ok) return;                       // an auth challenge or a 5xx: try again next tick
+      const m = (await res.text()).match(/name="tmt-stamp" content="([^"]*)"/);
+      if (!m || m[1] === (D.updatedISO || '')) return;
+    } catch (e) { return; }                      // offline: the next tick tries again
+    landed = true; writeP(null); stop();
+    showLanded();
+  }
+  // A reload while a row or a venue panel is open throws away what the partner is reading, so the
+  // bar goes up either way and the reload waits for the screen to be clear.
+  // `state` is declared below this block, so the guard also covers the temporal dead zone: nothing
+  // is open before the page has finished setting itself up.
+  // Reviewed defect: this checked only the expanded row and the venue panel, so an auto-reload
+  // arriving while a partner was half-way through the Add/Edit client form threw the form away.
+  // #cl-modal is a plain div toggled with .on — not a <dialog> — so it has to be named.
+  const pageBusy = () => { try {
+    const modal = document.querySelector('#cl-modal');
+    return !!(document.querySelector('dialog[open]')
+      || (modal && modal.classList.contains('on'))
+      || (state && (state.open || state.ven)));
+  } catch (e) { return false; } };
+  function showLanded() {
+    bar.className = 'sweepbar'; bar.innerHTML = '';
+    if (!pageBusy()) {
+      say('This sweep has finished — showing the new version.');
+      setTimeout(() => location.reload(), 800);   // a beat, so the bar is read rather than flashed
       return;
     }
+    say('This sweep has finished. The new version loads as soon as you close what is open — '
+      + '<button type="button" class="linkbtn" id="sw-now">show it now</button>.', 'warn');
+    const b = $('#sw-now'); if (b) b.addEventListener('click', () => location.reload());
+    const t = setInterval(() => { if (!pageBusy()) { clearInterval(t); showLanded(); } }, 1500);
+  }
+
+  async function startSweep(retry) {
+    btn.disabled = true; btn.textContent = 'Updating…';
+    say('Asking the pipeline to run a sweep…');
+    try {
+      const res = await fetch(cfg.pipelineEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sweep', source: 'tmt-radar-dashboard' }) });
+      let msg = '';
+      try { msg = ((await res.json()) || {}).message || ''; } catch (e) { msg = ''; }
+      // Never claim a sweep started unless the endpoint said so.
+      if (res.ok) {
+        // The normal path names no service and asks nothing of the partner: the bar below carries
+        // the wait, and this page loads the result by itself. The endpoint's own 202 message is
+        // deliberately NOT echoed — api/sweep.js answers "Sweep running. Reload in a few minutes.",
+        // which was true when a reload was the only way to see the result and is now an instruction
+        // to do by hand what this page does on its own. Failures below still carry its message
+        // verbatim: a misconfiguration is exactly the case where it knows something this page cannot.
+        say('Sweep started. The progress is below; this page shows the result as soon as it lands.');
+        writeP({ dispatched_at: new Date().toISOString(), from: D.updatedISO || '' });
+        runInfo = null; landed = false;
+        drawBar();
+      } else {
+        say(esc(msg || ('The trigger endpoint returned ' + res.status + '.')) + ghLink(), 'bad');
+      }
+    } catch (e) {
+      say('This page could not reach the endpoint that starts a sweep.' + ghLink(), 'bad');
+    } finally { btn.disabled = false; btn.textContent = 'Update now'; }
+  }
+
+  btn.addEventListener('click', async () => {
+    if (cfg.pipelineEndpoint) { await startSweep(false); return; }
     if (cfg.actionsUrl) {
       window.open(cfg.actionsUrl, '_blank', 'noopener');
-      say('Opened the hosted pipeline. Click <b>Run workflow</b> there — it sweeps every source, '
-        + 'regenerates the briefs, and rebuilds this page (a few minutes). Then reload here.');
+      say('Opened the hosted pipeline. Start the run there — it sweeps every source, regenerates the '
+        + 'briefs, and rebuilds this page (about twelve minutes). Then reload here.');
       return;
     }
     // Nothing wired: a sandboxed page cannot fetch government sites itself. Say so plainly.
@@ -1197,6 +1428,10 @@ $('#upd').textContent = D.updated;
       + 'A shared page can\'t fetch government sites itself, so it doesn\'t refresh on click. To update it: '
       + 'on the firm machine run <code>engine/run_sweep.sh</code>, or wire a trigger — see docs/CONNECTOR.md.');
   });
+
+  // A sweep started before this tab was opened (or before the last reload) is still being waited
+  // for: pick the record up and carry on watching, rather than losing the wait to a refresh.
+  if (readP()) { landed = false; drawBar(); }
 })();
 
 // Age is computed when the page opens, not when it was built: a tab left open for a
@@ -1228,10 +1463,18 @@ function dateBounds(kind) {
   return null;
 }
 
-document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+// The open tab travels in the URL hash so the reload after a sweep lands the partner back where
+// they were — and so a link to this page can name a tab. replaceState rather than assigning
+// location.hash: the latter pushes a history entry per click and turns Back into a tab-by-tab rewind.
+function showTab(v, remember) {
+  const b = document.querySelector('.tabs button[data-v="' + v + '"]');
+  if (!b) return;
   document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
-  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + b.dataset.v));
-}));
+  document.querySelectorAll('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
+  if (remember !== false) { try { history.replaceState(null, '', location.pathname + location.search + '#tab=' + v); } catch (e) {} }
+}
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.v)));
+(function(){ const m = String(location.hash || '').match(/^#tab=([a-z]+)$/); if (m) showTab(m[1], false); })();
 
 /* stratum filter */
 $('#stratum').innerHTML = '<option value="All">All strata</option>' +
@@ -1766,7 +2009,8 @@ if _memo_src.exists():
 
 _svg = (_ICONS / "favicon.svg")
 _favicon_b64 = base64.b64encode(_svg.read_bytes()).decode() if _svg.exists() else ""
-html = TEMPLATE.replace("__DATA__", data_json).replace("__FAVICON_SVG__", _favicon_b64)
+html = (TEMPLATE.replace("__DATA__", data_json).replace("__FAVICON_SVG__", _favicon_b64)
+        .replace("__STAMP__", payload["updatedISO"]))
 _out = DIST / "tmt-radar-v2.html"
 _out.write_text(html, encoding="utf-8")
 

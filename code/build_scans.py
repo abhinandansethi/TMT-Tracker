@@ -6,12 +6,23 @@ data, build one JSON payload per page, write one HTML file with embedded CSS and
 model, no network. The tracker's builder is untouched; the two families share the wordmark, the
 design tokens and the auth gate, and nothing else, so this surface can be designed cleanly.
 
+dist/scans.html is the product's front door: the list of scans, TMT India first as the built-in
+vetted one. Each other card opens dist/scan/<id>.html, which is that scan's whole workspace — the
+same seven sections the tracker has, over the scan's own data: Coverage · Instruments · Judgments ·
+Signals · Miscellaneous · Clients · Audit, with the digest and its KPI tiles above them as the
+scan's masthead. Developments route into the three ledger lanes by `type`, using the one rule in
+lane_of() and nothing else, so every development is in exactly one lane and the tab counts cannot
+disagree with the tables.
+
 Inputs (all optional except the tracker's own registry, which the built-in card is computed from):
   scans/<id>.json                       the definition, written only by the scan workflow
   data/scans/<id>/developments.json     the ledger
   data/scans/<id>/digest.json           the week's narrative
   data/scans/<id>/health.json           per-source evidence from the last run
   data/scans/<id>/text/<dev>.txt        the text every citation points into
+  data/scans/<id>/misc.json             the Miscellaneous lane: an open-web search OUTSIDE the
+                                        gated coverage list. Absent on every older scan, and its
+                                        absence renders as "nobody looked", never as "nothing found"
 
 TMT_SCAN_ROOT moves scans/ and data/scans/ to another root (run.py honours the same variable), so
 a sample or a fixture tree can be built without touching the repository. --out moves dist/.
@@ -51,9 +62,11 @@ from pipeline.scan import common  # noqa: E402  (load_json, atomic writes, IST c
 # (with the simpler check) on a checkout where the enricher is absent.
 try:
     from pipeline.scan.enrich import _quote_found, _norm, _bare, MIN_QUOTE_CHARS  # noqa: E402
+    from pipeline.scan.enrich import TYPES as ENRICH_TYPES  # noqa: E402
 except Exception:  # pragma: no cover — enrich.py missing or unimportable
     _quote_found = _norm = _bare = None  # type: ignore[assignment]
     MIN_QUOTE_CHARS = 20
+    ENRICH_TYPES = None  # type: ignore[assignment]
 
 # How many documents the FIRST run of a new scan reads. The dialog and the pending card both
 # promise this number to the partner, so it must be the number the pipeline actually uses — a
@@ -83,6 +96,55 @@ KIND_LABELS = {"gazette": "Gazette", "regulator": "Regulator", "ministry": "Gov"
 # extraction floor) when the scan is created — the dialog says so, and so does this comment.
 API = {"scans": "/api/scans", "ask": "/api/ask", "draft": "/api/draft", "propose": "/api/propose",
        "discover": "/api/discover"}
+
+# ----------------------------------------------------------------------------- lane routing
+# ONE rule, shared by the whole product: a development's `type` decides its lane, and a development
+# is in exactly one of the three. The tracker's own tabs mean the same three words, so a partner
+# who learns Instruments/Judgments/Signals on TMT India reads any scan the same way.
+INSTRUMENT_TYPES = ("Legislation", "Rules/Regulations", "Order/Decision", "Notice/Circular", "Guidance/Advisory")
+JUDGMENT_TYPES = ("Judgment",)
+SIGNAL_TYPES = ("Consultation/Draft", "Press release", "Other")
+KNOWN_TYPES = INSTRUMENT_TYPES + JUDGMENT_TYPES + SIGNAL_TYPES
+LANES = ("instruments", "judgments", "signals")
+
+# Reviewed defect: the three tuples above were a second, hand-kept copy of enrich.TYPES, so the day
+# the enricher gained a type this builder had never heard of, every row carrying it would have been
+# routed to Signals AND stamped "untyped" — the page calling the pipeline's own vocabulary a
+# mistake. The lanes cannot simply be `= enrich.TYPES` (the grouping is this file's editorial
+# judgement, not the enricher's), so the vocabulary is asserted instead: a drift fails the build
+# loudly, here, where the fix is one line, rather than quietly on a partner's page. The assert is
+# skipped when enrich.py could not be imported at all — there is then nothing to disagree with.
+if ENRICH_TYPES is not None and set(ENRICH_TYPES) != set(KNOWN_TYPES):
+    _added = sorted(set(ENRICH_TYPES) - set(KNOWN_TYPES))
+    _gone = sorted(set(KNOWN_TYPES) - set(ENRICH_TYPES))
+    raise SystemExit(
+        "build_scans: the lane routing table has drifted from pipeline.scan.enrich.TYPES — "
+        + (f"the enricher now writes {_added} which no lane claims; " if _added else "")
+        + (f"this file still routes {_gone} which the enricher no longer writes; " if _gone else "")
+        + "put each type in INSTRUMENT_TYPES, JUDGMENT_TYPES or SIGNAL_TYPES and rebuild")
+
+
+def lane_of(dev_type: Optional[str]) -> str:
+    """Type -> lane. A row whose type is absent or unrecognised is NOT dropped: it lands in Signals,
+    whose own catch-all is "Other", and the page marks it untyped. A development routed into no
+    lane would be a development nobody ever reads again — the one outcome a ledger must not have.
+    Queued and unread rows are exactly that case: run.py writes them before the enricher has said
+    what they are."""
+    t = (dev_type or "").strip()
+    if t in INSTRUMENT_TYPES:
+        return "instruments"
+    if t in JUDGMENT_TYPES:
+        return "judgments"
+    return "signals"
+
+
+# ----------------------------------------------------------------------------- Miscellaneous
+# data/scans/<id>/misc.json, written by the pipeline's open-web pass. Nothing in it was fetched by
+# us: it is what a hosted web-search tool returned, which is why it carries no gate evidence, no
+# robots verdict and no ledger row. `official_venue` is the valuable case — a venue this scan does
+# not cover, which a partner may promote into the coverage list, where the Python gate decides.
+MISC_KINDS = ("official_venue", "secondary", "commentary")
+MISC_STATUSES = ("new", "promoted", "dismissed")
 
 
 # ----------------------------------------------------------------------------- roots
@@ -311,10 +373,99 @@ def coverage_for(defn: dict, health: dict) -> dict:
     # Discovery's own account — "discovery gap DE: …", "discovery dropped …", "discovery failed —
     # …" — lives in health.notes; the panel groups those lines so a gap is read next to the list
     # it is a gap in. Reviewed defect: these notes were never read.
+    # Grouped on the Coverage panel, all of them. But only the CAVEATS become page problems:
+    # "discovery dropped <url>: <reason>" is the deny-list and the dedupe doing their job on every
+    # healthy run, and filing that as a problem taught a partner to ignore the problems list.
     discovery = [n for n in (health.get("notes") or []) if isinstance(n, str) and n.lower().startswith("discovery")]
+    discovery_caveats = [n for n in discovery if not n.lower().startswith("discovery dropped")]
     gated = sum(1 for s in groups["approved"] if s["health"] and s["health"]["status"] == "GATED")
     return {"approved": groups["approved"], "pending": groups["pending"], "rejected": groups["rejected"],
-            "uncovered": uncovered, "discovery": discovery, "gated": gated, "problems": unknown}
+            "uncovered": uncovered, "discovery": discovery, "discovery_caveats": discovery_caveats,
+            "gated": gated, "problems": unknown}
+
+
+def load_misc(res: Path) -> dict:
+    """The Miscellaneous lane's file, or the honest absence of one. An older scan has none and a
+    scan whose run predates this lane has none; neither is an error, and neither may be rendered as
+    "nothing was found" — "nobody looked" and "we looked and found nothing" are different facts, so
+    `present` carries the difference to the page.
+
+    A finding without a URL is dropped: this lane's entire product is a link out to a primary
+    source, and a row nobody can open is a claim with nothing behind it. An unknown `kind` or
+    `status` is shown in the safest group rather than hidden — commentary and new — with the raw
+    value reported, because a value we do not understand must not silently become a Promote button.
+
+    Every tolerance here appends a problem, so the page can show what it had to forgive. Reviewed
+    defect: a duplicate finding id was the one exception — dropped in silence — so a file carrying
+    two rows under one id lost one of them with nothing on the page to say a lead had gone.
+    """
+    path = res / "misc.json"
+    if not path.exists():
+        return {"present": False, "generated": "", "query": {}, "findings": [], "notes": [], "problems": []}
+    doc = common.load_json(path, {}) or {}
+    if not isinstance(doc, dict):
+        raise RuntimeError(f"{path}: misc.json must be an object")
+    problems: list[str] = []
+    q = doc.get("query") if isinstance(doc.get("query"), dict) else {}
+    query = {"intent": str(q.get("intent") or ""),
+             "topics": [str(t) for t in (q.get("topics") or []) if t],
+             "jurisdictions": [str(j).upper() for j in (q.get("jurisdictions") or []) if j],
+             "excluded_hosts": [str(h) for h in (q.get("excluded_hosts") or []) if h]}
+    findings: list[dict] = []
+    seen: set = set()
+    for f in doc.get("findings") or []:
+        if not isinstance(f, dict):
+            problems.append(f"misc: finding is not an object: {str(f)[:60]!r} (skipped)")
+            continue
+        url = str(f.get("url") or "").strip()
+        if not url:
+            problems.append(f"misc: {str(f.get('title') or '?')[:60]!r} has no URL — dropped; this lane is a link out, and a row with nowhere to go proves nothing")
+            continue
+        kind = f.get("kind") if f.get("kind") in MISC_KINDS else None
+        if kind is None:
+            problems.append(f"misc: unknown kind {f.get('kind')!r} on {host_of(url) or url} — shown as commentary, not promotable")
+            kind = "commentary"
+        status = f.get("status") if f.get("status") in MISC_STATUSES else None
+        if status is None and f.get("status") not in (None, ""):
+            problems.append(f"misc: unknown status {f.get('status')!r} on {host_of(url) or url} — shown as new")
+        fid = str(f.get("id") or "") or hashlib.sha1(url.encode("utf-8")).hexdigest()[:10]
+        if fid in seen:
+            # Two rows for one finding would read as two leads, so the second is still dropped —
+            # but said, like every other tolerance in this function.
+            problems.append(f"misc: two findings share the id {fid!r} — the second ({host_of(url) or url}) is dropped")
+            continue
+        seen.add(fid)
+        # `host` is recomputed from the URL, never read from the file, exactly as misc.py does when
+        # it writes one ("the model's `host` field is not trusted"). Reviewed defect: trusting the
+        # stored value let a row show one host while its link went to another — and the host is the
+        # single thing a partner reads to decide whether a lead is worth opening. host_of() folds
+        # `www.` off, which is what misc.py's own discover.host_of does, so a file written by the
+        # pipeline produces the identical string and nothing is reported.
+        stored_host = str(f.get("host") or "").strip().lower()
+        host = host_of(url)
+        if stored_host and stored_host != host:
+            problems.append(f"misc: finding {fid} says host {stored_host!r} but its URL is on {host or '(no host)'} — "
+                            f"showing the URL's own host")
+        findings.append({
+            "id": fid, "title": str(f.get("title") or url), "url": url,
+            "host": host,
+            "date": str(f.get("date") or ""), "jurisdiction": str(f.get("jurisdiction") or "").upper(),
+            "kind": kind, "why": str(f.get("why") or ""), "snippet": str(f.get("snippet") or ""),
+            "first_seen": str(f.get("first_seen") or ""), "status": status or "new",
+            # Written by misc.mark_stale for a finding the latest search no longer returned. It is
+            # kept deliberately (design §2: "a lead does not cease to exist because a search engine
+            # changed its mind"), and the page marks the row — a lead nobody can distinguish from a
+            # fresh hit is a quietly ageing claim. Absent on every file written before the flag
+            # existed, which reads as "not stale", the only safe default. misc.py's own docstring
+            # says to READ this flag rather than re-derive it by comparing stamps, because two runs
+            # in the same second would make a stale lead look fresh; `last_seen` is carried beside
+            # it so the row can say how old the lead is, and never used to compute staleness.
+            "stale": f.get("stale") is True,
+            "last_seen": str(f.get("last_seen") or ""),
+        })
+    return {"present": True, "generated": str(doc.get("generated") or ""), "query": query,
+            "findings": findings, "notes": [str(n) for n in (doc.get("notes") or []) if n],
+            "problems": problems}
 
 
 def prepare_item(it: dict, text_dir: Path, kinds: Optional[dict] = None) -> dict:
@@ -375,7 +526,13 @@ def prepare_item(it: dict, text_dir: Path, kinds: Optional[dict] = None) -> dict
         "kind": kind if kind in KIND_LABELS else "",
         "tier": it.get("tier") or "discovered", "jurisdiction": (it.get("jurisdiction") or "").upper(),
         "date": it.get("date") or "", "first_seen": it.get("first_seen") or "", "read_as": it.get("read_as") or "",
-        "type": it.get("type") or "", "topics": list(it.get("topics") or []),
+        "type": it.get("type") or "",
+        # The contract's lane rule, applied once here so the table, the counts and the tab bar
+        # cannot disagree about where a development belongs. `untyped` is carried separately so a
+        # row that landed in Signals only because nothing has typed it yet says so on the page
+        # rather than passing as a press release.
+        "lane": lane_of(it.get("type")), "untyped": (it.get("type") or "").strip() not in KNOWN_TYPES,
+        "topics": list(it.get("topics") or []),
         # The enricher may leave the headline empty on a document it could not summarise; the
         # table's two-line cell then shows the title rather than a blank.
         "headline": it.get("headline") or title, "summary": summary,
@@ -405,6 +562,7 @@ def load_scan(root: Path, defn_path: Path) -> dict:
     developments = common.load_json(res / "developments.json", {}) or {}
     digest = common.load_json(res / "digest.json", {}) or {}
     health = common.load_json(res / "health.json", {}) or {}
+    misc = load_misc(res)
     kinds = {s.get("url", ""): s.get("kind") or "" for s in defn.get("sources") or [] if isinstance(s, dict)}
     items = [prepare_item(it, res / "text", kinds) for it in developments.get("items", []) if isinstance(it, dict)]
     generated = health.get("generated") or developments.get("generated") or digest.get("generated") or ""
@@ -435,6 +593,7 @@ def load_scan(root: Path, defn_path: Path) -> dict:
         upcoming = [u for u in digest["upcoming"] if isinstance(u, dict) and u.get("dev") in ids and u.get("when")]
     cov = coverage_for(defn, health)
     problems.extend(cov.pop("problems"))
+    problems.extend(misc.pop("problems"))
     # run.py writes every cap that dropped work to health.budget.dropped and the run-level notes
     # (given-up documents, discovery gaps, digest verifier notes) to health.notes. Reviewed
     # defect: the builder read a top-level health.dropped that only the old sample produced, so
@@ -447,8 +606,8 @@ def load_scan(root: Path, defn_path: Path) -> dict:
         if n in drops or n in cov["discovery"] or n in (digest.get("notes") or []):
             continue       # drops are listed above; discovery lines and digest notes are shown where they belong
         problems.append(f"run: {n}")
-    if cov["discovery"]:
-        problems.append(f"discovery recorded {len(cov['discovery'])} note(s) — open Coverage")
+    if cov.get("discovery_caveats"):
+        problems.append(f"discovery recorded {len(cov['discovery_caveats'])} caveat(s) — open Coverage")
     run = health.get("run") if isinstance(health.get("run"), dict) else {}
     counts = digest.get("counts") or {}
     counts = {"new": counts.get("new", len([i for i in items if i["first_seen"] and i["first_seen"] >= generated[:10]]) if generated else counts.get("new", 0)),
@@ -485,6 +644,13 @@ def load_scan(root: Path, defn_path: Path) -> dict:
             # no_discover is stored on the definition by create_scan (contract), so Edit pre-ticks
             # the box as the scan was actually created rather than always "on".
             "no_discover": defn.get("no_discover") is True, "demo": bool(defn.get("demo", False)),
+            # Reviewed defect: an Edit rebuilds the definition from THIS payload and submits it, so
+            # any key missing here is silently erased. no_misc turned the Miscellaneous lane back
+            # on, discovery_notes threw away discovery's account of what it searched and dropped,
+            # and budget reset a partner's own caps to the defaults — all on a plain Save.
+            "no_misc": defn.get("no_misc") is True,
+            "discovery_notes": [str(n) for n in defn.get("discovery_notes") or []],
+            "budget": dict(defn.get("budget") or {}),
             "created": defn.get("created", ""), "updated": defn.get("updated", ""),
         },
         "items": items, "digest": {"week": digest.get("week", ""), "headline": digest.get("headline", ""), "body": body,
@@ -494,7 +660,7 @@ def load_scan(root: Path, defn_path: Path) -> dict:
                                    "selection": str(digest.get("selection") or ""),
                                    "notes": [str(n) for n in (digest.get("notes") or []) if n]},
         "counts": counts, "run": {k: run.get(k) for k in ("new", "enriched", "queued", "read_failed", "enrich_failed", "ledgered_total")},
-        "coverage": cov, "generated": generated, "problems": problems,
+        "coverage": cov, "misc": misc, "generated": generated, "problems": problems,
         "results_dir": res,
     }
 
@@ -541,22 +707,33 @@ def home_payload(scans: list[dict], built: str) -> dict:
             "id": d["id"], "name": d["name"], "href": f"/scan/{d['id']}.html", "builtin": False,
             "tier": "discovered", "demo": d["demo"], "meta": scan_meta(d, s["coverage"]["gated"]), "flags": d["jurisdictions"],
             "generated": s["generated"],
+            # When the DEFINITION last changed, which a run does not always move. A promotion
+            # changes only this: it adds a pending source and commits, without reading anything.
+            # The home page's pending card watches it to know a promotion has landed, and the
+            # stamp below includes it so an open tab notices the same commit.
+            "updated": d.get("updated", ""),
             "kpi": [{"n": s["counts"]["new"], "label": "new"}, {"n": s["counts"]["high"], "label": "high"}],
             "problems": s["problems"],
         })
     return {"page": "home", "builtISO": built, "cards": cards, "clientNames": client_names(),
             "actionsUrl": _actions_url(), "api": API, "firstRunMax": FIRST_RUN_MAX_NEW,
             "maxSources": MAX_SOURCES,
-            "stamp": stamp_of(*[f"{c['id']}:{c['generated']}" for c in cards])}
+            # Reviewed defect: the stamp was ids + last-run times only, so a promotion — which
+            # commits a changed definition and no new developments — left it identical, and a home
+            # page waiting for one would have polled for ever without noticing it had landed.
+            "stamp": stamp_of(*[f"{c['id']}:{c['generated']}:{c.get('updated', '')}" for c in cards])}
 
 
 def scan_payload(s: dict, built: str) -> dict:
     d = s["definition"]
     return {"page": "scan", "builtISO": built, "scan": d, "meta": scan_meta(d, s["coverage"]["gated"]), "items": s["items"],
-            "digest": s["digest"], "counts": s["counts"], "run": s["run"], "coverage": s["coverage"], "generated": s["generated"],
+            "digest": s["digest"], "counts": s["counts"], "run": s["run"], "coverage": s["coverage"], "misc": s["misc"],
+            "generated": s["generated"],
             "problems": s["problems"], "clientNames": client_names(), "actionsUrl": _actions_url(), "api": API,
             "firstRunMax": FIRST_RUN_MAX_NEW, "maxSources": MAX_SOURCES,
-            "stamp": stamp_of(d["id"], s["generated"], d.get("updated", ""))}
+            # misc.json has its own stamp: a Miscellaneous-only run changes nothing else on the
+            # page, and an open tab must still notice that the lane refreshed.
+            "stamp": stamp_of(d["id"], s["generated"], d.get("updated", ""), s["misc"].get("generated", ""))}
 
 
 # ----------------------------------------------------------------------------- HTML
@@ -741,9 +918,9 @@ table.dev .chips{gap:3px}
 .tablewrap{overflow-x:auto}
 @media (max-width:1100px){table.dev{min-width:960px}}
 
-/* coverage panel */
-.coverage{display:none;margin-top:26px;border:1px solid var(--rule2);border-radius:12px;padding:24px 28px;background:#fff}
-.coverage.on{display:block}
+/* coverage panel — a tab now, not a drawer: it shows whenever its view does, so no .on gate and
+   no card chrome of its own (the tab is the frame). */
+.coverage{margin-top:22px}
 .coverage h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:0 0 4px}
 .coverage .sub{color:var(--mute);font-size:12.5px;margin:0 0 18px}
 .coverage .grp{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:20px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--rule3)}
@@ -886,7 +1063,16 @@ dialog[data-step=form] .only-describe{display:none}
 .pending:empty{display:none}
 .pcard{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;border:1px dashed var(--rule);border-radius:10px;padding:18px 22px;background:var(--row3)}
 .pcard .name{font-family:var(--serif);font-size:21px;line-height:1.25;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.pcard .pstate{margin:6px 0 0;color:var(--mute);font-size:12.5px;line-height:1.5}
+.pcard.failed{border-style:solid;border-color:#E7C8C1;background:var(--alarm-wash)}
+.pcard .pstate{margin:6px 0 0;color:var(--ink);font-size:13px;line-height:1.5}
+/* The estimate is set apart from the observed line above it, so a reader can see at a glance
+   which sentence is a fact about the run and which is the clock talking. */
+.pcard .pest{margin:4px 0 0;color:var(--mute);font-size:12.5px;line-height:1.5;font-style:italic}
+.pcard .right .btn.sm{margin-top:6px}
+a.el.quiet{color:var(--faint);text-decoration:underline;text-underline-offset:2px;font-size:10px}
+a.el.quiet:hover{color:var(--navy)}
+.linkbtn{appearance:none;border:0;background:none;padding:0;font:inherit;color:inherit;
+  text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .pcard .fine{margin-top:5px;font-size:12px;color:var(--faint);line-height:1.5;max-width:640px}
 .pcard .right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:150px}
 .pcard .el{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--mute)}
@@ -955,8 +1141,136 @@ a.el{color:var(--navy)}
 .legend .badge{margin-top:3px}
 .src .ev .gated{color:var(--alarm)}
 
+/* ---- the scan's own tab bar. Same vocabulary as the tracker's nav (uppercase mono labels, a
+   3px ochre underline on the active one), on paper rather than navy, because the navy bar above
+   it is the site's nav and two identical bars would read as one broken one. */
+.vtabs{margin-top:30px;display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--rule2)}
+.vtabs button{appearance:none;cursor:pointer;background:none;border:0;border-bottom:3px solid transparent;
+  padding:12px 16px;font-family:var(--sans);font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.14em;color:var(--faint);white-space:nowrap;margin-bottom:-1px}
+.vtabs button:hover{color:var(--ink)}
+.vtabs button.on{color:var(--ink);border-bottom-color:var(--ochre)}
+.vtabs button .k{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--off);margin-left:7px}
+.vtabs button.on .k{color:var(--mute)}
+.view{display:none}
+.view.on{display:block}
+.view .toolbar{margin-top:22px}
+.viewhead{margin-top:26px}
+.viewhead .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.viewhead h3{font-family:var(--serif);font-weight:400;font-size:22px;margin:6px 0 0}
+.viewhead .sub{margin:6px 0 0;color:var(--mute);font-size:13px;line-height:1.6;max-width:860px}
+/* A lane that is empty says which types would land in it and why none did. */
+.laneempty{margin-top:8px;border:1px dashed var(--rule);border-radius:10px;padding:26px 28px;max-width:760px}
+.laneempty h4{font-family:var(--serif);font-weight:400;font-size:18px;margin:0 0 6px;letter-spacing:0;
+  text-transform:none;color:var(--ink)}
+.laneempty p{margin:0 0 6px;color:var(--mute);font-size:13px;line-height:1.6}
+.laneempty p:last-child{margin-bottom:0}
+.laneempty .why{color:#5B4507}
+.chip.untyped{border-style:dashed;color:#7A5E0E;background:var(--ochre-wash);border-color:#E4D19A}
+
+/* ---- Miscellaneous. The header copy is the most important text on this page: everything below
+   it is unfetched, ungated, uncitable, and outside the coverage list. */
+.miscwarn{margin-top:18px;border:1px solid #E4D19A;border-left:3px solid var(--ochre);border-radius:10px;
+  padding:18px 22px;background:var(--ochre-wash);color:#4A3806;max-width:920px}
+.miscwarn h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A5E0E;margin:0 0 8px;font-weight:600}
+.miscwarn p{margin:0 0 8px;font-size:13px;line-height:1.65}
+.miscwarn p:last-child{margin-bottom:0}
+.miscwarn b{font-weight:600}
+.miscq{margin-top:16px;padding:10px 14px;border:1px solid var(--rule3);border-radius:8px;background:var(--row3);
+  font-family:var(--mono);font-size:11px;color:var(--mute);line-height:1.7}
+.miscq b{font-weight:500;color:var(--ink)}
+.miscgrp{margin-top:26px}
+.miscgrp .gh{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:6px;border-bottom:1px solid var(--rule3)}
+.miscgrp .gsub{margin:6px 0 0;color:var(--mute);font-size:12.5px;line-height:1.55;max-width:800px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;padding:14px 0;border-bottom:1px solid var(--rule3);align-items:start}
+.mrow .mt{font-size:13.5px;font-weight:600;line-height:1.4}
+.mrow .mt a{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--rule)}
+.mrow .mm{margin-top:4px;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.02em}
+.mrow .mw{margin-top:5px;color:var(--mute);font-size:12.5px;line-height:1.55;max-width:720px}
+.mrow .ms{margin:6px 0 0;padding:7px 11px;border-left:2px solid var(--rule2);color:var(--mute);font-size:12.5px;
+  line-height:1.5;font-style:italic;background:var(--row3)}
+.mrow .mact{display:flex;flex-direction:column;align-items:flex-end;gap:5px;min-width:132px}
+.mrow .mst{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint)}
+.mrow .mst.promoted{color:var(--ok)}
+.mrow .mst.stale{color:#7A5E0E}
+/* A lead the last search no longer returns is kept, never deleted — so it must LOOK different
+   from one the search still stands behind, or the page ages silently. */
+.mrow.stale{background:linear-gradient(90deg,var(--ochre-wash),transparent 70%)}
+.mrow .mstale{margin-top:5px;font-size:12px;line-height:1.5;color:#5B4507;max-width:720px}
+.miscgrp .gh .ghrest{margin-left:10px;letter-spacing:.04em;text-transform:none;font-size:10.5px;color:var(--off)}
+.mnone{padding:16px 0;color:var(--faint);font-style:italic;font-size:13px}
+
+/* ---- Clients: one section per client named on the scan */
+.clsec{margin-top:26px;border-top:1px solid var(--rule2);padding-top:18px}
+.clsec:first-of-type{border-top:0;padding-top:6px}
+.clsec .cn{font-family:var(--serif);font-size:21px;line-height:1.25;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.clsec .cscope{margin-top:5px;font-size:12.5px;color:var(--mute)}
+.clsec .cscope b{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);margin-right:7px}
+.clsec .ccount{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--faint)}
+.clitem{padding:14px 0;border-bottom:1px solid var(--rule3);display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:16px;align-items:start}
+.clitem .cl-l{padding-top:2px}
+.clitem .ct{font-size:13.5px;font-weight:600;line-height:1.4}
+.clitem .ct button{appearance:none;border:0;background:none;padding:0;cursor:pointer;font:inherit;text-align:left;
+  text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--rule);color:var(--ink)}
+.clitem .ct button:hover{color:var(--navy);text-decoration-color:var(--navy)}
+.clitem .cm{margin-top:4px;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+.clitem .cw{margin-top:5px;color:var(--mute);font-size:12.5px;line-height:1.55}
+.clitem .ca{margin-top:7px;padding:8px 12px;border-left:2px solid var(--ochre);background:var(--ochre-wash);
+  color:#3d2f05;font-size:12.5px;line-height:1.5;border-radius:0 6px 6px 0}
+.clitem .cbtn{min-width:120px;text-align:right}
+
+/* ---- Audit: link-wise, the tracker's own framing */
+.audsrc{border:1px solid var(--rule2);border-radius:10px;margin-top:12px;background:#fff}
+.audsrc .ah{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 16px;cursor:pointer}
+.audsrc .ah:hover{background:var(--row3)}
+.audsrc .ah:focus-visible{outline:2px solid var(--navy);outline-offset:-2px}
+/* the same health dot as the coverage panel, so one colour means one thing on both tabs */
+.audsrc .dotc{width:8px;height:8px;border-radius:50%;background:var(--off);display:inline-block}
+.audsrc .dotc.OK{background:var(--ok)}.audsrc .dotc.QUIET{background:var(--ochre)}
+.audsrc .dotc.EMPTY{background:var(--off)}.audsrc .dotc.FAILED{background:var(--alarm)}.audsrc .dotc.GATED{background:var(--alarm)}
+.audsrc .an b{font-weight:600}
+.audsrc .an{font-size:13.5px;line-height:1.4;min-width:0}
+.audsrc .ahost{display:block;font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.audsrc .acount{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--mute);white-space:nowrap}
+.audsrc .abody{display:none;padding:0 16px 16px 40px;border-top:1px solid var(--rule3)}
+.audsrc.open .abody{display:block}
+.audsrc .ameta{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--mute);line-height:1.7}
+.audsrc .alink{font-family:var(--mono);font-size:11px;color:var(--navy);text-decoration:underline;text-underline-offset:3px}
+.aitem{display:grid;grid-template-columns:88px 42px minmax(0,1fr);gap:10px;padding:7px 0;border-bottom:1px solid var(--rule3);font-size:12.5px;line-height:1.45}
+.aitem .ad{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.aitem .al{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);
+  border:1px solid var(--rule2);border-radius:20px;padding:1px 0;text-align:center;height:16px;line-height:14px}
+.aitem button{appearance:none;border:0;background:none;padding:0;cursor:pointer;font:inherit;text-align:left;
+  text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--rule);color:var(--ink)}
+.aitem button:hover{color:var(--navy)}
+.anone{margin-top:12px;padding:10px 13px;border-radius:8px;background:var(--panel);color:var(--mute);font-size:12.5px;line-height:1.55}
+.anone.bad{background:var(--alarm-wash);color:var(--alarm)}
+.averify{margin-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;color:var(--faint);line-height:1.7}
+
+/* ---- create dialog: the coverage preview that gates Create */
+.prev{margin-top:20px;border:1px solid var(--rule2);border-radius:10px;background:var(--row3);padding:16px 18px}
+.prev h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px;font-weight:500}
+.prev .pj{margin-top:12px}
+.prev .pj:first-of-type{margin-top:0}
+.prev .pjh{font-size:12.5px;font-weight:600;display:flex;gap:8px;align-items:baseline}
+.prev ul{list-style:none;margin:5px 0 0;padding:0}
+.prev li{padding:5px 0 5px 12px;border-left:2px solid var(--rule2);margin-top:4px}
+.prev li .pn{font-size:12.5px;font-weight:500}
+.prev li .ph{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-left:7px}
+.prev li .pr{font-size:12px;color:var(--mute);line-height:1.45;margin-top:2px}
+.prev .pgap{margin-top:12px;font-size:12.5px;color:#5B4507;line-height:1.5}
+.prev .pfine{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule3);font-size:12px;color:var(--mute);line-height:1.6}
+.prev .pfine b{color:var(--ink);font-weight:600}
+.prevbar{margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.prevbar .pwhy{font-size:12px;color:var(--faint);line-height:1.45;flex:1;min-width:200px}
+
 @media (max-width:900px){
   .head,.tabs{padding-left:22px;padding-right:22px}
+  .clitem,.mrow{grid-template-columns:1fr}
+  .clitem .cbtn{text-align:left}
+  .mrow .mact{align-items:flex-start}
   .page{padding:26px 22px 90px}
   .digest{grid-template-columns:1fr}
   .kpis{flex-direction:row}
@@ -1027,6 +1341,12 @@ a.el{color:var(--navy)}
         <div class="help">Relevance is rated per named client; the model is asked to name them in the action line.</div></div>
       <div class="field check"><input type="checkbox" id="f-disc" checked><label for="f-disc">Discover sources automatically</label></div>
       <div class="help" id="f-disc-help">Off, only the sources listed above are gated and read.</div>
+      <div class="field" id="preview-block">
+        <label>What this scan will cover</label>
+        <div class="prevbar"><button type="button" class="btn" id="dlg-preview">Show what this scan will cover</button>
+          <span class="pwhy" id="preview-why">Coverage is the whole product — see the venues before the scan exists, not after.</span></div>
+        <div class="prev" id="preview" hidden></div>
+      </div>
       <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents, so the scan appears quickly rather than after every backlogged page. Anything older queues and is counted as queued on the scan. Press <b>Run scan</b> again to continue through the backlog.</div>
     </div>
     <div class="df"><div class="err" id="dlg-err" aria-live="polite"></div>
@@ -1087,24 +1407,17 @@ $('#headstamp').innerHTML = D.page === 'home'
   ? 'Human-run scans · <span>nothing scheduled</span>'
   : 'Last run <span>' + esc(D.generated ? stampText(D.generated) + ' IST' : 'never') + '</span>';
 
-// ---- notice bar + polling ----------------------------------------------------------------
+// ---- notice bar ------------------------------------------------------------------------------
 let noticeEl = null;
 function say(html, kind) { if (!noticeEl) return; noticeEl.className = 'notice on' + (kind ? ' ' + kind : ''); noticeEl.innerHTML = html; }
-const actionsLink = () => D.actionsUrl ? ' <a href="' + esc(D.actionsUrl) + '" target="_blank" rel="noopener">Open the Actions page</a> to watch it.' : '';
-let pollTimer = null;
-function startPolling() {
-  if (pollTimer) return;
-  // Fetch this very page and compare the stamp the builder embedded. A reload happens only when
-  // the data behind the page changed, so a rebuild that changed nothing leaves the reader alone.
-  pollTimer = setInterval(async () => {
-    try {
-      const res = await fetch(location.pathname, { cache: 'no-store' });
-      if (!res.ok) return;
-      const m = (await res.text()).match(/name="tmt-stamp" content="([^"]*)"/);
-      if (m && m[1] !== D.stamp) location.reload();
-    } catch (e) { /* offline or auth lapsed: keep waiting, the next tick tries again */ }
-  }, 60000);
-}
+// The run log is the affordance of LAST resort, and it is worded that way. A partner should never
+// have to open a CI page to know what is happening — that is what the pending cards are for — so
+// this link appears only where something has gone wrong or cannot be seen from here, never as the
+// main event, and it does not name the service it points at.
+const runLog = (url, label) => {
+  const u = url || D.actionsUrl || '';
+  return u ? ' <a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(label || 'Open the run log') + '</a>.' : '';
+};
 async function postJSON(url, body, ms) {
   // `ms` is opt-in, and only the discovery call and the status poll ask for it. A fetch with no
   // deadline is indistinguishable from a slow model: the Find sources button would spin for ever
@@ -1120,27 +1433,39 @@ async function postJSON(url, body, ms) {
 // Returns the endpoint's own answer on success (it carries scan_id and actionsUrl, which the
 // pending card needs) and null on any failure, so callers can still write `if (ok)`.
 async function dispatchScan(body, verb) {
-  say('Asking GitHub Actions to ' + esc(verb) + '…');
+  say('Asking the pipeline to ' + esc(verb) + '…');
   try {
     const r = await postJSON(D.api.scans, body);
-    if (r.ok) { say(esc(r.data.message || 'Queued. This page refreshes itself when results land.') + actionsLink()); startPolling(); return r.data || {}; }
-    say(esc(r.data.message || ('The scans endpoint answered ' + r.status + '.')) + (r.status === 501 ? actionsLink().replace('to watch it', 'and run <b>scan.yml</b> by hand') : ''), 'bad');
+    // The normal path names nothing but the work: the card below carries the progress from here,
+    // and this page loads the result by itself, so there is nothing for the partner to go and do.
+    //
+    // The endpoint's own 202 message is deliberately NOT echoed. api/scans.js's queued message
+    // names the CI service by name, tells the partner the page "refreshes itself" without saying
+    // when, and on a promotion describes a gate that does not in fact run until the next run.
+    // Those are that function's words about its own plumbing; this page's job is to say what is
+    // happening to the partner's scan. Failures below DO carry its message verbatim: a
+    // misconfiguration is exactly the case where the endpoint knows something this page cannot.
+    if (r.ok) { say('Started. The progress is below, and this page shows the result as soon as it lands.'); return r.data || {}; }
+    say(esc(r.data.message || ('The scans endpoint answered ' + r.status + '.'))
+        + runLog(null, r.status === 501 ? 'Open the run log and start it by hand' : 'Open the run log'), 'bad');
   } catch (e) {
-    say('No scans endpoint is reachable from this page.' + actionsLink(), 'bad');
+    say('This page could not reach the endpoint that starts a run.' + runLog(), 'bad');
   }
   return null;
 }
 
-// ---- pending scans: dispatched, not yet built ------------------------------------------------
-// GitHub accepts a create in a second; the scan's page does not exist until the workflow has
-// gated, read, committed, and Vercel has rebuilt — twenty minutes on a first run. The defect this
-// closes: between those two moments the Scans page showed nothing at all and the partner had to
-// go and watch GitHub to know anything was happening. These records bridge the gap. They live in
-// this browser only, like stars and triage, and each one is dropped the moment the built page
-// carries the scan.
+// ---- pending runs: dispatched, and waited for HERE --------------------------------------------
+// The dispatch is accepted in a second; the result does not exist until the workflow has gated,
+// read, committed, and the site has rebuilt — about twelve minutes, of which the last two are the
+// rebuild. The defect this closes: between those two moments the page said nothing, and a partner
+// had to go and watch a CI page to know anything was happening, then guess when to reload. These
+// records bridge the gap. They live in this browser only, like stars and triage, and each is
+// dropped the moment the built page carries its result.
 const PKEY = 'tmt_scans_pending_v1';
 const PENDING_STALE_MS = 90 * 60 * 1000;
-let redrawPending = null;   // set by renderHome; the dialog can submit from a scan page too
+const STATUS_MS = 15000;   // how often the run's own status is asked for
+const STAMP_MS = 20000;    // how often this page asks whether a newer version of itself exists
+let redrawPending = null;  // set by whichever page mounted the cards
 function pendingRead() {
   let v = null;
   try { v = JSON.parse(localStorage.getItem(PKEY) || '[]'); } catch (e) { v = null; }
@@ -1153,6 +1478,298 @@ function addPending(rec) {
   if (!rec || !rec.id) return;
   pendingWrite(pendingRead().filter(p => p.id !== rec.id).concat([rec]));
   if (redrawPending) redrawPending();
+}
+// Older records (written before Try again existed) carry `action` and no `kind`.
+const kindOf = p => String(p.kind || p.action || 'create');
+
+// ---- what a run is probably doing -------------------------------------------------------------
+// The status action gives three words — queued, in_progress, completed — and a conclusion. It
+// never says which STEP is running. A spinner would be honest and useless; a named step would be
+// useful and false. So the card states what it observes as fact and fills the long middle with an
+// estimate derived from the clock against the shape we have measured: about two minutes before the
+// runner has the code, then the gate, then the reading (which dominates), then the digest, then
+// about two minutes committing and rebuilding this page. Every estimate is worded as one — "usually
+// reading documents around now" — because a step that cannot be observed must never be asserted.
+const RUN_PHASES = [{ to: 2, what: 'setting up' }, { to: 4, what: 'gating the venues' },
+                    { to: 9.5, what: 'reading documents' }, { to: 11, what: 'writing the digest' },
+                    { to: Infinity, what: 'publishing' }];
+// A promotion is a different, much shorter errand: it edits the definition and commits. It reads
+// nothing and gates nothing, so it must not borrow the reading run's phases.
+const PROMOTE_PHASES = [{ to: 2, what: 'setting up' }, { to: 3, what: 'adding the venue to the sources list' },
+                        { to: Infinity, what: 'publishing' }];
+function phaseAt(mins, table) {
+  const t = table || RUN_PHASES;
+  for (let i = 0; i < t.length; i++) { if (mins < t[i].to) return t[i].what; }
+  return t[t.length - 1].what;
+}
+const aboutMins = m => (m < 1 ? 'just started' : m < 1.5 ? 'about a minute in' : 'about ' + Math.round(m) + ' minutes in');
+const QUEUED = ['queued', 'waiting', 'requested', 'pending'];
+
+// ---- this page picking up its own result ------------------------------------------------------
+// The workflow commits, the site rebuilds, and the page a partner is looking at knows none of it.
+// So while anything is pending, the page fetches ITSELF with cache:'no-store' and compares the
+// stamp the builder embedded — a hash of the DATA, not of the build, so a rebuild that changed
+// nothing never disturbs a reader. When it differs, the result has landed.
+let stampTimer = null, hasLanded = false, waitingForClear = false;
+let currentTab = '';   // the open tab, set by whichever page is rendered; travels in the hash
+function stampWatch(on) {
+  if (!on || hasLanded) { if (stampTimer) { clearInterval(stampTimer); stampTimer = null; } return; }
+  if (!stampTimer) stampTimer = setInterval(checkStamp, STAMP_MS);
+}
+async function checkStamp() {
+  if (hasLanded) return;
+  try {
+    const res = await fetch(location.pathname + location.search, { cache: 'no-store' });
+    if (!res.ok) return;                    // an auth challenge or a 5xx: try again next tick
+    const m = (await res.text()).match(/name="tmt-stamp" content="([^"]*)"/);
+    if (!m || m[1] === D.stamp) return;
+  } catch (e) { return; }                   // offline: the next tick tries again
+  hasLanded = true;
+  stampWatch(false);
+  showLanded();
+}
+// A reload while a dialog is open, or while the detail slide-over is showing, throws away what the
+// partner is in the middle of reading or typing. So the bar goes up either way and the reload
+// waits for the screen to be clear — with a button for a partner who would rather not wait.
+function pageBusy() {
+  if ($$('dialog[open]').length) return true;
+  const panel = $('#panel');
+  return !!(panel && panel.classList.contains('on'));
+}
+// The tab travels in the URL hash so the reload lands the partner back where they were. It is
+// written with replaceState on every tab change rather than by assigning location.hash, which
+// would push a history entry per click and turn Back into a tab-by-tab rewind.
+function setTabHash(k) {
+  currentTab = k || '';
+  if (!currentTab) return;
+  try { history.replaceState(null, '', location.pathname + location.search + '#tab=' + currentTab); } catch (e) {}
+}
+const tabFromHash = () => { const m = String(location.hash || '').match(/^#tab=([a-z-]{1,24})$/); return m ? m[1] : ''; };
+function showLanded() {
+  if (!pageBusy()) {
+    say('This scan has finished — showing the new version.');
+    // A beat, so the bar is read rather than flashed. The hash already holds the open tab.
+    setTimeout(() => location.reload(), 800);
+    return;
+  }
+  say('This scan has finished. The new version loads as soon as you close what is open — '
+    + '<button type="button" class="linkbtn" id="shownow">show it now</button>.', 'warn');
+  const b = $('#shownow'); if (b) b.addEventListener('click', () => location.reload());
+  if (waitingForClear) return;
+  waitingForClear = true;
+  const t = setInterval(() => { if (!pageBusy()) { clearInterval(t); waitingForClear = false; showLanded(); } }, 1500);
+}
+
+// ---- the pending cards ------------------------------------------------------------------------
+// One implementation, mounted by both pages. Reviewed gap: these cards existed only on the Scans
+// home, so a partner who pressed Run scan on a scan's own page got a one-line notice and then
+// nothing at all for twelve minutes — the exact wait this whole mechanism exists to fill.
+//
+// ctx.mine(p)      — is this record about the thing this page shows?
+// ctx.builtNow(p)  — has the committed page this record was waiting for arrived?
+function mountPending(el, ctx) {
+  let runState = {};             // record id -> the last status answer, kept across redraws
+  let ticker = null, statusTimer = null;
+
+  const elapsed = iso => {
+    const t = Date.parse(iso || '');
+    if (!isFinite(t)) return '';
+    const s = Math.max(0, Math.round((Date.now() - t) / 1000)), m = Math.floor(s / 60);
+    if (m >= 60) return Math.floor(m / 60) + 'h ' + (m % 60) + 'm elapsed';
+    return (m ? m + 'm ' + (s % 60) + 's' : s + 's') + ' elapsed';
+  };
+  function tickElapsed() { $$('.el[data-since]', el).forEach(x => { x.textContent = elapsed(x.dataset.since); }); }
+
+  function prune() {
+    const now = Date.now(), keep = [], mine = [];
+    let changed = false;
+    pendingRead().forEach(p => {
+      if (!ctx.mine(p)) { keep.push(p); return; }          // another page's errand: leave it alone
+      // The committed result is on the page now, so the card has nothing left to say. Some errands
+      // still owe the partner a sentence about where to look for what changed.
+      if (ctx.builtNow(p)) { changed = true; if (ctx.onLanded) ctx.onLanded(p); return; }
+      const t = Date.parse(p.dispatched_at || '');
+      // Ninety minutes is far past the longest run we have measured. Something went wrong that this
+      // page cannot see, so stop pretending to watch it and point at the log.
+      if (isFinite(t) && now - t > PENDING_STALE_MS) {
+        changed = true;
+        say('“' + esc(p.name || p.id) + '” was started more than 90 minutes ago and has still not landed here.'
+          + runLog(p.actionsUrl, 'Open the run log'), 'warn');
+        return;
+      }
+      keep.push(p); mine.push(p);
+    });
+    if (changed) pendingWrite(keep);
+    return mine;
+  }
+
+  // What the card says, split so each line can be traced to what it rests on: `badge` and the
+  // first sentence are OBSERVED (the status endpoint said so, or this page dispatched it itself);
+  // `est` is the clock talking and always says so.
+  function story(p, st) {
+    st = st || {};
+    const promo = kindOf(p) === 'promote';
+    const status = String(st.status || ''), concl = String(st.conclusion || '');
+    const known = !!status;                      // the endpoint has actually reported on this run
+    // A run reports status 'completed' a moment before its conclusion is populated. Treating an
+    // empty conclusion as success flashed "Finished" over a run that had in fact failed, so a
+    // completed-but-unrated run is NOT yet done: the card keeps waiting for the verdict.
+    const done = status === 'completed' && !!concl;
+    const bad = done && concl !== 'success';
+    // The phase estimate runs from when the RUN began, not from the button press: a run that sat
+    // in a queue for four minutes is not four minutes into reading documents.
+    const started = Date.parse(st.created_at || '') || Date.parse(p.dispatched_at || '');
+    const mins = isFinite(started) ? Math.max(0, (Date.now() - started) / 60000) : 0;
+    const out = { bad: bad, done: done, est: '', note: String(st.message || '') };
+    if (bad) {
+      out.badge = concl.replace(/_/g, ' ');
+      out.badgeClass = 'failed';
+      out.line = 'The run stopped — it finished as ' + concl.replace(/_/g, ' ') + '. Nothing was committed, so nothing on this page has changed.';
+      return out;
+    }
+    if (done) {
+      out.badge = 'Publishing'; out.badgeClass = 'working';
+      out.line = promo
+        // Reviewed defect: this card used to say the gate was running. run.py's promote does no
+        // such thing — it appends the URL as a PENDING source and commits. The gate (robots.txt,
+        // the site's terms, the parse test) runs at the start of the next run, so the card now
+        // says what happened and what the partner has to press for the rest to happen.
+        ? 'Added to this scan’s sources as pending. Nothing has been fetched from it and the gate has not judged it yet.'
+        : 'Finished. Publishing the new version — this page loads it by itself, usually within a couple of minutes.';
+      return out;
+    }
+    if (!known) {
+      // The contract's degraded answer (runs:[] with a message) or no status endpoint at all. Say
+      // only what is actually known: it was dispatched, this is how long ago, and the run's own
+      // state cannot be seen from here. No phase is estimated, because a phase estimate on top of
+      // an unknown run state would be a guess dressed as progress.
+      out.badge = promo ? 'Adding' : 'Started'; out.badgeClass = 'working';
+      out.line = 'Started from this page. Live run status is off on this deployment, so the timer here is this page’s own clock, not the run’s.';
+      out.est = 'A run usually takes about twelve minutes end to end. This page still loads the result by itself when it lands.';
+      return out;
+    }
+    if (QUEUED.indexOf(status) >= 0) {
+      out.badge = 'Waiting for a runner'; out.badgeClass = 'working';
+      out.line = 'Waiting for a runner. Nothing has been read yet.';
+      return out;
+    }
+    out.badge = 'Running'; out.badgeClass = 'working';
+    out.line = promo ? 'Running — this errand only edits the scan’s source list; it reads nothing.'
+                     : 'Running.';
+    out.est = aboutMins(mins) + '; usually ' + phaseAt(mins, promo ? PROMOTE_PHASES : RUN_PHASES)
+            + ' around now. That is an estimate from the clock — the run reports that it is running, not which step it is on.';
+    return out;
+  }
+
+  function pcard(p, st) {
+    const s = story(p, st);
+    const promo = kindOf(p) === 'promote';
+    const url = (st && st.html_url) || p.actionsUrl || D.actionsUrl || '';
+    // The fine print belongs to the errand, not to runs in general: the first-run cap is a promise
+    // about a CREATE, and repeating it under a re-run of an established scan says something that
+    // is not true of the run being waited for.
+    const fine = promo
+      ? (s.done && !s.bad
+          ? 'The gate — robots.txt, the site’s own terms and a parse test — runs at the START of the next run, not now. Press <b>Run scan</b> on this scan when you want it judged. Until it passes, nothing is ever fetched from it, and a refusal appears on <b>Coverage</b> with its reason.'
+          : 'Promoting is the only route from Miscellaneous into coverage, and it is a request, not a decision: the same gate that judged every other source will judge this URL at the start of the next run.')
+      : kindOf(p) === 'run'
+        ? 'This run reads the newest documents each approved source is showing, within the scan’s own caps. Anything beyond them queues and is counted as queued; press Run scan again to continue through the backlog.'
+        : esc(FIRST_RUN_LINE);
+    return '<div class="pcard' + (s.bad ? ' failed' : '') + '">'
+      + '<div><div class="name">' + esc(p.name || p.id) + '<span class="badge ' + esc(s.badgeClass) + '">' + esc(s.badge) + '</span></div>'
+      + '<p class="pstate">' + esc(s.line) + '</p>'
+      + (s.est ? '<p class="pest">' + esc(s.est) + '</p>' : '')
+      + '<div class="fine">' + fine + (s.note ? '<br>' + esc(s.note) : '') + '</div></div>'
+      + '<div class="right"><div class="el" data-since="' + esc(p.dispatched_at || '') + '"></div>'
+      + (s.bad ? '<button type="button" class="btn sm" data-retry="' + esc(p.id) + '">Try again</button>' : '')
+      // Secondary by design, and only where it earns its place: a failure, or a run this page
+      // cannot see the state of. In the normal path there is nothing here to click, because there
+      // is nothing the partner needs to do.
+      + ((s.bad || !st || !st.status) && url
+          ? '<a class="el quiet" href="' + esc(url) + '" target="_blank" rel="noopener">Open the run log</a>' : '')
+      + '<button type="button" class="pdismiss" data-dismiss="' + esc(p.id) + '" aria-label="Stop watching ' + esc(p.name || p.id) + '" title="Stop watching this run — the result still appears here when it lands">×</button></div></div>';
+  }
+
+  function draw() {
+    const list = prune();
+    el.innerHTML = list.map(p => pcard(p, runState[p.id])).join('');
+    if (ctx.onDraw) ctx.onDraw(list);
+    tickElapsed();
+    // Stop polling a terminal state: a finished run has nothing more to report, and a failed one
+    // will never land, so neither timer has anything left to do for it.
+    const watching = list.filter(p => { const st = runState[p.id]; return !st || st.status !== 'completed'; });
+    const canStillLand = list.some(p => { const st = runState[p.id]; return !st || st.status !== 'completed' || st.conclusion === 'success' || !st.conclusion; });
+    // The clock runs only while something can still change. Reviewed defect: it was driven by
+    // list.length, so a card left showing a FAILED run ticked its elapsed time upward for ever,
+    // which reads as "still working" over a run that stopped.
+    schedule(watching.length > 0, watching.length > 0, canStillLand);
+  }
+  redrawPending = draw;
+
+  // Both timers stop while the tab is hidden and start again when it comes back: a partner who
+  // leaves this open in a background tab must not keep the status endpoint busy for an hour to
+  // animate a clock nobody is looking at.
+  function schedule(wantStatus, wantClock, wantStamp) {
+    const vis = !document.hidden;
+    if (ticker && !(wantClock && vis)) { clearInterval(ticker); ticker = null; }
+    if (statusTimer && !(wantStatus && vis)) { clearInterval(statusTimer); statusTimer = null; }
+    // Reviewed defect: the stamp watch was owned by draw() alone, so hiding the tab stopped the
+    // status poll and the clock but left this one re-fetching the whole page every 20 s for as
+    // long as the tab stayed open — the exact behaviour the comment above says it avoids.
+    stampWatch(!!wantStamp && vis);
+    if (!vis) return;
+    if (wantClock && !ticker) ticker = setInterval(tickElapsed, 1000);
+    if (wantStatus && !statusTimer) { statusTimer = setInterval(pollStatus, STATUS_MS); pollStatus(); }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) schedule(false, false, false); else draw(); });
+
+  async function pollStatus() {
+    const list = prune().filter(p => { const st = runState[p.id]; return !st || st.status !== 'completed'; });
+    if (!list.length) { draw(); return; }
+    for (const p of list) {
+      if (document.hidden) return;               // stop mid-list rather than finish the round
+      let r = null;
+      // A promotion's record is keyed by finding, not by scan; the status action wants the scan the
+      // workflow was dispatched for.
+      try { r = await postJSON(D.api.scans, { action: 'status', scan_id: p.scan_id || p.id }, 20000); } catch (e) { r = null; }
+      // No status endpoint, or it refused: the card keeps its own elapsed clock and says live
+      // status is off. Nothing is shown as an error, because nothing about the RUN is known to be
+      // wrong — only that this page cannot see it.
+      if (!r || !r.ok) continue;
+      const runs = Array.isArray(r.data.runs) ? r.data.runs : [];
+      // The status action filters by scan id but not by time, so runs[0] can be LAST WEEK's run of
+      // the same scan — which would flash "Finished" over a run that has not started. Only a run
+      // created at or after this dispatch can be this dispatch. Two minutes of slack absorbs the
+      // difference between the browser's clock and the runner's; a run older than that is somebody
+      // else's history, and the card keeps saying live status is off rather than borrowing it.
+      const since = Date.parse(p.dispatched_at || 0) - 120000;
+      const mine = runs.filter(x => Date.parse(x.created_at || 0) >= since);
+      if (mine.length) runState[p.id] = mine[0];
+      else if (!runState[p.id]) runState[p.id] = { message: r.data.message || '' };
+    }
+    draw();
+  }
+
+  el.addEventListener('click', async e => {
+    const d = e.target.closest('button[data-dismiss]');
+    if (d) { pendingWrite(pendingRead().filter(p => p.id !== d.dataset.dismiss)); draw(); return; }
+    const t = e.target.closest('button[data-retry]');
+    if (!t) return;
+    const p = pendingRead().filter(x => x.id === t.dataset.retry)[0];
+    // The request is stored on the record precisely so a failed run can be re-dispatched exactly as
+    // it was first sent — same definition, same sources, same discovery setting. A record written
+    // before this existed has no request to replay, and says so rather than sending a guess.
+    if (!p || !p.request) { say('This run was started before the page could remember its definition, so it cannot be repeated automatically. Press Create scan or Run scan again.', 'warn'); return; }
+    t.disabled = true; t.textContent = 'Starting…';
+    const res = await dispatchScan(p.request, p.verb || 'run this again');
+    t.disabled = false; t.textContent = 'Try again';
+    if (!res) return;
+    delete runState[p.id];
+    addPending(Object.assign({}, p, { dispatched_at: new Date().toISOString(),
+      actionsUrl: res.actionsUrl || p.actionsUrl || D.actionsUrl || '' }));
+  });
+
+  draw();
 }
 
 // ---- chip input ----------------------------------------------------------------------------
@@ -1172,6 +1789,10 @@ function chipInput(root, opts) {
       c.innerHTML = (opts.render ? opts.render(v) : esc(v)) + '<button type="button" aria-label="Remove ' + esc(v) + '" data-i="' + idx + '">×</button>';
       root.insertBefore(c, root.firstChild);
     });
+    // draw() runs on every add, every removal and every programmatic set, so this one hook is
+    // every change the coverage preview needs to hear about: a preview built from stale chips
+    // would promise venues and jurisdictions the create no longer sends.
+    if (opts.onchange) opts.onchange();
   };
   const add = raw => { const v = norm(raw); if (!v) return; if (opts.validate && !opts.validate(v)) { input.setCustomValidity('x'); input.reportValidity(); return; } if (!values.includes(v)) values.push(v); input.value = ''; draw(); };
   input.addEventListener('keydown', e => {
@@ -1195,14 +1816,18 @@ const DEMO_NOTE = 'Demo scan: fixture data, not a real instrument.';
 
 // ---- create / edit dialog -------------------------------------------------------------------
 const dlg = $('#dlg'), form = $('#dlg-form');
+// The coverage preview reads the jurisdictions and the typed sources, so both re-draw it.
+const onCoverageInput = () => { if (typeof refreshPreview === 'function') refreshPreview(); };
 const F = {
-  jur: chipInput($('#c-jur'), { inputId: 'f-jur', placeholder: 'Germany, FR, EU…', normalize: jurNorm, render: v => flagged(v) + (NAMES[v] ? ' <span class="mark d">' + esc(countryName(v)) + '</span>' : '') }),
+  jur: chipInput($('#c-jur'), { inputId: 'f-jur', placeholder: 'Germany, FR, EU…', normalize: jurNorm, onchange: onCoverageInput, render: v => flagged(v) + (NAMES[v] ? ' <span class="mark d">' + esc(countryName(v)) + '</span>' : '') }),
   top: chipInput($('#c-top'), { inputId: 'f-top', placeholder: 'Pay equity, Employment…' }),
   ind: chipInput($('#c-ind'), { inputId: 'f-ind', placeholder: 'Professional services…' }),
-  src: chipInput($('#c-src'), { inputId: 'f-src', placeholder: 'https://…', validate: isUrl, render: v => esc(v.replace(/^https?:\/\/(www\.)?/, '').slice(0, 60)) }),
+  src: chipInput($('#c-src'), { inputId: 'f-src', placeholder: 'https://…', validate: isUrl, onchange: onCoverageInput, render: v => esc(v.replace(/^https?:\/\/(www\.)?/, '').slice(0, 60)) }),
   cl: chipInput($('#c-cl'), { inputId: 'f-cl', placeholder: 'Client name', suggest: D.clientNames || [] }),
 };
 let editingId = null;
+// The definition Edit read back, so Save can carry forward the keys this dialog does not edit.
+let editingDefn = null;
 // {name, scope} clients keep their scope across an edit: the chip shows the name, the object is
 // re-attached on submit so saving a scan does not silently drop "employees in Germany only".
 let clientObjs = {};
@@ -1217,6 +1842,7 @@ let srcObjs = {};
 let cands = [], picked = {}, discTouched = false;
 const DISC_HELP = 'Off, only the sources listed above are gated and read.';
 function openDialog(scan) {
+  editingDefn = scan || null;
   editingId = scan ? scan.id : null;
   clientObjs = {};
   (scan ? scan.clients : []).forEach(c => { const n = clientName(c); if (n && typeof c === 'object') clientObjs[n] = c; });
@@ -1232,6 +1858,10 @@ function openDialog(scan) {
   cands = []; picked = {}; discTouched = false;
   $('#cands').innerHTML = ''; setNote('#find-note', ''); $('#f-disc-help').textContent = DISC_HELP;
   $('#f-disc').checked = scan ? !scan.no_discover : true;
+  // Every dialog opening starts the coverage gate again: what the last scan was going to cover
+  // says nothing about this one, and a Create left enabled from a previous open would be exactly
+  // the "created blind" outcome this preview exists to stop.
+  previewSeen = false; $('#preview').hidden = true; $('#preview').innerHTML = ''; syncSubmit();
   $('#dlg-err').textContent = '';
   setNote('#dlg-pnote', ''); setNote('#dlg-pnote-1', '');
   $('#f-desc').value = '';
@@ -1278,14 +1908,85 @@ function findWhy() {
 $('#f-intent').addEventListener('input', findWhy);
 function discHelp() {
   const n = Object.keys(picked).length, disc = $('#f-disc');
-  const total = n + F.src.get().length;
+  // The same de-duplicated list the submit handler sends and the preview shows. Defect the preview
+  // exposed: a URL that was both ticked in the picker and typed into Sources was counted twice, so
+  // the counter could read "13 of 12 — too many" over twelve venues.
+  const total = previewSources().length;
   $('#find-count').textContent = total ? total + ' of ' + MAX_SOURCES + ' source' + (MAX_SOURCES === 1 ? '' : 's') + ' chosen' + (total > MAX_SOURCES ? ' — too many' : '') : '';
   $('#find-count').classList.toggle('over', total > MAX_SOURCES);
   $('#f-disc-help').textContent = (!disc.checked && n)
     ? 'Off — the workflow gates exactly the ' + pl(n, 'source') + ' you picked instead of proposing 25 of its own, which is about five minutes less before the scan appears. Tick it back on to have it look for more as well.'
     : DISC_HELP;
 }
-$('#f-disc').addEventListener('change', () => { discTouched = true; discHelp(); });
+$('#f-disc').addEventListener('change', () => { discTouched = true; discHelp(); refreshPreview(); });
+
+// ---- the coverage preview: what this scan will read, BEFORE it exists -------------------------
+// Coverage is the whole product — "a scan shows exactly which URLs it fetches" (design §1.1) — so
+// a partner should see the venues before pressing Create, not discover them on the coverage panel
+// twenty minutes later. Create stays disabled until this has been drawn from the current inputs.
+let previewSeen = false;
+function syncSubmit() {
+  const b = $('#dlg-submit'); if (!b) return;
+  b.disabled = !previewSeen;
+  b.title = previewSeen ? '' : 'See what this scan will cover first.';
+  const why = $('#preview-why');
+  if (why) why.textContent = previewSeen
+    ? 'This is what will be gated on creation. It updates as you change the venues, the jurisdictions or the brief.'
+    : 'Create is disabled until you have seen the venues this scan will read. Coverage is what a scan is.';
+}
+// Exactly the list the submit handler will send, built by the same rule, so the preview can never
+// promise a venue the dispatch drops or hide one it adds.
+function previewSources() {
+  const chosen = cands.filter(c => picked[c.url]);
+  const chosenUrls = chosen.map(c => c.url);
+  // Who put a venue on the list is part of what the partner is being asked to approve. An Edit
+  // re-opens venues the definition already carries, and `proposed_by` on those is the truth —
+  // calling a discovered venue "added by you" would misattribute the choice back to the reader.
+  const from = (o, url, fallback) => ({ url: url, name: o.name || hostOf(url) || url, host: o.host || hostOf(url),
+    jurisdiction: (o.jurisdiction || '').toUpperCase(), kind: o.kind || '', rationale: o.rationale || '',
+    how: o.proposed_by ? 'proposed by ' + o.proposed_by : fallback });
+  return chosen.map(c => from(c, c.url, 'proposed by discovery'))
+    .concat(F.src.get().filter(u => !chosenUrls.includes(u)).map(u => from(srcObjs[u] || {}, u, 'added by you')));
+}
+function renderPreview() {
+  const list = previewSources(), el = $('#preview');
+  const order = [], groups = {};
+  list.forEach(s => { const k = s.jurisdiction || '—'; if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(s); });
+  // The scan's own jurisdictions lead, in the order they were typed, so a jurisdiction with no
+  // venue is read in place rather than found by its absence at the bottom of a list.
+  const jurs = F.jur.get();
+  const heads = jurs.filter(j => groups[j]).concat(order.filter(k => k !== '—' && !jurs.includes(k)), groups['—'] ? ['—'] : []);
+  const venues = heads.map(k => '<div class="pj"><div class="pjh">' + (k === '—' ? 'Jurisdiction not stated' : flagged(k) + (NAMES[k] ? ' ' + esc(countryName(k)) : ''))
+      + '<span class="ph">' + pl(groups[k].length, 'venue') + '</span></div><ul>'
+    + groups[k].map(s => '<li><span class="pn">' + esc(s.name) + '</span><span class="ph">' + esc(KINDL[s.kind] || 'kind not classified') + ' · ' + esc(s.host || s.url) + ' · ' + esc(s.how) + '</span>'
+        + (s.rationale ? '<div class="pr">' + esc(String(s.rationale).slice(0, 300)) + '</div>' : '<div class="pr">No rationale was given for this venue.</div>') + '</li>').join('')
+    + '</ul></div>').join('');
+  // A venue that did not say which jurisdiction it serves makes a gap unprovable — the same rule
+  // the built coverage panel uses, so the two never contradict each other about the same scan.
+  const unstated = list.filter(s => !s.jurisdiction).length;
+  const gaps = jurs.filter(j => !groups[j]);
+  const gapLine = !jurs.length ? '<div class="pgap">No jurisdiction is listed yet — the pipeline refuses a scan without one.</div>'
+    : unstated ? '<div class="pgap">' + esc(pl(unstated, 'venue')) + ' did not say which jurisdiction it serves, so this list cannot tell you which jurisdictions are uncovered. The scan\'s Coverage panel will, once the gate has read them.</div>'
+    : gaps.length ? '<div class="pgap">No venue for ' + gaps.map(flagged).join(', ') + '. '
+        + ($('#f-disc').checked ? 'Discovery is on, so the workflow will look for one; if it finds none, the Coverage panel says so and keeps saying so.' : 'Discovery is off, so nothing will be read for ' + (gaps.length === 1 ? 'it' : 'them') + '. Add a listing page, or turn discovery back on.') + '</div>'
+    : '';
+  const named = heads.filter(k => k !== '—').length;
+  el.innerHTML = (list.length
+      ? '<h4>' + esc(pl(list.length, 'venue')) + (named ? ' across ' + esc(pl(named, 'jurisdiction')) : ', none stating a jurisdiction') + '</h4>' + venues
+      : '<h4>No venue chosen yet</h4><div class="pgap">Nothing is listed, so this scan would read nothing of its own.'
+        + ($('#f-disc').checked ? ' Discovery is on, so the workflow will propose venues and gate them; you will first see them on the scan\'s Coverage panel.' : ' Discovery is off too — press Find sources, or add a listing page.') + '</div>')
+    + gapLine
+    + '<div class="pfine"><b>Each venue above is gated when the scan is created</b> — reachability, robots.txt, the site\'s own terms and a parse test. Anything that fails is listed as <b>rejected</b> on the scan\'s Coverage panel, with the reason, and is never fetched. Nothing here is coverage until the gate has said so, and a scan reads at most ' + MAX_SOURCES + ' sources.'
+    + ($('#f-disc').checked ? '<br>Discovery is on, so the workflow will also propose venues of its own and gate them the same way. Those are not on this list.' : '')
+    + '<br><b>Miscellaneous will additionally search the open web outside this list.</b> That lane fetches nothing, gates nothing and cites nothing — it is leads to verify at their primary source. A lead that turns out to be an official venue can be promoted into this coverage list, where the same gate decides.</div>';
+  el.hidden = false;
+  previewSeen = true;
+  syncSubmit();
+}
+// Re-draw only once it has been shown: opening the dialog must not silently satisfy its own gate.
+function refreshPreview() { if (previewSeen) renderPreview(); }
+$('#dlg-preview').addEventListener('click', () => { renderPreview(); $('#preview').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+
 function candRow(c, i) {
   const host = c.host || hostOf(c.url);
   const kind = KINDL[c.kind] || host || 'Source';
@@ -1318,18 +2019,53 @@ $('#cands').addEventListener('change', e => {
   // already set the box yourself, in which case your setting stands.
   if (Object.keys(picked).length && $('#f-disc').checked && !discTouched) $('#f-disc').checked = false;
   discHelp();
+  refreshPreview();
 });
 $('#dlg-find').addEventListener('click', async () => {
   const intent = $('#f-intent').value.trim();
   if (intent.length < 20) { findWhy(); $('#f-intent').focus(); return; }
-  const b = $('#dlg-find'); b.disabled = true; b.textContent = 'Looking…';
+  const b = $('#dlg-find'); b.disabled = true;
   setNote('#find-note', '');
-  let r = null, err = null;
-  // 55 s: outside api/discover.js's own 50 s model deadline, inside its 60 s function budget, so
-  // a slow-but-answering call is never cut off and a dead one does not hang the button for ever.
-  try { r = await postJSON(D.api.discover, { intent, jurisdictions: F.jur.get(), topics: F.top.get(), industries: F.ind.get() }, 55000); }
-  catch (e) { err = e; }
+  // ONE JURISDICTION PER CALL. A hosted web search across four jurisdictions took longer than the
+  // platform's 60 s function ceiling and answered 504 every time; /api/discover now refuses more
+  // than one, and the fix is smaller searches run at the same time rather than a longer wait.
+  // 55 s each: outside the endpoint's own 50 s model deadline, inside its 60 s budget.
+  const jurs = F.jur.get();
+  const calls = jurs.length ? jurs : [null];
+  let done = 0;
+  const tick = () => { b.textContent = calls.length > 1 ? 'Looking… ' + done + '/' + calls.length : 'Looking…'; };
+  tick();
+  const results = await Promise.all(calls.map(j => postJSON(D.api.discover,
+      Object.assign({ intent, topics: F.top.get(), industries: F.ind.get() }, j ? { jurisdiction: j } : {}), 55000)
+    .then(x => ({ j: j, r: x }), e => ({ j: j, err: e }))
+    .then(x => { done += 1; tick(); return x; })));
   b.disabled = false; b.textContent = 'Find sources'; findWhy();
+
+  // Merge the answers. A jurisdiction whose own call failed is named rather than silently missing,
+  // because an empty list and an unanswered search are not the same thing.
+  const okCalls = results.filter(x => x.r && x.r.ok && Array.isArray(x.r.data.candidates));
+  const failed = results.filter(x => !(x.r && x.r.ok && Array.isArray(x.r.data.candidates)));
+  let r = null, err = null;
+  if (okCalls.length) {
+    const seen = {}, merged = [], gaps = [], dropped = [], notes = [];
+    okCalls.forEach(x => {
+      (x.r.data.candidates || []).forEach(c => {
+        const k = c && c.url;
+        if (!k || seen[k]) return;                      // the same venue can answer two searches
+        seen[k] = 1; merged.push(c);
+      });
+      (x.r.data.gaps || []).forEach(g => gaps.push(g));
+      (x.r.data.dropped || []).forEach(d => dropped.push(d));
+      (x.r.data.notes || []).forEach(n => { if (notes.indexOf(n) < 0) notes.push(n); });
+    });
+    failed.forEach(x => notes.push('The search for ' + (x.j || 'this subject') + ' did not answer'
+      + (x.err && x.err.name === 'AbortError' ? ' within 55 seconds' : '') + ' — nothing from it is listed below.'));
+    r = { ok: true, status: 200, data: { candidates: merged, gaps: gaps, dropped: dropped,
+      notes: notes, model: (okCalls[0].r.data || {}).model } };
+  } else {
+    const first = results[0] || {};
+    err = first.err || null; r = first.r || null;
+  }
   if (r && r.ok && Array.isArray(r.data.candidates)) {
     // A candidate without a usable URL cannot be gated or fetched; drop it and say how many, so a
     // short list is never mistaken for a thin one.
@@ -1344,6 +2080,9 @@ $('#dlg-find').addEventListener('click', async () => {
       ? '<b>' + esc(pl(cands.length, 'candidate')) + ' proposed' + (r.data.model ? ' by ' + esc(r.data.model) : '') + '.</b> Tick the ones this scan should read.'
       : '<b>No venue proposed for this brief.</b> Add the listing pages you know by hand below.')
       + (notes.length ? '<br>' + notes.map(esc).join('<br>') : ''), !cands.length);
+    // The point of Find sources is to choose coverage, so the coverage preview opens with the
+    // answer rather than waiting to be asked for.
+    renderPreview();
     return;
   }
   // Same fallback discipline as the describe path: say why, and leave the manual input working.
@@ -1371,7 +2110,7 @@ $('#dlg-build').addEventListener('click', async () => {
     F.src.set((p.sources || []).map(s => typeof s === 'string' ? s : (s && s.url) || '').filter(isUrl));
     const notes = [].concat(p.notes ? [p.notes] : [], Array.isArray(r.data.notes) ? r.data.notes : []);
     setNote('#dlg-pnote', '<b>Proposed from your description.</b> Check every field before creating; the sources listed are suggestions until the gate has read them.' + (notes.length ? '<br>' + notes.map(esc).join('<br>') : ''));
-    setStep('form'); $('#f-name').focus();
+    setStep('form'); renderPreview(); $('#f-name').focus();
     return;
   }
   // Fallback: the manual form, with one line saying why. The description becomes the intent so
@@ -1408,6 +2147,15 @@ form.addEventListener('submit', async e => {
     }));
   const scan = { name, intent, jurisdictions: F.jur.get(), topics: F.top.get(), industries: F.ind.get(),
     sources, clients: F.cl.get().map(n => clientObjs[n] || n) };
+  // Carry forward what this dialog does not edit. An Edit re-creates the scan from this object,
+  // so a key left out here is erased: no_misc silently re-enabled the Miscellaneous lane, budget
+  // reset the partner's own caps, and discovery_notes lost discovery's account of its search.
+  if (editingId && editingDefn) {
+    if (editingDefn.no_misc === true) scan.no_misc = true;
+    if (editingDefn.budget && Object.keys(editingDefn.budget).length) scan.budget = editingDefn.budget;
+    if ((editingDefn.discovery_notes || []).length) scan.discovery_notes = editingDefn.discovery_notes;
+    if (editingDefn.demo === true) scan.demo = true;
+  }
   if (editingId) scan.id = editingId;
   const err = $('#dlg-err');
   if (name.length < 3) { err.textContent = 'Give the scan a name (3 characters or more).'; $('#f-name').focus(); return; }
@@ -1431,16 +2179,29 @@ form.addEventListener('submit', async e => {
   // minutes later on the Actions page.
   if (!scan.jurisdictions.length) { err.textContent = 'Add at least one jurisdiction — the pipeline refuses a scan without one.'; F.jur.input.focus(); return; }
   if (!scan.topics.length && !scan.industries.length && !scan.sources.length) { err.textContent = 'Add at least one topic, industry or source, or discovery has nothing to look for.'; F.top.input.focus(); return; }
+  // The gate on Create: a scan is its coverage, and this is the last moment the partner can see
+  // that coverage before twenty minutes of gating and reading happen on their behalf. The button
+  // is disabled until the preview has been drawn; this is the belt to that braces, for a submit
+  // that arrived by Enter rather than by the button.
+  if (!previewSeen) {
+    err.textContent = 'See what this scan will cover first — press “Show what this scan will cover”.';
+    $('#dlg-preview').focus(); return;
+  }
   err.textContent = '';
   const btn = $('#dlg-submit'); btn.disabled = true;
-  const res = await dispatchScan({ action: 'create', scan_id: editingId || undefined, scan, no_discover: !$('#f-disc').checked }, editingId ? 'update and re-run this scan' : 'create the scan');
+  const verb = editingId ? 'update and re-run this scan' : 'create the scan';
+  const req = { action: 'create', scan_id: editingId || undefined, scan, no_discover: !$('#f-disc').checked };
+  const res = await dispatchScan(req, verb);
   btn.disabled = false;
   if (res) {
     // Remember it so the Scans home shows it immediately. api/scans.js answers 202 with the id it
     // derived from the name, which is the id the page will live at — take it from there rather
     // than deriving a second slug here that could disagree with the workflow's.
+    // The request travels with it so a failed run can be repeated exactly as it was sent, without
+    // making the partner retype a definition they have already confirmed.
     addPending({ id: res.scan_id || scan.id || '', name: name, dispatched_at: new Date().toISOString(),
-      action: 'create', actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+      kind: 'create', action: 'create', request: req, verb: verb,
+      actionsUrl: res.actionsUrl || D.actionsUrl || '' });
     dlg.close();
   }
 });
@@ -1480,8 +2241,16 @@ function renderHome() {
   if (!['all', 'starred'].includes(hs.tab)) hs.tab = 'all';
   if (!['name', 'lastrun', 'new'].includes(hs.sort)) hs.sort = 'name';
   const hsave = () => { try { localStorage.setItem(HKEY, JSON.stringify(hs)); } catch (e) {} };
-  main.innerHTML = '<div class="titlerow"><div><div class="crumb">Scans</div><h1 class="title">Scans</h1>'
-    + '<p class="lede">Each scan reads a fixed, gated list of sources for one question. The TMT India tracker is the built-in, vetted one; the rest are yours, with every source discovered, gated and labelled as such.</p></div>'
+  main.innerHTML = '<div class="titlerow"><div><div class="crumb">TMT Regulatory Radar</div><h1 class="title">Scans</h1>'
+    // This page is the product's front door, not an index behind the tracker: it opens with what a
+    // scan is and who owns which one, because a partner arriving here for the first time has no
+    // other page to learn it from.
+    + '<p class="lede">A scan is one question, read against a fixed list of official sources you can see. Open a scan for its own workspace — coverage, instruments, judgments, signals, miscellaneous leads, clients and audit.</p>'
+    // The count comes from the built-in card, which computes it from the registry: a typed number
+    // reads as coverage the day a venue is retired.
+    + '<p class="lede"><b>TMT India</b> is the built-in scan — ' + esc((D.cards.find(c => c.builtin) || {}).meta || 'the vetted registry')
+    + ', vetted one by one, each with its own adapter, fixture, floor and legal analysis. Every other scan here is one you made: its sources were discovered and passed an automated gate, and they are labelled <i>discovered</i> everywhere they appear so the two are never confused.</p>'
+    + '<p class="lede">Scans run when you press Run scan. Nothing here is scheduled.</p></div>'
     + '<div class="actions"><button class="btn primary" id="create">+ Create scan</button></div></div>'
     + '<div class="notice" id="notice"></div>'
     + '<div class="htoolbar"><div class="ttabs" role="tablist" id="htabs"></div>'
@@ -1494,7 +2263,7 @@ function renderHome() {
   const c2 = $('#create2'); if (c2) c2.addEventListener('click', () => openDialog(null));
   $('#hsort').value = hs.sort;
   $('#hsort').addEventListener('change', e => { hs.sort = e.target.value; hsave(); drawCards(); });
-  $('#htabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { hs.tab = b.dataset.tab; hsave(); drawCards(); } });
+  $('#htabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { hs.tab = b.dataset.tab; hsave(); setTabHash(hs.tab); drawCards(); } });
   $('#cards').addEventListener('click', e => {
     const b = e.target.closest('button[data-star]'); if (!b) return;
     e.preventDefault();
@@ -1517,118 +2286,42 @@ function renderHome() {
       + (hs.tab === 'starred' && !list.length && !builtin.some(c => hs.star[c.id]) ? '<div class="hnone">No starred scans yet — press ☆ on a card to keep it here.</div>' : '');
     $$('.card .last').forEach(el => { el.textContent = 'Last run ' + rel(el.dataset.iso); });
   }
-  drawCards();
 
-  // ---- pending scans: dispatched, not yet on this page ---------------------------------------
-  const builtIds = {};
-  D.cards.forEach(c => { builtIds[c.id] = true; });
-  let runState = {};              // scan id -> the last status answer, kept across redraws
-  let ticker = null, statusTimer = null;
-
-  const elapsed = iso => {
-    const t = Date.parse(iso || '');
-    if (!isFinite(t)) return '';
-    const s = Math.max(0, Math.round((Date.now() - t) / 1000)), m = Math.floor(s / 60);
-    if (m >= 60) return Math.floor(m / 60) + 'h ' + (m % 60) + 'm elapsed';
-    return (m ? m + 'm ' + (s % 60) + 's' : s + 's') + ' elapsed';
-  };
-  function tickElapsed() { $$('#pending .el[data-since]').forEach(el => { el.textContent = elapsed(el.dataset.since); }); }
-
-  function prunePending() {
-    const now = Date.now(), keep = [];
-    let changed = false;
-    pendingRead().forEach(p => {
-      // The workflow committed and the site rebuilt: the real card below is this scan now, and two
-      // cards for one scan would read as two scans.
-      if (builtIds[p.id]) { changed = true; return; }
-      const t = Date.parse(p.dispatched_at || '');
-      // Ninety minutes is far past the longest first run we have measured. Something went wrong
-      // that this page cannot see, so stop pretending to watch it and point at the run.
-      if (isFinite(t) && now - t > PENDING_STALE_MS) {
-        changed = true;
-        say('“' + esc(p.name || p.id) + '” was queued more than 90 minutes ago and still has not landed here — check the run.'
-          + (p.actionsUrl ? ' <a href="' + esc(p.actionsUrl) + '" target="_blank" rel="noopener">Open the run</a>.' : actionsLink()), 'warn');
-        return;
+  // ---- pending runs: dispatched, not yet on this page -----------------------------------------
+  // The home page's job here is a CREATE: the scan has no card until the workflow has committed
+  // and the site has rebuilt. A promotion dispatched from a scan page also lands here, keyed by
+  // finding rather than by scan.
+  const builtIds = {}, cardById = {};
+  D.cards.forEach(c => { builtIds[c.id] = true; cardById[c.id] = c; });
+  mountPending($('#pending'), {
+    mine: () => true,                       // every errand in this browser is shown on the home page
+    builtNow: p => {
+      // A create is finished when the scan has a card: that card IS the committed result.
+      if (builtIds[p.id]) return true;
+      const c = cardById[p.scan_id || p.id];
+      if (!c) return false;
+      const since = Date.parse(p.dispatched_at || 0);
+      // A promotion commits a changed DEFINITION and no new developments, so the definition's own
+      // stamp is what moves. A run commits developments, so its stamp is the last-run time. Both
+      // are on the card, and either one advancing past the dispatch means this errand has landed.
+      return Date.parse(c.updated || 0) > since || Date.parse(c.generated || 0) > since;
+    },
+    onLanded: p => {
+      // A promotion changes one thing and it is not on this page: the scan's source list. Say
+      // where the verdict will be, and that the gate has not spoken yet.
+      if (kindOf(p) === 'promote') {
+        say('“' + esc(p.name || p.scan_id) + '” has the promoted venue in its sources now, as <b>pending</b>. '
+          + 'The gate judges it at the start of the next run — open the scan and press <b>Run scan</b>.', 'warn');
       }
-      keep.push(p);
-    });
-    if (changed) pendingWrite(keep);
-    return keep;
-  }
-
-  function pcard(p, st) {
-    st = st || {};
-    const status = String(st.status || ''), concl = String(st.conclusion || '');
-    const done = status === 'completed', bad = done && concl && concl !== 'success';
-    const badge = bad ? '<span class="badge failed">' + esc(concl.replace(/_/g, ' ')) + '</span>'
-      : done ? '<span class="badge working">Finished</span>'
-      : '<span class="badge working">' + esc(status ? status.replace(/_/g, ' ') : 'Creating') + '</span>';
-    // The state line says what is happening to THIS scan, not what GitHub calls the job.
-    const line = bad ? 'The run finished as ' + esc(concl.replace(/_/g, ' ')) + ' — nothing was committed. Open the run to see which step failed.'
-      : done ? 'Finished — the scan appears here as soon as the site rebuilds, a minute or two.'
-      : status === 'in_progress' ? 'Running — gating your sources, then reading the first documents.'
-      : (status === 'queued' || status === 'waiting' || status === 'requested' || status === 'pending')
-        ? 'Queued on GitHub Actions — waiting for a runner, then it gates your sources and reads the first documents.'
-      : 'Creating — gating your sources, then reading the first documents.';
-    const url = st.html_url || p.actionsUrl || D.actionsUrl || '';
-    return '<div class="pcard">'
-      + '<div><div class="name">' + esc(p.name || p.id) + badge + '</div>'
-      + '<p class="pstate">' + line + '</p>'
-      + '<div class="fine">' + esc(FIRST_RUN_LINE) + (st.message ? '<br>' + esc(st.message) : '') + '</div></div>'
-      + '<div class="right"><div class="el" data-since="' + esc(p.dispatched_at || '') + '"></div>'
-      + (url ? '<a class="el" href="' + esc(url) + '" target="_blank" rel="noopener">Open the run</a>' : '')
-      + '<button type="button" class="pdismiss" data-dismiss="' + esc(p.id) + '" aria-label="Stop watching ' + esc(p.name || p.id) + '" title="Stop watching this run — the scan still appears here when it lands">×</button></div></div>';
-  }
-
-  function drawPending() {
-    const list = prunePending();
-    $('#pending').innerHTML = list.map(p => pcard(p, runState[p.id])).join('');
-    // The "No scans yet" block is not true while one is being created.
-    const em = $('#hempty'); if (em) em.hidden = list.length > 0;
-    tickElapsed();
-    schedule(list.length > 0);
-  }
-  redrawPending = drawPending;
-
-  // Both timers stop while the tab is hidden and start again when it comes back: a partner who
-  // leaves this open in a background tab must not keep the status endpoint (and GitHub's rate
-  // limit) busy for an hour to animate a clock nobody is looking at.
-  function schedule(wanted) {
-    const live = wanted && !document.hidden;
-    if (ticker && !live) { clearInterval(ticker); ticker = null; }
-    if (statusTimer && !live) { clearInterval(statusTimer); statusTimer = null; }
-    if (!live) return;
-    if (!ticker) ticker = setInterval(tickElapsed, 1000);
-    if (!statusTimer) { statusTimer = setInterval(pollStatus, 15000); pollStatus(); }
-  }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) schedule(false); else drawPending(); });
-
-  async function pollStatus() {
-    const list = pendingRead().filter(p => !builtIds[p.id]);
-    if (!list.length) { schedule(false); return; }
-    for (const p of list) {
-      if (document.hidden) return;                 // stop mid-list rather than finish the round
-      let r = null;
-      try { r = await postJSON(D.api.scans, { action: 'status', scan_id: p.id }, 20000); } catch (e) { r = null; }
-      // No status endpoint, or it refused: the card keeps its own elapsed clock, which is honest
-      // on its own. Nothing is shown as an error, because nothing about the run is known to be
-      // wrong — only that this page cannot see it.
-      if (!r || !r.ok) continue;
-      const runs = Array.isArray(r.data.runs) ? r.data.runs : [];
-      // The contract's degraded answer is 200 with runs:[] and a message (the token cannot read
-      // Actions). Keep the card, show the message quietly, and say nothing about the run itself.
-      runState[p.id] = runs.length ? runs[0] : { message: r.data.message || '' };
-    }
-    drawPending();
-  }
-
-  $('#pending').addEventListener('click', e => {
-    const b = e.target.closest('button[data-dismiss]');
-    if (!b) return;
-    pendingWrite(pendingRead().filter(p => p.id !== b.dataset.dismiss));
-    drawPending();
+    },
+    onDraw: list => { const em = $('#hempty'); if (em) em.hidden = list.length > 0; },
   });
-  drawPending();
+  // The home page has tabs too (Starred / All); the hash keeps the partner on the one they chose
+  // when this page reloads itself after a run lands.
+  const hhash = tabFromHash();
+  if (['all', 'starred'].includes(hhash)) hs.tab = hhash;
+  setTabHash(hs.tab);
+  drawCards();
 }
 function card(c, starred) {
   const flags = (c.flags || []).map(flag).filter(Boolean).join(' ');
@@ -1644,47 +2337,136 @@ function card(c, starred) {
 // ============================================================================================
 function renderScan() {
   const S = D.scan, items = D.items;
+  const MISC = D.misc || { present: false, generated: '', query: {}, findings: [], notes: [] };
   const byId = {}; items.forEach(it => { byId[it.id] = it; });
   const KL = KINDL;  // discover.KINDS -> chip label; one table, defined once above
   // Triage lives in this browser only, as clients do on the tracker. Nothing leaves the page.
+  // `view` (the open tab) and `promoted` (findings this browser has already asked the gate about)
+  // live beside it under the same key, so clearing one clears them all.
   const KEY = 'tmt_scan_' + S.id;
-  let state = { read: {}, star: {}, arch: {} };
+  let state = { read: {}, star: {}, arch: {}, promoted: {}, view: 'coverage' };
   try { state = Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+  ['read', 'star', 'arch', 'promoted'].forEach(k => { if (!state[k] || typeof state[k] !== 'object') state[k] = {}; });
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
-  let tab = 'all', q = '', sort = 'newest', openId = null, lastFocus = null;
+  let openId = null, lastFocus = null;
+
+  // ---- lanes ------------------------------------------------------------------------------------
+  // The builder stamped `lane` on every development using the contract's one routing rule; the page
+  // groups by that stamp rather than re-deriving it, so the tab counts and the tables cannot
+  // disagree about where a development lives — and every development is in exactly one of them.
+  const LANE_DEFS = [
+    { k: 'instruments', label: 'Instruments', types: ['Legislation', 'Rules/Regulations', 'Order/Decision', 'Notice/Circular', 'Guidance/Advisory'],
+      sub: 'The binding texts and the official readings of them. Every row came from a source on the Coverage tab, and every summary sentence quotes a passage of the document itself.' },
+    { k: 'judgments', label: 'Judgments', types: ['Judgment'],
+      sub: 'Judgments of courts and tribunals, as the forum published them.' },
+    { k: 'signals', label: 'Signals', types: ['Consultation/Draft', 'Press release', 'Other'],
+      sub: 'Not a binding instrument, or not yet one. A development the enricher has not typed — because it is queued, unread or its enrichment failed — is parked here and marked untyped, rather than dropped out of every lane.' },
+  ];
+  const LANE_BY = {}; LANE_DEFS.forEach(d => { LANE_BY[d.k] = d; });
+  const laneItems = { instruments: [], judgments: [], signals: [] };
+  items.forEach(it => { (laneItems[it.lane] || laneItems.signals).push(it); });
+  const lstate = {}; LANE_DEFS.forEach(d => { lstate[d.k] = { tab: 'all', q: '', sort: 'newest' }; });
+
+  // Clients named on the scan, plus any client a development rates that the scan does not name: an
+  // orphan rating is a fact about the ledger and gets its own section rather than vanishing.
+  const scanClients = (S.clients || []).map(c => ({ name: clientName(c), scope: (c && typeof c === 'object' && c.scope) ? String(c.scope) : '' })).filter(c => c.name);
+  const ratedNames = {};
+  items.forEach(it => Object.keys(it.relevance.clients || {}).forEach(n => { ratedNames[n] = true; }));
+  const orphanClients = Object.keys(ratedNames).filter(n => !scanClients.some(c => c.name.toLowerCase() === n.toLowerCase())).sort();
+
+  const VIEWS = [
+    { k: 'coverage', label: 'Coverage', n: () => D.coverage.approved.length },
+    { k: 'instruments', label: 'Instruments', n: () => laneItems.instruments.filter(it => !state.arch[it.id]).length },
+    { k: 'judgments', label: 'Judgments', n: () => laneItems.judgments.filter(it => !state.arch[it.id]).length },
+    { k: 'signals', label: 'Signals', n: () => laneItems.signals.filter(it => !state.arch[it.id]).length },
+    // No count when the file is absent: "0" would claim the open web was searched and held nothing.
+    // Reviewed defect: the count was every row in the file, so it kept counting leads the partner
+    // had dismissed, venues already promoted into coverage, and findings the last search no longer
+    // returns — a tab reading "14" when the search had in fact surfaced four live leads. It counts
+    // what the last search actually stands behind and nothing else; the groups below still SHOW the
+    // rest, marked, because a lead is never deleted here.
+    { k: 'misc', label: 'Miscellaneous', n: () => MISC.present ? MISC.findings.filter(isLiveFinding).length : null },
+    { k: 'clients', label: 'Clients', n: () => scanClients.length + orphanClients.length },
+    { k: 'audit', label: 'Audit', n: () => D.coverage.approved.length + D.coverage.pending.length + D.coverage.rejected.length },
+  ];
+  if (!VIEWS.some(v => v.k === state.view)) state.view = 'coverage';
 
   const main = $('#main');
   const flags = S.jurisdictions.map(j => flagged(j)).join(' ');
-  main.innerHTML = '<div class="crumb"><a href="/scans.html">Scans</a><span>›</span>' + esc(S.name) + '</div>'
+  main.innerHTML = '<div class="crumb"><a href="/scans.html">Scans</a><span>&rsaquo;</span>' + esc(S.name) + '</div>'
     + '<div class="titlerow"><div><h1 class="title">' + esc(S.name) + '</h1>'
-    + '<div class="metaline"><span>' + esc(D.meta) + '</span><span class="dot">·</span><span class="flags">' + flags + '</span><span class="dot">·</span><span>Last run <b id="lastrun"></b></span>'
+    + '<div class="metaline"><span>' + esc(D.meta) + '</span><span class="dot">&middot;</span><span class="flags">' + flags + '</span><span class="dot">&middot;</span><span>Last run <b id="lastrun"></b></span>'
     + (S.demo ? '<span class="badge demo">Demo</span>' : '') + '<span class="badge discovered">Discovered sources</span></div>'
-    + '<p class="plain">Runs when a person presses Run scan — nothing here is scheduled.</p>'
+    + '<p class="plain">Runs when a person presses Run scan &mdash; nothing here is scheduled.</p>'
     + (S.intent ? '<p class="intent">' + esc(S.intent) + '</p>' : '') + '</div>'
     // run.py refuses a demo definition with exit 2 (its sources are reserved .test hosts), so the
     // button says so up front instead of letting a partner queue a run that can only fail.
-    + '<div class="actions"><button class="btn primary' + (S.demo ? ' demo-off' : '') + '" id="run"' + (S.demo ? ' disabled title="Demo scans use fixture hosts and cannot be run live — create your own scan" aria-disabled="true"' : '') + '>Run scan</button><button class="btn" id="edit">Edit</button><button class="btn" id="cov" aria-expanded="false" aria-controls="coverage">Coverage<span class="k">' + D.coverage.approved.length + (D.coverage.gated ? ' · ' + (D.coverage.approved.length - D.coverage.gated) + ' read' : '') + '</span></button></div></div>'
+    + '<div class="actions"><button class="btn primary' + (S.demo ? ' demo-off' : '') + '" id="run"' + (S.demo ? ' disabled title="Demo scans use fixture hosts and cannot be run live — create your own scan" aria-disabled="true"' : '') + '>Run scan</button><button class="btn" id="edit">Edit</button></div></div>'
     + '<div class="notice" id="notice"></div>'
+    // Run scan and Promote are pressed HERE, so the wait has to be shown here too. Before this the
+    // scan page dispatched a run, printed one line, and then looked identical for twelve minutes.
+    + '<div class="pending" id="pending"></div>'
     + (D.problems.length ? '<ul class="problems">' + D.problems.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
-    + '<section class="coverage" id="coverage">' + coverageHTML() + '</section>'
+    // The digest and its tiles are the scan's masthead: true of every tab, so above all of them.
     + digestHTML()
-    + '<div class="toolbar"><div class="ttabs" role="tablist" id="ttabs"></div>'
-    + '<div class="tools"><input type="search" id="q" placeholder="Search developments" aria-label="Search developments"><select id="sort" aria-label="Sort"><option value="newest">Newest</option><option value="relevance">Relevance</option></select></div></div>'
-    + '<div class="tablewrap"><table class="dev" id="tbl"><colgroup><col><col style="width:112px"><col style="width:124px"><col style="width:180px"><col style="width:176px"><col style="width:112px"></colgroup>'
-    + '<thead><tr><th>Development</th><th>Relevance</th><th>Type</th><th>Topics</th><th>Source</th><th>Jurisdiction</th></tr></thead><tbody id="tb"></tbody></table></div>'
+    + '<nav class="vtabs" id="vtabs" role="tablist" aria-label="Scan sections"></nav>'
+    + '<section class="view" id="v-coverage" role="tabpanel" aria-label="Coverage"><div class="coverage">' + coverageHTML() + '</div></section>'
+    + LANE_DEFS.map(d => '<section class="view" id="v-' + d.k + '" role="tabpanel" aria-label="' + esc(d.label) + '">' + laneShell(d) + '</section>').join('')
+    + '<section class="view" id="v-misc" role="tabpanel" aria-label="Miscellaneous"></section>'
+    + '<section class="view" id="v-clients" role="tabpanel" aria-label="Clients"></section>'
+    + '<section class="view" id="v-audit" role="tabpanel" aria-label="Audit"></section>'
+    // The obligations register spans every lane, so it belongs to none of them: it stays below the
+    // tabs, where it reads as a property of the scan rather than of whichever tab happens to be open.
     + '<section class="oblsec" id="oblsec" aria-label="Obligations register">' + obligationsHTML() + '</section>';
   noticeEl = $('#notice');
   $('#lastrun').textContent = rel(D.generated);
-  $('#run').addEventListener('click', async () => { if (S.demo) return; const b = $('#run'); b.disabled = true; await dispatchScan({ action: 'run', scan_id: S.id }, 'run this scan'); b.disabled = false; });
+  $('#run').addEventListener('click', async () => {
+    if (S.demo) return;
+    const b = $('#run'); b.disabled = true;
+    const req = { action: 'run', scan_id: S.id };
+    const res = await dispatchScan(req, 'run this scan');
+    b.disabled = false;
+    if (!res) return;
+    // The record is what turns a fired-and-forgotten dispatch into a wait the partner can watch:
+    // it carries the clock, the derived phase, the failure state and the request to repeat.
+    addPending({ id: S.id, scan_id: S.id, kind: 'run', name: S.name, request: req, verb: 'run this scan',
+                 dispatched_at: new Date().toISOString(),
+                 actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+  });
   $('#oblsec').addEventListener('click', e => { const b = e.target.closest('button[data-dev]'); if (b) openDetail(b.dataset.dev, b); });
   $('#main').addEventListener('click', e => { const a = e.target.closest('a[data-dev]'); if (a) { e.preventDefault(); openDetail(a.dataset.dev, a); } });
   $('#edit').addEventListener('click', () => openDialog(S));
-  $('#cov').addEventListener('click', () => { const c = $('#coverage'), on = !c.classList.contains('on'); c.classList.toggle('on', on); $('#cov').classList.toggle('on', on); $('#cov').setAttribute('aria-expanded', on); if (on) c.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
-  $('#q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); drawTable(); });
-  $('#sort').addEventListener('change', e => { sort = e.target.value; drawTable(); });
-  $('#ttabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { tab = b.dataset.tab; drawTable(); } });
-  $('#tb').addEventListener('click', e => { const r = e.target.closest('tr.r'); if (r) openDetail(r.dataset.id, r); });
-  $('#tb').addEventListener('keydown', e => { const r = e.target.closest('tr.r'); if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetail(r.dataset.id, r); } });
+  $('#vtabs').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (b) setView(b.dataset.view); });
+  LANE_DEFS.forEach(d => {
+    const l = d.k;
+    $('#q-' + l).addEventListener('input', e => { lstate[l].q = e.target.value.trim().toLowerCase(); drawLane(l); });
+    $('#sort-' + l).addEventListener('change', e => { lstate[l].sort = e.target.value; drawLane(l); });
+    $('#ttabs-' + l).addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { lstate[l].tab = b.dataset.tab; drawLane(l); } });
+    $('#tb-' + l).addEventListener('click', e => { const r = e.target.closest('tr.r'); if (r) openDetail(r.dataset.id, r); });
+    $('#tb-' + l).addEventListener('keydown', e => { const r = e.target.closest('tr.r'); if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetail(r.dataset.id, r); } });
+  });
+
+  // ---- tab bar ----------------------------------------------------------------------------------
+  function drawTabs() {
+    $('#vtabs').innerHTML = VIEWS.map(v => {
+      const n = v.n();
+      return '<button type="button" role="tab" data-view="' + v.k + '" class="' + (state.view === v.k ? 'on' : '') + '"'
+        + ' aria-selected="' + (state.view === v.k) + '" aria-controls="v-' + v.k + '">' + esc(v.label)
+        + (n == null ? '' : '<span class="k">' + esc(n) + '</span>') + '</button>';
+    }).join('');
+  }
+  // Each tab draws when it is opened rather than on first paint: a scan with a long ledger would
+  // otherwise build seven tables to show one.
+  function setView(k) {
+    if (!VIEWS.some(v => v.k === k)) k = 'coverage';
+    state.view = k; save(); setTabHash(k);
+    VIEWS.forEach(v => { $('#v-' + v.k).classList.toggle('on', v.k === k); });
+    drawTabs();
+    if (LANE_BY[k]) drawLane(k);
+    else if (k === 'misc') drawMisc();
+    else if (k === 'clients') drawClients();
+    else if (k === 'audit') drawAudit();
+  }
 
   // ---- digest --------------------------------------------------------------------------------
   function digestHTML() {
@@ -1812,14 +2594,26 @@ function renderScan() {
       + '<div class="foot">Scans run when a person presses Run scan. Nothing here is scheduled.</div>';
   }
 
-  // ---- table ---------------------------------------------------------------------------------
+  // ---- lane tables -----------------------------------------------------------------------------
   const isUnread = it => !state.read[it.id] && !state.arch[it.id];
   const LV = { high: 0, medium: 1, low: 2 };
-  function visible() {
-    let list = items.filter(it => tab === 'archived' ? state.arch[it.id] : tab === 'starred' ? state.star[it.id] && !state.arch[it.id] : tab === 'unread' ? isUnread(it) : !state.arch[it.id]);
-    if (q) list = list.filter(it => [it.title, it.headline, it.type, it.domain, it.jurisdiction, it.topics.join(' '), it.summary.map(s => s.text).join(' ')].join(' ').toLowerCase().includes(q));
+  // One shell per lane, built once; drawLane fills the triage tabs, the rows and the empty state.
+  function laneShell(d) {
+    const l = d.k, low = d.label.toLowerCase();
+    return '<div class="viewhead"><div class="eyebrow">' + esc(d.label) + '</div>'
+      + '<p class="sub">' + esc(d.sub) + '</p></div>'
+      + '<div class="toolbar"><div class="ttabs" role="tablist" id="ttabs-' + l + '"></div>'
+      + '<div class="tools"><input type="search" id="q-' + l + '" placeholder="Search ' + esc(low) + '" aria-label="Search ' + esc(low) + '">'
+      + '<select id="sort-' + l + '" aria-label="Sort ' + esc(low) + '"><option value="newest">Newest</option><option value="relevance">Relevance</option></select></div></div>'
+      + '<div class="tablewrap" id="wrap-' + l + '"><table class="dev"><colgroup><col><col style="width:112px"><col style="width:124px"><col style="width:180px"><col style="width:176px"><col style="width:112px"></colgroup>'
+      + '<thead><tr><th>Development</th><th>Relevance</th><th>Type</th><th>Topics</th><th>Source</th><th>Jurisdiction</th></tr></thead>'
+      + '<tbody id="tb-' + l + '"></tbody></table></div><div id="empty-' + l + '"></div>';
+  }
+  function visible(pool, st) {
+    let list = pool.filter(it => st.tab === 'archived' ? state.arch[it.id] : st.tab === 'starred' ? state.star[it.id] && !state.arch[it.id] : st.tab === 'unread' ? isUnread(it) : !state.arch[it.id]);
+    if (st.q) list = list.filter(it => [it.title, it.headline, it.type, it.domain, it.jurisdiction, it.topics.join(' '), it.summary.map(s => s.text).join(' ')].join(' ').toLowerCase().includes(st.q));
     const newest = (a, b) => (b.date || '').localeCompare(a.date || '') || (b.first_seen || '').localeCompare(a.first_seen || '');
-    list.sort(sort === 'relevance' ? ((a, b) => (LV[a.relevance.level] - LV[b.relevance.level]) || newest(a, b)) : newest);
+    list.sort(st.sort === 'relevance' ? ((a, b) => (LV[a.relevance.level] - LV[b.relevance.level]) || newest(a, b)) : newest);
     return list;
   }
   function relHTML(r) {
@@ -1831,37 +2625,304 @@ function renderScan() {
   function kindChip(kind, tier, host) {
     const label = KL[kind] || host || '?';
     const title = (tier === 'vetted' ? 'Vetted source: adapter, fixture, floor and legal analysis' : 'Discovered source: passed the automated gate; evidence on the coverage panel') + (host ? ' — ' + host : '');
-    return '<span class="chip" title="' + esc(title) + '"><span class="mark ' + (tier === 'vetted' ? 'v' : 'd') + '">' + (tier === 'vetted' ? '✓' : '◌') + '</span>' + esc(label) + '</span>';
+    return '<span class="chip" title="' + esc(title) + '"><span class="mark ' + (tier === 'vetted' ? 'v' : 'd') + '">' + (tier === 'vetted' ? '&#10003;' : '&#9678;') + '</span>' + esc(label) + '</span>';
   }
   function srcChip(it) { return kindChip(it.kind, it.tier, it.domain); }
-  function drawTable() {
-    const counts = { all: items.filter(it => !state.arch[it.id]).length, unread: items.filter(isUnread).length, starred: items.filter(it => state.star[it.id] && !state.arch[it.id]).length, archived: items.filter(it => state.arch[it.id]).length };
-    $('#ttabs').innerHTML = [['all', 'All'], ['unread', 'Unread'], ['starred', 'Starred'], ['archived', 'Archived']].map(([k, l]) => '<button type="button" role="tab" data-tab="' + k + '" class="' + (tab === k ? 'on' : '') + '" aria-selected="' + (tab === k) + '">' + l + '<span class="k">' + counts[k] + '</span></button>').join('');
-    const list = visible();
-    $('#tb').innerHTML = list.length ? list.map(it => '<tr class="r' + (state.read[it.id] ? ' read' : '') + '" tabindex="0" data-id="' + esc(it.id) + '" aria-label="' + esc(it.title) + '">'
-      + '<td><div class="t"><span class="un" aria-hidden="true"></span><span>' + esc(it.title) + (state.star[it.id] ? '<span class="star" aria-label="starred">★</span>' : '') + '</span></div>'
-      + (it.headline ? '<div class="h">' + esc(it.headline) + '</div>' : '') + '<div class="w"><b>' + esc(rel(it.date || it.first_seen)) + '</b> · ' + esc(it.domain) + '</div></td>'
+  function rowHTML(it) {
+    return '<tr class="r' + (state.read[it.id] ? ' read' : '') + '" tabindex="0" data-id="' + esc(it.id) + '" aria-label="' + esc(it.title) + '">'
+      + '<td><div class="t"><span class="un" aria-hidden="true"></span><span>' + esc(it.title) + (state.star[it.id] ? '<span class="star" aria-label="starred">&#9733;</span>' : '') + '</span></div>'
+      + (it.headline ? '<div class="h">' + esc(it.headline) + '</div>' : '') + '<div class="w"><b>' + esc(rel(it.date || it.first_seen)) + '</b> &middot; ' + esc(it.domain) + '</div></td>'
       + '<td>' + relHTML(it.relevance) + '</td>'
-      + '<td>' + (it.type ? '<span class="chip">' + esc(it.type) + '</span>' : '') + '</td>'
+      // An untyped row is in Signals because nothing has typed it yet, not because it is a signal.
+      + '<td>' + (it.type ? '<span class="chip">' + esc(it.type) + '</span>'
+          : '<span class="chip untyped" title="No type was recorded, so the lane rule parked this development in Signals. It moves when the enricher types it.">untyped</span>') + '</td>'
       + '<td><div class="chips">' + it.topics.map(t => '<span class="chip">' + esc(t) + '</span>').join('') + '</div></td>'
       + '<td>' + srcChip(it) + '</td>'
-      + '<td>' + flagged(it.jurisdiction) + '</td></tr>').join('')
-      : '<tr><td colspan="6" class="nothing">' + (items.length ? 'Nothing matches.' : (D.generated ? 'This run read nothing new.' : 'No run yet.')) + '</td></tr>';
+      + '<td>' + flagged(it.jurisdiction) + '</td></tr>';
   }
+  // A lane with nothing in it must say what would be there and why nothing is: an empty table is
+  // otherwise indistinguishable from a broken one, and from a scan that read nothing at all.
+  function laneEmptyHTML(l, st, counts) {
+    const d = LANE_BY[l], pool = laneItems[l];
+    const would = '<p>What lands here: ' + d.types.map(t => '<b>' + esc(t) + '</b>').join(', ') + '.</p>';
+    let why;
+    if (st.q && pool.length) why = 'Nothing in this lane matches &ldquo;' + esc(st.q) + '&rdquo;. The lane holds ' + esc(pl(counts.all, 'development')) + '; clear the search to see them.';
+    else if (pool.length && st.tab !== 'all') why = 'The lane holds ' + esc(pl(counts.all, 'development')) + ', but none is ' + (st.tab === 'unread' ? 'unread &mdash; you have opened them all' : st.tab === 'starred' ? 'starred in this browser' : 'archived') + '. Switch to <b>All</b>.';
+    else if (!D.generated) why = 'This scan has not run yet. Press <b>Run scan</b>; nothing runs on a schedule.';
+    else if (!items.length) why = 'The last run put nothing at all in the ledger. The <b>Coverage</b> tab says what each source returned, and the <b>Audit</b> tab shows the silence source by source so you can check it.';
+    else why = 'The last run produced ' + esc(pl(items.length, 'development')) + ', and none of them is of these types. They are in ' + LANE_DEFS.filter(x => x.k !== l && laneItems[x.k].length).map(x => '<b>' + esc(x.label) + '</b>').join(' and ') + '.';
+    return '<div class="laneempty"><h4>Nothing in ' + esc(d.label) + ' right now.</h4>' + would + '<p class="why">' + why + '</p>'
+      + '<p>A development can only reach this lane from a source on the <b>Coverage</b> tab. The <b>Miscellaneous</b> tab is the one place this page shows anything from outside that list, and nothing there is a citable instrument.</p></div>';
+  }
+  function drawLane(l) {
+    const st = lstate[l], pool = laneItems[l];
+    const counts = { all: pool.filter(it => !state.arch[it.id]).length, unread: pool.filter(isUnread).length,
+                     starred: pool.filter(it => state.star[it.id] && !state.arch[it.id]).length, archived: pool.filter(it => state.arch[it.id]).length };
+    $('#ttabs-' + l).innerHTML = [['all', 'All'], ['unread', 'Unread'], ['starred', 'Starred'], ['archived', 'Archived']]
+      .map(([k, lab]) => '<button type="button" role="tab" data-tab="' + k + '" class="' + (st.tab === k ? 'on' : '') + '" aria-selected="' + (st.tab === k) + '">' + lab + '<span class="k">' + counts[k] + '</span></button>').join('');
+    const list = visible(pool, st);
+    $('#tb-' + l).innerHTML = list.map(rowHTML).join('');
+    $('#wrap-' + l).hidden = !list.length;
+    $('#empty-' + l).innerHTML = list.length ? '' : laneEmptyHTML(l, st, counts);
+  }
+  // Every lane the reader is not looking at still needs its counts refreshed when triage changes.
+  function drawAll() { drawTabs(); LANE_DEFS.forEach(d => { if (state.view === d.k) drawLane(d.k); }); if (state.view === 'clients') drawClients(); }
+
+  // ---- Miscellaneous ---------------------------------------------------------------------------
+  // The one lane that looks outside the gated coverage list, and therefore the one that has to be
+  // hardest about what it is not. Nothing here was fetched by the tracker: these are a hosted
+  // web-search tool's results, read and linked out. No robots.txt was consulted for these hosts
+  // because we never asked them for anything; no terms were checked; nothing is citable; nothing
+  // is in the ledger. Promote is the ONLY route from here into coverage, and it is a request to
+  // the same Python gate that judges every other source, not a decision.
+  const MISC_GROUPS = [
+    { k: 'official_venue', label: 'Official venues this scan does not cover',
+      sub: 'The valuable case: a regulator, gazette, court or ministry that publishes binding material on this brief and is not on the coverage list. Promote adds its URL to the scan\'s sources as <b>pending</b> &mdash; that is all it does. The gate &mdash; robots.txt, the site\'s own terms, a parse test &mdash; runs at the start of the <b>next run</b>, so press <b>Run scan</b> after promoting. Until it passes, nothing is ever fetched from it.', promote: true },
+    { k: 'secondary', label: 'Secondary reports',
+      sub: 'Press, trade bodies and law-firm notes reporting on something official. Useful as a pointer to the primary source; never a substitute for it, and never promotable &mdash; a report about an instrument is not a venue that publishes instruments.' },
+    { k: 'commentary', label: 'Commentary',
+      sub: 'Analysis and opinion. Context for a partner, evidence for nothing.' },
+  ];
+  // What the LAST search still stands behind: not dismissed, not already promoted into coverage,
+  // and still returned by the search. The tab count is this set; the page shows every row.
+  function isLiveFinding(f) {
+    return f.status !== 'dismissed' && f.status !== 'promoted' && !state.promoted[f.id] && !f.stale;
+  }
+  function miscRow(f, canPromote) {
+    const promoted = f.status === 'promoted' || !!state.promoted[f.id];
+    const meta = [f.host, f.date ? fmt(f.date) : 'no date given', f.jurisdiction ? flagged(f.jurisdiction) : ''].filter(Boolean).join(' &middot; ');
+    return '<div class="mrow' + (f.stale ? ' stale' : '') + '"><div>'
+      // rel="nofollow noopener" and a new tab: we are pointing at an unvetted page, not endorsing it.
+      + '<div class="mt"><a href="' + esc(f.url) + '" target="_blank" rel="noopener nofollow">' + esc(f.title) + ' &#8599;</a></div>'
+      + '<div class="mm">' + meta + '</div>'
+      // A stale finding is one the last search did not return. It is kept on purpose (design §2:
+      // a lead does not cease to exist because a search engine changed its mind) — but a kept lead
+      // that looks identical to a fresh hit is a claim quietly ageing on the page, so it is marked
+      // on the row rather than only counted somewhere else.
+      + (f.stale ? '<div class="mstale">Not in the last search'
+          + (f.last_seen ? '; last returned ' + esc(stampText(f.last_seen)) : '')
+          + '. Kept, not dropped &mdash; but the lead may have moved or been withdrawn, so verify it at the source before relying on it.</div>' : '')
+      + (f.why ? '<div class="mw">' + esc(f.why) + '</div>' : '<div class="mw">No reason was recorded for surfacing this.</div>')
+      + (f.snippet ? '<div class="ms">' + esc(f.snippet) + '</div>' : '')
+      + '</div><div class="mact">'
+      + (canPromote && !promoted && f.status !== 'dismissed'
+          ? '<button type="button" class="btn sm" data-promote="' + esc(f.id) + '">Promote to coverage</button>'
+          : '')
+      + '<span class="mst' + (promoted ? ' promoted' : '') + (f.stale && !promoted ? ' stale' : '') + '">'
+        + esc(promoted ? 'promotion requested' : f.status === 'dismissed' ? 'dismissed' : f.stale ? 'kept from an earlier search' : 'lead') + '</span>'
+      // Reviewed defect: this said "the gate decides" the moment a promotion was requested, which
+      // read as though something were being judged. Nothing is: promote appends the URL as a
+      // pending source, and the gate runs at the start of the next run.
+      + (promoted ? '<span class="mst">pending — gated on the next run</span>' : '')
+      + '</div></div>';
+  }
+  function miscHTML() {
+    const head = '<div class="viewhead"><div class="eyebrow">Miscellaneous</div>'
+      + '<h3>An open-web search, outside this scan\'s gated coverage list</h3></div>'
+      + '<div class="miscwarn"><h4>Read this before you use anything below</h4>'
+      + '<p>Every other tab on this page is built from the sources on <b>Coverage</b>. This one is not. It is a search of the open web for things happening <b>outside</b> that list, and it exists because a coverage list you can see is also a coverage list with edges.</p>'
+      + '<p><b>The tracker fetched none of these pages.</b> We read a hosted search tool\'s results and link out. Because we never requested these hosts, no robots.txt was consulted for them and no terms were checked &mdash; and none of that is a gap to be fixed here, because nothing on this tab is ever read, stored, quoted or ledgered.</p>'
+      + '<p><b>Nothing here is a citable instrument.</b> There is no verified quote, no obligation, no relevance rating and no audit trail behind any row. Each one is a lead: open it, and verify it at its primary source.</p>'
+      + '<p><b>Promote is the only route from this lane into coverage.</b> It adds an official venue\'s URL to this scan\'s sources as <b>pending</b>, and nothing more: the same gate that judged every other source judges it at the start of the <b>next run</b>, so promoting and then pressing <b>Run scan</b> are two steps, not one. If it fails, it appears on <b>Coverage</b> as rejected, with the reason. Nothing is fetched from a promoted venue until it has passed.</p></div>';
+    if (!MISC.present) {
+      return head + '<div class="laneempty"><h4>No open-web search has been run for this scan.</h4>'
+        + '<p>This lane appears once a run has written one. A scan created before the lane existed has none, and that is a different fact from a search that found nothing &mdash; so this page will not pretend to have looked.</p>'
+        + '<p>Press <b>Run scan</b> to have the next run search.</p></div>';
+    }
+    const q = MISC.query || {};
+    const qline = '<div class="miscq">Searched: <b>' + esc(q.intent || S.intent || 'this scan\'s brief') + '</b>'
+      + (q.jurisdictions && q.jurisdictions.length ? '<br>Jurisdictions: <b>' + q.jurisdictions.map(flagged).join(', ') + '</b>' : '')
+      + (q.topics && q.topics.length ? '<br>Topics: <b>' + q.topics.map(esc).join(', ') + '</b>' : '')
+      // The excluded hosts ARE the coverage list: saying so is what makes "outside the list" checkable.
+      + (q.excluded_hosts && q.excluded_hosts.length ? '<br>Excluded (already covered): <b>' + q.excluded_hosts.map(esc).join(', ') + '</b>' : '')
+      + (MISC.generated ? '<br>Last searched: <b>' + esc(stampText(MISC.generated)) + ' IST</b>' : '')
+      + '</div>'
+      + (MISC.notes.length ? '<ul class="problems">' + MISC.notes.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul>' : '');
+    if (!MISC.findings.length) {
+      return head + qline + '<div class="laneempty"><h4>The search found nothing outside the coverage list.</h4>'
+        + '<p>That is an answer, not a failure: the last open-web pass returned no official venue, no secondary report and no commentary this scan does not already cover.</p></div>';
+    }
+    const groups = MISC_GROUPS.map(g => {
+      const rows = MISC.findings.filter(f => f.kind === g.k);
+      // Same rule as the tab count: the headline number is what the last search stands behind, and
+      // anything carried over or already dealt with is named beside it rather than folded in.
+      const live = rows.filter(isLiveFinding).length, rest = rows.length - live;
+      return '<div class="miscgrp"><div class="gh">' + esc(g.label) + ' &middot; ' + live
+        + (rest ? ' live<span class="ghrest"> &middot; ' + rest + ' promoted, dismissed or kept from an earlier search</span>' : '') + '</div>'
+        + '<p class="gsub">' + g.sub + '</p>'
+        + (rows.length ? rows.map(f => miscRow(f, g.promote)).join('')
+                       : '<div class="mnone">None in this search.</div>') + '</div>';
+    }).join('');
+    return head + qline + groups;
+  }
+  function drawMisc() {
+    $('#v-misc').innerHTML = miscHTML();
+  }
+  $('#v-misc').addEventListener('click', async e => {
+    const b = e.target.closest('button[data-promote]');
+    if (!b) return;
+    const f = MISC.findings.filter(x => x.id === b.dataset.promote)[0];
+    if (!f) return;
+    b.disabled = true; b.textContent = 'Asking…';
+    // The whole finding travels, not just the URL: the workflow records what was promoted and why,
+    // so the coverage panel can say where a source came from a year from now.
+    // The id, never the record: /api/scans validates `finding` against ^[a-f0-9]{10}$ and the
+    // workflow reads the rest out of misc.json by that id. Posting the object was a silent 400.
+    const req = { action: 'promote', scan_id: S.id, finding: f.id };
+    const res = await dispatchScan(req, 'add this venue to the scan’s sources');
+    b.disabled = false; b.textContent = 'Promote to coverage';
+    if (!res) return;
+    state.promoted[f.id] = new Date().toISOString(); save();
+    // Keyed by finding rather than by scan: a promotion is a separate errand from a run, and a
+    // partner may promote two venues before either has landed.
+    addPending({ id: S.id + '#' + f.id, scan_id: S.id, kind: 'promote', request: req,
+                 verb: 'add this venue to the scan’s sources',
+                 name: S.name + ' — ' + (f.host || hostOf(f.url)), dispatched_at: new Date().toISOString(),
+                 action: 'promote', actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+    drawMisc();
+  });
+
+  // ---- Clients ----------------------------------------------------------------------------------
+  // Per client, the developments that rate them, with the level, the why, the action line and the
+  // Draft email that already exists on the detail panel. Relevance is rated per named client by the
+  // enricher, so this view is a re-cut of the ledger, never a second judgement of it.
+  function clientSection(name, scope, orphan) {
+    // A per-client level the enricher wrote as something other than high/medium/low sorts last and
+    // is shown unrated; NaN out of an unknown key would otherwise scramble the whole client's list.
+    const clv = it => { const v = LV[String(it.relevance.clients[name] || '').toLowerCase()]; return v == null ? 3 : v; };
+    const rows = items.filter(it => it.relevance.clients && it.relevance.clients[name])
+      .sort((a, b) => (clv(a) - clv(b)) || (b.date || '').localeCompare(a.date || ''));
+    const body = rows.length ? rows.map(it => {
+      const lvl = String(it.relevance.clients[name] || '').toLowerCase();
+      return '<div class="clitem"><div class="cl-l">' + relHTML(LV[lvl] == null ? { level: 'low', unrated: true } : lvl) + '</div>'
+        + '<div><div class="ct"><button type="button" data-dev="' + esc(it.id) + '">' + esc(it.headline || it.title) + '</button></div>'
+        + '<div class="cm">' + esc(it.date ? fmt(it.date) : 'undated') + ' &middot; ' + esc(it.type || 'untyped') + ' &middot; ' + esc(LANE_BY[it.lane].label) + ' &middot; ' + flagged(it.jurisdiction) + ' &middot; ' + esc(it.domain) + '</div>'
+        + (it.relevance.why ? '<div class="cw">' + esc(it.relevance.why) + '</div>' : '')
+        + (it.relevance.action ? '<div class="ca">' + esc(it.relevance.action) + '</div>' : '<div class="cw" style="color:var(--faint)">No action line was written for this development.</div>')
+        + '</div><div class="cbtn"><button type="button" class="btn sm" data-draft="' + esc(it.id) + '" data-client="' + esc(name) + '">Draft email</button></div></div>';
+    }).join('') : '<div class="mnone">No development in this scan rates ' + esc(name) + '. Relevance is rated per named client on every run; an absence here means nothing read so far touches them.</div>';
+    return '<div class="clsec"><div class="cn">' + esc(name)
+      + (orphan ? '<span class="badge demo">not named on this scan</span>' : '')
+      + '<span class="ccount">' + esc(pl(rows.length, 'development')) + '</span></div>'
+      + (scope ? '<div class="cscope"><b>Scope</b>' + esc(scope) + '</div>' : '')
+      + (orphan ? '<div class="cscope">A development rates this client, but the scan definition does not name them. Add them with <b>Edit</b>, or treat the rating as stale.</div>' : '')
+      + body + '</div>';
+  }
+  function drawClients() {
+    const head = '<div class="viewhead"><div class="eyebrow">Clients</div>'
+      + '<p class="sub">Each client named on this scan, and the developments the enricher rated against them &mdash; the level, why, and the action line, which names the client because the scan does. Draft email is grounded on the stored summary, obligations and text; nothing is ever sent from here.</p></div>';
+    if (!scanClients.length && !orphanClients.length) {
+      $('#v-clients').innerHTML = head + '<div class="laneempty"><h4>This scan names no clients.</h4>'
+        + '<p>Add them with <b>Edit</b>. Every run then rates each development against each client by name, and the action line says what that client should do.</p></div>';
+      return;
+    }
+    $('#v-clients').innerHTML = head
+      + scanClients.map(c => clientSection(c.name, c.scope, false)).join('')
+      + orphanClients.map(n => clientSection(n, '', true)).join('');
+  }
+  $('#v-clients').addEventListener('click', e => {
+    const d = e.target.closest('button[data-draft]');
+    if (d) { const it = byId[d.dataset.draft]; if (it) draftEmail(it, d.dataset.client, d); return; }
+    const b = e.target.closest('button[data-dev]');
+    if (b) openDetail(b.dataset.dev, b);
+  });
+
+  // ---- Audit ------------------------------------------------------------------------------------
+  // The tracker's own framing, link by link: every approved source, what it yielded on the last
+  // run, and every development traced back to the source it came from. Silence is a claim, so a
+  // source that yielded nothing is listed with the invitation to go and check it.
+  let auditOpen = null;
+  function auditItems(url) { return items.filter(it => it.source_url === url).sort((a, b) => (b.date || '').localeCompare(a.date || '')); }
+  function auditSrc(s, group) {
+    const open = auditOpen === s.url;
+    const rows = auditItems(s.url);
+    const h = s.health;
+    const laneTag = { instruments: 'ins', judgments: 'jdg', signals: 'sig' };
+    return '<div class="audsrc' + (open ? ' open' : '') + '" data-url="' + esc(s.url) + '">'
+      + '<div class="ah" tabindex="0" role="button" aria-expanded="' + open + '">'
+      + '<span class="dotc ' + esc(h ? h.status : '') + '" title="' + esc(h ? h.status : 'not run') + '"></span>'
+      + '<div class="an"><b>' + esc(s.name) + '</b>' + (s.jurisdiction ? ' ' + flagged(s.jurisdiction) : '')
+      + '<span class="ahost">' + esc(s.url) + '</span></div>'
+      + '<div class="acount">' + esc(group) + ' &middot; ' + (rows.length ? esc(pl(rows.length, 'development')) : 'nothing') + '</div>'
+      + '</div><div class="abody">'
+      + '<div class="ameta"><a class="alink" href="' + esc(s.url) + '" target="_blank" rel="noopener">Open the live listing we fetch &#8599;</a></div>'
+      + '<div class="ameta">Gate: ' + esc(s.evidence) + (s.checked ? ' &middot; checked ' + esc(fmt(s.checked)) : '') + '</div>'
+      + (h ? '<div class="ameta">Last run: ' + esc(h.status)
+            + (h.rows_seen == null ? '' : ' &middot; ' + esc(h.rows_seen) + ' rows parsed')
+            + (h.new == null ? '' : ' &middot; ' + esc(h.new) + ' new')
+            + (h.newest_visible ? ' &middot; newest item the venue shows: ' + esc(fmt(h.newest_visible)) : '')
+            + (h.checked ? ' &middot; ' + esc(rel(h.checked)) : '') + '</div>'
+          + (h.notes.length ? '<div class="ameta">' + h.notes.map(esc).join('<br>') + '</div>' : '')
+          + (h.info.length ? '<div class="ameta">' + h.info.map(esc).join('<br>') + '</div>' : '')
+        : '<div class="ameta">No run has touched this source yet.</div>')
+      // Nothing may enter the ledger from a source the gate did not approve (design §1.1). If rows
+      // are listed under a pending or rejected link, the ledger and the definition have drifted —
+      // say so above the rows rather than let the list read as ordinary coverage.
+      + (rows.length && group !== 'approved'
+          ? '<div class="anone bad">' + esc(pl(rows.length, 'development')) + ' in the ledger name this link, but the gate has it as ' + esc(group) + ' — nothing should ever have been read from it. The ledger and the coverage list have drifted apart; re-run the scan.</div>'
+          : '')
+      + (rows.length
+          ? rows.map(it => '<div class="aitem"><span class="ad">' + esc(it.date ? fmt(it.date) : '\u2014') + '</span>'
+              + '<span class="al" title="' + esc(LANE_BY[it.lane].label) + '">' + laneTag[it.lane] + '</span>'
+              + '<span><button type="button" data-dev="' + esc(it.id) + '">' + esc(it.title) + '</button>'
+              + (it.url ? ' <a href="' + esc(it.url) + '" target="_blank" rel="noopener" title="Open the document at the venue">&#8599;</a>' : '') + '</span></div>').join('')
+          : (h && h.status === 'FAILED'
+              ? '<div class="anone bad">This source FAILED on the last run &mdash; we could not read the venue, so this is blind, not silent. Anything it published since is unverified until it recovers.</div>'
+              : group === 'approved'
+                ? '<div class="anone">Nothing entered the ledger from this link. That is a claim, and it is checkable: open the live listing above and confirm the venue really published nothing new in the window. If it did, we missed it &mdash; say so.</div>'
+                : '<div class="anone">Nothing has ever been fetched from this link, because the gate did not approve it. Its verdict and the reason are on the Coverage tab.</div>'))
+      + '<div class="averify">Audit check: open the source link &rarr; list what the venue shows for the window &rarr; compare with the rows above.</div>'
+      + '</div></div>';
+  }
+  function drawAudit() {
+    const C = D.coverage;
+    const known = {};
+    [].concat(C.approved, C.pending, C.rejected).forEach(s => { known[s.url] = true; });
+    // A development whose source_url matches no source on the definition is the one thing this
+    // page must never round off: the ledger's own invariant says it cannot happen, so if it has,
+    // it gets its own section rather than being quietly attributed to nobody.
+    const orphans = items.filter(it => !known[it.source_url]);
+    const head = '<div class="viewhead"><div class="eyebrow">Audit &mdash; verify us</div>'
+      + '<p class="sub">Link by link from Coverage: every source this scan holds, what it yielded on the last run, and every development traced back to the link it came from. Sources that yielded nothing are listed too &mdash; silence must be checkable, not hidden. Open a source, open its live listing, and compare.</p></div>';
+    const sec = (label, list, group) => '<div class="miscgrp"><div class="gh">' + esc(label) + ' &middot; ' + list.length + '</div>'
+      + (list.length ? list.map(s => auditSrc(s, group)).join('') : '<div class="mnone">None.</div>') + '</div>';
+    $('#v-audit').innerHTML = head
+      + sec('Approved \u2014 fetched on every run', C.approved, 'approved')
+      + sec('Pending a human decision \u2014 never fetched', C.pending, 'pending')
+      + sec('Rejected \u2014 never fetched', C.rejected, 'rejected')
+      + (orphans.length
+          ? '<div class="miscgrp"><div class="gh">Not traceable to a source &middot; ' + orphans.length + '</div>'
+            + '<p class="gsub">These developments name a source URL this scan\'s definition does not list. Nothing should ever be in this group; if something is, the ledger and the definition have drifted apart and the scan needs re-running.</p>'
+            + orphans.map(it => '<div class="aitem"><span class="ad">' + esc(it.date ? fmt(it.date) : '\u2014') + '</span><span class="al">?</span>'
+                + '<span><button type="button" data-dev="' + esc(it.id) + '">' + esc(it.title) + '</button> <span style="font-family:var(--mono);font-size:10.5px;color:var(--faint)">' + esc(it.source_url || 'no source_url') + '</span></span></div>').join('')
+            + '</div>'
+          : '')
+      + '<div class="averify" style="margin-top:22px">Every development on this page came from exactly one link above. A source not on this list cannot contribute anything &mdash; except the Miscellaneous tab, which contributes nothing to the ledger at all.</div>';
+  }
+  $('#v-audit').addEventListener('click', e => {
+    const b = e.target.closest('button[data-dev]');
+    if (b) { openDetail(b.dataset.dev, b); return; }
+    const h = e.target.closest('.ah');
+    if (h && !e.target.closest('a')) { const u = h.parentElement.dataset.url; auditOpen = auditOpen === u ? null : u; drawAudit(); }
+  });
+  $('#v-audit').addEventListener('keydown', e => {
+    const h = e.target.closest('.ah');
+    if (h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); const u = h.parentElement.dataset.url; auditOpen = auditOpen === u ? null : u; drawAudit(); }
+  });
 
   // ---- detail slide-over ---------------------------------------------------------------------
   const panel = $('#panel'), scrim = $('#scrim');
   function openDetail(id, from) {
     const it = byId[id]; if (!it) return;
     lastFocus = from || document.activeElement; openId = id;
-    if (!state.read[id]) { state.read[id] = true; save(); drawTable(); }
+    if (!state.read[id]) { state.read[id] = true; save(); drawAll(); }
     panel.innerHTML = detailHTML(it);
     panel.classList.add('on'); scrim.classList.add('on'); panel.setAttribute('aria-hidden', 'false');
     wireCites(panel);
     $('.pclose', panel).addEventListener('click', closeDetail);
-    $('#p-star').addEventListener('click', () => { state.star[id] = !state.star[id]; if (!state.star[id]) delete state.star[id]; save(); $('#p-star').textContent = state.star[id] ? '★ Starred' : '☆ Star'; $('#p-star').classList.toggle('on', !!state.star[id]); drawTable(); });
-    $('#p-arch').addEventListener('click', () => { state.arch[id] = !state.arch[id]; if (!state.arch[id]) delete state.arch[id]; save(); $('#p-arch').textContent = state.arch[id] ? 'Unarchive' : 'Archive'; drawTable(); });
-    $('#p-draft').addEventListener('click', () => draftEmail(it));
+    $('#p-star').addEventListener('click', () => { state.star[id] = !state.star[id]; if (!state.star[id]) delete state.star[id]; save(); $('#p-star').textContent = state.star[id] ? '★ Starred' : '☆ Star'; $('#p-star').classList.toggle('on', !!state.star[id]); drawAll(); });
+    $('#p-arch').addEventListener('click', () => { state.arch[id] = !state.arch[id]; if (!state.arch[id]) delete state.arch[id]; save(); $('#p-arch').textContent = state.arch[id] ? 'Unarchive' : 'Archive'; drawAll(); });
+    $('#p-draft').addEventListener('click', () => draftEmail(it, clientName(S.clients[0]), $('#p-draft')));
     $('#p-askb').addEventListener('click', () => { const a = $('#p-ask'); a.classList.toggle('on'); if (a.classList.contains('on')) $('#p-q').focus(); });
     $('#p-askf').addEventListener('submit', e => { e.preventDefault(); ask(it); });
     panel.scrollTop = 0;
@@ -1870,7 +2931,7 @@ function renderScan() {
   function closeDetail() {
     panel.classList.remove('on'); scrim.classList.remove('on'); panel.setAttribute('aria-hidden', 'true'); hideHC();
     openId = null;
-    if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); else { const r = $('#tb tr.r'); if (r) r.focus(); }
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); else { const r = $('#v-' + state.view + ' tr.r'); if (r) r.focus(); }
   }
   scrim.addEventListener('click', closeDetail);
   document.addEventListener('keydown', e => {
@@ -1952,10 +3013,14 @@ function renderScan() {
       + (d.passages || []).map(p => '<blockquote>' + esc(typeof p === 'string' ? p : (p.quote || p.text || '')) + '</blockquote>').join('')
       + ((d.notes || []).length ? '<div class="nt">' + d.notes.map(esc).join('<br>') + '</div>' : '');
   }
-  async function draftEmail(it) {
-    const b = $('#p-draft'); b.disabled = true; b.textContent = 'Drafting…';
+  // `client` and `btn` are passed by the Clients tab, which drafts for the client whose section
+  // the button sits in; the detail panel passes its own button and the scan's first client, as it
+  // always did. Reviewed defect this closes by construction: a per-client draft that silently
+  // addressed the first client on the scan would be worse than no draft at all.
+  async function draftEmail(it, client, btn) {
+    const b = btn || $('#p-draft'); b.disabled = true; b.textContent = 'Drafting…';
     let r = null, err = null;
-    try { r = await postJSON(D.api.draft, { scan: S.id, dev: it.id, client: clientName(S.clients[0]) || undefined, kind: 'email' }); } catch (e) { err = e; }
+    try { r = await postJSON(D.api.draft, { scan: S.id, dev: it.id, client: client || undefined, kind: 'email' }); } catch (e) { err = e; }
     b.disabled = false; b.textContent = 'Draft email';
     // The tier and the demo mark ride with the text itself, because the text is what gets copied
     // out of this modal and forwarded.
@@ -1975,10 +3040,10 @@ function renderScan() {
       : (r.status === 501 || r.status === 404) ? 'the draft endpoint is not configured on this deployment (HTTP ' + r.status + ')'
       : r.ok ? 'the draft endpoint answered without a draft body'
       : 'the draft endpoint answered ' + r.status + (r.data.message ? ': ' + r.data.message : '');
-    showModal('Draft email', demoPrefix + template(it), ['Deterministic template built from the record, because ' + why + '. Nothing was sent.'].concat(provenance));
+    showModal('Draft email', demoPrefix + template(it, client), ['Deterministic template built from the record, because ' + why + '. Nothing was sent.'].concat(provenance));
   }
-  function template(it) {
-    const client = clientName(S.clients[0]) || '[Client]';
+  function template(it, forClient) {
+    const client = forClient || clientName(S.clients[0]) || '[Client]';
     const lines = ['Subject: ' + (it.jurisdiction ? countryName(it.jurisdiction) + ' — ' : '') + (it.headline || it.title), '', 'Dear ' + client + ' team,', '',
       (it.headline ? it.headline + ' ' : '') + 'The instrument is: ' + it.title + (it.date ? ' (' + fmt(it.date) + ')' : '') + '.', ''];
     it.summary.forEach((s, i) => lines.push('• ' + s.text + (s.where ? ' [' + s.where + ']' : '') + (s.verified ? '' : ' [citation unverified]')));
@@ -2036,7 +3101,30 @@ function renderScan() {
   // First paint last: everything above is declared by now (the const bindings the table reads
   // are not hoisted, and a draw before them throws on the very first render).
   wireCites(main);
-  drawTable();
+  // The hash wins over the remembered tab: it is what the auto-reload writes on its way out, so a
+  // partner reading Miscellaneous when a run lands comes back to Miscellaneous.
+  const hv = tabFromHash();
+  if (hv && VIEWS.some(v => v.k === hv)) state.view = hv;
+  setView(state.view);
+
+  // ---- pending runs on this scan ---------------------------------------------------------------
+  mountPending($('#pending'), {
+    // Only this scan's errands. Another scan's create belongs on the Scans home, not here.
+    mine: p => (p.scan_id || p.id) === S.id,
+    builtNow: p => {
+      const since = Date.parse(p.dispatched_at || 0);
+      // A run lands as new developments (D.generated moves); a promotion lands as a changed
+      // definition (S.updated moves) and no developments at all. Watching only one of the two
+      // would leave the other card spinning until the 90-minute timeout.
+      return Date.parse(D.generated || 0) > since || Date.parse(S.updated || 0) > since;
+    },
+    onLanded: p => {
+      if (kindOf(p) === 'promote') {
+        say('The promoted venue is in this scan’s sources now, as <b>pending</b> on <b>Coverage</b>. '
+          + 'Nothing has been fetched from it: the gate judges it at the start of the next run — press <b>Run scan</b>.', 'warn');
+      }
+    },
+  });
 }
 </script>
 """
@@ -2410,11 +3498,55 @@ def write_sample(dest: Path) -> Path:
                   "discovery dropped https://blog.example.com/pay-transparency: not an official venue"]
                  + dropped + ["dropped 1 citation(s) to ids the model was not shown"],
     }
+    # The Miscellaneous lane: what a hosted web search returned from OUTSIDE the coverage list.
+    # Nothing here was fetched, gated or ledgered — every field is what the search provider showed.
+    # One of each kind and one of each status, so the grouping, the Promote action and the two
+    # non-promotable groups are all exercised. The second sample scan deliberately has NO misc.json:
+    # absence is a state the page must render as "nobody looked", not as "nothing was found".
+    def finding(url, title, jur, kind, why, **kw):
+        return {"id": hashlib.sha1(url.encode()).hexdigest()[:10], "title": title, "url": url,
+                "host": host_of(url), "date": kw.get("date"), "jurisdiction": jur, "kind": kind,
+                "why": why, "snippet": kw.get("snippet", ""), "first_seen": common.today_ist(),
+                "status": kw.get("status", "new"),
+                # misc.merge sets this on a finding the latest search no longer returned. The
+                # sample carries one so the marked row, the live tab count and the group's
+                # "+ n kept" line are all exercised by the selftest and visible on the page.
+                "stale": bool(kw.get("stale", False)), "last_seen": kw.get("last_seen", "")}
+    misc = {
+        "generated": now,
+        "query": {"intent": defn["intent"], "topics": defn["topics"], "jurisdictions": defn["jurisdictions"],
+                  "excluded_hosts": sorted({s["host"] for s in sources})},
+        "findings": [
+            finding("https://www.ilo.org/global/standards/pay-transparency-2026", "ILO — guidance note on pay-gap reporting methodologies",
+                    "EU", "commentary", "Referenced by two national consultations; methodology only, not binding anywhere."),
+            finding("https://www.arbeidstilsynet.no/regelverk/lonnstransparens", "Arbeidstilsynet — lønnstransparens (regulatory portal)",
+                    "NO", "official_venue", "An official labour-inspectorate portal publishing binding pay-transparency rules for a jurisdiction this scan does not cover.",
+                    date="2026-08-31", snippet="Nye regler om lønnstransparens trer i kraft 1. januar 2027."),
+            finding("https://curia.europa.eu/juris/liste.jsf?num=C-401/26", "CJEU — Case C-401/26, reference on Article 157 TFEU and pay ranges",
+                    "EU", "official_venue", "The Court's own case register; a reference here would bind every member state's transposition.",
+                    date="2026-09-01"),
+            finding("https://www.reuters.com/legal/eu-pay-transparency-deadline-missed-2026-09-01/", "Most EU states miss the pay transparency deadline",
+                    "EU", "secondary", "Press report naming four states said to have draft bills; each claim needs checking at its own gazette.",
+                    date="2026-09-01", snippet="Only six of 27 member states had transposed the directive by the June deadline, according to Commission figures."),
+            finding("https://www.paywatch-europe.example/blog/what-italy-got-wrong", "What Italy got wrong in its transposition",
+                    "IT", "commentary", "Law-firm commentary on the Italian decree already in this scan's ledger.", date="2026-08-20"),
+            finding("https://www.gazzettaufficiale.it/ricerca/serie_generale", "Gazzetta Ufficiale — Serie Generale",
+                    "IT", "official_venue", "Already on this scan's coverage list; promoted from a previous search.",
+                    date="2026-08-12", status="promoted"),
+            finding("https://www.someministry.example/news", "Ministry newsroom (dismissed)",
+                    "ES", "official_venue", "A newsroom, not a listing of instruments — dismissed by the partner.", status="dismissed"),
+            finding("https://www.consilium.europa.eu/en/press/press-releases/2026/07/pay-transparency-council/", "Council press service — pay transparency progress note",
+                    "EU", "secondary", "Surfaced by an earlier search and not by the last one; kept, and marked, because a lead does not vanish when a search changes its mind.",
+                    date="2026-07-14", stale=True, last_seen="2026-08-28T09:00:00+05:30"),
+        ],
+        "notes": ["Search returned 19 results; 12 were on hosts this scan already covers and were dropped."],
+    }
     common.atomic_write_json(dest / "scans" / f"{sid}.json", defn)
     res = dest / "data" / "scans" / sid
     common.atomic_write_json(res / "developments.json", {"generated": now, "items": devs})
     common.atomic_write_json(res / "digest.json", digest)
     common.atomic_write_json(res / "health.json", health)
+    common.atomic_write_json(res / "misc.json", misc)
     for did, t in texts.items():
         common.atomic_write_text(res / "text" / f"{did}.txt", t)
     # A second definition, created with discovery off, whose create died between writing the
@@ -2443,6 +3575,15 @@ def selftest() -> None:
     assert quote_in_text("the employer's duty to report annually", "The employer’s duty to report annually is fixed.") is True
     assert quote_in_text("the Act", "the Act the Act the Act") is False
     assert quote_in_text("not there at all, honestly", "some text") is False and quote_in_text("x", None) is None
+    # The contract's lane rule: every known type lands in exactly one lane, and a type nobody
+    # recognises (or an absent one, which is what a queued row has) lands in Signals rather than
+    # nowhere. A development in no lane is a development nobody reads again.
+    assert [lane_of(t) for t in INSTRUMENT_TYPES] == ["instruments"] * 5
+    assert lane_of("Judgment") == "judgments"
+    assert [lane_of(t) for t in SIGNAL_TYPES] == ["signals"] * 3
+    assert lane_of("") == lane_of(None) == lane_of("Gazette notice") == "signals"
+    assert len(set(KNOWN_TYPES)) == 9 and set(LANES) == {lane_of(t) for t in KNOWN_TYPES}
+
     ev = gate_evidence({"reachable": True, "http": 200, "robots": "allowed", "tos": {"checked": ["u"], "flags": []}, "extract": {"rows": 31, "dated": 29, "floor": 8}})
     assert ev == "robots allowed · terms checked: 1 page, no flags · 31 rows parsed, 29 dated", ev
     assert gate_evidence({}) == "no gate evidence recorded"
@@ -2492,6 +3633,50 @@ def selftest() -> None:
         assert it3["headline"] == "T" and it3["relevance"] == {"level": "low", "unrated": True, "why": "", "action": "", "clients": {}}
         assert it3["kind"] == "gazette" and it3["obligations"] == [{"who": "w", "what": "", "when": ""}]
         assert prepare_item({"id": "k", "source_url": "https://s/x"}, tdir, {"https://s/x": "bogus"})["kind"] == ""
+        # lane + untyped ride on every row, from the one rule above
+        assert prepare_item({"id": "a", "type": "Judgment"}, tdir)["lane"] == "judgments"
+        assert prepare_item({"id": "b", "type": "Notice/Circular"}, tdir) == dict(prepare_item({"id": "b", "type": "Notice/Circular"}, tdir), lane="instruments", untyped=False)
+        assert prepare_item({"id": "c", "enriched": False}, tdir)["lane"] == "signals"
+        assert prepare_item({"id": "c", "enriched": False}, tdir)["untyped"] is True
+        assert prepare_item({"id": "d", "type": "Press release"}, tdir)["untyped"] is False
+
+    # 1b. Miscellaneous: absence is a state, and every tolerance is stated rather than swallowed
+    with tempfile.TemporaryDirectory() as td:
+        res = Path(td)
+        empty = load_misc(res)
+        assert empty == {"present": False, "generated": "", "query": {}, "findings": [], "notes": [], "problems": []}
+        common.atomic_write_json(res / "misc.json", {
+            "generated": "2026-09-04T10:00:00+05:30",
+            "query": {"intent": "i", "topics": ["t"], "jurisdictions": ["de"], "excluded_hosts": ["a.gov"]},
+            "findings": [
+                {"id": "aaaaaaaaaa", "title": "A", "url": "https://x.gov/list", "kind": "official_venue", "status": "new"},
+                # host says one thing, URL says another: the URL wins, as misc.py's writer does
+                {"title": "B", "url": "https://press.example/story", "kind": "secondary", "host": "somewhere.else"},
+                {"title": "no url", "kind": "commentary"},
+                {"title": "C", "url": "https://y.example/z", "kind": "sponsored", "status": "queued"},
+                {"id": "aaaaaaaaaa", "title": "duplicate", "url": "https://x.gov/list", "kind": "official_venue"},
+                # the last search did not return this one; it is kept and must be marked
+                {"id": "bbbbbbbbbb", "title": "D", "url": "https://www.old.example/list", "kind": "official_venue", "stale": True},
+                "junk",
+            ],
+            "notes": ["12 results dropped: already covered"]})
+        m = load_misc(res)
+        assert m["present"] and m["generated"].startswith("2026-09-04")
+        assert m["query"]["jurisdictions"] == ["DE"] and m["query"]["excluded_hosts"] == ["a.gov"]
+        # the URL-less row and the duplicate are gone; the unknown kind is shown as commentary
+        assert [f["kind"] for f in m["findings"]] == ["official_venue", "secondary", "commentary", "official_venue"], m["findings"]
+        assert m["findings"][1]["id"] == hashlib.sha1(b"https://press.example/story").hexdigest()[:10]
+        assert m["findings"][1]["host"] == "press.example" and m["findings"][2]["status"] == "new"
+        # host is recomputed from the URL, never read from the file (misc.py does the same), and
+        # www. is folded off so a pipeline-written row produces the identical string
+        assert m["findings"][3]["host"] == "old.example" and m["findings"][3]["stale"] is True
+        assert [f["stale"] for f in m["findings"]] == [False, False, False, True]
+        assert len(m["problems"]) == 6 and any("has no URL" in p for p in m["problems"])
+        assert any("unknown kind 'sponsored'" in p and "not promotable" in p for p in m["problems"])
+        assert any("unknown status 'queued'" in p for p in m["problems"])
+        # every tolerance says so: the dropped duplicate and the disagreeing host are both reported
+        assert any("two findings share the id 'aaaaaaaaaa'" in p for p in m["problems"]), m["problems"]
+        assert any("says host 'somewhere.else'" in p and "press.example" in p for p in m["problems"])
 
     # 2. zero scans: only the built-in card, and a page that still stands on its own
     with tempfile.TemporaryDirectory() as td:
@@ -2516,8 +3701,49 @@ def selftest() -> None:
         # The pending store, under the contract's key, and the poll that must stand down
         assert "'tmt_scans_pending_v1'" in html and "action: 'status'" in html
         assert 'id="pending"' in html and "document.hidden" in html and "visibilitychange" in html
+        # The wait, made a product rather than a CI job (§ "make the wait seamless"):
+        # 1. the page picks up its own result — it fetches itself uncached, compares the DATA
+        #    stamp, tells the partner, and reloads once with the open tab in the hash
+        assert "cache: 'no-store'" in html and 'name="tmt-stamp" content="([^"]*)"' in html
+        assert "This scan has finished — showing the new version." in html
+        assert "const STAMP_MS = 20000;" in html and "function pageBusy()" in html
+        assert "dialog[open]" in html and "history.replaceState" in html and "#tab=" in html
+        # 2. honest phases: derived from the clock, and said to be derived
+        assert "reading documents" in html and "writing the digest" in html and "gating the venues" in html
+        assert "usually ' + phaseAt(mins" in html and "That is an estimate from the clock" in html
+        assert "Waiting for a runner. Nothing has been read yet." in html
+        # 3. failure keeps the clock, offers a repeat, and stops polling
+        assert "data-retry=" in html and ">Try again<" in html and "The run stopped" in html
+        assert "st.status !== 'completed'" in html
+        # 4. status unavailable says only what is known
+        assert "Live run status is off on this deployment" in html
+        # 5. no CI service is named in the normal path; the run log is the fallback affordance
+        assert "GitHub" not in html, "the page must not name the CI service"
+        assert ">Open the run log<" in html or "'Open the run log'" in html
         # "No scans yet" is not true while one is being created, so the empty block is addressable
         assert 'id="hempty"' in html and "em.hidden = list.length > 0" in html
+        # The Scans home is the product's front door now: it says what a scan is, and which one is
+        # the built-in vetted scan, without typing a source count the registry owns.
+        assert "A scan is one question" in html and "TMT India</b> is the built-in scan" in html
+        # the built-in scan's source count comes from the card the registry computed, never typed
+        assert "labelled <i>discovered</i>" in html and "(D.cards.find(c => c.builtin) || {}).meta" in html
+        assert '"href": "/tmt-radar-v2.html"' in html and "coverage, instruments, judgments, signals, miscellaneous leads, clients and audit" in html
+        # Create is gated on the coverage preview, in the markup and in the submit handler
+        assert 'id="dlg-preview">Show what this scan will cover<' in html
+        assert "if (!previewSeen) {" in html and "b.disabled = !previewSeen;" in html
+        assert "Create is disabled until you have seen the venues this scan will read." in html
+        assert "Each venue above is gated when the scan is created" in html
+        assert "Miscellaneous will additionally search the open web outside this list." in html
+        # The seven tabs, by name, and the lane rule the page routes by
+        for label in ("Coverage", "Instruments", "Judgments", "Signals", "Miscellaneous", "Clients", "Audit"):
+            assert "label: '" + label + "'" in html, label
+        assert "id: 'v-'" not in html and "data-view=" in html
+        # The Miscellaneous standing copy: the four sentences that must never be edited away
+        assert "The tracker fetched none of these pages." in html
+        assert "no robots.txt was consulted for them and no terms were checked" in html
+        assert "Nothing here is a citable instrument." in html
+        assert "Promote is the only route from this lane into coverage." in html
+        assert "action: 'promote'" in html and "kind: 'promote'" in html
         # a lone unreadable definition must stop the build, not produce a page over corrupt data
         (root / "scans").mkdir()
         (root / "scans" / "bad.json").write_text("{not json", encoding="utf-8")
@@ -2547,6 +3773,29 @@ def selftest() -> None:
         page = (out / "scan" / f"{sid}.html").read_text(encoding="utf-8")
         payload = json.loads(re.search(r'<script id="scan-data" type="application/json">(.*?)</script>', page, re.S).group(1).replace("<\\/", "</"))
         assert payload["page"] == "scan" and len(payload["items"]) == 13
+        # Lane routing: every development lands in exactly one lane, and the three lanes together
+        # are the whole ledger. This is the assertion the contract asks for.
+        lanes = {}
+        for it in payload["items"]:
+            lanes.setdefault(it["lane"], []).append(it["id"])
+        assert set(lanes) <= set(LANES) and sum(len(v) for v in lanes.values()) == len(payload["items"])
+        assert len(set().union(*[set(v) for v in lanes.values()])) == len(payload["items"])   # no id in two lanes
+        assert {k: len(v) for k, v in sorted(lanes.items())} == {"instruments": 6, "signals": 7}, lanes
+        assert all(it["lane"] == lane_of(it["type"]) for it in payload["items"])
+        # the three unread rows have no type and are parked in Signals, marked untyped
+        assert sorted(it["lane"] for it in payload["items"] if it["untyped"]) == ["signals"] * 3
+        # Miscellaneous, from the fixture: grouped by kind, statuses carried, coverage hosts excluded
+        M = payload["misc"]
+        assert M["present"] and M["generated"] and M["notes"]
+        assert [f["kind"] for f in M["findings"]].count("official_venue") == 4
+        assert [f["kind"] for f in M["findings"]].count("secondary") == 2
+        assert [f["kind"] for f in M["findings"]].count("commentary") == 2
+        assert {f["status"] for f in M["findings"]} == {"new", "promoted", "dismissed"}
+        # One finding the last search no longer returned: kept, flagged, and therefore excluded
+        # from the "live" count the tab shows (the page still renders it, marked).
+        assert [f["id"] for f in M["findings"] if f["stale"]] and sum(1 for f in M["findings"] if f["stale"]) == 1
+        assert "gazzettaufficiale.it" in M["query"]["excluded_hosts"] and M["query"]["jurisdictions"] == ["DE", "FR", "IT", "ES"]
+        assert all(f["url"].startswith("http") and f["id"] for f in M["findings"])
         assert payload["counts"] == {"new": 13, "high": 2, "sources_ok": 3, "sources_failed": 1, "sources_empty": None, "assessed": 10, "queued": 1}, payload["counts"]
         assert payload["run"] == {"new": 13, "enriched": 10, "queued": 1, "read_failed": 1, "enrich_failed": 1, "ledgered_total": 13}, payload["run"]
         # the GATED source is not counted as read in the header (reviewed defect)
@@ -2589,7 +3838,11 @@ def selftest() -> None:
         # The digest verifier's notes are printed under the digest label, so they are NOT repeated as
         # header problems (review finding: the same sentence appeared twice on the page).
         assert not any("dropped 1 citation(s) to ids the model was not shown" in p for p in probs), probs
-        assert "discovery recorded 2 note(s) — open Coverage" in probs and "1 source(s) FAILED this run — open Coverage" in probs
+        # Only CAVEATS are problems now: a routine "discovery dropped <url>" is the deny-list working,
+        # and filing that as a problem taught a partner to ignore the list (reviewed defect).
+        assert any(re.match(r"discovery recorded \d+ caveat", p) for p in probs), probs
+        assert not any("discovery dropped" in p for p in probs), probs
+        assert "1 source(s) FAILED this run — open Coverage" in probs, probs
         assert any(p.startswith("1 development(s) could not be read") for p in probs) and any("read but not enriched" in p for p in probs)
         assert not any(p.startswith("run: discovery") for p in probs)   # discovery lines are grouped on the panel, not repeated
         # the read states, one of each, carried with their reasons
@@ -2629,6 +3882,24 @@ def selftest() -> None:
         p2 = json.loads(re.search(r'<script id="scan-data" type="application/json">(.*?)</script>', page2, re.S).group(1).replace("<\\/", "</"))
         assert p2["problems"] == ["create did not finish gating 1 source(s) — Edit and save to re-run"], p2["problems"]
         assert p2["scan"]["no_discover"] is True and p2["coverage"]["pending"][0]["reason"] == "not yet gated"
+        # ... and it has no misc.json at all: the page must say nobody looked, not that nothing
+        # was found, so `present` is false and the tab shows no count.
+        assert p2["misc"] == {"present": False, "generated": "", "query": {}, "findings": [], "notes": []}, p2["misc"]
+        assert "No open-web search has been run for this scan." in page2
+        # a misc-only change moves the scan page's stamp, so an open tab notices the new lane
+        mpath = root / "data" / "scans" / sid / "misc.json"
+        orig_misc = mpath.read_text(encoding="utf-8")
+        stamp_before = re.search(r'name="tmt-stamp" content="([0-9a-f]{12})"', page).group(1)
+        mj = json.loads(orig_misc)
+        mj["generated"] = "2027-01-01T00:00:00+05:30"
+        mpath.write_text(json.dumps(mj), encoding="utf-8")
+        build(root, out)
+        assert re.search(r'name="tmt-stamp" content="([0-9a-f]{12})"', (out / "scan" / f"{sid}.html").read_text(encoding="utf-8")).group(1) != stamp_before
+        # a misc.json the run wrote badly is reported on the page, never dropped in silence
+        mpath.write_text(json.dumps({"generated": "x", "findings": [{"title": "no url", "kind": "commentary"}]}), encoding="utf-8")
+        sm = build(root, out)
+        assert any("has no URL" in pr for pr in sm["problems"][sid]), sm["problems"][sid]
+        mpath.write_text(orig_misc, encoding="utf-8")
         # home
         home = (out / "scans.html").read_text(encoding="utf-8")
         hp = json.loads(re.search(r'<script id="scan-data" type="application/json">(.*?)</script>', home, re.S).group(1).replace("<\\/", "</"))
@@ -2649,11 +3920,17 @@ def selftest() -> None:
         (res / "digest.json").write_text(json.dumps(dg), encoding="utf-8")
         s3 = build(root, out)
         assert any("deadbeef00" in p for p in s3["problems"][sid])
-    print("PASS build_scans selftest: helpers (enricher's citation rule, gate wording), zero-scan build, sample build "
-          "(13 developments incl. queued / read-failed / enrichment-failed / truncated, 5/1/1 sources incl. FAILED and GATED, "
-          "budget drops + run notes + discovery on the page, 1 unverified citation, 1 uncited sentence, 4 unrated rows), "
-          f"an ungated definition, publish, failure modes; source picker + pending store "
-          f"(first run = {FIRST_RUN_MAX_NEW} documents, from run.FIRST_RUN_MAX_NEW)")
+    print("PASS build_scans selftest: helpers (enricher's citation rule, gate wording), lane routing "
+          "(9 types -> 3 lanes, an untyped row parked in Signals), Miscellaneous loading (absent, present, "
+          "URL-less / duplicate / unknown-kind tolerances), zero-scan build, sample build "
+          "(13 developments in exactly one lane each — 6 instruments, 0 judgments, 7 signals — incl. queued / "
+          "read-failed / enrichment-failed / truncated, 5/1/1 sources incl. FAILED and GATED, 8 misc findings "
+          "across 3 kinds and 3 statuses, budget drops + run notes + discovery on the page, 1 unverified "
+          "citation, 1 uncited sentence, 4 unrated rows), a scan with no misc.json, an ungated definition, "
+          "publish, failure modes; seven tabs, the Miscellaneous standing copy, the coverage preview gating "
+          f"Create, source picker + pending store (first run = {FIRST_RUN_MAX_NEW} documents, from run.FIRST_RUN_MAX_NEW), "
+          "and the wait: self pick-up on a changed data stamp, clock-derived phases said to be estimates, "
+          "Try again on a failed run, an honest fallback when live status is off, and no CI service named")
 
 
 # ----------------------------------------------------------------------------- main

@@ -1,4 +1,4 @@
-# TMT Regulatory Radar — Scans: create, run or delete one horizon scan.
+# TMT Regulatory Radar — Scans: create, run, delete or promote into one horizon scan.
 #
 # The Scans layer (docs/horizon-design.md) lets a partner point the tracker at any question:
 # discover official sources, gate them, read them, enrich each development with a cited
@@ -23,9 +23,18 @@ on:
         description: "What to do"
         type: choice
         required: true
-        options: [create, run, delete]
+        options: [create, run, delete, promote]
       scan_id:
-        description: "Scan id (run and delete; optional for create, where it is derived from the name)"
+        description: "Scan id (run, delete and promote; optional for create, where it is derived from the name)"
+        required: false
+        default: ""
+      finding_id:
+        description: "Promote: the 10-character Miscellaneous finding id from data/scans/<id>/misc.json"
+        # Promote moves one finding's URL onto the scan's coverage list as a PENDING source. The
+        # Miscellaneous lane never fetched it — it only read search results — so nothing about that
+        # URL has been checked yet; the next run puts it through the same Python gate as every
+        # other candidate (robots.txt, terms, extraction floor). Only a finding whose kind is
+        # official_venue can be promoted, and run.py refuses the rest by name.
         required: false
         default: ""
       scan:
@@ -85,16 +94,28 @@ jobs:
           ACTION: ${{ inputs.action }}
           SCAN_ID: ${{ inputs.scan_id }}
           SCAN: ${{ inputs.scan }}
+          FINDING_ID: ${{ inputs.finding_id }}
         run: |
           case "$ACTION" in
-            create|run|delete) ;;
-            *) echo "::error::action must be create, run or delete (got '$ACTION')"; exit 1 ;;
+            create|run|delete|promote) ;;
+            *) echo "::error::action must be create, run, delete or promote (got '$ACTION')"; exit 1 ;;
           esac
           if [ -n "$SCAN_ID" ] && ! printf '%s\n' "$SCAN_ID" | grep -Eq '^[a-z0-9][a-z0-9-]{1,59}$'; then
             echo "::error::scan_id must match ^[a-z0-9][a-z0-9-]{1,59}$"; exit 1
           fi
           if [ "$ACTION" != "create" ] && [ -z "$SCAN_ID" ]; then
             echo "::error::scan_id is required for $ACTION"; exit 1
+          fi
+          if [ "$ACTION" = "promote" ]; then
+            # Same discipline as scan_id: a shape, matched before the value reaches any command.
+            # run.py re-checks it against the same pattern, and looks the finding up rather than
+            # trusting it — a finding id names a row in a file we wrote, nothing more.
+            if [ -z "$FINDING_ID" ]; then
+              echo "::error::finding_id is required for promote"; exit 1
+            fi
+            if ! printf '%s\n' "$FINDING_ID" | grep -Eq '^[0-9a-f]{10}$'; then
+              echo "::error::finding_id must be 10 hexadecimal characters (see data/scans/<id>/misc.json)"; exit 1
+            fi
           fi
           if [ "$ACTION" = "create" ]; then
             if [ -z "$SCAN" ]; then
@@ -123,11 +144,17 @@ jobs:
           ACTION: ${{ inputs.action }}
           SCAN_ID: ${{ inputs.scan_id }}
           NO_DISCOVER: ${{ inputs.no_discover }}
+          FINDING_ID: ${{ inputs.finding_id }}
         run: |
-          if [ "$ACTION" != "delete" ] && [ -z "${OPENAI_API_KEY}" ]; then
-            echo "::error::OPENAI_API_KEY is not configured. Add it as a repository secret."
-            exit 1
-          fi
+          # delete and promote call no model at all: promote only moves a URL a previous run
+          # already found into the definition, to be gated by the next run.
+          case "$ACTION" in
+            delete|promote) ;;
+            *) if [ -z "${OPENAI_API_KEY}" ]; then
+                 echo "::error::OPENAI_API_KEY is not configured. Add it as a repository secret."
+                 exit 1
+               fi ;;
+          esac
           # SCAN_ID has already been matched against ^[a-z0-9][a-z0-9-]{1,59}$ above; it is
           # still passed as a quoted array element, not spliced into a string.
           # The summary is written by run.py to a file of our choosing, not grepped out of the
@@ -142,6 +169,7 @@ jobs:
               if [ "$NO_DISCOVER" = "true" ]; then ARGS+=(--no-discover); fi ;;
             run)    ARGS=(run --id "$SCAN_ID" --summary-out "$SUMMARY_OUT") ;;
             delete) ARGS=(delete --id "$SCAN_ID" --summary-out "$SUMMARY_OUT") ;;
+            promote) ARGS=(promote --id "$SCAN_ID" --finding "$FINDING_ID" --summary-out "$SUMMARY_OUT") ;;
           esac
           echo "running: python -m pipeline.scan.run ${ARGS[*]}"
           # Exit 1 means a source FAILED after everything was written; the results must still
@@ -176,12 +204,21 @@ jobs:
           print(f"id={sid}")                      # -> $GITHUB_OUTPUT
           log = open(3, "w", closefd=False)        # -> the run log, where ::notice:: is a command
           if s.get("action") in ("create", "run"):
+              m = s.get("misc") if isinstance(s.get("misc"), dict) else {}
               print("::notice::" + f"scan {sid}: {s.get('new', 0)} new, {s.get('enriched', 0)} enriched, "
                     f"{s.get('queued', 0)} queued, {s.get('high', 0)} high relevance, "
                     f"{s.get('sources_ok', 0)} source(s) ok, {s.get('sources_failed', 0)} failed, "
+                    f"miscellany {m.get('found', 0)} outside coverage ({m.get('new', 0)} new), "
                     f"week {s.get('week', '?')}", file=log)
           elif s.get("action") == "delete":
               print("::notice::" + f"scan {sid}: removed {len(s.get('removed') or [])} path(s)", file=log)
+          elif s.get("action") == "promote":
+              # The URL is echoed for the audit trail, with what actually happened to it: added as
+              # pending and gated by the next run, or already on the list and left alone.
+              print("::notice::" + f"scan {sid}: promoted finding {s.get('finding', '?')} — "
+                    + ("added " + str(s.get("url", "")) + " as a pending source; the next run gates it "
+                       "(robots.txt, terms, extraction floor)" if s.get("added")
+                       else "already on the coverage list with status " + str(s.get("status", "?"))), file=log)
           else:
               print("::warning::run.py wrote no summary file — see the step log", file=log)
           log.flush()
@@ -195,6 +232,9 @@ jobs:
           git config user.name  "tmt-radar-scans"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A -- scans
+          # Everything the run wrote under data/scans/<id>/ goes in together — developments.json,
+          # digest.json, health.json, the document text and misc.json — so a reader a year later
+          # sees the ledger and the leads the same run produced, in one commit.
           # data/scans may not exist yet (first scan) or may just have been emptied (last delete);
           # git add errors on a pathspec that matches neither the tree nor the index.
           if [ -d data/scans ] || git ls-files --error-unmatch -- data/scans >/dev/null 2>&1; then

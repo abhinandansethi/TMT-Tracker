@@ -34,18 +34,71 @@ not negotiable, because they are the reason a law firm can run this at all.
 
 ## 2. Shape of the product
 
+**Scans is the front door.** `/` is the list of scans, not the TMT tracker. A scan is not a feed
+inside a bigger app — it is a whole workspace, and clicking one opens the same seven-tab view the
+TMT India tracker has always had, built from that scan's own ledger. TMT India is simply the
+first scan, and the only vetted one.
+
 ```
-Scans (home)
-├── TMT India  ─ built-in, vetted, the existing tracker (Coverage · Instruments · Judgments · Signals · Audit)
-├── EU Pay Transparency ─ partner-created
-├── RBI Digital Lending ─ partner-created
-└── + Create scan
+/  Scans (landing)
+├── TMT India ─ built-in, VETTED: 51 hand-built adapters, fixtures, floors, per-source legal analysis
+│      └── Coverage · Instruments · Judgments · Signals · Clients · Audit      (dist/tmt-radar-v2.html)
+├── EU Pay Transparency ─ partner-created, DISCOVERED sources
+│      └── Coverage · Instruments · Judgments · Signals · Miscellaneous · Clients · Audit
+└── + Create scan  →  describe  →  pick venues  →  SEE THE COVERAGE  →  create
 ```
 
 A **scan** is `{intent, jurisdictions, topics, sources?, clients?}`. Creating one dispatches the
-scan workflow, which: discovers candidate sources → gates them → fetches the approved ones →
-extracts developments → enriches each (cited summary, type, topics, jurisdiction, relevance
-against the intent) → writes the weekly digest → commits. Vercel rebuilds; the scan page appears.
+scan workflow, which: gates the chosen sources (or discovers them first) → fetches the approved
+ones → extracts developments → enriches each (cited summary, type, topics, jurisdiction, relevance
+against the intent) → searches the open web for what lies *outside* that coverage → writes the
+weekly digest → commits. Vercel rebuilds; the scan page appears.
+
+### The seven lanes
+
+The first six are the TMT tracker's own lanes, applied to any subject. A development is routed by
+its `type`, and lands in exactly one:
+
+| Lane | What is in it | Routed from |
+|---|---|---|
+| **Coverage** | every URL this scan fetches, with the gate's evidence, and every candidate it rejected and why | the definition's `sources` |
+| **Instruments** | documents that bind someone | `Legislation`, `Rules/Regulations`, `Order/Decision`, `Notice/Circular`, `Guidance/Advisory` |
+| **Judgments** | how the law is being applied | `Judgment` |
+| **Signals** | real and useful, but not itself binding | `Consultation/Draft`, `Press release`, `Other` |
+| **Miscellaneous** | the open web, *outside* the coverage list | its own file; never routed from a development |
+| **Clients** | each named client, what rates them, and the draft | `relevance.clients` |
+| **Audit** | link by link: what each source yielded, so a human can check for a miss | `source_url` |
+
+### Miscellaneous — the lane that is deliberately not coverage
+
+A gated coverage list is the point of this tracker and also its blind spot: it can only ever find
+what its sources publish. Miscellaneous is the honest answer — one hosted web search per run,
+asking what has happened on this subject that is *not* published by any host the scan already
+covers.
+
+It is bounded by one rule that shapes everything about it: **Miscellaneous never fetches.** It
+reads the search provider's results and links out. We do not request those hosts, so no robots.txt
+or terms question arises for them; equally, nothing here has passed a gate, nothing here is
+citable, and nothing here enters the ledger. Findings are sorted into:
+
+* **Official venues this scan does not cover** — the valuable case. *Promote* puts the URL into
+  the scan's `sources`, where the ordinary Python gate decides. That promotion is the only route
+  from this lane into coverage, and the gate can still reject it.
+* **Secondary reports** — press or trade coverage *about* something official. A lead; verify at
+  the primary source.
+* **Commentary** — read for orientation, cite nothing.
+
+A finding that stops surfacing in later searches is kept and marked, never quietly dropped: a
+lead does not cease to exist because a search engine changed its mind.
+
+### Creating a scan shows its coverage first
+
+The partner describes the subject, the model proposes the structure, *Find sources* proposes
+venues with a rationale each, and the partner ticks. Before Create is enabled, the dialog shows
+the **coverage this scan will have**: the venues grouped by jurisdiction, the jurisdictions where
+nothing was found, the reminder that each is gated on creation and a failure is shown as rejected,
+and the note that Miscellaneous will additionally search outside this list. Nobody should be able
+to create a scan without having seen what it is going to read.
 
 Each scan page (Harvey's layout, our data):
 
@@ -250,6 +303,7 @@ that Ask answers from. Committed, so a citation can be checked in git a year lat
 | `gate.py` | For each candidate: fetch (honest UA), robots.txt, ToS scan (follows footer links matching terms/legal/copyright/disclaimer; flags anti-automation language), listing extraction test with a floor. Decides `approved / pending / rejected` with evidence. | Deterministic. The only "judgement" is a regex list for ToS language, and a hit means *pending*, never *approved*. |
 | `extract.py` | Turns a listing page into rows `{title, date, url}` via structured output over the page's visible text + link inventory; validates dates, resolves URLs, dedupes against the ledger. Fetches document text via `brief.py`'s extractor (PDF, HTML, vision for scans). | Model extracts; code validates and floors. |
 | `enrich.py` | Per new development: cited summary, obligations, type, topics, jurisdiction, relevance against the intent and the named clients. Verifies every quote against the text. | Model writes; code verifies citations. |
+| `misc.py` | One hosted web search per run for what is happening OUTSIDE the scan's coverage. Drops anything on a covered host (that is coverage, not miscellany), dedupes, caps at 20, merges with the previous run so a finding keeps its id, first_seen and status. | Model searches; code filters and never fetches. |
 | `digest.py` | Weekly narrative with citations to development ids; verifies every cited id exists. | Model writes; code verifies. |
 | `run.py` | CLI: `create` (validate + write definition + discover + gate + first run), `run`, `delete`. Budgets, delays, health, atomic writes. | The orchestrator. |
 
@@ -314,6 +368,9 @@ lighter chrome and a real information hierarchy.
 * **Save to Vault** — no DMS integration; drafts are copied or downloaded.
 * **Relevance without a reason** — every level comes with *why* and *action*, and the action names
   the client when one is set on the scan.
+* **A single undifferentiated feed.** Harvey shows one developments table; we keep the tracker's
+  lanes, because a consultation paper and a notified rule are not the same kind of thing to a
+  lawyer, and a web-search hit is not either.
 * **Email alerts and daily email digests** — no mail infrastructure here; the digest lives on the
   page. If wanted later, the scan workflow can post it to a mailbox or channel — still only when a
   person ran the scan.

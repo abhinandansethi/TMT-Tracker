@@ -5,15 +5,29 @@
  "description": "What a partner asks a scan to watch, plus every source the scan proposed, gated, approved or rejected — with the gate's evidence. Committed by the scan workflow and edited only through it. `id`, `created`, `updated` and `no_discover` are filled in by `pipeline/scan/run.py create`; everything else comes from the partner. This file documents the contract; `run.validate_definition` enforces it by hand so the pipeline carries no jsonschema dependency.",
  "type": "object",
  "additionalProperties": false,
- "required": ["id", "name", "intent", "jurisdictions"],
+ "required": [
+  "id",
+  "name",
+  "intent",
+  "jurisdictions"
+ ],
  "properties": {
   "id": {
    "type": "string",
    "pattern": "^[a-z0-9][a-z0-9-]{1,59}$",
-   "not": {"enum": ["schema", "tmt-india"]},
+   "not": {
+    "enum": [
+     "schema",
+     "tmt-india"
+    ]
+   },
    "description": "Slug; doubles as the file name and the data/scans/<id>/ directory. Also the shape the workflow's scan_id input is validated against. `schema` (this file) and `tmt-india` (the built-in vetted tracker) are reserved and refused by run.py and api/scans.js."
   },
-  "name": {"type": "string", "minLength": 3, "maxLength": 120},
+  "name": {
+   "type": "string",
+   "minLength": 3,
+   "maxLength": 120
+  },
   "intent": {
    "type": "string",
    "minLength": 20,
@@ -24,24 +38,55 @@
    "type": "array",
    "minItems": 1,
    "maxItems": 60,
-   "items": {"type": "string", "minLength": 1, "maxLength": 40},
+   "items": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 40
+   },
    "description": "ISO codes or plain names; the model is told both and the UI renders a flag when it recognises a code."
   },
-  "topics": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 80}},
-  "industries": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 80}},
+  "topics": {
+   "type": "array",
+   "items": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 80
+   }
+  },
+  "industries": {
+   "type": "array",
+   "items": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 80
+   }
+  },
   "clients": {
    "type": "array",
    "description": "Names the relevance step rates each development against. A string is a client watching the whole intent; an object narrows the scope. Every consumer reads the name through one helper (clientName), so both shapes are one shape.",
    "items": {
     "oneOf": [
-     {"type": "string", "minLength": 1, "maxLength": 120},
+     {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+     },
      {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
+      "required": [
+       "name"
+      ],
       "properties": {
-       "name": {"type": "string", "minLength": 1, "maxLength": 120},
-       "scope": {"type": "string", "maxLength": 500}
+       "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+       },
+       "scope": {
+        "type": "string",
+        "maxLength": 500
+       }
       }
      }
     ]
@@ -52,8 +97,14 @@
    "description": "Every candidate the scan has ever considered, in every state. Only `approved` sources are fetched; `rejected` and `pending` stay listed with their reason, because coverage that hides what it declined is not honest coverage. On input — the create/edit dialog, or a hand-typed definition — an entry may be a bare URL string, or an object carrying any of `url` (required), `name`, `jurisdiction`, `kind` and `rationale`: that is exactly what the live discovery step hands the dialog for each venue the partner picks, and those words are kept because the coverage panel shows the partner's own reason for choosing the venue rather than a bare hostname. run.py coerces a string to {url} before validating, and the committed file always holds objects. Everything else in $defs/source is written by the gate: `status`, `tier`, `proposed_by` and `gate` in a partner's input are accepted by the validator (a committed definition is re-validated on every run) but discarded by run._candidate_from_partner — a definition may never label itself vetted or approve its own source.",
    "items": {
     "oneOf": [
-     {"type": "string", "pattern": "^https?://", "maxLength": 2000},
-     {"$ref": "#/$defs/source"}
+     {
+      "type": "string",
+      "pattern": "^https?://",
+      "maxLength": 2000
+     },
+     {
+      "$ref": "#/$defs/source"
+     }
     ]
    }
   },
@@ -62,12 +113,37 @@
    "description": "Caps the run agrees to before it starts. Keys mirror pipeline/scan/common.Budget.DEFAULTS, and those defaults are CEILINGS: a partner may lower a cap, never raise one, and delay_seconds cannot go below 1.0 s outside a dry run (the legal basis in docs §8 rests on these bounds). run.py clamps an over-ceiling value and records the clamp in health; api/scans.js refuses it with a message. Every cap that drops work is reported in health.",
    "additionalProperties": false,
    "properties": {
-    "max_sources": {"type": "number", "minimum": 0, "maximum": 12},
-    "max_new_per_run": {"type": "number", "minimum": 0, "maximum": 60, "description": "Developments enriched per run. The scan's FIRST run reads fewer — run.FIRST_RUN_MAX_NEW — so the page appears in minutes instead of the 10-15 that enriching 60 documents took; the remainder queues and is reported like any other cap, and pressing Run scan again continues through it."},
-    "max_doc_chars": {"type": "number", "minimum": 0, "maximum": 30000},
-    "delay_seconds": {"type": "number", "minimum": 1, "description": "Floor 1.0 s. The dry-run fixture in pipeline/scan/fixtures uses 0 and is not validated against this schema; a committed definition never goes below 1."},
-    "max_candidates": {"type": "number", "minimum": 0, "maximum": 25},
-    "max_pages_per_source": {"type": "number", "minimum": 0, "maximum": 1}
+    "max_sources": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 12
+    },
+    "max_new_per_run": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 60,
+     "description": "Developments enriched per run. The scan's FIRST run reads fewer — run.FIRST_RUN_MAX_NEW — so the page appears in minutes instead of the 10-15 that enriching 60 documents took; the remainder queues and is reported like any other cap, and pressing Run scan again continues through it."
+    },
+    "max_doc_chars": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 30000
+    },
+    "delay_seconds": {
+     "type": "number",
+     "minimum": 1,
+     "description": "Floor 1.0 s. The dry-run fixture in pipeline/scan/fixtures uses 0 and is not validated against this schema; a committed definition never goes below 1."
+    },
+    "max_candidates": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 25
+    },
+    "max_pages_per_source": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1
+    }
    }
   },
   "demo": {
@@ -78,60 +154,393 @@
    "type": "boolean",
    "description": "True when the scan was created with discovery off (only the partner's own sources were gated). Recorded by run.py create so the edit dialog can show how the scan was made; api/scans.js passes it both as a dispatch input and inside the definition."
   },
-  "created": {"type": "string", "description": "ISO-8601 with offset, IST — common.now_ist()."},
-  "updated": {"type": "string", "description": "Bumped on every create/run that writes the definition."}
+  "discovery_notes": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "description": "What discovery searched for and did not find, or found and dropped, written by run.py create. It lives in the definition rather than in health because a plain `run` rebuilds health from scratch, and the coverage panel must keep saying 'no official venue found for DE' for as long as that is true. Documented here because it was missing: every definition the pipeline has ever written carries this key, and a schema with additionalProperties false was rejecting all of them."
+  },
+  "no_misc": {
+   "type": "boolean",
+   "description": "True when the Miscellaneous lane is switched off for this scan: no open-web search runs and data/scans/<id>/misc.json is left as it is. Recorded by run.py create (or set by hand); `run --no-misc` skips the lane for one run without changing this flag."
+  },
+  "created": {
+   "type": "string",
+   "description": "ISO-8601 with offset, IST — common.now_ist()."
+  },
+  "updated": {
+   "type": "string",
+   "description": "Bumped on every create/run that writes the definition."
+  }
  },
  "$defs": {
+  "misc": {
+   "title": "Miscellaneous findings (data/scans/<id>/misc.json)",
+   "description": "What is happening on this scan's subject OUTSIDE its coverage list. Written by pipeline/scan/misc.py on every run (unless no_misc), committed with the ledger. This $def is not reachable from this document's root — it describes a sibling file, and lives here so the whole scan contract is in one place. Three properties of this file matter more than its shape. (1) NOTHING HERE IS FETCHED: the lane makes one hosted web-search call, reads the provider's results and links out, so no robots.txt or terms question arises for any host named here — there is nothing to answer, because nothing is requested. (2) NOTHING HERE IS A CITABLE INSTRUMENT AND NOTHING HERE ENTERS THE LEDGER: a finding is a lead — a title, a link and a line saying why — with no verified quote, no obligations and no relevance rating, because the document has not been read. (3) PROMOTION IS THE ONLY ROUTE INTO COVERAGE: `run.py promote --id <scan> --finding <id>` takes a finding of kind official_venue and adds its URL to `sources` as pending with proposed_by 'miscellany', and the existing Python gate then decides. A secondary or commentary finding is refused by name. The page must say all three.",
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "generated",
+    "query",
+    "findings",
+    "notes"
+   ],
+   "properties": {
+    "generated": {
+     "type": "string",
+     "description": "ISO-8601 with offset, IST — common.now_ist()."
+    },
+    "query": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "intent",
+      "topics",
+      "jurisdictions",
+      "excluded_hosts"
+     ],
+     "description": "What the lane asked for, copied from the definition, so a reader can judge the answer against the question.",
+     "properties": {
+      "intent": {
+       "type": "string",
+       "maxLength": 1500
+      },
+      "topics": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "maxLength": 80
+       }
+      },
+      "jurisdictions": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "maxLength": 40
+       }
+      },
+      "excluded_hosts": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "maxLength": 253
+       },
+       "description": "The hosts of this scan's APPROVED sources — the coverage the lane searched outside of. A finding on one of these (or a subdomain) is dropped and the drop is noted: that is coverage, not miscellany. Pending and rejected sources are deliberately NOT excluded — a venue the gate declined is exactly the kind of thing worth seeing again as a lead."
+      }
+     }
+    },
+    "findings": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/misc_finding"
+     }
+    },
+    "notes": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "description": "Everything that left the list and why (a covered host, a deny-listed host, a duplicate, the MAX_FINDINGS=20 cut), what the search itself reported, which findings no longer surface, and — when the search call failed — that it failed. A web-search failure is a note, never a failed run: nothing in this lane is coverage, so its absence cannot make the scan wrong."
+    }
+   }
+  },
+  "misc_finding": {
+   "type": "object",
+   "description": "One lead. `id`, `host`, `date`, `first_seen` and `status` are written by code; the rest is the model's reading of a search result and is shown as such.",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "title",
+    "url",
+    "host",
+    "date",
+    "jurisdiction",
+    "kind",
+    "why",
+    "snippet",
+    "first_seen",
+    "status",
+    "last_seen",
+    "stale"
+   ],
+   "properties": {
+    "id": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{10}$",
+     "description": "10 hex characters of the normalised URL (common.short_id), so http/https, www and tracking parameters are one lead. This is the id `run.py promote --finding` and the workflow's finding_id input take."
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 300
+    },
+    "url": {
+     "type": "string",
+     "pattern": "^https?://",
+     "maxLength": 2000,
+     "description": "Normalised (https, lower-case host, no fragment, no tracking parameters). Never fetched by us."
+    },
+    "host": {
+     "type": "string",
+     "maxLength": 253,
+     "description": "Recomputed from the URL; the model's own host field is not trusted."
+    },
+    "date": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "description": "ISO date the result stated, or null. Never estimated: an undated lead is shown undated."
+    },
+    "jurisdiction": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "kind": {
+     "type": "string",
+     "enum": [
+      "official_venue",
+      "secondary",
+      "commentary"
+     ],
+     "description": "official_venue: an official publisher this scan does not cover — the valuable case, and the ONLY kind that can be promoted. secondary: press, trade body or law-firm note reporting on something official. commentary: opinion. The lane's deny-list is short precisely because a newspaper is a legitimate secondary lead here, unlike in discovery where it can never be a publisher of record."
+    },
+    "why": {
+     "type": "string",
+     "maxLength": 300,
+     "description": "One line from the model: why a lawyer on this intent would want to know. Becomes the source's rationale when the finding is promoted."
+    },
+    "snippet": {
+     "type": "string",
+     "maxLength": 400,
+     "description": "The search result's own snippet, quoted rather than rewritten — nothing here has been read, so nothing here may be summarised as if it had."
+    },
+    "first_seen": {
+     "type": "string",
+     "description": "The date this lane first surfaced this URL. Kept across runs."
+    },
+    "status": {
+     "type": "string",
+     "enum": [
+      "new",
+      "promoted",
+      "dismissed"
+     ],
+     "description": "new: untriaged. promoted: its URL was added to `sources` by run.py promote. dismissed: a partner set it aside. Status and first_seen survive every later run, and a finding the search stops returning is KEPT with its status and noted — a lead does not vanish because a search changed its mind."
+    },
+    "last_seen": {
+     "type": "string",
+     "description": "Run stamp when the search last returned this finding."
+    },
+    "stale": {
+     "type": "boolean",
+     "description": "True when the most recent search did not return it. Kept and marked, never dropped."
+    }
+   }
+  },
   "source": {
    "type": "object",
    "description": "A source in any state. The partner may supply url, name, jurisdiction, kind and rationale; every other property is the gate's evidence and is written by pipeline/scan/gate.py. No other key is allowed — run.validate_definition names the whole allowed set when it finds one, rather than letting a typo through to be gated as an empty URL.",
-   "required": ["url"],
+   "required": [
+    "url"
+   ],
    "additionalProperties": false,
    "properties": {
-    "url": {"type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2000},
-    "name": {"type": "string", "maxLength": 200},
-    "host": {"type": "string", "maxLength": 253},
-    "jurisdiction": {"type": "string", "maxLength": 40},
-    "kind": {"type": "string", "enum": ["gazette", "regulator", "ministry", "court", "parliament", "standards", "other"]},
+    "url": {
+     "type": "string",
+     "format": "uri",
+     "pattern": "^https?://",
+     "maxLength": 2000
+    },
+    "name": {
+     "type": "string",
+     "maxLength": 200
+    },
+    "host": {
+     "type": "string",
+     "maxLength": 253
+    },
+    "jurisdiction": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "kind": {
+     "type": "string",
+     "enum": [
+      "gazette",
+      "regulator",
+      "ministry",
+      "court",
+      "parliament",
+      "standards",
+      "other"
+     ]
+    },
     "status": {
      "type": "string",
-     "enum": ["approved", "pending", "rejected"],
+     "enum": [
+      "approved",
+      "pending",
+      "rejected"
+     ],
      "description": "approved: fetched on every run. pending: the gate could not decide (typically ToS language) and a human must. rejected: never fetched; `reason` says why."
     },
     "tier": {
      "type": "string",
-     "enum": ["vetted", "discovered"],
+     "enum": [
+      "vetted",
+      "discovered"
+     ],
      "description": "vetted is reserved for the TMT India registry sources (adapter, fixture, floor, legal analysis) and is derived by the gate from registry membership — never copied from a candidate or a partner's definition. Anything a scan gates automatically — partner-typed or model-proposed — is discovered, and the label is never dropped."
     },
-    "proposed_by": {"type": "string", "enum": ["partner", "discovery"]},
-    "rationale": {"type": "string", "maxLength": 1000},
-    "confidence": {"type": "string", "enum": ["high", "medium", "low", ""]},
-    "reason": {"type": "string", "maxLength": 1000, "description": "Why a source is pending or rejected. Absent on approved sources."},
+    "proposed_by": {
+     "type": "string",
+     "enum": [
+      "partner",
+      "discovery",
+      "miscellany"
+     ],
+     "description": "Who put this URL in front of the gate. partner: typed or picked in the create dialog. discovery: proposed by pipeline/scan/discover.py. miscellany: promoted out of the Miscellaneous lane by `run.py promote` — see $defs/misc. A miscellany source arrives `pending` with no gate evidence at all (that lane never fetches), and run.py gates exactly those at the start of the next run; a source pending for any other reason is left for a human, because the gate already looked and could not decide."
+    },
+    "rationale": {
+     "type": "string",
+     "maxLength": 1000
+    },
+    "confidence": {
+     "type": "string",
+     "enum": [
+      "high",
+      "medium",
+      "low",
+      ""
+     ]
+    },
+    "reason": {
+     "type": "string",
+     "maxLength": 1000,
+     "description": "Why a source is pending or rejected. Absent on approved sources."
+    },
     "gate": {
      "type": "object",
      "description": "Evidence the gate collected, in the order it checked: fetch, robots, terms, extraction. Absent evidence is null, never a placeholder — a source the gate declined to fetch (robots.txt) has reachable null and extract null, because no parse ran. Shape owned by pipeline/scan/gate.py.",
      "properties": {
-      "reachable": {"type": ["boolean", "null"], "description": "true: fetched. false: the network refused. null: not attempted (our own rules stopped the fetch — robots.txt, an undeclared host, a non-public address)."},
-      "http": {"type": ["integer", "null"], "description": "Status of the final response; null when nothing was fetched."},
-      "content_type": {"type": ["string", "null"], "description": "Media type of the final response, without parameters; null when nothing was fetched."},
-      "robots": {"type": ["string", "null"], "description": "'allowed' or 'disallowed'; null when the check never ran. The dry run writes 'dry-run: not checked'."},
-      "robots_note": {"type": "string", "maxLength": 200, "description": "The engine's one-line reading of the site's robots.txt (why the path was allowed)."},
-      "final_url": {"type": "string", "description": "Present only when the fetch was redirected; the URL the evidence describes."},
-      "hops": {"type": "array", "items": {"type": "string"}, "description": "The redirect chain followed (at most 5), each hop re-checked against the declared host, the public-address rule and robots.txt."},
+      "reachable": {
+       "type": [
+        "boolean",
+        "null"
+       ],
+       "description": "true: fetched. false: the network refused. null: not attempted (our own rules stopped the fetch — robots.txt, an undeclared host, a non-public address)."
+      },
+      "http": {
+       "type": [
+        "integer",
+        "null"
+       ],
+       "description": "Status of the final response; null when nothing was fetched."
+      },
+      "content_type": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "description": "Media type of the final response, without parameters; null when nothing was fetched."
+      },
+      "robots": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "description": "'allowed' or 'disallowed'; null when the check never ran. The dry run writes 'dry-run: not checked'."
+      },
+      "robots_note": {
+       "type": "string",
+       "maxLength": 200,
+       "description": "The engine's one-line reading of the site's robots.txt (why the path was allowed)."
+      },
+      "final_url": {
+       "type": "string",
+       "description": "Present only when the fetch was redirected; the URL the evidence describes."
+      },
+      "hops": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "The redirect chain followed (at most 5), each hop re-checked against the declared host, the public-address rule and robots.txt."
+      },
       "tos": {
        "type": "object",
        "properties": {
-        "checked": {"type": "array", "items": {"type": "string"}, "description": "Policy pages fetched and scanned. Empty for a non-HTML listing, which has no footer to follow."},
-        "flags": {"type": "array", "items": {"type": "object", "required": ["url", "text"], "properties": {"url": {"type": "string"}, "text": {"type": "string", "maxLength": 200}}}, "description": "Sentences with anti-automation language, each with the page it was found on. Any flag parks the source pending for a human read."},
-        "errors": {"type": "array", "items": {"type": "object", "required": ["url", "error"], "properties": {"url": {"type": "string"}, "error": {"type": "string"}}}, "description": "Policy pages that could not be read. Present only when there were any; 'no flags' must never be mistaken for 'terms read and fine'."}
+        "checked": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         },
+         "description": "Policy pages fetched and scanned. Empty for a non-HTML listing, which has no footer to follow."
+        },
+        "flags": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "required": [
+           "url",
+           "text"
+          ],
+          "properties": {
+           "url": {
+            "type": "string"
+           },
+           "text": {
+            "type": "string",
+            "maxLength": 200
+           }
+          }
+         },
+         "description": "Sentences with anti-automation language, each with the page it was found on. Any flag parks the source pending for a human read."
+        },
+        "errors": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "required": [
+           "url",
+           "error"
+          ],
+          "properties": {
+           "url": {
+            "type": "string"
+           },
+           "error": {
+            "type": "string"
+           }
+          }
+         },
+         "description": "Policy pages that could not be read. Present only when there were any; 'no flags' must never be mistaken for 'terms read and fine'."
+        }
        }
       },
       "extract": {
-       "type": ["object", "null"],
+       "type": [
+        "object",
+        "null"
+       ],
        "description": "The extraction test's counts. null until the extractor actually ran, so a robots-refused, unreachable, HTTP-error or ToS-pending source never shows '0 rows parsed'.",
-       "properties": {"rows": {"type": "integer"}, "dated": {"type": "integer"}, "floor": {"type": "integer"}}
+       "properties": {
+        "rows": {
+         "type": "integer"
+        },
+        "dated": {
+         "type": "integer"
+        },
+        "floor": {
+         "type": "integer"
+        }
+       }
       },
-      "checked": {"type": "string", "description": "When the gate ran — common.now_ist()."}
+      "checked": {
+       "type": "string",
+       "description": "When the gate ran — common.now_ist()."
+      }
      }
     }
    }

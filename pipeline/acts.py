@@ -35,7 +35,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "data" / "act_text"
 
-CONTACT = os.environ.get("TMT_RADAR_CONTACT", "compliance@trilegal.com")
+CONTACT = os.environ.get("TMT_RADAR_CONTACT") or "compliance@trilegal.com"
 UA = {"User-Agent": "Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)",
       "From": CONTACT}
 

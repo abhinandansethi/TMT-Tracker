@@ -73,11 +73,13 @@ another instrument are folded into it rather than listed twice. The page also ca
 pipeline state (registry, classification, validation gates, short-title map, rules shelf) inside
 its embedded JSON, so a scheduled cloud session needs nothing but the artifact URL.
 
-## Scans — horizon scanning for any practice, any jurisdiction
+## Scans — the front door
 
-The TMT India tracker above is the first and deepest **scan**: 51 hand-vetted sources, each with an
-adapter, a fixture, a floor and a per-site legal analysis. The **Scans** tab lets a partner build
-another one for any subject — *"national transposition of the Pay Transparency Directive across
+**`/` is the list of scans.** The TMT India tracker described above is the first and deepest one:
+51 hand-vetted sources, each with an adapter, a fixture, a floor and a per-site legal analysis —
+and it is reached by clicking its card, at `/tmt-radar-v2.html`. Every scan opens the same
+workspace: **Coverage · Instruments · Judgments · Signals · Miscellaneous · Clients · Audit**,
+built from that scan's own ledger. A partner builds another one for any subject — *"national transposition of the Pay Transparency Directive across
 DE, FR, IT, ES"* — in Harvey's Horizon Scanning shape: describe it (or fill the form), the model
 proposes the official venues, a deterministic gate checks each one (reachable, robots.txt allows,
 no anti-automation language in its terms, listing parses above a floor), the approved ones are
@@ -86,9 +88,17 @@ verifies, a relevance level with a *why* and an *action*, and a weekly digest th
 developments it draws on. Design and data contract: `docs/horizon-design.md`.
 
 What stays true for a scan, exactly as for the tracker: coverage is the whole world (a scan's
-Coverage panel lists what it fetches, what it rejected and why); health is earned by evidence;
+Coverage tab lists what it fetches, what it rejected and why); health is earned by evidence;
 **nothing runs on a schedule** — a scan runs when a person presses *Run scan*; discovered sources
 are labelled *discovered*, never *vetted*; a document that cannot be read is never scored.
+
+**Miscellaneous** is the one lane that is deliberately outside all of that, and it says so on its
+own tab. A gated coverage list can only find what its sources publish; Miscellaneous runs one
+web search per run for what is happening *outside* it. It never fetches — it reads the search
+provider's results and links out — so nothing there has passed a gate, nothing is citable, and
+nothing enters the ledger. When a finding turns out to be an official venue the scan does not
+cover, *Promote* puts it into the scan's sources, where the ordinary gate decides. That is the
+only route from the open web into coverage.
 
 Where the pieces live:
 
@@ -99,7 +109,8 @@ Where the pieces live:
     api/scans.js                       the page's Create / Run / Edit button → dispatches scan.yml
     api/propose.js                     "What do you want this scan to track?" → a proposal to confirm
     api/ask.js · api/draft.js          Ask a development a question / draft an email or memo, grounded on the stored text
-    code/build_scans.py                builds dist/scans.html and dist/scan/<id>.html (Vercel runs it after the tracker build)
+    pipeline/scan/misc.py              the open-web lane: what is happening outside this scan's coverage
+    code/build_scans.py                builds dist/scans.html (the landing page) and dist/scan/<id>.html
 
 Secrets: `OPENAI_API_KEY` as a repository secret (the workflow) **and** as a Vercel environment
 variable (Ask, Draft, Propose). Without the Vercel one those three buttons say so and the page

@@ -17,15 +17,27 @@
 // Why this file duplicates api/propose.js's guards and plumbing verbatim: Vercel bundles each
 // function alone and api/ has no package.json, so there is no shared module to import from.
 //
+// ONE JURISDICTION PER CALL. Measured 4 Sep 2026: {jurisdictions:["DE","IT"]} answered 504 after
+// 50 s — the hosted web-search tool searches each jurisdiction in turn, and two of them do not fit
+// under the platform's function ceiling (Vercel Hobby kills a function at 60 s; MODEL_TIMEOUT_MS
+// sits at 50 s so we can send an honest message instead of being killed mid-sentence). The
+// ceiling is NOT ours to raise, so the fix is a smaller call, not a longer wait: this endpoint
+// now takes a single `jurisdiction` and the create dialog calls it once per jurisdiction and
+// merges the answers. A caller that still sends `jurisdictions` with more than one entry is
+// refused with that instruction rather than left to discover the 504 for itself. `jurisdictions`
+// with one entry, or none, still works — one-shot callers (curl, a subject-only search) keep
+// their shape.
+//
 // Requires OPENAI_API_KEY in Vercel → Settings → Environment Variables (501 without it).
 
 'use strict';
 
-// gpt-5-mini, not gpt-5, on purpose: with the hosted web-search tool the strong model regularly
-// spends more than a minute searching, and a Vercel function is dead at 60 s — the partner would
-// see a timeout instead of venues. The workflow's own discovery (discover.py) keeps the strong
-// model, because Actions has no such ceiling. Override with TMT_DISCOVER_MODEL if a deployment
-// wants otherwise, and accept the risk.
+// gpt-5.6-luna, which replaced the gpt-5-mini this file was written against: measured 4 Sep 2026,
+// /api/propose answers in 5.2 s on luna against 13.5 s on mini, so the interactive endpoints are
+// no longer paying for a weaker model to stay under the clock. What remains true is the reason
+// mini was chosen at all — a searching call can outlast a Vercel function, which is dead at 60 s —
+// and that is now handled by making each call cover one jurisdiction rather than by the model
+// choice. Override with TMT_DISCOVER_MODEL if a deployment wants otherwise, and accept the risk.
 const MODEL = process.env.TMT_DISCOVER_MODEL || 'gpt-5.6-luna';
 // Under the 60 s function ceiling with room to send an honest answer rather than be killed.
 const MODEL_TIMEOUT_MS = 50000;
@@ -113,9 +125,10 @@ async function callOpenAI(key, model, system, user, schemaName, schema) {
     clearTimeout(timer);
     return { error: e && e.name === 'AbortError'
       ? { status: 504,
-          message: `The search did not finish within ${MODEL_TIMEOUT_MS / 1000} s — this function is capped at 60 s. `
-            + 'Try again, or narrow the scan to fewer jurisdictions; you can also create the scan and let the '
-            + 'workflow discover sources, which has no such time limit.' }
+          message: `The search did not finish within ${MODEL_TIMEOUT_MS / 1000} s — this function is capped at 60 s by `
+            + 'the platform, so the fix is a smaller search, not a longer wait. This call already covers one '
+            + 'jurisdiction only; try again, or narrow the topics and the intent. You can also create the scan and '
+            + 'let the workflow discover sources, which runs on Actions and has no such time limit.' }
       : { status: 502, message: 'Could not reach the OpenAI API.' } };
   }
   clearTimeout(timer);
@@ -149,7 +162,8 @@ async function callOpenAI(key, model, system, user, schemaName, schema) {
   if (data.status === 'incomplete') {
     const why = ((data.incomplete_details || {}).reason) || 'unknown';
     return { error: { status: 502, message: why === 'max_output_tokens'
-      ? 'The model ran out of room before finishing. Try fewer jurisdictions in one go.'
+      ? 'The model ran out of room before finishing. Narrow the topics or the intent — this call already '
+        + 'covers one jurisdiction only.'
       : `The model stopped before finishing (${why}). Try again.` } };
   }
   try {
@@ -189,7 +203,7 @@ const SCHEMA = {
           url: { type: 'string', description: 'The exact listing-page URL you visited. Never a guess.' },
           name: { type: 'string', description: "Venue and series, e.g. 'Gazzetta Ufficiale — Serie Generale'." },
           host: { type: 'string' },
-          jurisdiction: { type: 'string', description: 'One of the jurisdictions given, as written in the request.' },
+          jurisdiction: { type: 'string', description: 'The jurisdiction given, exactly as written in the request.' },
           kind: { type: 'string', enum: KINDS },
           rationale: { type: 'string', description: 'One line: what binding or authoritative material appears here.' },
           confidence: { type: 'string', enum: CONFIDENCE,
@@ -199,7 +213,7 @@ const SCHEMA = {
     },
     gaps: {
       type: 'array',
-      description: 'Jurisdictions or topics where you could not find an official venue with evidence.',
+      description: 'The jurisdiction or topics where you could not find an official venue with evidence.',
       items: {
         type: 'object',
         properties: { jurisdiction: { type: 'string' }, note: { type: 'string' } },
@@ -259,23 +273,34 @@ function jurLine(j) {
   return name && code.toUpperCase() === code ? `${code} (${name})` : code;
 }
 
-// discover.py's build_prompt, minus the "already covered" block: this call runs before a scan
-// exists, so there is nothing already covered.
+// discover.py's build_prompt, minus the "already covered" block (this call runs before a scan
+// exists, so there is nothing already covered) and narrowed to ONE jurisdiction. The narrowing is
+// the timeout fix, not a cosmetic edit: the searching model works jurisdiction by jurisdiction,
+// so naming one is what makes the call fit under the platform's 60 s ceiling. Saying "this call
+// only" also stops the model volunteering neighbours the partner did not ask for, which would be
+// wasted search time inside the same budget.
 function buildUser(q) {
-  const jurs = q.jurisdictions.map(jurLine).filter(Boolean);
+  const jur = jurLine(q.jurisdiction);
   const lines = [
     'SCAN',
     `Intent: ${normWs(q.intent)}`,
-    `Jurisdictions: ${jurs.length ? jurs.join(', ') : '(none given — ask for gaps)'}`,
+    `Jurisdiction: ${jur || '(none given — the subject itself, wherever it is published)'}`,
     `Topics: ${q.topics.length ? q.topics.join(', ') : '(none given)'}`,
   ];
   if (q.industries.length) lines.push(`Industries: ${q.industries.join(', ')}`);
   lines.push('',
-    'For each jurisdiction, return the official listing pages for the instruments this intent '
-    + 'turns on. Aim for the few venues a practitioner would actually watch — typically the '
-    + "gazette series, the sector regulator's notifications page, the ministry's page and the "
-    + 'competent court or tribunal — rather than an exhaustive directory. Fill `gaps` for any '
-    + 'jurisdiction where you could not find a venue with evidence.');
+    jur
+      ? `Search ${jur} and nothing else on this call — other jurisdictions are being asked for `
+        + `separately. Return the official listing pages in ${jur} for the instruments this intent `
+        + 'turns on. Aim for the few venues a practitioner would actually watch — typically the '
+        + "gazette series, the sector regulator's notifications page, the ministry's page and the "
+        + `competent court or tribunal — rather than an exhaustive directory. If you cannot find a `
+        + `venue in ${jur} with evidence, return no candidates and say so in \`gaps\`.`
+      : 'No jurisdiction was given: return the official listing pages for the instruments this '
+        + 'intent turns on, wherever they are published, and say in `gaps` where you looked and '
+        + 'found nothing. Aim for the few venues a practitioner would actually watch — typically '
+        + "the gazette series, the sector regulator's notifications page, the ministry's page and "
+        + 'the competent court or tribunal — rather than an exhaustive directory.');
   return lines.join('\n');
 }
 
@@ -405,7 +430,10 @@ function cleanStr(v, n) {
 // Normalise, deny-list, dedupe, cap. Returns {candidates, dropped} where `dropped` is the
 // partner-readable line for each candidate that left the list — nothing goes silently, because a
 // list of survivors read as the whole picture is exactly how coverage stops being honest.
-function filterCandidates(raw) {
+// `jurisdiction` is the one this call asked about: it fills in for a candidate the model left
+// unlabelled, which is safe now that a call covers exactly one jurisdiction — before the split, a
+// blank label could have meant any of several and had to stay blank.
+function filterCandidates(raw, jurisdiction) {
   const candidates = [];
   const dropped = [];
   const seen = new Set();
@@ -432,7 +460,7 @@ function filterCandidates(raw) {
       url,
       name: cleanStr(r.name, 160) || hostOf(url),
       host: hostOf(url),          // recomputed: the model's own `host` field is not trusted
-      jurisdiction: cleanStr(r.jurisdiction, 40),
+      jurisdiction: cleanStr(r.jurisdiction, 40) || normWs(jurisdiction),
       kind: KINDS.includes(r.kind) ? r.kind : 'other',
       rationale: cleanStr(r.rationale, 300),
       confidence: CONFIDENCE.includes(r.confidence) ? r.confidence : 'low',
@@ -482,8 +510,28 @@ module.exports = async (req, res) => {
       message: `Send "intent": what this scan should track, ${MIN_INTENT} to ${MAX_INTENT} characters — say what to `
         + 'advise on and what to surface, the way you would brief an associate.' });
   }
+  // One jurisdiction per call — see the header. `jurisdiction` is the field the page sends;
+  // `jurisdictions` is still read so a one-shot caller keeps working, but only while it names at
+  // most one. Both together are fine when they agree (the page may echo its list back); more than
+  // one distinct jurisdiction is refused HERE, with the fix in the message, rather than left to
+  // fail as a 504 fifty seconds later.
+  if (body.jurisdiction !== undefined && !isStr(body.jurisdiction, 0, 40)) {
+    return res.status(400).json({ ok: false,
+      message: '"jurisdiction" must be a string of at most 40 characters, e.g. "DE" or "US-CA".' });
+  }
   const jur = strList(body.jurisdictions, 'jurisdictions', 40, 60);
   if (jur.error) return res.status(400).json({ ok: false, message: jur.error });
+  const wanted = [];
+  for (const j of [normWs(body.jurisdiction)].concat(jur.list)) {
+    if (j && !wanted.some((w) => w.toLowerCase() === j.toLowerCase())) wanted.push(j);
+  }
+  if (wanted.length > 1) {
+    return res.status(400).json({ ok: false,
+      message: `Send one jurisdiction per call: this function is capped at 60 s by the platform and one `
+        + `web search covering ${wanted.length} jurisdictions does not finish inside it. Call this endpoint `
+        + `once per jurisdiction — {"jurisdiction": ${JSON.stringify(wanted[0])}}, then ${wanted.slice(1)
+          .map((w) => JSON.stringify(w)).join(', ')} — and merge the answers.` });
+  }
   const top = strList(body.topics, 'topics', 80, 20);
   if (top.error) return res.status(400).json({ ok: false, message: top.error });
   const ind = strList(body.industries, 'industries', 80, 20);
@@ -499,16 +547,16 @@ module.exports = async (req, res) => {
     });
   }
 
-  const q = { intent: body.intent, jurisdictions: jur.list, topics: top.list, industries: ind.list };
+  const q = { intent: body.intent, jurisdiction: wanted[0] || '', topics: top.list, industries: ind.list };
   const out = await callOpenAI(key, MODEL, SYSTEM, buildUser(q), SCHEMA_NAME, SCHEMA);
   if (out.error) return res.status(out.error.status).json({ ok: false, message: out.error.message });
 
   const object = out.object || {};
-  const { candidates, dropped } = filterCandidates(object.candidates);
+  const { candidates, dropped } = filterCandidates(object.candidates, q.jurisdiction);
   const gaps = (Array.isArray(object.gaps) ? object.gaps : [])
     .filter((g) => g !== null && typeof g === 'object' && !Array.isArray(g))
     .map((g) => ({
-      jurisdiction: cleanStr(g.jurisdiction, 40) || '(unspecified)',
+      jurisdiction: cleanStr(g.jurisdiction, 40) || q.jurisdiction || '(unspecified)',
       note: cleanStr(g.note, 200) || 'no official venue found with evidence',
     }))
     .slice(0, 60);
@@ -518,14 +566,23 @@ module.exports = async (req, res) => {
     + 'robots.txt-checked, terms-scanned and floor-tested by the gate when the scan is created, and '
     + 'only the gate can approve one.'];
   if (!candidates.length) {
-    notes.push('No venue survived with evidence. Add a topic or a jurisdiction, or create the scan '
-      + 'with sources you name yourself.');
+    notes.push(q.jurisdiction
+      ? `No venue survived with evidence for ${q.jurisdiction}. Add a topic, try another jurisdiction, or `
+        + 'create the scan with sources you name yourself.'
+      : 'No venue survived with evidence. Add a topic or a jurisdiction, or create the scan '
+        + 'with sources you name yourself.');
   }
   if (dropped.length) notes.push(`${dropped.length} proposal(s) were dropped here; the reasons are listed.`);
-  if (gaps.length) notes.push(`${gaps.length} jurisdiction(s) had no official venue found.`);
+  if (gaps.length) notes.push(`${gaps.length} gap(s) reported: no official venue found with evidence.`);
 
-  return res.status(200).json({ ok: true, candidates, gaps, dropped, model: out.model, notes });
+  // `jurisdiction` is echoed because the caller now makes one call per jurisdiction and merges the
+  // answers: a merged list has to be able to say which call each candidate came from.
+  return res.status(200).json({
+    ok: true, jurisdiction: q.jurisdiction, candidates, gaps, dropped, model: out.model, notes,
+  });
 };
 
-// One model call, but a searching one; Hobby permits up to 60 s and MODEL_TIMEOUT_MS sits under it.
+// One model call, but a searching one; Hobby permits up to 60 s and MODEL_TIMEOUT_MS sits under
+// it. 60 is the platform's maximum, not a number we can raise, which is why the work per call was
+// made smaller instead (one jurisdiction).
 module.exports.config = { maxDuration: 60 };

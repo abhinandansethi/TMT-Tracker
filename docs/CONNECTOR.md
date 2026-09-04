@@ -155,9 +155,27 @@ Setup, once:
    who has it, and the page embeds the client roster. `middleware.js` gates the whole
    deployment (page *and* `/api/sweep`) behind HTTP Basic Auth at Vercel's edge, so an
    unauthenticated request never receives the HTML. It runs on the free Hobby plan — no
-   Deployment Protection subscription needed. Set `AUTH_USER` / `AUTH_PASS` in Vercel →
-   Settings → Environment Variables and redeploy; unset, it falls back to the starter
-   credentials in the file, which you should change.
+   Deployment Protection subscription needed. Configure credentials in Vercel →
+   Settings → Environment Variables and redeploy. With **nothing** configured the deployment
+   refuses every request with a 503 that says so — there is deliberately no starter pair, because
+   a short password committed to git in front of a client roster is weakly closed, not closed.
+   Three ways to set them, and they can be mixed:
+
+   * `AUTH_USER` / `AUTH_PASS` — the original single pair, unchanged.
+   * `AUTH_USERS` — one `user:password` per line, which is how you add a partner:
+
+         abhi:········
+         priya:········
+
+     Only the first colon splits, so a password may contain colons. Commas work as a separator
+     instead of newlines, so if a password contains a comma, use one pair per line.
+   * `AUTH_USER_2` / `AUTH_PASS_2` … up to `_9` — separate variables, if you would rather see
+     rows in the Vercel UI than one multi-line box.
+
+   A partner needs nothing but the URL and their pair: this is our own Basic Auth at the edge,
+   not Vercel's Deployment Protection, so no Vercel account, invite or plan is involved. Adding
+   someone does require a redeploy, because Vercel only exposes a new environment value to a new
+   deployment.
 
    A login rendered *inside* the dashboard would not do this job: the page is one static
    file, so the roster and the password would both be readable in its source. The gate has

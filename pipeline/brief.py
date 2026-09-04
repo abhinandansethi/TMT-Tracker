@@ -48,7 +48,7 @@ CLIENTS = ROOT / "pipeline" / "clients.json"
 
 # Same honest identifying UA the engine fetches with (Principle 2): not a browser
 # spoof, but not a crawler-signature token either — passes the gov.in Akamai WAFs.
-CONTACT = os.environ.get("TMT_RADAR_CONTACT", "compliance@trilegal.com")
+CONTACT = os.environ.get("TMT_RADAR_CONTACT") or "compliance@trilegal.com"
 UA = {"User-Agent": "Mozilla/5.0 (compatible; TMTRegulatoryRadar/2.0; Trilegal internal regulatory monitoring)",
       "From": CONTACT}
 
@@ -66,8 +66,8 @@ PROVIDER = _resolve_provider()
 MODEL = os.environ.get("TMT_BRIEF_MODEL") or ("gpt-5.6-luna" if PROVIDER == "openai" else "claude-opus-5")
 # Vision model for scanned documents. Only the OpenAI path is wired today; the Anthropic path
 # would need image content blocks, so a scan simply stays unbriefed there rather than pretending.
-VISION_MODEL = os.environ.get("TMT_VISION_MODEL", "gpt-4o-mini")
-EFFORT = os.environ.get("TMT_BRIEF_EFFORT", "medium")   # low | medium | high | xhigh | max
+VISION_MODEL = os.environ.get("TMT_VISION_MODEL") or "gpt-4o-mini"
+EFFORT = os.environ.get("TMT_BRIEF_EFFORT") or "medium"   # low | medium | high | xhigh | max
 MAX_CHARS = 18000
 MAX_FETCH_SECONDS = 90          # hard wall-clock cap per document
 VISION_PAGES = 4                # pages rendered for a scanned document (the operative part)
