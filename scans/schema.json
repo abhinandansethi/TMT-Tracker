@@ -49,7 +49,7 @@
   },
   "sources": {
    "type": "array",
-   "description": "Every candidate the scan has ever considered, in every state. Only `approved` sources are fetched; `rejected` and `pending` stay listed with their reason, because coverage that hides what it declined is not honest coverage. On input (the edit dialog, a hand-typed definition) an entry may be a bare URL string; run.py coerces it to {url} before validating, and the committed file always holds objects.",
+   "description": "Every candidate the scan has ever considered, in every state. Only `approved` sources are fetched; `rejected` and `pending` stay listed with their reason, because coverage that hides what it declined is not honest coverage. On input — the create/edit dialog, or a hand-typed definition — an entry may be a bare URL string, or an object carrying any of `url` (required), `name`, `jurisdiction`, `kind` and `rationale`: that is exactly what the live discovery step hands the dialog for each venue the partner picks, and those words are kept because the coverage panel shows the partner's own reason for choosing the venue rather than a bare hostname. run.py coerces a string to {url} before validating, and the committed file always holds objects. Everything else in $defs/source is written by the gate: `status`, `tier`, `proposed_by` and `gate` in a partner's input are accepted by the validator (a committed definition is re-validated on every run) but discarded by run._candidate_from_partner — a definition may never label itself vetted or approve its own source.",
    "items": {
     "oneOf": [
      {"type": "string", "pattern": "^https?://", "maxLength": 2000},
@@ -63,7 +63,7 @@
    "additionalProperties": false,
    "properties": {
     "max_sources": {"type": "number", "minimum": 0, "maximum": 12},
-    "max_new_per_run": {"type": "number", "minimum": 0, "maximum": 60},
+    "max_new_per_run": {"type": "number", "minimum": 0, "maximum": 60, "description": "Developments enriched per run. The scan's FIRST run reads fewer — run.FIRST_RUN_MAX_NEW — so the page appears in minutes instead of the 10-15 that enriching 60 documents took; the remainder queues and is reported like any other cap, and pressing Run scan again continues through it."},
     "max_doc_chars": {"type": "number", "minimum": 0, "maximum": 30000},
     "delay_seconds": {"type": "number", "minimum": 1, "description": "Floor 1.0 s. The dry-run fixture in pipeline/scan/fixtures uses 0 and is not validated against this schema; a committed definition never goes below 1."},
     "max_candidates": {"type": "number", "minimum": 0, "maximum": 25},
@@ -84,8 +84,9 @@
  "$defs": {
   "source": {
    "type": "object",
+   "description": "A source in any state. The partner may supply url, name, jurisdiction, kind and rationale; every other property is the gate's evidence and is written by pipeline/scan/gate.py. No other key is allowed — run.validate_definition names the whole allowed set when it finds one, rather than letting a typo through to be gated as an empty URL.",
    "required": ["url"],
-   "additionalProperties": true,
+   "additionalProperties": false,
    "properties": {
     "url": {"type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2000},
     "name": {"type": "string", "maxLength": 200},

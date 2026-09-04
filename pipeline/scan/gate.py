@@ -34,7 +34,10 @@ from . import common
 _fetch = common.polite_get   # module-level so a test can replace it; assess() looks it up at call time
 REGISTRY_PATH = common.ROOT / "engine" / "registry_v2.json"   # the TMT India registry: the only vetted tier
 
-DEFAULT_FLOOR = 8            # a listing with fewer rows than this on page 1 is not a listing
+DEFAULT_FLOOR = 8
+# Below this many anchors in the raw HTML, the page is browser-rendered and an HTML fetcher can
+# never read its list. Separates "we parsed it badly" from "there is nothing here to parse".
+_JS_ANCHOR_FLOOR = 5            # a listing with fewer rows than this on page 1 is not a listing
 MIN_DATED = 3                # rows exist but almost none carry a date: a human has to look
 MAX_POLICY_LINKS = 3         # footer links fetched per candidate; each is a polite request
 MAX_FLAGS_PER_PAGE = 5       # evidence, not a transcript: the human reads the page anyway
@@ -238,6 +241,14 @@ def _source_shell(candidate: dict, floor: int) -> dict:
     }
 
 
+def _anchor_count(body: bytes) -> int:
+    """Links in the raw HTML, counted before any parsing — evidence about the page, not about us."""
+    try:
+        return len(re.findall(rb"<a\s[^>]*href=", body or b"", re.I))
+    except Exception:
+        return 0
+
+
 def _dated(row: Any) -> bool:
     d = row.get("date") if isinstance(row, dict) else None
     return isinstance(d, str) and bool(ISO_DATE_RE.match(d.strip()))
@@ -343,9 +354,25 @@ def assess(candidate: dict, budget: common.Budget, extractor: Callable[[bytes, s
         return src
     rows = list(rows or [])
     dated = sum(1 for row in rows if _dated(row))
-    gate["extract"] = {"rows": len(rows), "dated": dated, "floor": floor}
+    anchors = _anchor_count(body)
+    gate["extract"] = {"rows": len(rows), "dated": dated, "floor": floor, "anchors": anchors}
     if len(rows) < floor:
-        src["reason"] = f"listing parsed {len(rows)} rows, below floor {floor}"
+        # Two very different failures used to share one sentence. A page that HAS links but from
+        # which we extracted too few is a weak parse; a page whose HTML carries almost no anchors
+        # at all builds its list in the browser, and no HTML fetcher will ever read it — MeitY's
+        # own listing is a React shell, which is exactly why the vetted tracker consumes MeitY's
+        # WP-JSON API instead. Saying "parsed 0 rows, below floor 8" for that blamed our parser
+        # and told the partner nothing they could act on.
+        if anchors < _JS_ANCHOR_FLOOR:
+            src["status"] = "pending"
+            src["reason"] = (f"this page builds its list with JavaScript — its HTML carries "
+                             f"{anchors} link(s), so there is nothing for an HTML fetcher to read. "
+                             f"Find the site's API, RSS feed or printable listing and use that URL "
+                             f"instead; a human must supply it.")
+            return src
+        src["reason"] = (f"listing parsed {len(rows)} rows, below floor {floor} "
+                         f"(the page itself carries {anchors} links, so it was read but did not "
+                         f"look like a list of dated documents)")
         return src
     if dated < MIN_DATED:
         src["status"] = "pending"
@@ -415,7 +442,9 @@ def selftest() -> None:
         assert s["status"] == "approved", s
         assert s["tier"] == "discovered" and s["gate"]["robots"] == "allowed" and s["gate"]["http"] == 200, s
         assert s["gate"]["tos"] == {"checked": [f"{base}/terms-of-use"], "flags": []}, s["gate"]["tos"]
-        assert s["gate"]["extract"] == {"rows": 12, "dated": 12, "floor": 8}, s["gate"]
+        assert {k: v for k, v in s["gate"]["extract"].items() if k != "anchors"} == {
+            "rows": 12, "dated": 12, "floor": 8}, s["gate"]
+        assert s["gate"]["extract"]["anchors"] > 0, s["gate"]["extract"]
         assert "robots_note" in s["gate"] and s["gate"]["reachable"] is True and s["gate"]["checked"], s["gate"]
         # the offsite "legal" link and the in-body "conditions of licence" row were not fetched
         assert calls == [f"{base}/notifications", f"{base}/terms-of-use"], calls
@@ -469,7 +498,7 @@ def selftest() -> None:
         # (f) below floor rejects, with the counts; candidate floor overrides the default
         pages[f"{base}/notifications"] = _Resp(f"{base}/notifications", _listing_html())
         s = assess(cand, budget, lambda *a: good_rows(*a)[:5])
-        assert s["status"] == "rejected" and s["reason"] == "listing parsed 5 rows, below floor 8", s
+        assert s["status"] == "rejected" and s["reason"].startswith("listing parsed 5 rows, below floor 8"), s
         s = assess(dict(cand, floor=4), budget, lambda *a: good_rows(*a)[:5])
         assert s["status"] == "approved" and s["gate"]["extract"]["floor"] == 4, s
 

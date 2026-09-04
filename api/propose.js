@@ -15,7 +15,7 @@
 
 'use strict';
 
-const MODEL = process.env.TMT_PROPOSE_MODEL || process.env.TMT_ASK_MODEL || 'gpt-5-mini';
+const MODEL = process.env.TMT_PROPOSE_MODEL || process.env.TMT_ASK_MODEL || 'gpt-5.6-luna';
 const MODEL_TIMEOUT_MS = 40000;
 const MAX_DESCRIPTION = 2000;
 

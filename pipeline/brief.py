@@ -63,7 +63,7 @@ def _resolve_provider():
     return "anthropic"   # key, auth token, or an `ant auth login` profile
 
 PROVIDER = _resolve_provider()
-MODEL = os.environ.get("TMT_BRIEF_MODEL") or ("gpt-5-mini" if PROVIDER == "openai" else "claude-opus-5")
+MODEL = os.environ.get("TMT_BRIEF_MODEL") or ("gpt-5.6-luna" if PROVIDER == "openai" else "claude-opus-5")
 # Vision model for scanned documents. Only the OpenAI path is wired today; the Anthropic path
 # would need image content blocks, so a scan simply stays unbriefed there rather than pretending.
 VISION_MODEL = os.environ.get("TMT_VISION_MODEL", "gpt-4o-mini")

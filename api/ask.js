@@ -17,7 +17,7 @@
 // Authorization header so the Edge gate lets them through — the function has no credentials of
 // its own and should not need any.
 
-const MODEL = process.env.TMT_ASK_MODEL || 'gpt-5-mini';
+const MODEL = process.env.TMT_ASK_MODEL || 'gpt-5.6-luna';
 const SCAN_ID = /^[a-z0-9][a-z0-9-]{1,59}$/;
 const DEV_ID = /^[a-f0-9]{10}$/;
 const MAX_TEXT = 60000;        // the pipeline caps stored text at 30k; this is headroom, not a target

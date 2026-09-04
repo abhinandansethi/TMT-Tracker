@@ -12,7 +12,7 @@
 //
 // Needs OPENAI_API_KEY in Vercel → Settings → Environment Variables. Absent, answers 501.
 
-const MODEL = process.env.TMT_ASK_MODEL || 'gpt-5-mini';
+const MODEL = process.env.TMT_ASK_MODEL || 'gpt-5.6-luna';
 const SCAN_ID = /^[a-z0-9][a-z0-9-]{1,59}$/;
 const DEV_ID = /^[a-f0-9]{10}$/;
 const KINDS = ['email', 'memo'];

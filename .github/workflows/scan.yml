@@ -34,6 +34,10 @@ on:
         default: ""
       no_discover:
         description: "Create: gate only the partner's own sources, skip model discovery"
+        # Set by api/scans.js when the partner chose the venues themselves in the create dialog
+        # (they came from /api/discover, which proposes and fetches nothing). Those picks still
+        # go through the Python gate here — robots.txt, terms, extraction floor — exactly like a
+        # model-proposed one; all this flag skips is the model's own search for more.
         type: boolean
         required: false
         default: false
@@ -52,8 +56,12 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    # Discovery + gating + up to 60 documents read and enriched, paced 1.5s apart: well under
-    # an hour. The cap is a backstop against a trickling server, not an expectation.
+    # Gating + documents read and enriched, paced 1.5s apart: well under an hour. A create the
+    # partner made from the live discovery step is the fast case — no_discover skips discovery
+    # and gates only the ~6 venues they picked instead of up to max_candidates=25, and the first
+    # run enriches run.FIRST_RUN_MAX_NEW documents rather than max_new_per_run's 60, so the page
+    # exists in minutes. The remainder queues, is reported in health, and the next Run scan picks
+    # it up. The cap here is a backstop against a trickling server, not an expectation.
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -105,6 +113,13 @@ jobs:
         id: run
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # Which model the pipeline uses is a setting, not a code change. Set these as repository
+          # VARIABLES (Settings -> Secrets and variables -> Actions -> Variables) to move the whole
+          # pipeline onto a new model without touching the source; empty means the code's default.
+          # TMT_SCAN_MODEL is the volume model (one call per candidate gated, one per document
+          # enriched); TMT_SCAN_MODEL_STRONG is the judgement model (discovery and the digest).
+          TMT_SCAN_MODEL: ${{ vars.TMT_SCAN_MODEL }}
+          TMT_SCAN_MODEL_STRONG: ${{ vars.TMT_SCAN_MODEL_STRONG }}
           ACTION: ${{ inputs.action }}
           SCAN_ID: ${{ inputs.scan_id }}
           NO_DISCOVER: ${{ inputs.no_discover }}
@@ -136,6 +151,13 @@ jobs:
           RC="${PIPESTATUS[0]}"
           set -e
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          # THE DEFECT THIS CLOSES: this heredoc's whole stdout used to be redirected into
+          # $GITHUB_OUTPUT, so the ::notice:: lines below landed in a file that accepts only
+          # key=value. GitHub answered "Invalid format '::notice::scan ...'", failed the step,
+          # and SKIPPED "Commit the scan" — a 12-minute run was discarded with its results
+          # already written to disk. Only key=value goes to the output file now; the workflow
+          # commands go to the log on fd 3, where GitHub reads them.
+          exec 3>&1
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json, os, pathlib, re
           p = pathlib.Path(os.environ["RUNNER_TEMP"]) / "summary.json"
@@ -151,16 +173,18 @@ jobs:
           sid = s.get("id") or os.environ.get("SCAN_ID") or "unknown"
           if not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,59}", str(sid)) or sid in ("schema", "tmt-india"):
               sid = "unknown"
-          print(f"id={sid}")
+          print(f"id={sid}")                      # -> $GITHUB_OUTPUT
+          log = open(3, "w", closefd=False)        # -> the run log, where ::notice:: is a command
           if s.get("action") in ("create", "run"):
               print("::notice::" + f"scan {sid}: {s.get('new', 0)} new, {s.get('enriched', 0)} enriched, "
                     f"{s.get('queued', 0)} queued, {s.get('high', 0)} high relevance, "
                     f"{s.get('sources_ok', 0)} source(s) ok, {s.get('sources_failed', 0)} failed, "
-                    f"week {s.get('week', '?')}")
+                    f"week {s.get('week', '?')}", file=log)
           elif s.get("action") == "delete":
-              print("::notice::" + f"scan {sid}: removed {len(s.get('removed') or [])} path(s)")
+              print("::notice::" + f"scan {sid}: removed {len(s.get('removed') or [])} path(s)", file=log)
           else:
-              print("::warning::run.py wrote no summary file — see the step log")
+              print("::warning::run.py wrote no summary file — see the step log", file=log)
+          log.flush()
           PY
 
       - name: Commit the scan

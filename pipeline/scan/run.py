@@ -3,7 +3,7 @@
 Design: docs/horizon-design.md. This module owns the ledger semantics; the sibling modules
 (discover, gate, extract, enrich, digest) each do one step and never touch a file.
 
-    python -m pipeline.scan.run create --from-json scans/new.json [--no-discover] [--dry-run]
+    python -m pipeline.scan.run create --from-json scans/new.json [--no-discover] [--max-new N] [--dry-run]
     python -m pipeline.scan.run run --id eu-pay-transparency [--dry-run] [--max-new N]
     python -m pipeline.scan.run delete --id eu-pay-transparency
     python -m pipeline.scan.run list
@@ -19,8 +19,12 @@ Rules this file enforces, each learned from the engine the hard way:
   the read failed, up to three tries); a URL seen again just updates `last_seen`. Re-enriching
   the backlog every run would cost the whole budget and change summaries under a partner's feet.
 * Every cap that drops work — sources beyond `max_sources`, developments beyond
-  `max_new_per_run`, text beyond `max_doc_chars` — is written into health. A FAILED source makes
-  the process exit 1 after everything is written, never before.
+  `max_new_per_run` (or beyond FIRST_RUN_MAX_NEW on a create), text beyond `max_doc_chars` — is
+  written into health. A FAILED source makes the process exit 1 after everything is written,
+  never before.
+* A create reads less than a run: the partner is waiting on a page that does not exist yet, so
+  the first run enriches FIRST_RUN_MAX_NEW documents and says how many it queued. See the
+  constant for the measurement behind the number.
 * `--dry-run` swaps the four network-touching functions for fixture readers and the model for
   FakeClient, so the whole path can be exercised without a key or a socket. The swap is at
   module level (`fetch_listing`, `listing_rows`, `document_text`, `enrich_dev`, `discover_propose`,
@@ -52,10 +56,28 @@ ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,59}$")
 RESERVED_IDS = frozenset({"schema", "tmt-india"})
 SOURCE_STATUSES = ("approved", "pending", "rejected")
 TIERS = ("vetted", "discovered")
+SOURCE_KINDS = ("gazette", "regulator", "ministry", "court", "parliament", "standards", "other")
+# What a partner may write on a source (the create dialog's shape, and what /api/discover
+# returns for each candidate), and what the gate adds on top of it. The validator accepts both
+# groups because it re-checks the *committed* definition on every `run` — but only the first
+# group survives `_candidate_from_partner` into the gate, so a hand-typed definition can never
+# award itself `tier: "vetted"`, an `approved` status or forged gate evidence.
+SOURCE_KEYS_PARTNER = ("url", "name", "jurisdiction", "kind", "rationale")
+SOURCE_KEYS = SOURCE_KEYS_PARTNER + ("host", "status", "tier", "proposed_by", "confidence", "reason", "gate")
 TOP_KEYS = ("id", "name", "intent", "jurisdictions", "topics", "industries", "clients", "sources", "discovery_notes",
             "budget", "demo", "no_discover", "created", "updated")
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 MAX_READ_ATTEMPTS = 3          # a document that will not read is given up on, loudly, not retried forever
+# How many developments a scan's FIRST run enriches, under the budget's own max_new_per_run.
+# The defect this closes, measured on a real create: enriching up to 60 documents took 10-15
+# minutes of the ~20 the whole create took, and the partner saw nothing at all — no page, no
+# digest, no coverage panel — until the run had committed and Vercel had rebuilt. Nothing is
+# lost by reading fewer first: the remainder queues exactly like any other over-cap backlog and
+# is reported through the paths that already exist (budget.note_drop -> health.budget.dropped ->
+# the page's problems list, and digest counts.queued -> the KPI subtitle), and pressing Run scan
+# again continues from the newest. Only the first run is capped this way; a later plain `run`
+# uses the full max_new_per_run.
+FIRST_RUN_MAX_NEW = 20
 ENRICH_FIELDS = ("headline", "summary", "obligations", "type", "topics", "jurisdiction",
                  "relevance", "confidence", "verified_ratio", "note")
 EXIT_OK, EXIT_FAILED_SOURCE, EXIT_USAGE = 0, 1, 2
@@ -112,11 +134,14 @@ def _str_list(v: Any, what: str, max_len: int, problems: list[str]) -> None:
 
 
 def coerce_sources(defn: Any) -> None:
-    """A source may be given as a URL string or as {url, ...}: the edit dialog sends strings,
-    a hand-typed definition may use either. Review finding: the validator demanded objects,
-    so every dialog-created scan was queued (HTTP 202) and then died two minutes later with
-    `sources[0] must be an object` in a log the partner never sees. Strings become {"url": s}
-    in place, before validation, so both shapes are one shape from here on."""
+    """A source may be given as a URL string or as an object carrying any of
+    SOURCE_KEYS_PARTNER — {url (required), name, jurisdiction, kind, rationale}. That object is
+    what the live discovery step hands the create dialog for each venue the partner picked, and
+    the partner's own words for a venue are worth keeping: they ride through the gate into the
+    committed source and are what the coverage panel shows. Review finding: the validator
+    demanded objects, so every dialog-created scan was queued (HTTP 202) and then died two
+    minutes later with `sources[0] must be an object` in a log the partner never sees. Strings
+    become {"url": s} in place, before validation, so both shapes are one shape from here on."""
     if isinstance(defn, dict) and isinstance(defn.get("sources"), list):
         defn["sources"] = [{"url": s.strip()} if isinstance(s, str) else s for s in defn["sources"]]
 
@@ -188,15 +213,38 @@ def validate_definition(defn: Any) -> list[str]:
                 if not isinstance(s, dict):
                     problems.append(f"sources[{i}] must be an object")
                     continue
+                # Named, not silently ignored. Defect this closes: the loop checked only the
+                # keys it knew, so a source carrying `sources[0].urls` or `tier_` was accepted,
+                # gated as {url: None} and rejected two minutes later inside the workflow.
+                extra = [k for k in s if k not in SOURCE_KEYS]
+                if extra:
+                    problems.append(f"sources[{i}]: unknown field(s) {sorted(extra)} "
+                                    f"(allowed: {', '.join(SOURCE_KEYS)})")
                 if not _is_url(s.get("url")):
                     problems.append(f"sources[{i}].url must be an http(s) URL")
                 if "status" in s and s["status"] not in SOURCE_STATUSES:
                     problems.append(f"sources[{i}].status must be one of {list(SOURCE_STATUSES)}")
                 if "tier" in s and s["tier"] not in TIERS:
                     problems.append(f"sources[{i}].tier must be one of {list(TIERS)}")
+                if "kind" in s and s["kind"] not in SOURCE_KINDS:
+                    problems.append(f"sources[{i}].kind must be one of {list(SOURCE_KINDS)}")
+                if "proposed_by" in s and s["proposed_by"] not in ("partner", "discovery"):
+                    problems.append(f"sources[{i}].proposed_by must be one of ['partner', 'discovery']")
+                # "" is a real value: a source whose confidence was never assessed. An absence
+                # is not a low score — the same rule the page applies to relevance.
+                if "confidence" in s and s["confidence"] not in ("high", "medium", "low", ""):
+                    problems.append(f"sources[{i}].confidence must be one of ['high', 'medium', 'low']")
+                if "gate" in s and not isinstance(s["gate"], dict):
+                    problems.append(f"sources[{i}].gate must be an object")
                 for k in ("name", "host", "jurisdiction", "rationale", "reason"):
                     if k in s and not isinstance(s[k], str):
                         problems.append(f"sources[{i}].{k} must be a string")
+                if isinstance(s.get("name"), str) and len(s["name"]) > 200:
+                    problems.append(f"sources[{i}].name must be at most 200 characters")
+                if isinstance(s.get("rationale"), str) and len(s["rationale"]) > 1000:
+                    problems.append(f"sources[{i}].rationale must be at most 1000 characters")
+                if isinstance(s.get("jurisdiction"), str) and len(s["jurisdiction"]) > 40:
+                    problems.append(f"sources[{i}].jurisdiction must be at most 40 characters")
     if "budget" in defn:
         b = defn["budget"]
         if not isinstance(b, dict):
@@ -352,10 +400,14 @@ def _err(e: BaseException) -> str:
 
 # ----------------------------------------------------------------------------- the run
 def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None,
-             notes: Optional[list[str]] = None) -> tuple[dict, int]:
+             notes: Optional[list[str]] = None, first_run: bool = False) -> tuple[dict, int]:
     """Fetch every approved source, ledger what is new, enrich up to the budget, write the
     digest. Returns (summary, exit_code). Everything is written before the exit code is
-    decided, so a FAILED source never costs the run's other results."""
+    decided, so a FAILED source never costs the run's other results.
+
+    `max_new` lowers this run's enrichment cap below the budget's max_new_per_run; `first_run`
+    only changes how the resulting queue note reads, because a partner watching their brand-new
+    scan appear needs to be told it is the *first* run that reads fewer, not the scan."""
     from . import digest as digest_mod
     budget = _budget(defn)
     today, now = common.today_ist(), common.now_ist()
@@ -480,12 +532,22 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
     queue = [d for d in items if not d.get("enriched") and d.get("read_attempts", 0) < MAX_READ_ATTEMPTS]
     queue.sort(key=lambda d: (d.get("date") or "0000-00-00", d.get("first_seen") or ""), reverse=True)
     cap = int(budget["max_new_per_run"])
-    if max_new is not None:
-        cap = min(cap, max(0, int(max_new)))
+    # Which cap actually bit decides what the note says, because the two are different promises:
+    # max_new_per_run is the scan's standing budget, while a smaller `max_new` is this one run
+    # holding back — on a create, so the page appears in a couple of minutes instead of fifteen.
+    capped_by_run = max_new is not None and max(0, int(max_new)) < cap
+    if capped_by_run:
+        cap = max(0, int(max_new))
     to_do, rest = queue[:cap], queue[cap:]
     if rest:
-        budget.note_drop(f"{len(rest)} development(s) queued, not enriched — max_new_per_run={cap}; "
-                         f"the next run continues from the newest")
+        if capped_by_run and first_run:
+            why = f"first run reads the newest {cap}"
+        elif capped_by_run:
+            why = f"this run was limited to {cap} (--max-new)"
+        else:
+            why = f"max_new_per_run={cap}"
+        budget.note_drop(f"{len(rest)} development(s) queued, not enriched — {why}; "
+                         f"press Run scan again to continue through the backlog")
     given_up = [d for d in items if not d.get("enriched") and d.get("read_attempts", 0) >= MAX_READ_ATTEMPTS]
     if given_up:
         scan_notes.append(f"{len(given_up)} development(s) could not be read after {MAX_READ_ATTEMPTS} attempts "
@@ -609,8 +671,22 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
 
 # ----------------------------------------------------------------------------- create
 def _candidate_from_partner(s: dict) -> dict:
+    """A partner's source object as a gate candidate. Everything the partner wrote about the
+    venue — name, jurisdiction, kind, rationale — is carried through, because gate._source_shell
+    keeps exactly these fields on the committed source and the coverage panel then shows the
+    partner's own reason for picking it rather than a bare hostname. Defect this closes: `kind`
+    was dropped here, so a venue the partner chose as a gazette in the create dialog rendered on
+    the coverage panel as kind "other".
+
+    `status`, `tier` and `gate` are deliberately NOT copied from the partner's object even
+    though the validator accepts them on a committed definition: the gate decides all three, and
+    tier is forced to "discovered" — a scan reads every source through the generic extractor, so
+    a definition may never label itself vetted. (Mirrors discover._partner_candidate; kept local
+    because create must still write a definition when discover cannot even be imported.)"""
     return {"url": s["url"], "name": s.get("name") or _host(s["url"]), "host": _host(s["url"]),
-            "jurisdiction": s.get("jurisdiction", ""), "proposed_by": "partner",
+            "jurisdiction": s.get("jurisdiction", ""),
+            "kind": s["kind"] if s.get("kind") in SOURCE_KINDS else "other",
+            "proposed_by": "partner",
             "tier": "discovered", "rationale": s.get("rationale") or "added by the partner"}
 
 
@@ -718,9 +794,12 @@ def create_scan(defn: dict, paths: ScanPaths, client, no_discover: bool,
     # claim and must outlive this create: a plain `run` rebuilds health from scratch (review
     # finding), so the account lives in the definition and every run re-seeds its notes from it.
     defn["discovery_notes"] = [n for n in dict.fromkeys(notes) if n.lower().startswith("discovery")]
-    summary, code = run_scan(defn, paths, client, max_new=max_new, notes=notes)
+    summary, code = run_scan(defn, paths, client, max_new=max_new, notes=notes, first_run=True)
     summary["gated"] = {"approved": approved_n, "pending": sum(1 for s in results if s["status"] == "pending"),
                         "rejected": sum(1 for s in results if s["status"] == "rejected")}
+    # How many candidates were gated at all — the number a `no_discover` create is judged by:
+    # six partner-chosen venues must cost six gates, not the twenty-five max_candidates allows.
+    summary["candidates"] = len(uniq)
     return summary, code
 
 
@@ -1010,7 +1089,12 @@ def restore_live() -> None:
 def _client_for(dry_run: bool):
     if dry_run:
         return enable_dry_run()
-    return common.openai_client()
+    client = common.openai_client()
+    # Ask before working. A wrong model name used to surface as "discovery failed" twelve minutes
+    # in, with the results already written and then discarded; now it stops the run in seconds and
+    # names the models the key actually has.
+    common.preflight(client, [common.MODEL, common.MODEL_STRONG])
+    return client
 
 
 def _print_summary(summary: dict, out: Optional[str] = None) -> None:
@@ -1061,7 +1145,11 @@ def cmd_create(args) -> int:
     # The flag may arrive as a dispatch input (--no-discover) or inside the definition
     # (api/scans.js passes both); either is the partner's choice.
     no_discover = bool(args.no_discover) or bool(defn.get("no_discover"))
-    summary, code = create_scan(defn, paths, client, no_discover=no_discover, max_new=getattr(args, "max_new", None))
+    # A create is the only run nobody has ever seen results from, so it reads FIRST_RUN_MAX_NEW
+    # documents rather than the budget's full max_new_per_run and the page appears in minutes.
+    # An explicit --max-new wins: a caller who named a number meant that number.
+    max_new = args.max_new if getattr(args, "max_new", None) is not None else FIRST_RUN_MAX_NEW
+    summary, code = create_scan(defn, paths, client, no_discover=no_discover, max_new=max_new)
     summary["action"] = "create"
     _print_summary(summary, getattr(args, "summary_out", None))
     return code
@@ -1169,7 +1257,8 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--from-json", help="path to a JSON definition")
     c.add_argument("--no-discover", action="store_true", help="gate only the partner's sources")
     c.add_argument("--dry-run", action="store_true", help="fixtures + FakeClient; no network, no key")
-    c.add_argument("--max-new", type=int, default=None, help=argparse.SUPPRESS)
+    c.add_argument("--max-new", type=int, default=None,
+                   help=f"enrich at most N on this first run (default {FIRST_RUN_MAX_NEW}; the rest queue)")
     r = sub.add_parser("run", help="fetch approved sources, enrich what is new, write the digest")
     r.add_argument("--id", required=True)
     r.add_argument("--dry-run", action="store_true")
@@ -1262,6 +1351,19 @@ def selftest() -> None:
     import tempfile
     demo = json.loads((FIXTURES / "demo-definition.json").read_text(encoding="utf-8"))
 
+    # Everything below runs under TMT_SCAN_ROOT, so the repo's own scans/ must come out byte
+    # for byte as it went in. Defect this closes: the guard at the end asserted that
+    # scans/eu-pay-transparency-directive-scan.json did not exist — which stopped being true
+    # the day the shipped demo scan was committed under exactly that name, so the selftest
+    # failed on the very file it was meant to be protecting. A before/after snapshot says the
+    # real thing ("nothing here was written"), and keeps saying it whatever scans exist.
+    def _scans_dir_state() -> dict:
+        if not common.SCANS_DIR.exists():
+            return {}
+        return {p.name: p.read_bytes() for p in sorted(common.SCANS_DIR.glob("*.json"))}
+
+    scans_before = _scans_dir_state()
+
     # 1. The validator: the demo passes; a broken definition reports every problem.
     assert validate_definition(demo) == [], validate_definition(demo)
     bad = {"id": "Bad_ID", "name": "ab", "intent": "too short", "jurisdictions": [],
@@ -1273,11 +1375,48 @@ def selftest() -> None:
                    "budget.bogus", "demo must be", "unknown field 'jurisdiction'"):
         assert any(needle in p for p in probs), (needle, probs)
     assert validate_definition("nope") == ["definition must be a JSON object"]
+    # validate_definition mirrors scans/schema.json by hand (no jsonschema dependency in the
+    # pipeline), so the two are checked against each other here rather than left to drift.
+    schema = common.load_json(common.SCANS_DIR / "schema.json", None)
+    if schema:
+        src_schema = schema["$defs"]["source"]
+        assert src_schema["additionalProperties"] is False, "the schema still lets any key onto a source"
+        assert set(src_schema["properties"]) == set(SOURCE_KEYS), \
+            (sorted(set(src_schema["properties"]) ^ set(SOURCE_KEYS)), "schema and SOURCE_KEYS disagree")
+        assert tuple(src_schema["properties"]["kind"]["enum"]) == SOURCE_KINDS, src_schema["properties"]["kind"]
+        assert tuple(src_schema["properties"]["status"]["enum"]) == SOURCE_STATUSES
+        assert tuple(src_schema["properties"]["tier"]["enum"]) == TIERS
+        assert tuple(src_schema["properties"]["proposed_by"]["enum"]) == ("partner", "discovery")
     # sources given as URL strings (the edit dialog's shape) are coerced to {url} and accepted
     strs = dict(demo, sources=["https://gazette.example.test/serie-generale", {"url": "https://ministry.example.test/x"}, "ftp://no"])
     probs = validate_definition(strs)
     assert probs == ["sources[2].url must be an http(s) URL"], probs
     assert strs["sources"][0] == {"url": "https://gazette.example.test/serie-generale"}, strs["sources"]
+    # A rich source object — what the create dialog sends for a venue the partner picked out of
+    # the live discovery step — is accepted whole, and every field the gate later fills in is
+    # accepted too, because `run` re-validates the committed definition.
+    rich = dict(demo, sources=[{"url": "https://gazette.example.test/serie-generale",
+                                "name": "Gazzetta Ufficiale — Serie Generale",
+                                "jurisdiction": "IT", "kind": "gazette",
+                                "rationale": "Official gazette; transposition decrees appear here."}])
+    assert validate_definition(rich) == [], validate_definition(rich)
+    gated_shape = dict(demo, sources=[dict(rich["sources"][0], host="gazette.example.test", status="approved",
+                                           tier="discovered", proposed_by="partner", confidence="high",
+                                           gate={"reachable": True})])
+    assert validate_definition(gated_shape) == [], validate_definition(gated_shape)
+    # An unknown key is named, with the whole allowed set, rather than silently ignored and
+    # then dropped on the floor by the gate.
+    junk = dict(demo, sources=[{"url": "https://ok.test/x", "kind": "blog", "confidence": "certain",
+                                "gate": "yes", "why": "because", "rationale": 5}])
+    jp = validate_definition(junk)
+    assert any("unknown field(s) ['why']" in p and "allowed: url, name, jurisdiction, kind, rationale, host" in p
+               for p in jp), jp
+    assert any("sources[0].kind must be one of" in p for p in jp), jp
+    assert any("sources[0].confidence must be one of" in p for p in jp), jp
+    assert any("sources[0].gate must be an object" in p for p in jp), jp
+    assert any("sources[0].rationale must be a string" in p for p in jp), jp
+    assert any("sources[0].rationale must be at most 1000" in p for p in validate_definition(
+        dict(demo, sources=[{"url": "https://ok.test/x", "rationale": "x" * 1001}])))
     # reserved ids are refused by the validator; no_discover must be a boolean
     for rid in sorted(RESERVED_IDS):
         assert any("reserved" in p for p in validate_definition(dict(demo, id=rid))), rid
@@ -1393,6 +1532,105 @@ def selftest() -> None:
             assert main(["run", "--id", "capped-demo", "--dry-run", "--max-new", "1"]) == 0
             ch = common.load_json(cp.health)
             assert ch["run"]["enriched"] == 1 and ch["run"]["queued"] == 4, ch["run"]
+            # a --max-new below the budget names itself, so the note never blames a cap the
+            # partner set: this run held back, the scan's standing budget did not change
+            assert any("this run was limited to 1 (--max-new)" in n for n in ch["notes"]), ch["notes"]
+
+            # 5b. FIRST_RUN_MAX_NEW. A create reads only the newest FIRST_RUN_MAX_NEW documents
+            #     even when the budget allows 60, queues the rest through the cap's existing
+            #     report path, and says how to continue; a later plain `run` uses the full cap.
+            #     25 rows from one listing, so the first-run cap is what bites, not the budget.
+            fc0 = enable_dry_run()
+            saved_rows, saved_client_for = listing_rows, _client_for
+            try:
+                globals()["listing_rows"] = lambda body, url, client, defn_, budget: ([
+                    {"title": f"Decreto {n}", "url": f"/eli/{n}", "date": f"2026-08-{n:02d}"}
+                    for n in range(1, 26)], {"seen": 25, "kept": 25, "dropped": {}})
+                # main(--dry-run) would call enable_dry_run() again and put the fixture
+                # extractor back over the one above; the client is already the fake one.
+                globals()["_client_for"] = lambda dry_run: fc0
+                first = dict(demo, name="First run demo", sources=[demo["sources"][0]],
+                             budget=dict(demo["budget"], max_new_per_run=60))
+                first_path = Path(tmp) / "first.json"
+                first_path.write_text(json.dumps(first), encoding="utf-8")
+                assert main(["create", "--from-json", str(first_path), "--no-discover", "--dry-run"]) == 0
+                fpp = paths_for("first-run-demo")
+                fh = common.load_json(fpp.health)
+                assert fh["budget"]["caps"]["max_new_per_run"] == 60, fh["budget"]["caps"]
+                assert fh["run"]["queued"] == 25 - FIRST_RUN_MAX_NEW, fh["run"]
+                note = f"first run reads the newest {FIRST_RUN_MAX_NEW}"
+                assert any(note in n and "press Run scan again" in n for n in fh["budget"]["dropped"]), fh["budget"]
+                assert any(note in n for n in fh["notes"]), fh["notes"]      # and in the page's problems list
+                assert common.load_json(fpp.digest)["counts"]["queued"] == 25 - FIRST_RUN_MAX_NEW
+                fl = common.load_json(fpp.developments)["items"]
+                assert len(fl) == 25, len(fl)
+                tried = sorted(d["date"] for d in fl if d.get("read_attempts"))
+                untouched = sorted(d["date"] for d in fl if not d.get("read_attempts"))
+                assert len(tried) == FIRST_RUN_MAX_NEW and untouched == ["2026-08-0%d" % n for n in range(1, 6)], untouched
+                # the backlog is picked up by a plain run, which is not capped to the first-run number
+                assert main(["run", "--id", "first-run-demo", "--dry-run"]) == 0
+                fh2 = common.load_json(fpp.health)
+                assert fh2["run"]["queued"] == 0 and not any("queued" in n for n in fh2["budget"]["dropped"]), fh2
+                assert all(d.get("read_attempts") for d in common.load_json(fpp.developments)["items"])
+            finally:
+                globals()["listing_rows"], globals()["_client_for"] = saved_rows, saved_client_for
+                restore_live()
+
+            # 5c. A partner's source object arrives whole: name, jurisdiction, kind and
+            #     rationale survive the gate onto the committed source, so the coverage panel
+            #     shows the partner's own reason for picking the venue. `tier` and `status` in
+            #     the partner's object are ignored — the gate decides both, and tier is always
+            #     "discovered" (a scan reads every venue through the generic extractor).
+            picked = dict(demo, name="Picked demo", sources=[
+                {"url": "https://gazette.example.test/serie-generale",
+                 "name": "Gazzetta Ufficiale — Serie Generale",
+                 "jurisdiction": "IT", "kind": "gazette",
+                 "rationale": "Official gazette; transposition decrees are published here."},
+                {"url": "https://ministry.example.test/labour/pay-transparency",
+                 "name": "Bundesministerium für Arbeit — Entgelttransparenz",
+                 "jurisdiction": "DE", "kind": "ministry",
+                 "rationale": "Publishes the transposition bill and its drafts.",
+                 "tier": "vetted", "status": "approved"},
+            ])
+            picked_path = Path(tmp) / "picked.json"
+            picked_path.write_text(json.dumps(picked), encoding="utf-8")
+            assert main(["create", "--from-json", str(picked_path), "--no-discover", "--dry-run"]) == 0
+            pd = common.load_json(paths_for("picked-demo").definition)["sources"]
+            assert [s["kind"] for s in pd] == ["gazette", "ministry"], pd
+            assert [s["name"] for s in pd] == [picked["sources"][0]["name"], picked["sources"][1]["name"]], pd
+            assert [s["rationale"] for s in pd] == [s["rationale"] for s in picked["sources"]], pd
+            assert [s["jurisdiction"] for s in pd] == ["IT", "DE"], pd
+            assert all(s["tier"] == "discovered" and s["proposed_by"] == "partner" for s in pd), pd
+            assert all(s["status"] == "approved" and s["gate"]["extract"]["dated"] >= 2 for s in pd), pd
+
+            # 5d. no_discover: six partner-chosen venues cost six gate calls and no discovery
+            #     call at all. This is what the live create dialog buys — the workflow gates the
+            #     partner's ~6 picks instead of up to max_candidates=25 model proposals.
+            fc1 = enable_dry_run()
+            saved_gate, saved_disc = gate_assess, discover_propose
+            calls = {"gate": 0, "discover": 0}
+            try:
+                def counting_gate(cand, budget, extractor):
+                    calls["gate"] += 1
+                    return saved_gate(cand, budget, extractor)
+
+                def counting_discover(defn_, client, budget):
+                    calls["discover"] += 1
+                    return saved_disc(defn_, client, budget)
+                globals()["gate_assess"], globals()["discover_propose"] = counting_gate, counting_discover
+                six = dict(demo, name="Six sources demo", id="six-sources-demo",
+                           budget=dict(demo["budget"], max_sources=6),
+                           sources=[{"url": f"https://gazette.example.test/serie-generale?part={n}",
+                                     "name": f"Gazzetta Ufficiale — part {n}", "jurisdiction": "IT",
+                                     "kind": "gazette", "rationale": "Picked by the partner from discovery."}
+                                    for n in range(6)])
+                assert validate_definition(six) == [], validate_definition(six)
+                summ, code6 = create_scan(six, paths_for(six["id"]), fc1, no_discover=True)
+                assert calls == {"gate": 6, "discover": 0}, calls
+                assert summ["candidates"] == 6 and summ["gated"]["approved"] == 6 and code6 == 0, summ
+            finally:
+                globals()["gate_assess"], globals()["discover_propose"] = saved_gate, saved_disc
+                restore_live()
 
             # 6. A source whose host has no fixture FAILS: everything is still written, exit 1.
             broken = dict(demo, name="Broken demo",
@@ -1561,12 +1799,17 @@ def selftest() -> None:
         finally:
             os.environ.pop("TMT_SCAN_ROOT", None)
             restore_live()
-    assert not (common.SCANS_DIR / "eu-pay-transparency-directive-scan.json").exists()
+    after = _scans_dir_state()
+    assert after == scans_before, \
+        f"the selftest wrote into the repo's scans/: {sorted(set(after) ^ set(scans_before)) or 'contents changed'}"
     assert not (common.SCANS_DIR / "schema.json").exists() or common.load_json(common.SCANS_DIR / "schema.json")["title"].startswith("Scan definition"), \
         "scans/schema.json must still be the contract"
     how = _check_workflow()
-    print(f"PASS run: validator (string sources, reserved ids, budget ceilings), dry-run create+run (7 devs, "
+    print(f"PASS run: validator (string sources, rich {{url,name,jurisdiction,kind,rationale}} sources, unknown source "
+          f"key named, reserved ids, budget ceilings), dry-run create+run (7 devs, "
           f"all quotes verified, digest cites real ids, upcoming computed), idempotent second run, enrichment cap + queue, "
+          f"first run reads {FIRST_RUN_MAX_NEW} of 25 and the backlog is picked up by the next run, partner kind/name/"
+          f"rationale survive the gate (tier still discovered), no_discover gates 6 partner sources with 0 discovery calls, "
           f"FAILED source exit 1 (fetch and extractor error), GATED over budget, delete guarded, undated pair kept, "
           f"enrich error retried then given up, robots read final, clamp noted, --summary-out; scan.yml checked via {how}")
 

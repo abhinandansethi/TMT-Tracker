@@ -143,7 +143,14 @@ def _in_range(parts: tuple, today: Optional[_dt.date] = None) -> Optional[str]:
 
 
 # ----------------------------------------------------------------------------- inventory
-_STRIP_TAGS = ["script", "style", "noscript", "template", "iframe", "svg", "canvas", "form", "nav", "header", "footer"]
+# "form" is deliberately NOT here, and the reason is a whole class of Indian government venue.
+# Legacy servlet sites wrap their entire body in one <form> — CERT-In's advisory listing puts all
+# 87 links and every one of its 2,841 characters inside a single form element. Decomposing it
+# emptied the page, the model was handed nothing, and the gate rejected a live, well-formed
+# listing as "parsed 0 rows". Interactive controls are stripped instead (below): they are the
+# noise the strip was for, and none of them ever carries a listing row.
+_STRIP_TAGS = ["script", "style", "noscript", "template", "iframe", "svg", "canvas", "nav", "header", "footer"]
+_STRIP_CONTROLS = ["input", "button", "select", "textarea", "option", "label"]
 _STRIP_ROLES = {"navigation", "banner", "contentinfo", "search", "menu", "menubar", "complementary"}
 _SKIP_SCHEMES = ("javascript:", "mailto:", "tel:", "data:", "#")
 TRUNCATED = "[... truncated: {what} beyond {n} {unit} not shown]"
@@ -157,6 +164,8 @@ def _build_inventory(body: bytes, url: str, max_chars: int, max_links: int):
     soup = BeautifulSoup(body or b"", "lxml")
     title = norm_ws(soup.title.get_text()) if soup.title else ""
     for tag in soup(_STRIP_TAGS):
+        tag.decompose()
+    for tag in soup(_STRIP_CONTROLS):
         tag.decompose()
     for tag in soup.find_all(attrs={"role": True}):
         if str(tag.get("role", "")).lower() in _STRIP_ROLES:

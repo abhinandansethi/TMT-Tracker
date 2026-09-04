@@ -284,8 +284,11 @@ def polite_get(url: str, delay: float = 1.5, allowed_hosts: Optional[list[str]] 
 
 # ----------------------------------------------------------------------------- model access
 PROVIDER = "openai"   # the scan layer is OpenAI-only by decision; brief.py keeps its dual path
-MODEL = os.environ.get("TMT_SCAN_MODEL", "gpt-5-mini")
-MODEL_STRONG = os.environ.get("TMT_SCAN_MODEL_STRONG", "gpt-5")   # discovery + digest: judgement, not volume
+MODEL = os.environ.get("TMT_SCAN_MODEL", "gpt-5.6-luna")          # volume: one call per candidate, per document
+MODEL_STRONG = os.environ.get("TMT_SCAN_MODEL_STRONG", "gpt-5.6-luna")   # judgement: discovery + digest
+# Both are repository VARIABLES on the workflow (scan.yml passes them through), so moving the
+# pipeline to another model is a setting, not an edit — and the volume knob can be pointed at a
+# cheaper model on its own if the per-document cost ever bites.
 DRY_RUN = os.environ.get("TMT_SCAN_DRY_RUN") == "1"
 
 INJECTION_GUARD = (
@@ -341,6 +344,63 @@ def openai_client():
     return OpenAI()
 
 
+def preflight(client, models) -> None:
+    """Fail in seconds on a model this key cannot use, instead of twelve minutes into a run.
+
+    Learned the hard way: a scan spent 12 minutes gating twelve venues, wrote its results, and
+    was then discarded — and the first thing anyone asked was whether the model name was even
+    right. Asking the provider up front costs one cheap call and turns an unanswerable failure
+    into a sentence naming the models the key actually has."""
+    if isinstance(client, FakeClient) or DRY_RUN:
+        return
+    seen, missing = [], []
+    for m in dict.fromkeys(models):
+        if not m:
+            continue
+        try:
+            client.models.retrieve(m)
+            seen.append(m)
+        except Exception as e:
+            if "not found" in f"{e}".lower() or "does not exist" in f"{e}".lower() or "404" in f"{e}":
+                missing.append(m)
+            else:
+                return   # a network or auth problem is not a naming problem; let the real call report it
+    if not missing:
+        log(f"models available: {', '.join(seen) or '—'}")
+        return
+    try:
+        have = sorted(x.id for x in client.models.list())[:40]
+    except Exception:
+        have = []
+    raise SystemExit(
+        f"[scan] this API key cannot use {', '.join(repr(m) for m in missing)}. "
+        f"Set TMT_SCAN_MODEL / TMT_SCAN_MODEL_STRONG (repository variables on the scan workflow) "
+        f"to a model the key has"
+        + (f". The key can use: {', '.join(have)}" if have else ", and check the key's project access")
+        + ".")
+
+
+def _model_error(e: Exception, model: str) -> Exception:
+    """Turn a provider failure into a sentence that names the fix.
+
+    The reason this exists: MODEL_STRONG defaults to a larger model than the rest of the pipeline
+    uses, and a key that can reach the small model cannot necessarily reach the large one. When
+    that happened the run did not stop — discovery caught the error and recorded "discovery
+    failed", the digest caught it and recorded "digest not written", and twenty minutes later a
+    scan landed with no sources and no digest and nothing saying which knob to turn. The failure
+    was honest but unactionable, which is barely better than silent."""
+    text = f"{type(e).__name__}: {e}"
+    lowered = text.lower()
+    if "model" in lowered and ("not found" in lowered or "does not exist" in lowered
+                               or "do not have access" in lowered or "404" in lowered):
+        var = "TMT_SCAN_MODEL_STRONG" if model == MODEL_STRONG else "TMT_SCAN_MODEL"
+        return RuntimeError(
+            f"this API key cannot use the model {model!r}. Set {var} to a model the key can use "
+            f"(for example gpt-5-mini, which the rest of this pipeline uses) as a repository "
+            f"variable on the workflow, or grant the key access to {model!r}. Provider said — {text[:200]}")
+    return RuntimeError(text[:400])
+
+
 def structured(client, name: str, system: str, user: str, schema: dict,
                model: Optional[str] = None, web_search: bool = False) -> dict:
     """One structured-output call. `schema` must be a strict JSON schema (additionalProperties
@@ -353,23 +413,26 @@ def structured(client, name: str, system: str, user: str, schema: dict,
         return client.structured(name, schema, system=system, user=user, model=model, web_search=web_search)
     model = model or MODEL
     sys_msg = system + "\n\n" + INJECTION_GUARD
-    if web_search:
-        resp = client.responses.create(
+    try:
+        if web_search:
+            resp = client.responses.create(
+                model=model,
+                tools=[{"type": "web_search"}],
+                input=[{"role": "system", "content": sys_msg}, {"role": "user", "content": user}],
+                text={"format": {"type": "json_schema", "name": name, "strict": True, "schema": schema}},
+            )
+            out = resp.output_text
+            if not out:
+                raise RuntimeError("model returned no text")
+            return json.loads(out)
+        resp = client.chat.completions.create(
             model=model,
-            tools=[{"type": "web_search"}],
-            input=[{"role": "system", "content": sys_msg}, {"role": "user", "content": user}],
-            text={"format": {"type": "json_schema", "name": name, "strict": True, "schema": schema}},
+            messages=[{"role": "system", "content": sys_msg}, {"role": "user", "content": user}],
+            response_format={"type": "json_schema",
+                            "json_schema": {"name": name, "strict": True, "schema": schema}},
         )
-        out = resp.output_text
-        if not out:
-            raise RuntimeError("model returned no text")
-        return json.loads(out)
-    resp = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "system", "content": sys_msg}, {"role": "user", "content": user}],
-        response_format={"type": "json_schema",
-                         "json_schema": {"name": name, "strict": True, "schema": schema}},
-    )
+    except Exception as e:
+        raise _model_error(e, model) from e
     choice = resp.choices[0]
     if getattr(choice.message, "refusal", None):
         raise RuntimeError(f"model declined: {choice.message.refusal[:160]}")

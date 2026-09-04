@@ -1,4 +1,4 @@
-// Vercel serverless function — Create / Run / Delete a scan.
+// Vercel serverless function — Create / Run / Delete a scan, and report what its runs are doing.
 //
 // The scan layer (docs/horizon-design.md §3) does all its real work on GitHub Actions, because
 // discovery, gating, fetching and enrichment take minutes and hit government sites, which is not
@@ -6,6 +6,12 @@
 // dispatches .github/workflows/scan.yml with the partner's request bound as workflow inputs; the
 // workflow validates the definition again, runs, and commits the results, and Vercel rebuilds
 // the page from what was committed. Nothing here claims a scan ran that did not run.
+//
+// The one exception to "dispatch only" is action:"status", which READS the Actions runs of
+// scan.yml so the page can show a dispatched scan as queued/running/finished instead of leaving
+// the partner to watch GitHub for twenty minutes. It is still a report of what GitHub says, and
+// when GitHub will not say (a token without actions:read), it answers with an empty list and the
+// reason rather than an error — the page then falls back to its own elapsed-time card.
 //
 // Token and repository discovery, CSRF guards and error mapping mirror api/sweep.js exactly —
 // same Vercel settings, same 501 when a secret is missing, and no token value ever echoed.
@@ -24,7 +30,14 @@ const TOKEN_NAMES = [
   'GITHUB_DISPATCH_TOKEN', 'TMT_TOKEN', 'TMT_DISPATCH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN',
 ];
 const WORKFLOW = 'scan.yml';
-const ACTIONS = ['create', 'run', 'delete'];
+// "status" is the odd one out: it dispatches nothing, it reads. A scan takes minutes on Actions,
+// and until this existed the partner had to watch GitHub to know whether their scan was running,
+// finished or had failed. It is on this endpoint rather than a new file because it needs exactly
+// the same token and repository discovery.
+const ACTIONS = ['create', 'run', 'delete', 'status'];
+// How many runs "status" reports, and how many it asks GitHub for when filtering by scan_id
+// (the matching runs may sit behind other scans' runs).
+const MAX_RUNS = 10;
 // Same shape the workflow and pipeline/scan/common.py insist on, so an id minted here is one the
 // pipeline will accept as a file name under scans/ and data/scans/ without any further cleaning.
 const SCAN_ID = /^[a-z0-9][a-z0-9-]{1,59}$/;
@@ -41,6 +54,26 @@ const TOP_KEYS = ['id', 'name', 'intent', 'jurisdictions', 'topics', 'industries
   'sources', 'budget', 'demo', 'created', 'updated', 'no_discover'];
 const SOURCE_STATUSES = ['approved', 'pending', 'rejected'];
 const TIERS = ['vetted', 'discovered'];
+// A source may arrive as a bare URL string or as an object. The object shape widened when
+// discovery moved into the browser (/api/discover): the Create dialog now sends the venue the
+// partner picked *with its evidence* — name, jurisdiction, kind and the one-line rationale — so
+// the coverage panel can show why that venue is on the list without re-asking a model. The rest
+// are the gate's own fields, accepted because an Edit re-submits a definition that was read back
+// out of scans/<id>.json (run._candidate_from_partner discards them; a definition can never
+// approve its own source or label itself vetted). This list is run.py's SOURCE_KEYS and
+// scans/schema.json's $defs/source properties, in the same order — keep the three identical, and
+// refuse anything else here so a typo is a message in the dialog rather than exit 2 in a
+// workflow log the partner never opens.
+const SOURCE_KEYS = ['url', 'name', 'jurisdiction', 'kind', 'rationale', 'host', 'status', 'tier',
+  'proposed_by', 'confidence', 'reason', 'gate'];
+// run.SOURCE_KINDS / discover.py's KINDS: the venue kinds the coverage panel has chips for.
+const KINDS = ['gazette', 'regulator', 'ministry', 'court', 'parliament', 'standards', 'other'];
+const PROPOSED_BY = ['partner', 'discovery'];
+// '' is a real value: a source whose confidence was never assessed. An absence is not a low score.
+const CONFIDENCE = ['high', 'medium', 'low', ''];
+// The maxLengths in scans/schema.json's $defs/source. Refusing beats a silent trim: a rationale
+// cut mid-sentence in the coverage panel reads as evidence when it is half of one.
+const SOURCE_STR_MAX = { name: 200, host: 253, jurisdiction: 40, rationale: 1000, reason: 1000 };
 // REVIEWED DEFECT: budget overrides used to pass through untouched, so a definition could set
 // max_new_per_run to a million and delay_seconds to 0 and remove every cost and politeness
 // bound the pipeline has. common.Budget.DEFAULTS are ceilings, not defaults-to-override; the
@@ -238,6 +271,11 @@ function definitionError(scan) {
         continue;
       }
       if (!isObj(s)) return `scan.sources[${i}] must be an http(s) URL or an object with a url field.`;
+      for (const k of Object.keys(s)) {
+        if (!SOURCE_KEYS.includes(k)) {
+          return `scan.sources[${i}].${k} is not a source field (allowed: ${SOURCE_KEYS.join(', ')}).`;
+        }
+      }
       if (!isUrl(s.url)) return `scan.sources[${i}].url must be an http(s) URL.`;
       if (s.status !== undefined && !SOURCE_STATUSES.includes(s.status)) {
         return `scan.sources[${i}].status must be one of: ${SOURCE_STATUSES.join(', ')}.`;
@@ -245,8 +283,22 @@ function definitionError(scan) {
       if (s.tier !== undefined && !TIERS.includes(s.tier)) {
         return `scan.sources[${i}].tier must be one of: ${TIERS.join(', ')}.`;
       }
-      for (const k of ['name', 'host', 'jurisdiction', 'rationale', 'reason']) {
-        if (s[k] !== undefined && typeof s[k] !== 'string') return `scan.sources[${i}].${k} must be a string.`;
+      if (s.kind !== undefined && !KINDS.includes(s.kind)) {
+        return `scan.sources[${i}].kind must be one of: ${KINDS.join(', ')}.`;
+      }
+      if (s.proposed_by !== undefined && !PROPOSED_BY.includes(s.proposed_by)) {
+        return `scan.sources[${i}].proposed_by must be one of: ${PROPOSED_BY.join(', ')}.`;
+      }
+      if (s.confidence !== undefined && !CONFIDENCE.includes(s.confidence)) {
+        return `scan.sources[${i}].confidence must be one of: high, medium, low (or "" when unassessed).`;
+      }
+      // The gate's evidence block is re-submitted verbatim by Edit. Its shape is gate.py's, so
+      // check only that it is an object and let the pipeline own the rest.
+      if (s.gate !== undefined && !isObj(s.gate)) return `scan.sources[${i}].gate must be an object.`;
+      for (const [k, max] of Object.entries(SOURCE_STR_MAX)) {
+        if (s[k] === undefined) continue;
+        if (typeof s[k] !== 'string') return `scan.sources[${i}].${k} must be a string.`;
+        if (s[k].length > max) return `scan.sources[${i}].${k} must be at most ${max} characters.`;
       }
     }
   }
@@ -289,6 +341,22 @@ function validate(body) {
   const action = body.action;
   if (typeof action !== 'string' || !ACTIONS.includes(action)) {
     return { error: `Unknown action ${JSON.stringify(action)}. Allowed: ${ACTIONS.join(', ')}.` };
+  }
+
+  // status reads GitHub; it dispatches nothing, so it takes an optional scan_id and nothing else.
+  // Refusing the extra keys keeps a caller from believing a definition sent alongside was acted on.
+  if (action === 'status') {
+    const extra = Object.keys(body).filter((k) => k !== 'action' && k !== 'scan_id');
+    if (extra.length) {
+      return { error: `status takes only scan_id (ignoring nothing: got ${extra.join(', ')}).` };
+    }
+    let statusId = null;
+    if (body.scan_id !== undefined) {
+      const e = idError(body.scan_id, 'scan_id');
+      if (e) return { error: e };
+      statusId = body.scan_id;
+    }
+    return { action, scan_id: statusId, scan: null, no_discover: false };
   }
 
   if (body.no_discover !== undefined && typeof body.no_discover !== 'boolean') {
@@ -343,6 +411,74 @@ function validate(body) {
   return { action, scan_id: scanId, scan, no_discover: noDiscover };
 }
 
+function ghHeaders(token) {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'Content-Type': 'application/json',
+    'User-Agent': 'tmt-radar-dashboard',
+  };
+}
+
+// run-name in .github/workflows/scan.yml is "Scan <action> <scan_id>", so the id is a whole
+// whitespace-separated word of the title. Matching on words rather than a substring keeps the
+// runs of "eu-pay" out of the status of "eu-pay-transparency".
+function titleNames(title, scanId) {
+  return String(title || '').split(/\s+/).includes(scanId);
+}
+
+// What the runs of scan.yml are doing, newest first. THIS NEVER FAILS THE PAGE: every problem —
+// a token without actions:read, GitHub unreachable, a body that is not JSON — comes back as an
+// empty list plus the reason, and the caller answers 200. The Scans page keeps its own
+// elapsed-time card for a scan it dispatched itself, and a red banner over a scan that is in fact
+// running would be a lie told by the status widget about the work, not about itself.
+async function runStatus(token, repo, scanId) {
+  const perPage = scanId ? 30 : MAX_RUNS;
+  const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW}/runs?per_page=${perPage}`;
+  let gh;
+  try {
+    gh = await fetch(url, { headers: ghHeaders(token) });
+  } catch (e) {
+    return { runs: [], message: 'Could not reach the GitHub API for run status; the timer here is this page\'s own.' };
+  }
+  if (gh.status !== 200) {
+    let reason = '';
+    try { reason = JSON.parse(await gh.text()).message || ''; } catch (e) { reason = ''; }
+    const detail = `${gh.status}${reason ? ': ' + reason : ''}`;
+    return { runs: [], message: gh.status === 403 || gh.status === 404
+      ? `Live run status is off: the GitHub token cannot read this repository's Actions runs (${detail}). `
+        + 'Give it Actions: read — dispatching works without it, so the scan is still running.'
+      : `GitHub could not report run status (${detail}). The scan itself is unaffected.` };
+  }
+  let data;
+  try { data = JSON.parse(await gh.text()); } catch (e) {
+    return { runs: [], message: 'GitHub returned something that was not JSON when asked for run status.' };
+  }
+  const runs = (Array.isArray(data.workflow_runs) ? data.workflow_runs : [])
+    .filter((r) => isObj(r))
+    .filter((r) => !scanId || titleNames(r.display_title || r.name, scanId))
+    // GitHub already sorts newest first; sorting again means a change there cannot quietly put
+    // last week's run at the top of a partner's status card.
+    .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))
+    .slice(0, MAX_RUNS)
+    .map((r) => ({
+      id: r.id,
+      status: r.status || '',            // queued | in_progress | completed
+      conclusion: r.conclusion || null,  // null until it completes, then success | failure | cancelled | ...
+      created_at: r.created_at || '',
+      updated_at: r.updated_at || '',
+      html_url: r.html_url || '',
+      display_title: r.display_title || r.name || '',
+    }));
+  if (!runs.length) {
+    return { runs: [], message: scanId
+      ? 'No run for this scan has reached GitHub yet — a dispatch takes a few seconds to appear.'
+      : 'No scan runs yet.' };
+  }
+  return { runs };
+}
+
 module.exports = async (req, res) => {
   if (refuse(req, res)) return undefined;
 
@@ -371,6 +507,15 @@ module.exports = async (req, res) => {
 
   const branch = process.env.VERCEL_GIT_COMMIT_REF || 'main';
   const actionsUrl = `https://github.com/${repo}/actions/workflows/${WORKFLOW}`;
+
+  if (v.action === 'status') {
+    const s = await runStatus(token, repo, v.scan_id);
+    const out = { ok: true, runs: s.runs, actionsUrl };
+    if (v.scan_id) out.scan_id = v.scan_id;
+    if (s.message) out.message = s.message;
+    return res.status(200).json(out);
+  }
+
   const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW}/dispatches`;
   // workflow_dispatch inputs are strings only — booleans and objects arrive as text and the
   // workflow parses them back. An absent scan is "" rather than "null" so a shell test on the
@@ -386,13 +531,7 @@ module.exports = async (req, res) => {
   try {
     gh = await fetch(url, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Content-Type': 'application/json',
-        'User-Agent': 'tmt-radar-dashboard',
-      },
+      headers: ghHeaders(token),
       body: JSON.stringify({ ref: branch, inputs }),
     });
   } catch (e) {

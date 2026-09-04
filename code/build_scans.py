@@ -55,6 +55,19 @@ except Exception:  # pragma: no cover — enrich.py missing or unimportable
     _quote_found = _norm = _bare = None  # type: ignore[assignment]
     MIN_QUOTE_CHARS = 20
 
+# How many documents the FIRST run of a new scan reads. The dialog and the pending card both
+# promise this number to the partner, so it must be the number the pipeline actually uses — a
+# second literal here would keep promising "20" the day run.py changes the cap, and the page would
+# be advertising a speed it no longer delivers. Guarded like the enricher import above so the
+# builder still runs on a checkout whose pipeline is older or absent; 20 is the documented default.
+try:
+    from pipeline.scan.run import FIRST_RUN_MAX_NEW  # noqa: E402
+    from pipeline.scan.common import Budget as _Budget  # noqa: E402
+    MAX_SOURCES = int(_Budget.CEILINGS["max_sources"])
+except Exception:  # pragma: no cover — run.py missing, or older than the first-run cap
+    FIRST_RUN_MAX_NEW = 20
+    MAX_SOURCES = 12
+
 STATUS_ORDER = ("approved", "pending", "rejected")
 LEVELS = ("high", "medium", "low")
 # Health vocabulary shared with engine/health.json plus GATED, which only a scan can produce: an
@@ -65,7 +78,11 @@ HEALTH_STATUSES = ("OK", "QUIET", "EMPTY", "FAILED", "GATED")
 # an absent kind fall back to the host, which is always true even when nobody classified it.
 KIND_LABELS = {"gazette": "Gazette", "regulator": "Regulator", "ministry": "Gov", "court": "Court",
                "parliament": "Parliament", "standards": "Standards"}
-API = {"scans": "/api/scans", "ask": "/api/ask", "draft": "/api/draft", "propose": "/api/propose"}
+# /api/discover is the live source picker's endpoint: it PROPOSES venues and fetches nothing.
+# Every candidate the partner ticks still goes through the Python gate (robots.txt, terms,
+# extraction floor) when the scan is created — the dialog says so, and so does this comment.
+API = {"scans": "/api/scans", "ask": "/api/ask", "draft": "/api/draft", "propose": "/api/propose",
+       "discover": "/api/discover"}
 
 
 # ----------------------------------------------------------------------------- roots
@@ -462,7 +479,8 @@ def load_scan(root: Path, defn_path: Path) -> dict:
             "topics": list(defn.get("topics") or []), "industries": list(defn.get("industries") or []),
             "clients": list(defn.get("clients") or []),
             "sources": [{"url": s.get("url", ""), "status": s.get("status", ""), "proposed_by": s.get("proposed_by", ""),
-                         "kind": s.get("kind", "")}
+                         "kind": s.get("kind", ""), "name": s.get("name", ""),
+                         "jurisdiction": s.get("jurisdiction", ""), "rationale": s.get("rationale", "")}
                         for s in defn.get("sources") or [] if isinstance(s, dict)],
             # no_discover is stored on the definition by create_scan (contract), so Edit pre-ticks
             # the box as the scan was actually created rather than always "on".
@@ -527,7 +545,8 @@ def home_payload(scans: list[dict], built: str) -> dict:
             "problems": s["problems"],
         })
     return {"page": "home", "builtISO": built, "cards": cards, "clientNames": client_names(),
-            "actionsUrl": _actions_url(), "api": API,
+            "actionsUrl": _actions_url(), "api": API, "firstRunMax": FIRST_RUN_MAX_NEW,
+            "maxSources": MAX_SOURCES,
             "stamp": stamp_of(*[f"{c['id']}:{c['generated']}" for c in cards])}
 
 
@@ -536,6 +555,7 @@ def scan_payload(s: dict, built: str) -> dict:
     return {"page": "scan", "builtISO": built, "scan": d, "meta": scan_meta(d, s["coverage"]["gated"]), "items": s["items"],
             "digest": s["digest"], "counts": s["counts"], "run": s["run"], "coverage": s["coverage"], "generated": s["generated"],
             "problems": s["problems"], "clientNames": client_names(), "actionsUrl": _actions_url(), "api": API,
+            "firstRunMax": FIRST_RUN_MAX_NEW, "maxSources": MAX_SOURCES,
             "stamp": stamp_of(d["id"], s["generated"], d.get("updated", ""))}
 
 
@@ -800,14 +820,16 @@ dialog .db{padding:6px 30px 26px}
 dialog .df{padding:16px 30px 22px;border-top:1px solid var(--rule3);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 dialog .df .err{color:var(--alarm);font-size:12.5px}
 .field{margin-top:16px}
-.field label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
-.field label .req{color:var(--alarm);margin-left:2px}
+/* Direct children only: the source picker's candidate rows are labels too, and they are prose,
+   not field captions (defect: every venue name and rationale rendered in shouting mono grey). */
+.field>label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.field>label .req{color:var(--alarm);margin-left:2px}
 .field .help{margin-top:5px;font-size:12px;color:var(--faint);line-height:1.45}
 .field input[type=text],.field textarea{width:100%;border:1px solid var(--rule);border-radius:6px;padding:8px 10px;font-size:13px;background:#fff;line-height:1.45}
 .field textarea{min-height:88px;resize:vertical}
 .field input[type=text]:focus,.field textarea:focus{border-color:var(--ink);outline:none}
 .field.check{display:flex;align-items:center;gap:8px}
-.field.check label{margin:0;font-family:var(--sans);text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink)}
+.field.check>label{margin:0;font-family:var(--sans);text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink)}
 .cin{display:flex;flex-wrap:wrap;gap:4px;border:1px solid var(--rule);border-radius:6px;padding:4px 6px;min-height:36px;background:#fff;cursor:text}
 .cin:focus-within{border-color:var(--ink)}
 .cin .chip{padding:2px 4px 2px 8px}
@@ -828,6 +850,51 @@ dialog[data-step=form] .only-describe{display:none}
 .pnote{display:none;margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--navy-wash);color:var(--navy);font-size:12.5px;line-height:1.5}
 .pnote.on{display:block}
 .pnote.warn{background:var(--ochre-wash);color:#5B4507}
+
+/* create dialog: the source picker. Candidates are proposals — the tick chooses what the gate
+   will be asked about, never what gets fetched, and the standing line under the list says so. */
+.find .findrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.find .findwhy{font-size:12px;color:var(--faint);line-height:1.45;flex:1;min-width:180px}
+.findcount{margin-left:auto;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.findcount.over{color:var(--alarm);font-weight:600}
+#dlg-find:disabled{cursor:not-allowed}
+.cands{margin-top:10px}
+.cands:empty{display:none}
+.candlist{list-style:none;margin:0;padding:0;border:1px solid var(--rule3);border-radius:8px;max-height:280px;overflow:auto;background:#fff}
+.candlist li+li{border-top:1px solid var(--rule3)}
+.cand{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:9px 12px;cursor:pointer;align-items:start;
+  font-family:var(--sans);font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink);margin:0}
+.cand:hover{background:var(--row3)}
+.cand>input{margin-top:4px}
+.cand .ctop{display:flex;flex-wrap:wrap;gap:7px;align-items:baseline;font-size:13px;line-height:1.35}
+.cand .nm{font-weight:500}
+.cand .kind{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);border:1px solid var(--rule3);border-radius:20px;padding:1px 7px}
+.cand .jur{font-size:12px;color:var(--mute);white-space:nowrap}
+.cand .conf{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.cand .conf.c-high{color:var(--ok)}
+.cand .conf.c-low{color:#7A5E0E}
+.cand .chost{display:block;font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:3px}
+.cand .crat{display:block;margin-top:3px;font-size:12px;color:var(--mute);line-height:1.45}
+.gapline,.dropline{margin-top:6px;font-size:12.5px;line-height:1.5}
+.gapline{color:#5B4507}
+.dropline{color:var(--mute)}
+.gapline .t,.dropline .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-right:7px}
+.firstrun{margin-top:20px;padding:10px 12px;border:1px solid var(--rule3);border-radius:8px;background:var(--row3);font-size:12.5px;color:var(--mute);line-height:1.55}
+
+/* home: scans dispatched but not yet built — dashed, because nothing is committed yet */
+.pending{margin-top:14px;display:flex;flex-direction:column;gap:12px}
+.pending:empty{display:none}
+.pcard{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;border:1px dashed var(--rule);border-radius:10px;padding:18px 22px;background:var(--row3)}
+.pcard .name{font-family:var(--serif);font-size:21px;line-height:1.25;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pcard .pstate{margin:6px 0 0;color:var(--mute);font-size:12.5px;line-height:1.5}
+.pcard .fine{margin-top:5px;font-size:12px;color:var(--faint);line-height:1.5;max-width:640px}
+.pcard .right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:150px}
+.pcard .el{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--mute)}
+a.el{color:var(--navy)}
+.pcard .pdismiss{appearance:none;border:1px solid transparent;background:none;cursor:pointer;color:var(--off);font-size:15px;line-height:1;padding:2px 7px;border-radius:6px;margin-top:2px}
+.pcard .pdismiss:hover{color:var(--alarm);border-color:var(--rule)}
+.badge.working{background:var(--navy-wash);color:var(--navy);border-color:#C7D8E2}
+.badge.failed{background:var(--alarm-wash);color:var(--alarm);border-color:#E7C8C1}
 
 /* home: tabs, sort, stars */
 .htoolbar{margin-top:30px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--rule2);padding-bottom:12px}
@@ -894,8 +961,9 @@ dialog[data-step=form] .only-describe{display:none}
   .digest{grid-template-columns:1fr}
   .kpis{flex-direction:row}
   .kpi-tile{flex:1}
-  .card{grid-template-columns:1fr}
+  .card,.pcard{grid-template-columns:1fr}
   .card .right{text-align:left}
+  .pcard .right{align-items:flex-start;min-width:0}
   .panel{width:100vw}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -944,12 +1012,22 @@ dialog[data-step=form] .only-describe{display:none}
         <div class="field"><label for="f-top">Topics</label><div class="cin" id="c-top"></div></div>
         <div class="field"><label for="f-ind">Industries</label><div class="cin" id="c-ind"></div></div>
       </div>
+      <div class="field find" id="find-block">
+        <label>Find sources</label>
+        <div class="findrow"><button type="button" class="btn" id="dlg-find">Find sources</button>
+          <span class="findwhy" id="find-why"></span>
+          <span class="findcount" id="find-count" aria-live="polite"></span></div>
+        <div class="pnote" id="find-note" aria-live="polite"></div>
+        <div class="cands" id="cands"></div>
+        <div class="help">These are proposals — nothing has been fetched to produce them. Every one you tick is checked against robots.txt and the site's own terms when the scan is created, and anything that fails is listed as rejected on the coverage panel and never fetched.</div>
+      </div>
       <div class="field"><label for="f-src">Sources</label><div class="cin" id="c-src"></div>
         <div class="help">Optional. Add a listing page you already trust; it will still be checked — robots, terms and a parse test — before anything is read from it.</div></div>
       <div class="field"><label for="f-cl">Clients</label><div class="cin" id="c-cl"></div>
         <div class="help">Relevance is rated per named client; the model is asked to name them in the action line.</div></div>
       <div class="field check"><input type="checkbox" id="f-disc" checked><label for="f-disc">Discover sources automatically</label></div>
       <div class="help" id="f-disc-help">Off, only the sources listed above are gated and read.</div>
+      <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents, so the scan appears quickly rather than after every backlogged page. Anything older queues and is counted as queued on the scan. Press <b>Run scan</b> again to continue through the backlog.</div>
     </div>
     <div class="df"><div class="err" id="dlg-err" aria-live="polite"></div>
       <div class="actions"><button type="button" class="btn quiet only-form" id="dlg-back">Describe instead</button><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary only-form" id="dlg-submit">Create scan</button></div></div>
@@ -992,6 +1070,18 @@ const stampText = iso => { if (!iso) return ''; const m = String(iso).match(/^(\
 const COUNTRIES = {'austria':'AT','belgium':'BE','bulgaria':'BG','croatia':'HR','cyprus':'CY','czechia':'CZ','czech republic':'CZ','denmark':'DK','estonia':'EE','finland':'FI','france':'FR','germany':'DE','greece':'GR','hungary':'HU','ireland':'IE','italy':'IT','latvia':'LV','lithuania':'LT','luxembourg':'LU','malta':'MT','netherlands':'NL','poland':'PL','portugal':'PT','romania':'RO','slovakia':'SK','slovenia':'SI','spain':'ES','sweden':'SE','european union':'EU','eu':'EU','united kingdom':'GB','uk':'GB','britain':'GB','switzerland':'CH','norway':'NO','iceland':'IS','india':'IN','united states':'US','usa':'US','canada':'CA','australia':'AU','new zealand':'NZ','singapore':'SG','japan':'JP','south korea':'KR','korea':'KR','china':'CN','hong kong':'HK','indonesia':'ID','malaysia':'MY','philippines':'PH','thailand':'TH','vietnam':'VN','uae':'AE','united arab emirates':'AE','saudi arabia':'SA','qatar':'QA','israel':'IL','turkey':'TR','south africa':'ZA','nigeria':'NG','kenya':'KE','egypt':'EG','brazil':'BR','mexico':'MX','argentina':'AR','chile':'CL','colombia':'CO','sri lanka':'LK','bangladesh':'BD','pakistan':'PK','nepal':'NP','mauritius':'MU'};
 const NAMES = {}; Object.keys(COUNTRIES).forEach(k => { if (!NAMES[COUNTRIES[k]] || k.length > NAMES[COUNTRIES[k]].length) NAMES[COUNTRIES[k]] = k; });
 const countryName = code => { const n = NAMES[code]; return n ? n.replace(/\b\w/g, c => c.toUpperCase()).replace('Uk', 'UK').replace('Usa', 'USA').replace('Uae', 'UAE') : code; };
+// discover.KINDS -> the chip label Harvey's Sources column uses, embedded by the builder so the
+// source picker in the dialog and the developments table cannot disagree about what a venue is.
+const KINDL = __KIND_LABELS__;
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+const SOURCE_KINDS = Object.keys(KINDL).concat(['other']);   // = discover.KINDS / run.SOURCE_KINDS
+// The number the pipeline actually caps the first run at (run.FIRST_RUN_MAX_NEW), carried in the
+// payload rather than typed here: the dialog and the pending card must promise what the run does.
+const FIRST_RUN_MAX = (typeof D.firstRunMax === 'number' && D.firstRunMax > 0) ? D.firstRunMax : 20;
+// The pipeline's own max_sources ceiling (common.Budget.CEILINGS), so the picker can say when a
+// partner has ticked more venues than a run will ever fetch.
+const MAX_SOURCES = (typeof D.maxSources === 'number' && D.maxSources > 0) ? D.maxSources : 12;
+const FIRST_RUN_LINE = 'The first run reads the newest ' + FIRST_RUN_MAX + ' documents so the scan appears quickly; anything older queues and is counted as queued. Press Run scan again to continue through the backlog.';
 
 $('#headstamp').innerHTML = D.page === 'home'
   ? 'Human-run scans · <span>nothing scheduled</span>'
@@ -1015,21 +1105,54 @@ function startPolling() {
     } catch (e) { /* offline or auth lapsed: keep waiting, the next tick tries again */ }
   }, 60000);
 }
-async function postJSON(url, body) {
-  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  let data = null; try { data = await res.json(); } catch (e) { data = null; }
-  return { status: res.status, ok: res.ok, data: data || {} };
+async function postJSON(url, body, ms) {
+  // `ms` is opt-in, and only the discovery call and the status poll ask for it. A fetch with no
+  // deadline is indistinguishable from a slow model: the Find sources button would spin for ever
+  // instead of falling back to the manual input, which is the whole point of the fallback.
+  const ctl = (ms && typeof AbortController === 'function') ? new AbortController() : null;
+  const timer = ctl ? setTimeout(() => ctl.abort(), ms) : null;
+  try {
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined });
+    let data = null; try { data = await res.json(); } catch (e) { data = null; }
+    return { status: res.status, ok: res.ok, data: data || {} };
+  } finally { if (timer) clearTimeout(timer); }
 }
+// Returns the endpoint's own answer on success (it carries scan_id and actionsUrl, which the
+// pending card needs) and null on any failure, so callers can still write `if (ok)`.
 async function dispatchScan(body, verb) {
   say('Asking GitHub Actions to ' + esc(verb) + '…');
   try {
     const r = await postJSON(D.api.scans, body);
-    if (r.ok) { say(esc(r.data.message || 'Queued. This page refreshes itself when results land.') + actionsLink()); startPolling(); return true; }
+    if (r.ok) { say(esc(r.data.message || 'Queued. This page refreshes itself when results land.') + actionsLink()); startPolling(); return r.data || {}; }
     say(esc(r.data.message || ('The scans endpoint answered ' + r.status + '.')) + (r.status === 501 ? actionsLink().replace('to watch it', 'and run <b>scan.yml</b> by hand') : ''), 'bad');
   } catch (e) {
     say('No scans endpoint is reachable from this page.' + actionsLink(), 'bad');
   }
-  return false;
+  return null;
+}
+
+// ---- pending scans: dispatched, not yet built ------------------------------------------------
+// GitHub accepts a create in a second; the scan's page does not exist until the workflow has
+// gated, read, committed, and Vercel has rebuilt — twenty minutes on a first run. The defect this
+// closes: between those two moments the Scans page showed nothing at all and the partner had to
+// go and watch GitHub to know anything was happening. These records bridge the gap. They live in
+// this browser only, like stars and triage, and each one is dropped the moment the built page
+// carries the scan.
+const PKEY = 'tmt_scans_pending_v1';
+const PENDING_STALE_MS = 90 * 60 * 1000;
+let redrawPending = null;   // set by renderHome; the dialog can submit from a scan page too
+function pendingRead() {
+  let v = null;
+  try { v = JSON.parse(localStorage.getItem(PKEY) || '[]'); } catch (e) { v = null; }
+  // An entry without an id can never be matched against a built card or polled for, so it could
+  // only ever expire: refuse it on the way in rather than let it sit on the page for 90 minutes.
+  return Array.isArray(v) ? v.filter(p => p && typeof p === 'object' && typeof p.id === 'string' && p.id) : [];
+}
+function pendingWrite(list) { try { localStorage.setItem(PKEY, JSON.stringify(list)); } catch (e) {} }
+function addPending(rec) {
+  if (!rec || !rec.id) return;
+  pendingWrite(pendingRead().filter(p => p.id !== rec.id).concat([rec]));
+  if (redrawPending) redrawPending();
 }
 
 // ---- chip input ----------------------------------------------------------------------------
@@ -1083,6 +1206,16 @@ let editingId = null;
 // {name, scope} clients keep their scope across an edit: the chip shows the name, the object is
 // re-attached on submit so saving a scan does not silently drop "employees in Germany only".
 let clientObjs = {};
+// The same discipline for sources. A source in a definition carries the venue's name, jurisdiction,
+// kind and the rationale discovery gave for it; the chip input can only show a URL. Re-attach the
+// descriptive fields on submit so an Edit does not quietly strip a venue back to a bare URL.
+// The gate's own verdict (status, tier, gate evidence) is deliberately NOT sent back: the gate
+// decides that again on every create, and echoing a stale "approved" would be us deciding for it.
+let srcObjs = {};
+// Candidates from /api/discover, and the partner's ticks. Proposals only: nothing here has been
+// fetched, and every ticked URL still goes through the Python gate when the scan is created.
+let cands = [], picked = {}, discTouched = false;
+const DISC_HELP = 'Off, only the sources listed above are gated and read.';
 function openDialog(scan) {
   editingId = scan ? scan.id : null;
   clientObjs = {};
@@ -1092,8 +1225,12 @@ function openDialog(scan) {
   $('#f-name').value = scan ? scan.name : '';
   $('#f-intent').value = scan ? scan.intent : '';
   F.jur.set(scan ? scan.jurisdictions : []); F.top.set(scan ? scan.topics : []); F.ind.set(scan ? scan.industries : []);
+  srcObjs = {};
+  (scan ? scan.sources : []).forEach(s => { if (s && typeof s === 'object' && s.url) srcObjs[s.url] = s; });
   F.src.set(scan ? scan.sources.map(s => typeof s === 'string' ? s : (s && s.url) || '').filter(Boolean) : []);
   F.cl.set(scan ? scan.clients.map(clientName).filter(Boolean) : []);
+  cands = []; picked = {}; discTouched = false;
+  $('#cands').innerHTML = ''; setNote('#find-note', ''); $('#f-disc-help').textContent = DISC_HELP;
   $('#f-disc').checked = scan ? !scan.no_discover : true;
   $('#dlg-err').textContent = '';
   setNote('#dlg-pnote', ''); setNote('#dlg-pnote-1', '');
@@ -1102,10 +1239,18 @@ function openDialog(scan) {
   // the model propose the structure, or fill the structured form directly. An edit of an existing
   // scan has nothing to describe, so it opens straight on the form.
   setStep(scan ? 'form' : 'describe');
+  findWhy();          // the describe step too: it is the state the form will open in
   dlg.showModal();
   (scan ? $('#f-name') : $('#f-desc')).focus();
 }
-function setStep(step) { dlg.dataset.step = step; $('#dlg-back').hidden = step !== 'form' || !!editingId; }
+function setStep(step) {
+  dlg.dataset.step = step;
+  $('#dlg-back').hidden = step !== 'form' || !!editingId;
+  // Every route into the form can have filled the intent without an input event (Create manually
+  // carries the description over; Build the scan writes the proposal, or the description on its
+  // fallback). Re-read it here so the Find sources button is never disabled beside a full intent.
+  if (step === 'form') findWhy();
+}
 function setNote(sel, html, warn) { const el = $(sel); el.className = 'pnote' + (html ? ' on' : '') + (warn ? ' warn' : ''); el.innerHTML = html || ''; }
 $('#dlg-manual').addEventListener('click', () => {
   // A description typed before choosing the manual path is the intent in the partner's own words;
@@ -1115,6 +1260,99 @@ $('#dlg-manual').addEventListener('click', () => {
   setStep('form'); $('#f-name').focus();
 });
 $('#dlg-back').addEventListener('click', () => { setStep('describe'); $('#f-desc').focus(); });
+
+// ---- source picker: discovery moved out of the workflow and into the browser ------------------
+// Discovery used to happen invisibly inside the run, so the partner never saw or chose the venues
+// and waited five minutes while the workflow gated up to 25 model-proposed candidates. Here they
+// see the evidence and pick, in about twenty seconds, and the run gates only what they ticked.
+// The endpoint proposes; it fetches nothing and decides nothing.
+function findWhy() {
+  const intent = $('#f-intent').value.trim(), b = $('#dlg-find');
+  const short = intent.length < 20;
+  b.disabled = short;
+  // A disabled button with no reason beside it is a dead end; say what is missing and how far off.
+  $('#find-why').textContent = short
+    ? 'Write the intent first — discovery reads that sentence, and it needs at least 20 characters (' + intent.length + ' so far).'
+    : 'Proposes official venues for this brief. Nothing is fetched, and nothing is created.';
+}
+$('#f-intent').addEventListener('input', findWhy);
+function discHelp() {
+  const n = Object.keys(picked).length, disc = $('#f-disc');
+  const total = n + F.src.get().length;
+  $('#find-count').textContent = total ? total + ' of ' + MAX_SOURCES + ' source' + (MAX_SOURCES === 1 ? '' : 's') + ' chosen' + (total > MAX_SOURCES ? ' — too many' : '') : '';
+  $('#find-count').classList.toggle('over', total > MAX_SOURCES);
+  $('#f-disc-help').textContent = (!disc.checked && n)
+    ? 'Off — the workflow gates exactly the ' + pl(n, 'source') + ' you picked instead of proposing 25 of its own, which is about five minutes less before the scan appears. Tick it back on to have it look for more as well.'
+    : DISC_HELP;
+}
+$('#f-disc').addEventListener('change', () => { discTouched = true; discHelp(); });
+function candRow(c, i) {
+  const host = c.host || hostOf(c.url);
+  const kind = KINDL[c.kind] || host || 'Source';
+  const conf = ['high', 'medium', 'low'].includes(c.confidence) ? c.confidence : '';
+  return '<li><label class="cand"><input type="checkbox" data-url="' + esc(c.url) + '"' + (picked[c.url] ? ' checked' : '') + '>'
+    + '<span><span class="ctop"><span class="nm">' + esc(c.name || host || c.url) + '</span>'
+    + '<span class="kind">' + esc(kind) + '</span>'
+    + (c.jurisdiction ? '<span class="jur">' + flagged(c.jurisdiction) + '</span>' : '')
+    + (conf ? '<span class="conf c-' + conf + '">' + conf + ' confidence</span>' : '<span class="conf">confidence not given</span>')
+    + '</span>'
+    + '<span class="chost">' + esc(host || c.url) + '</span>'
+    + (c.rationale ? '<span class="crat">' + esc(String(c.rationale).slice(0, 300)) + '</span>' : '')
+    + '</span></label></li>';
+}
+// gaps and dropped candidates are rendered, never swallowed: a jurisdiction discovery found no
+// venue for, and a candidate it deny-listed or de-duplicated, are both facts about coverage.
+function drawCands(gaps, dropped) {
+  const rows = cands.map(candRow).join('');
+  $('#cands').innerHTML = (rows ? '<ul class="candlist">' + rows + '</ul>' : '')
+    + (gaps || []).map(g => '<div class="gapline"><span class="t">gap</span>'
+        + esc(g && g.note ? g.note : ('No official venue found for ' + ((g && g.jurisdiction) || 'one jurisdiction') + ' — add one by hand if you know it')) + '</div>').join('')
+    + (dropped || []).map(t => '<div class="dropline"><span class="t">dropped</span>' + esc(t) + '</div>').join('');
+}
+$('#cands').addEventListener('change', e => {
+  const cb = e.target.closest('input[type=checkbox][data-url]');
+  if (!cb) return;
+  if (cb.checked) picked[cb.dataset.url] = true; else delete picked[cb.dataset.url];
+  // Picking venues here is the point: the create then dispatches no_discover:true and the workflow
+  // gates the handful you chose. Turned off for you, once, and said out loud — unless you have
+  // already set the box yourself, in which case your setting stands.
+  if (Object.keys(picked).length && $('#f-disc').checked && !discTouched) $('#f-disc').checked = false;
+  discHelp();
+});
+$('#dlg-find').addEventListener('click', async () => {
+  const intent = $('#f-intent').value.trim();
+  if (intent.length < 20) { findWhy(); $('#f-intent').focus(); return; }
+  const b = $('#dlg-find'); b.disabled = true; b.textContent = 'Looking…';
+  setNote('#find-note', '');
+  let r = null, err = null;
+  // 55 s: outside api/discover.js's own 50 s model deadline, inside its 60 s function budget, so
+  // a slow-but-answering call is never cut off and a dead one does not hang the button for ever.
+  try { r = await postJSON(D.api.discover, { intent, jurisdictions: F.jur.get(), topics: F.top.get(), industries: F.ind.get() }, 55000); }
+  catch (e) { err = e; }
+  b.disabled = false; b.textContent = 'Find sources'; findWhy();
+  if (r && r.ok && Array.isArray(r.data.candidates)) {
+    // A candidate without a usable URL cannot be gated or fetched; drop it and say how many, so a
+    // short list is never mistaken for a thin one.
+    const all = r.data.candidates.filter(c => c && typeof c === 'object');
+    cands = all.filter(c => isUrl(c.url));
+    Object.keys(picked).forEach(u => { if (!cands.some(c => c.url === u)) delete picked[u]; });
+    drawCands(r.data.gaps || [], r.data.dropped || []);
+    discHelp();
+    const notes = [].concat(Array.isArray(r.data.notes) ? r.data.notes : [],
+      all.length > cands.length ? [pl(all.length - cands.length, 'candidate') + ' arrived without a usable URL and were left out.'] : []);
+    setNote('#find-note', (cands.length
+      ? '<b>' + esc(pl(cands.length, 'candidate')) + ' proposed' + (r.data.model ? ' by ' + esc(r.data.model) : '') + '.</b> Tick the ones this scan should read.'
+      : '<b>No venue proposed for this brief.</b> Add the listing pages you know by hand below.')
+      + (notes.length ? '<br>' + notes.map(esc).join('<br>') : ''), !cands.length);
+    return;
+  }
+  // Same fallback discipline as the describe path: say why, and leave the manual input working.
+  const why = (err && err.name === 'AbortError') ? 'discovery took longer than 55 seconds'
+    : err ? 'no discover endpoint is reachable from this page'
+    : (r.status === 501 || r.status === 404) ? 'source discovery is not configured on this deployment (HTTP ' + r.status + ')'
+    : 'the discover endpoint answered ' + r.status + (r.data.message ? ': ' + r.data.message : '');
+  setNote('#find-note', 'Could not propose sources — ' + esc(why) + '. Add the listing pages you know into <b>Sources</b> below; the scan is created the same way and each URL is gated the same way. Leaving <b>Discover sources automatically</b> ticked lets the workflow look for venues itself, as it did before.', true);
+});
 $('#dlg-build').addEventListener('click', async () => {
   const desc = $('#f-desc').value.trim();
   if (desc.length < 20) { setNote('#dlg-pnote-1', 'Say a little more — the subject, the countries, what to surface — or create the scan manually.', true); $('#f-desc').focus(); return; }
@@ -1151,21 +1389,60 @@ form.addEventListener('submit', async e => {
   // Sources go as {url} objects: run.validate_definition requires objects (reviewed defect: URL
   // strings passed api/scans.js, then the workflow exited 2 with nothing committed). Clients go
   // back as the object they came in as, or the plain name.
+  // Ticked candidates carry what discovery said about the venue; a URL typed into the chip input
+  // is just a URL. Both are objects, because run.validate_definition requires objects (reviewed
+  // defect: URL strings passed api/scans.js, then the workflow exited 2 with nothing committed).
+  const chosen = cands.filter(c => picked[c.url]);
+  const chosenUrls = chosen.map(c => c.url);
+  // A kind the pipeline does not know would fail run.validate_definition and lose the whole
+  // create over a decorative field, so an unrecognised one is dropped rather than forwarded.
+  const describe = (from, into) => {
+    ['name', 'jurisdiction', 'rationale'].forEach(k => { if (from[k]) into[k] = String(from[k]).slice(0, 300); });
+    if (SOURCE_KINDS.includes(from.kind)) into.kind = from.kind;
+    return into;
+  };
+  const sources = chosen.map(c => describe(c, { url: c.url }))
+    .concat(F.src.get().filter(u => !chosenUrls.includes(u)).map(url => {
+      const was = srcObjs[url];
+      return was ? describe(was, { url }) : { url };
+    }));
   const scan = { name, intent, jurisdictions: F.jur.get(), topics: F.top.get(), industries: F.ind.get(),
-    sources: F.src.get().map(url => ({ url })), clients: F.cl.get().map(n => clientObjs[n] || n) };
+    sources, clients: F.cl.get().map(n => clientObjs[n] || n) };
   if (editingId) scan.id = editingId;
   const err = $('#dlg-err');
   if (name.length < 3) { err.textContent = 'Give the scan a name (3 characters or more).'; $('#f-name').focus(); return; }
   if (intent.length < 20) { err.textContent = 'The intent is what discovery and relevance read — write at least a sentence.'; $('#f-intent').focus(); return; }
+  // Reviewed defect: ticking a venue turns "Discover sources automatically" off, but unticking
+  // the last one never turned it back on — so a partner who changed their mind could dispatch a
+  // scan with no sources and no discovery, which reads nothing and burns a run to say so.
+  if (!$('#f-disc').checked && !sources.length) {
+    err.textContent = 'Discovery is off and no source is listed, so this scan would read nothing. '
+      + 'Tick a venue, add a listing URL, or turn discovery back on.';
+    $('#f-disc').focus(); return;
+  }
+  // The pipeline gates at most MAX_SOURCES; the picker used to let a partner tick 25 and say
+  // nothing about the ones that would sit unfetched.
+  if (sources.length > MAX_SOURCES) {
+    err.textContent = 'A scan reads at most ' + MAX_SOURCES + ' sources; ' + sources.length
+      + ' are listed. Untick ' + (sources.length - MAX_SOURCES) + ' — the rest would be approved but never fetched.';
+    return;
+  }
   // run.py refuses an empty jurisdictions list; asking here saves a queued create that fails two
   // minutes later on the Actions page.
   if (!scan.jurisdictions.length) { err.textContent = 'Add at least one jurisdiction — the pipeline refuses a scan without one.'; F.jur.input.focus(); return; }
   if (!scan.topics.length && !scan.industries.length && !scan.sources.length) { err.textContent = 'Add at least one topic, industry or source, or discovery has nothing to look for.'; F.top.input.focus(); return; }
   err.textContent = '';
   const btn = $('#dlg-submit'); btn.disabled = true;
-  const ok = await dispatchScan({ action: 'create', scan_id: editingId || undefined, scan, no_discover: !$('#f-disc').checked }, editingId ? 'update and re-run this scan' : 'create the scan');
+  const res = await dispatchScan({ action: 'create', scan_id: editingId || undefined, scan, no_discover: !$('#f-disc').checked }, editingId ? 'update and re-run this scan' : 'create the scan');
   btn.disabled = false;
-  if (ok) dlg.close();
+  if (res) {
+    // Remember it so the Scans home shows it immediately. api/scans.js answers 202 with the id it
+    // derived from the name, which is the id the page will live at — take it from there rather
+    // than deriving a second slug here that could disagree with the workflow's.
+    addPending({ id: res.scan_id || scan.id || '', name: name, dispatched_at: new Date().toISOString(),
+      action: 'create', actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+    dlg.close();
+  }
 });
 $$('[data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
 
@@ -1209,8 +1486,9 @@ function renderHome() {
     + '<div class="notice" id="notice"></div>'
     + '<div class="htoolbar"><div class="ttabs" role="tablist" id="htabs"></div>'
     + '<div class="tools"><select id="hsort" aria-label="Sort scans"><option value="name">Sort: name</option><option value="lastrun">Sort: last run</option><option value="new">Sort: new developments</option></select></div></div>'
+    + '<div class="pending" id="pending"></div>'
     + '<div class="cards" id="cards"></div>'
-    + (scans.length ? '' : '<div class="empty"><h2>No scans yet.</h2><p>Describe a question the way you would brief an associate — the clients, the jurisdictions, what to surface — and the system finds candidate places to read, gates each one, reads them, and writes you a weekly digest in which every sentence is cited or marked as uncited.</p><p>Runs happen when you press <b>Run scan</b>, never on a schedule. Nothing enters a scan that did not come from a source you can see on its coverage panel.</p><button class="btn primary" id="create2">+ Create your first scan</button></div>');
+    + (scans.length ? '' : '<div class="empty" id="hempty"><h2>No scans yet.</h2><p>Describe a question the way you would brief an associate — the clients, the jurisdictions, what to surface — and the system finds candidate places to read, gates each one, reads them, and writes you a weekly digest in which every sentence is cited or marked as uncited.</p><p>Runs happen when you press <b>Run scan</b>, never on a schedule. Nothing enters a scan that did not come from a source you can see on its coverage panel.</p><button class="btn primary" id="create2">+ Create your first scan</button></div>');
   noticeEl = $('#notice');
   $('#create').addEventListener('click', () => openDialog(null));
   const c2 = $('#create2'); if (c2) c2.addEventListener('click', () => openDialog(null));
@@ -1240,6 +1518,117 @@ function renderHome() {
     $$('.card .last').forEach(el => { el.textContent = 'Last run ' + rel(el.dataset.iso); });
   }
   drawCards();
+
+  // ---- pending scans: dispatched, not yet on this page ---------------------------------------
+  const builtIds = {};
+  D.cards.forEach(c => { builtIds[c.id] = true; });
+  let runState = {};              // scan id -> the last status answer, kept across redraws
+  let ticker = null, statusTimer = null;
+
+  const elapsed = iso => {
+    const t = Date.parse(iso || '');
+    if (!isFinite(t)) return '';
+    const s = Math.max(0, Math.round((Date.now() - t) / 1000)), m = Math.floor(s / 60);
+    if (m >= 60) return Math.floor(m / 60) + 'h ' + (m % 60) + 'm elapsed';
+    return (m ? m + 'm ' + (s % 60) + 's' : s + 's') + ' elapsed';
+  };
+  function tickElapsed() { $$('#pending .el[data-since]').forEach(el => { el.textContent = elapsed(el.dataset.since); }); }
+
+  function prunePending() {
+    const now = Date.now(), keep = [];
+    let changed = false;
+    pendingRead().forEach(p => {
+      // The workflow committed and the site rebuilt: the real card below is this scan now, and two
+      // cards for one scan would read as two scans.
+      if (builtIds[p.id]) { changed = true; return; }
+      const t = Date.parse(p.dispatched_at || '');
+      // Ninety minutes is far past the longest first run we have measured. Something went wrong
+      // that this page cannot see, so stop pretending to watch it and point at the run.
+      if (isFinite(t) && now - t > PENDING_STALE_MS) {
+        changed = true;
+        say('“' + esc(p.name || p.id) + '” was queued more than 90 minutes ago and still has not landed here — check the run.'
+          + (p.actionsUrl ? ' <a href="' + esc(p.actionsUrl) + '" target="_blank" rel="noopener">Open the run</a>.' : actionsLink()), 'warn');
+        return;
+      }
+      keep.push(p);
+    });
+    if (changed) pendingWrite(keep);
+    return keep;
+  }
+
+  function pcard(p, st) {
+    st = st || {};
+    const status = String(st.status || ''), concl = String(st.conclusion || '');
+    const done = status === 'completed', bad = done && concl && concl !== 'success';
+    const badge = bad ? '<span class="badge failed">' + esc(concl.replace(/_/g, ' ')) + '</span>'
+      : done ? '<span class="badge working">Finished</span>'
+      : '<span class="badge working">' + esc(status ? status.replace(/_/g, ' ') : 'Creating') + '</span>';
+    // The state line says what is happening to THIS scan, not what GitHub calls the job.
+    const line = bad ? 'The run finished as ' + esc(concl.replace(/_/g, ' ')) + ' — nothing was committed. Open the run to see which step failed.'
+      : done ? 'Finished — the scan appears here as soon as the site rebuilds, a minute or two.'
+      : status === 'in_progress' ? 'Running — gating your sources, then reading the first documents.'
+      : (status === 'queued' || status === 'waiting' || status === 'requested' || status === 'pending')
+        ? 'Queued on GitHub Actions — waiting for a runner, then it gates your sources and reads the first documents.'
+      : 'Creating — gating your sources, then reading the first documents.';
+    const url = st.html_url || p.actionsUrl || D.actionsUrl || '';
+    return '<div class="pcard">'
+      + '<div><div class="name">' + esc(p.name || p.id) + badge + '</div>'
+      + '<p class="pstate">' + line + '</p>'
+      + '<div class="fine">' + esc(FIRST_RUN_LINE) + (st.message ? '<br>' + esc(st.message) : '') + '</div></div>'
+      + '<div class="right"><div class="el" data-since="' + esc(p.dispatched_at || '') + '"></div>'
+      + (url ? '<a class="el" href="' + esc(url) + '" target="_blank" rel="noopener">Open the run</a>' : '')
+      + '<button type="button" class="pdismiss" data-dismiss="' + esc(p.id) + '" aria-label="Stop watching ' + esc(p.name || p.id) + '" title="Stop watching this run — the scan still appears here when it lands">×</button></div></div>';
+  }
+
+  function drawPending() {
+    const list = prunePending();
+    $('#pending').innerHTML = list.map(p => pcard(p, runState[p.id])).join('');
+    // The "No scans yet" block is not true while one is being created.
+    const em = $('#hempty'); if (em) em.hidden = list.length > 0;
+    tickElapsed();
+    schedule(list.length > 0);
+  }
+  redrawPending = drawPending;
+
+  // Both timers stop while the tab is hidden and start again when it comes back: a partner who
+  // leaves this open in a background tab must not keep the status endpoint (and GitHub's rate
+  // limit) busy for an hour to animate a clock nobody is looking at.
+  function schedule(wanted) {
+    const live = wanted && !document.hidden;
+    if (ticker && !live) { clearInterval(ticker); ticker = null; }
+    if (statusTimer && !live) { clearInterval(statusTimer); statusTimer = null; }
+    if (!live) return;
+    if (!ticker) ticker = setInterval(tickElapsed, 1000);
+    if (!statusTimer) { statusTimer = setInterval(pollStatus, 15000); pollStatus(); }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) schedule(false); else drawPending(); });
+
+  async function pollStatus() {
+    const list = pendingRead().filter(p => !builtIds[p.id]);
+    if (!list.length) { schedule(false); return; }
+    for (const p of list) {
+      if (document.hidden) return;                 // stop mid-list rather than finish the round
+      let r = null;
+      try { r = await postJSON(D.api.scans, { action: 'status', scan_id: p.id }, 20000); } catch (e) { r = null; }
+      // No status endpoint, or it refused: the card keeps its own elapsed clock, which is honest
+      // on its own. Nothing is shown as an error, because nothing about the run is known to be
+      // wrong — only that this page cannot see it.
+      if (!r || !r.ok) continue;
+      const runs = Array.isArray(r.data.runs) ? r.data.runs : [];
+      // The contract's degraded answer is 200 with runs:[] and a message (the token cannot read
+      // Actions). Keep the card, show the message quietly, and say nothing about the run itself.
+      runState[p.id] = runs.length ? runs[0] : { message: r.data.message || '' };
+    }
+    drawPending();
+  }
+
+  $('#pending').addEventListener('click', e => {
+    const b = e.target.closest('button[data-dismiss]');
+    if (!b) return;
+    pendingWrite(pendingRead().filter(p => p.id !== b.dataset.dismiss));
+    drawPending();
+  });
+  drawPending();
 }
 function card(c, starred) {
   const flags = (c.flags || []).map(flag).filter(Boolean).join(' ');
@@ -1256,7 +1645,7 @@ function card(c, starred) {
 function renderScan() {
   const S = D.scan, items = D.items;
   const byId = {}; items.forEach(it => { byId[it.id] = it; });
-  const KL = __KIND_LABELS__;  // discover.KINDS -> chip label, embedded by the builder so one table serves both
+  const KL = KINDL;  // discover.KINDS -> chip label; one table, defined once above
   // Triage lives in this browser only, as clients do on the tracker. Nothing leaves the page.
   const KEY = 'tmt_scan_' + S.id;
   let state = { read: {}, star: {}, arch: {} };
@@ -1657,7 +2046,8 @@ def render_page(payload: dict, title: str, favicon_b64: str) -> str:
     data_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
     return (TEMPLATE.replace("__DATA__", data_json).replace("__TITLE__", title.replace("&", "&amp;").replace("<", "&lt;"))
             .replace("__STAMP__", payload["stamp"]).replace("__FAVICON_SVG__", favicon_b64)
-            .replace("__KIND_LABELS__", json.dumps(KIND_LABELS)))
+            .replace("__KIND_LABELS__", json.dumps(KIND_LABELS))
+            .replace("__FIRST_RUN_MAX__", str(FIRST_RUN_MAX_NEW)))
 
 
 # ----------------------------------------------------------------------------- build
@@ -2112,6 +2502,22 @@ def selftest() -> None:
         html = (out / "scans.html").read_text(encoding="utf-8")
         assert '"builtin": true' in html and "vetted sources" in html and "Create scan" in html
         assert (out / "favicon.svg").exists()
+        # The source picker: its button, its endpoint, and the standing line that must never be
+        # edited away — a candidate is a proposal, and the gate is what decides.
+        assert 'id="dlg-find">Find sources<' in html and '"discover": "/api/discover"' in html
+        assert "These are proposals — nothing has been fetched to produce them." in html
+        assert "checked against robots.txt and the site's own terms when the scan is created" in html
+        assert 'id="cands"' in html and "at least 20 characters" in html
+        # The first-run promise is the pipeline's number in both places it is made, never a literal
+        assert f"the newest {FIRST_RUN_MAX_NEW} documents" in html, "dialog line lost the first-run cap"
+        assert f'"firstRunMax": {FIRST_RUN_MAX_NEW}' in html
+        assert "Press <b>Run scan</b> again to continue through the backlog." in html
+        assert "'The first run reads the newest ' + FIRST_RUN_MAX + ' documents" in html
+        # The pending store, under the contract's key, and the poll that must stand down
+        assert "'tmt_scans_pending_v1'" in html and "action: 'status'" in html
+        assert 'id="pending"' in html and "document.hidden" in html and "visibilitychange" in html
+        # "No scans yet" is not true while one is being created, so the empty block is addressable
+        assert 'id="hempty"' in html and "em.hidden = list.length > 0" in html
         # a lone unreadable definition must stop the build, not produce a page over corrupt data
         (root / "scans").mkdir()
         (root / "scans" / "bad.json").write_text("{not json", encoding="utf-8")
@@ -2154,6 +2560,11 @@ def selftest() -> None:
         assert cov["approved"][0]["evidence"].startswith("robots allowed · terms checked: 1 page, no flags · 31 rows parsed")
         assert "robots allowed (no robots.txt" in cov["approved"][1]["evidence"] and "1 terms page unreadable" in cov["approved"][2]["evidence"]
         assert [s["kind"] for s in cov["approved"]] == ["gazette", "ministry", "gazette", "ministry", "parliament"]
+        # Edit must be able to send a source back whole: the descriptive fields ride on the
+        # definition the page holds, the gate's verdict does not (it is decided again on create).
+        d0 = payload["scan"]["sources"][0]
+        assert d0["name"] and d0["jurisdiction"] == "IT" and d0["rationale"] and d0["kind"] == "gazette", d0
+        assert "gate" not in d0 and "tier" not in d0, d0
         assert cov["pending"][0]["flags"] and "automatizada" in cov["pending"][0]["flags"][0] and cov["pending"][0]["reason"].startswith("ToS language found")
         assert cov["rejected"][0]["reason"].startswith("robots.txt disallows")
         assert cov["rejected"][0]["evidence"] == "not fetched — robots.txt disallows our agent · terms not checked", cov["rejected"][0]["evidence"]
@@ -2199,6 +2610,12 @@ def selftest() -> None:
         # future-dated obligations exist for the Upcoming list to find (the page filters by its own today)
         assert sum(1 for i in payload["items"] for o in i["obligations"] if re.search(r"202[7-9]-\d\d-\d\d", o["when"])) >= 2
         assert payload["scan"]["demo"] is True and payload["api"]["propose"] == "/api/propose"
+        # Edit opens the same dialog, so the picker and the first-run promise are on the scan page
+        # too, wired to the same number. (The pending card itself cannot be sampled: it exists only
+        # after a live 202 from /api/scans.)
+        assert payload["api"]["discover"] == "/api/discover" and payload["firstRunMax"] == FIRST_RUN_MAX_NEW
+        assert 'id="dlg-find">Find sources<' in page and f"the newest {FIRST_RUN_MAX_NEW} documents" in page
+        assert "These are proposals — nothing has been fetched to produce them." in page
         # clients keep both contract shapes; no_discover is read as stored
         assert payload["scan"]["clients"] == ["Accenture", {"name": "Annalise.ai", "scope": "employees in Germany and France only"}]
         assert payload["scan"]["no_discover"] is False
@@ -2235,7 +2652,8 @@ def selftest() -> None:
     print("PASS build_scans selftest: helpers (enricher's citation rule, gate wording), zero-scan build, sample build "
           "(13 developments incl. queued / read-failed / enrichment-failed / truncated, 5/1/1 sources incl. FAILED and GATED, "
           "budget drops + run notes + discovery on the page, 1 unverified citation, 1 uncited sentence, 4 unrated rows), "
-          "an ungated definition, publish, failure modes")
+          f"an ungated definition, publish, failure modes; source picker + pending store "
+          f"(first run = {FIRST_RUN_MAX_NEW} documents, from run.FIRST_RUN_MAX_NEW)")
 
 
 # ----------------------------------------------------------------------------- main
