@@ -1,0 +1,128 @@
+{
+ "generated": "2026-09-04T15:46:53+05:30",
+ "query": {
+  "intent": "Surface new Indian AI regulatory requirements and related official guidance relevant to advising OpenAI on its artificial-intelligence activities.",
+  "topics": [
+   "Artificial intelligence regulation"
+  ],
+  "jurisdictions": [
+   "IN"
+  ],
+  "excluded_hosts": [
+   "cert-in.org.in",
+   "trai.gov.in"
+  ]
+ },
+ "findings": [
+  {
+   "id": "063e7622f0",
+   "title": "Press Release:Press Information Bureau",
+   "url": "https://www.pib.gov.in/PressReleaseIframePage.aspx?PRID=2291671&lang=2&reg=48",
+   "host": "pib.gov.in",
+   "date": "2026-07-30",
+   "jurisdiction": "India",
+   "kind": "official_venue",
+   "why": "PIB publishes the Government’s account of the legal and platform-accountability framework addressing AI-generated deepfakes, including recent IT Rules amendments and responsible-AI projects.",
+   "snippet": "The Government remains conscious of the threats posed by deepfakes powered by Artificial Intelligence (AI), including synthetic audio, video and text.",
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-09-04T15:46:53+05:30",
+   "stale": false,
+   "status": "new"
+  },
+  {
+   "id": "19c638bee1",
+   "title": "Press Release Page | Press Information Bureau",
+   "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2295500&lang=1&reg=1",
+   "host": "pib.gov.in",
+   "date": "2026-08-06",
+   "jurisdiction": "India",
+   "kind": "official_venue",
+   "why": "PIB publishes an official explanation of the strengthened framework for AI-generated deepfakes, including labelling, metadata, platform due diligence and takedown timelines.",
+   "snippet": "The Indian Computer Emergency Response Team also regularly issues guidelines on AI-related threats and countermeasures, including deepfake; shares safety and security tips and awareness posters, info-graphics and videos on its official websites and social media handles and is aimed at sensitizing internet users on cyber security attacks and frauds including online safety measures for children.",
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-09-04T15:46:53+05:30",
+   "stale": false,
+   "status": "new"
+  },
+  {
+   "id": "8619475114",
+   "title": "Press Release Page | Press Information Bureau",
+   "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2291062&lang=2&reg=48",
+   "host": "pib.gov.in",
+   "date": "2026-07-29",
+   "jurisdiction": "India",
+   "kind": "official_venue",
+   "why": "PIB publishes an official parliamentary account of IndiaAI governance institutions and responsible-AI measures, including the AIGEG, TPEC and AI Safety Institute.",
+   "snippet": "Ministry of Electronics & IT IndiaAI Mission Advances AI-Driven Governance and Public Service Delivery through Collaborative Roadmaps, Innovation Challenges and Capacity Building IndiaAI Mission Identifies 762 AI Use Cases Across 62 Ministries, Approves 58 AI Centres of Excellence and 543 Data & AI Labs India’s AI policy is based on Prime Minister Narendra Modi’s vision of democratizing technology",
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-09-04T15:46:53+05:30",
+   "stale": false,
+   "status": "new"
+  },
+  {
+   "id": "e012fd453c",
+   "title": "July 2026: IJLT Tech-Law Bulletin - NLS Forum",
+   "url": "https://forum.nls.ac.in/ijlt-blog-post/july-2026-ijlt-tech-law-bulletin/",
+   "host": "forum.nls.ac.in",
+   "date": "2026-07-24",
+   "jurisdiction": "India",
+   "kind": "secondary",
+   "why": "Reports the Delhi High Court’s significant interim copyright ruling concerning ANI’s claim against OpenAI’s use of news content for LLM training.",
+   "snippet": "On 24 th July 2026, a single-judge Bench of the Delhi HC delivered the final judgment in an interim application filed by ANI Media Pvt. ... It used principles from the CPC to establish territorial jurisdiction under the Copyright Act, as ANI’s principal place of business and registered office are in Delhi, and because OpenAI specifically targets/offers its services to users/subscribers across Indi",
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-09-04T15:46:53+05:30",
+   "stale": false,
+   "status": "new"
+  },
+  {
+   "id": "b07126a3be",
+   "title": "Parliament Question: Regulation and Misuse of Artificial Intelligence - 12th August 2026 - Ministry of Electronics and Information Technology - Gazette Notification PDF",
+   "url": "https://policyindex.ai/in/gazette/parliament-question-regulation-and-misuse-of-artificial-intelligence-ta2n1h",
+   "host": "policyindex.ai",
+   "date": "2026-08-12",
+   "jurisdiction": "India",
+   "kind": "secondary",
+   "why": "Indexes an official MeitY parliamentary question on whether India has enacted or proposes a legal framework regulating AI and on mechanisms addressing deepfakes, impersonation and other AI misuse.",
+   "snippet": "Read or download the official PDF of this gazette notification issued by the Ministry of Electronics and Information Technology on 12th August 2026. Date: 12th August 2026 Category: LOKSABHA_QNA Jurisdiction: India, Central Government ...",
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-09-04T15:46:53+05:30",
+   "stale": false,
+   "status": "new"
+  },
+  {
+   "id": "3762f12ac9",
+   "title": "BCI issues social media guidelines for advocates, law students - India Legal",
+   "url": "https://indialegallive.com/constitutional-law-news/courts-news/bci-issues-social-media-guidelines-for-lawyers-makes-digital-ethics-undertaking-mandatory-for-new-advocates/",
+   "host": "indialegallive.com",
+   "date": "2026-07-18",
+   "jurisdiction": "India",
+   "kind": "secondary",
+   "why": "Reports a Bar Council of India circular imposing professional and educational controls relevant to AI-generated content, deepfakes, confidentiality and digital ethics in the legal sector.",
+   "snippet": "The Bar Council of India (BCI) has issued comprehensive guidelines regulating the use of social media by advocates, law students and law interns, while making it mandatory for all future applicants seeking enrolment as advocates to submit an affidavit or compliance undertaking affirming adherence to digital ethics and professional standards.",
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-09-04T15:46:53+05:30",
+   "stale": false,
+   "status": "new"
+  },
+  {
+   "id": "295ba10e68",
+   "title": "AI training, fair dealing and copyright infringement by AI platforms: Analysing Delhi High Court's order in ANI Media v. OpenAI",
+   "url": "https://www.barandbench.com/law-firms/view-point/ai-training-fair-dealing-and-copyright-infringement-by-ai-platforms-analysing-delhi-high-courts-order-in-ani-media-v-openai",
+   "host": "barandbench.com",
+   "date": "2026-08-01",
+   "jurisdiction": "India",
+   "kind": "commentary",
+   "why": "Provides practitioner analysis of the Delhi High Court’s July 2026 ruling on copyright, LLM training, jurisdiction and OpenAI’s Indian users.",
+   "snippet": "On July 24, 2026, Justice Amit Bansal of the Delhi High Court delivered a judgment that may likely be a foundational stepping stone towards the establishment of an analytical framework on how the Indian judiciary could approach copyright disputes involving the training of large language models (LLMs).",
+   "first_seen": "2026-09-04",
+   "last_seen": "2026-09-04T15:46:53+05:30",
+   "stale": false,
+   "status": "new"
+  }
+ ],
+ "notes": [
+  "search note: Searches covered Indian government, parliamentary, judicial, regulatory, legal-sector and practitioner sources for developments dated 2026-07-06 through 2026-09-04.",
+  "search note: No additional standalone India-wide AI statute or comprehensive AI-specific regulation, apart from the identified synthetic-content/deepfake framework and related governance measures, was located in the searched non-excluded sources.",
+  "search note: No results from cert-in.org.in, trai.gov.in, or their subdomains are included."
+ ]
+}

@@ -1,0 +1,420 @@
+1 
+ 
+Draft for Comments of the Stakeholders 
+ 
+ 
+भारतीय दूरसंचार विवियामक प्राविकरण 
+Telecom Regulatory Authority of India 
+ 
+ 
+ 
+ 
+ 
+ 
+CONSULTATION PAPER  
+ 
+ON  
+ 
+DRAFT AMENDMENTS 
+ 
+IN 
+ 
+‘THE STANDARDS OF QUALITY OF SERVICE OF 
+ACCESS (WIRELINE AND WIRELESS) AND 
+BROADBAND (WIRELINE AND WIRELESS) SERVICE 
+REGULATIONS, 2024’ 
+ 
+ 
+New Delhi, India 
+5th August 2026 
+ 
+ 
+ 
+World Trade Center, Tower-F, Nauroji Nagar, New Delhi-110029 
+Website: www.trai.gov.in 
+
+2 
+ 
+ 
+The document seeking comments from stakeholders contains 
+following information:  
+ 
+1. The draft notification for proposed amendment in ‘The Standards 
+of Quality of Service of Access (Wireline and Wireless) and 
+Broadband (Wireline and Wireless) Service Regulations, 202 4’ 
+with explanatory note.  
+2. Annexure-I: Global Best Practices for Publication of Coverage 
+Map 
+3. Annexure-II: Clarification letter dated 20th March 2025 issued by 
+TRAI. 
+4. Annexure-III: Clarification letter dated 21st April 2025 issued by 
+TRAI. 
+5. Annexure-IV: Principal regulations incorporating proposed 
+amendment for ease of reference. This will however not be a part 
+of final notification to be issued for amendment. 
+6. Annexure-V: List of Acronyms 
+ 
+ 
+Stakeholders are requested to submit their comments  or feedback on 
+the draft amendments or any other relevant provisions in ‘The 
+Standards of Quality of Service of Access (Wireline and Wireless) and 
+Broadband (Wireline and Wireless) Service  Regulations, 2024’ by 26th 
+August 2026  and counter comments by 7th September 2026.  
+ 
+ 
+The inputs/ comments / counter-comments may be sent  in following 
+format with due justification, preferably in electronic form, to Advisor 
+(QoS-I), TRAI on the email id adv-qos1@trai.gov.in, which will be posted 
+on TRAI’s website www.trai.gov.in. 
+ 
+3 
+ 
+ 
+S. 
+No. 
+Para number 
+of draft 
+notification 
+Input/ Comment/ 
+Counter- Comment 
+Justification 
+with supporting 
+reference, if any 
+    
+    
+ 
+For any clarification/information, Shri Tejpal Singh, Advisor (QoS -I) 
+may be contacted at email: adv-qos1@trai.gov.in 
+ 
+ 
+  
+4 
+ 
+DRAFT NOTIFICATION FOR PROPOSED AMENDMENTS 
+ 
+TO BE PUBLISHED IN THE GAZETTE OF INDIA 
+ EXTRAORDINARY PART III SECTION 4 
+ 
+TELECOM REGULATORY AUTHORITY OF INDIA  
+NOTIFICATION  
+New Delhi | Dated: _____ 2026 
+F. No. RG-17/(3)/2022-QoS: In exercise of the powers conferred upon it by 
+section 36, read with sub-clauses (i) and (v) of clause (b) of sub-section (1) of 
+section 11, of the Telecom Regulatory Authority of India Act 1997 (24 of 1997), 
+the Telecom Regulatory Authority of India hereby makes the following 
+regulations further to amend “The Standards of Quality of Service of Access 
+(Wireline and Wireless) and Broadband (Wireline and Wireless) Service 
+Regulations, 2024 (06 of 2024)”, namely:- 
+THE STANDARDS OF QUALITY OF SERVICE OF ACCESS (WIRELINE 
+AND WIRELESS) AND BROADBAND (WIRELINE AND WIRELESS) 
+SERVICE (FIRST AMENDMENT) REGULATIONS, 2026 (XX of 2026) 
+1. Short title and commencement.—  
+(a) These regulations may be called the Standards of Quality of Service of 
+Access (Wireline and Wireless) and Broadband (Wireline and Wireless) 
+Service (First Amendment) Regulations, 2026.  
+(b) These shall come into force with effect from 1st October 2026. 
+ 
+2. In sub-regulation (1) of regulation 2 of the Standards of Quality of Service 
+of Access (Wireline and Wireless) and Broadband (Wireline and Wireless) 
+Service, 2024 (06 of 2024), (herein after referred to as the principal 
+regulations), after serial number (s), following shall be inserted, namely: - 
+5 
+ 
+“(sa) “Physical Resource Block” or “PRB” is the fundamental unit of radio 
+resource allocation in 4G LTE and 5G New Radio (NR) networks. It 
+represents a defined portion of radio spectrum over a specific time interval 
+and serves as the basic scheduling unit through which a cell allocates 
+radio resources to user equipment (UE) for data transmission and 
+reception.” 
+ 
+3. In regulation 4 of the principal regulations, against serial number (ii) of 
+table under sub-regulation (1), the name of parameter shall be substituted 
+as “Fault incidences (No. of faults per 100 subscribers/month)”. 
+ 
+4. In regulation 6 of the principal regulations, - 
+(a) Against serial number (i), (iv) and (xiv)  of table under sub -regulation 
+(1), following shall be substituted, namely: - 
+S. No. Name of Parameter 
+Bench
+mark 
+Assessment 
+period  
+Effective 
+date 
+(i) 
+Accuracy of service wise 
+geospatial coverage map 
+published on service 
+provider’s website 
+≥ 98% Monthly 01.10.2026 
+(iv) 
+Percentage of significant 
+network outage reported 
+to the Authority within 
+24 hrs of start of the 
+outage  
+Note:  Significant 
+Network Outage is 
+defined as an event 
+where access service 
+(wireless) in a district 
+remains unavailable for 
+a continuous period 
+100% Monthly 01.10.2026 
+6 
+ 
+exceeding four (4) hours, 
+or where more than ten 
+percent (10%) of  
+subscribers in the 
+Licensed Service Area 
+(LSA) experience 
+complete loss of service 
+for a continuous period 
+exceeding four (4) hours. 
+ 
+Rebate to the 
+subscribers for 
+significant network 
+outages of more than 
+24 hrs:  
+• For post -paid 
+subscribers 
+registered in the 
+district or affected 
+post-paid 
+subscribers, as 
+applicable: 
+Proportional rent 
+rebate, as per plan 
+charges, for affected 
+number of days shall 
+be credited in next 
+bill.  
+• For the  pre-paid 
+subscribers 
+registered in the 
+district or affected 
+7 
+ 
+pre-paid 
+subscribers, as 
+applicable: The 
+validity of subscribed 
+tariff offering shall be 
+increased by equal 
+number of affected 
+days. 
+(xiv) 
+Tariff offerings in which 
+80th percentile value of 
+measured download and 
+upload speed is ≥ offered 
+typical download and 
+upload speed  for 4G/ 
+5G technology  
+100% Monthly 01.10.2026 
+ 
+(b) In table under sub -regulation (1), after serial number (xiv), following 
+shall be inserted, namely: - 
+S. No. Name of Parameter 
+Bench
+mark 
+Assessment 
+period  
+Effective 
+date 
+V. Network Slicing 
+(xv) 
+Cells having daily PRB 
+utilisation > 80% (in 5G 
+network) 
+≤ 1% Monthly 01.10.2026 
+ 
+(c) In sub-regulation (2), the words “technology wise”  shall be inserted 
+before the words “ typical download and upload speed”  and word 
+“consumers” shall be substituted with word “subscribers”.  
+(d) After sub -regulation (2) of the principal regulations, following sub -
+regulations shall be inserted, namely: - 
+8 
+ 
+“(3) Every service provider, planning to create a new network slice in 
+their 5G network, shall submit the details of proposed and existing 
+network slice parameters, at least twenty one (21) days in advance to 
+the Authority, clearly demonstrating the availability of sufficient 
+capacity in the cell(s) which are part of different slices, in such manner 
+and format as may be directed by the Authority, from time to time.” 
+ 
+5. In regulation 7 of the principal regulations, in table under sub-regulation 
+(1), after serial number (vi), following shall be inserted, namely: - 
+S. No. Name of Parameter 
+Bench
+mark 
+Assessment 
+period  
+Effective 
+date 
+(vii) Silence Call Rate ≤ 1% Monthly 01.10.2026 
+ 
+6. In regulation 9 of the principal regulations, -  
+(a) Against serial number (iv)  and (vii) of table under sub -regulation (1), 
+following shall be substituted, namely: - 
+S. No. Name of Parameter 
+Benchm
+ark 
+Assessment 
+period  
+(iv) 
+Tariff offerings in which 90 th 
+percentile value of measured 
+download and upload speed is 
+≥ offered typical download and 
+upload speed 
+100% Quarterly 
+(vii) Fault incidences (No. of faults 
+per 100 subscribers/month) 
+≤ 5 Quarterly 
+ 
+ 
+9 
+ 
+(b) In table under sub -regulation (1), after serial number (ix), following 
+shall be inserted, namely: - 
+S. No. Name of Parameter 
+Benchm
+ark 
+Assessment 
+period  
+(x) Mean Time-To-Repair (MTTR) 
+≤ 10 
+hours 
+Quarterly 
+(xi) 
+Percentage of significant 
+network outage reported to the 
+Authority within 24 hrs of start 
+of the outage  
+Note: Significant Network 
+Outage is defined as an event 
+where broadband (wireline) 
+service in a district remains 
+unavailable for a continuous 
+period exceeding four (4) hours, 
+or where more than ten percent 
+(10%) of subscribers in the 
+Service Area experience 
+complete loss of service or 
+material degradation in service 
+quality for a continuous period 
+exceeding four (4) hours. 
+Material degradation in service 
+quality shall mean a reduction 
+of twenty percent (20%) or more 
+in the download  or upload 
+speed experienced by a 
+subscriber vis-à-vis the 
+declared typical download or 
+upload speed.   
+100% Quarterly 
+10 
+ 
+Rebate to the subscribers for 
+significant network outages 
+of more than 24 hrs:  
+• For post -paid subscribers 
+registered in the district or 
+affected post -paid 
+subscribers, as applicable : 
+Proportional rent rebate, as 
+per plan charges, for affected 
+number of days shall be 
+credited in next bill. 
+• For the pre -paid 
+subscribers registered in 
+the district or affected pre-
+paid subscribers, as 
+applicable: The validity of 
+subscribed tariff offering 
+shall be increased by equal 
+number of affected days. 
+ 
+(c) In the explanation under sub-regulation (2), the words “ fixed wireless 
+and” shall be deleted.  
+ 
+7. In regulation 10 of the principal regulations, - 
+(a) Against serial number (ii) of table under sub -regulation (1), following 
+shall be substituted, namely: - 
+S. No. Name of Parameter Benchmark 
+(ii) Resolution of billing/ charging complaints 
+within one week 
+100% 
+ 
+11 
+ 
+(b) Following proviso to the sub-regulation (1) shall be deleted, namely: - 
+“Provided that  the s ervice provider providing both access service 
+(wireline) and broadband (wireline) service shall meet the benchmarks 
+for both the services on aggregated basis.” 
+ 
+(c) In the explanation under sub-regulation (1), the words “ fixed wireless 
+and” shall be deleted. 
+ 
+8. In regulation 15 of the principal regulations, -   
+(a) In sub-regulation (1), after clause (d), following clause shall be inserted, 
+namely: - 
+“(e) Service wise Quality of Experience Score (QoES) of service providers 
+based on various parameters of network performance, consumer 
+service, and consumer perception collected through multiple sources;” 
+ 
+(b) In sub-regulation (3), after the words “manner and format,”, the words 
+“as broadly specified under Schedule III and” shall be inserted and the 
+words “by consumers” shall be deleted. 
+ 
+9. In regulation 16 of the principal regulations, - 
+(a) In sub-regulation (1), after the words “ one lakh per benchmark”, the 
+words “per compliance report” shall be inserted. 
+ 
+(b) Sub-regulation (2), Sub-regulation (3) and Sub -regulation (4) shall be 
+deleted, namely: - 
+“(2) If the compliance report furnished by the service provider under 
+regulation 13 is found to be false, it shall, without prejudice to the terms 
+and conditions of its license or authorization, or the Act or rules or 
+regulations or orders made, or, directi ons issued thereunder, be liable 
+to pay an amount, by way of financial disincentive, not exceeding 
+rupees two lakhs per benchmark, for which such false report has been 
+furnished, for the first contravention as the Authority may, by order, 
+direct: 
+12 
+ 
+Provided that  if the compliance report furnished by the service 
+provider under regulation 13 is found to be false for the same parameter 
+consecutively in two or more subsequent months or quarters, as 
+applicable, the service provider shall be liable to pay, by way of financial 
+disincentives, an amount not exceeding rupees five lakhs for the second 
+consecutive false reporting and not exceeding rupees ten lakhs for each 
+consecutive false reporting occurring thereafter. 
+(3) No order for payment of any amount by way of financial disincentive 
+shall be made by the Authority unless the service provider has been 
+given a reasonable opportunity of representing against the 
+contravention of the regulation observed by the Authority. 
+(4) The amount payable by way of financial disincentive under these 
+regulations shall be remitted to such head of account as may be 
+specified by the Authority.” 
+10. After regulation 16 of the principal regulations, following regulations 
+shall be inserted, namely: - 
+“16A.  Consequences for the failure of service providers to submit 
+correct compliance reports. - (1) If the compliance report furnished by 
+the service provider under regulation 13 is found to be false, it shall, 
+without prejudice to the terms and conditions of its license or 
+authorization, or the Act or rules or regulations or orders made, or, 
+directions issued thereunder, be liable to pay an amount, by way of 
+financial disincentive, not exceeding rupees two lakhs per benchmark per 
+compliance report, for which such false report has been furnished, for the 
+first contravention as the Authority may, by order, direct: 
+Provided that if the compliance report furnished by the service provider 
+under regulation 13 is found to be false for the same parameter 
+consecutively in two or more months or quarters, as applicable, the service 
+provider shall be liable to pay, by way of financial dis incentives, an 
+amount not exceeding rupees five lakhs for the second consecutive false 
+reporting and not exceeding rupees ten lakhs for each consecutive false 
+reporting occurring thereafter.

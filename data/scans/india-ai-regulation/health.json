@@ -1,0 +1,87 @@
+{
+ "generated": "2026-09-04T15:45:57+05:30",
+ "scan": "india-ai-regulation",
+ "sources": {
+  "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBADVLIST02&year=2026": {
+   "status": "OK",
+   "rows_seen": 15,
+   "new": 15,
+   "newest_visible": "2026-08-28",
+   "notes": [],
+   "info": [
+    "extractor saw 15 candidate row(s)",
+    "dd751ab6ec: document not read (attempt 1): scanned document; vision read failed: HTTPSConnectionPool(host='www.cert-in.org.in', port=443): Max retries exceeded with url: /s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0043 (Caused by ConnectTimeoutError(<HTTPSConnection(host=",
+    "eff063b689: document not read (attempt 1): HTTPSConnectionPool(host='www.cert-in.org.in', port=443): Max retries exceeded with url: /s2cMainServlet?pageid=PUBVLNOTES02&VLCODE=CIAD-2026-0042 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.cert-in.org.in', port=443) at 0x7fbf49596a90>, 'Connection to www.cert-in.org.in timed out. (co",
+    "7dade11d2a: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "33ea36ac06: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "ed54d1c481: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "07d016e16f: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "bca12c8f59: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "f0b4640c77: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "d3e850af93: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "b79560ad5e: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "887fe6e651: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "6889fd578f: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "aa40a2cbf8: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "5edf42ef3e: document not read (attempt 1): scanned document; vision returned 0 chars",
+    "f7c17655ea: document not read (attempt 1): scanned document; vision returned 0 chars"
+   ],
+   "checked": "2026-09-04T15:45:57+05:30",
+   "name": "CERT-In — Advisories, 2026",
+   "tier": "discovered"
+  },
+  "https://www.trai.gov.in/telecom/qos": {
+   "status": "OK",
+   "rows_seen": 103,
+   "new": 103,
+   "newest_visible": "2026-08-05",
+   "notes": [],
+   "info": [
+    "extractor dropped 1 row(s): date_out_of_range",
+    "extractor dropped 1 row(s): url_not_on_page",
+    "extractor saw 105 candidate row(s)"
+   ],
+   "checked": "2026-09-04T15:45:57+05:30",
+   "name": "TRAI — Quality of Service: Consultation Papers and Directions",
+   "tier": "discovered"
+  }
+ },
+ "run": {
+  "new": 118,
+  "enriched": 5,
+  "queued": 98,
+  "read_failed": 15,
+  "enrich_failed": 0,
+  "ledgered_total": 118,
+  "week": "2026-W36"
+ },
+ "misc": {
+  "found": 7,
+  "new": 7,
+  "promoted": 0,
+  "dismissed": 0,
+  "kept": 0,
+  "stale": 0,
+  "dropped": 0,
+  "total": 7,
+  "skipped": false,
+  "error": ""
+ },
+ "budget": {
+  "caps": {
+   "max_sources": 12,
+   "max_new_per_run": 60,
+   "max_doc_chars": 30000,
+   "delay_seconds": 1.5,
+   "max_candidates": 25,
+   "max_pages_per_source": 1
+  },
+  "dropped": [
+   "98 development(s) queued, not enriched — first run reads the newest 20; press Run scan again to continue through the backlog"
+  ]
+ },
+ "notes": [
+  "98 development(s) queued, not enriched — first run reads the newest 20; press Run scan again to continue through the backlog",
+  "118 developments qualified; the model was shown the newest 60"
+ ]
+}

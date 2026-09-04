@@ -1,0 +1,403 @@
+1 
+ 
+Telecom Regulatory Authority of India 
+No. RG-25/(25)/2023-QoS      Dated: March 13, 2026 
+Consultation on Draft Telecom Commercial Communications Customer 
+Preference (Third Amendment) Regulations, 2026. 
+ To curb the menace of Unsolicited Commercial Communications (UCC). TRAI 
+issued Telecom Commercial Communications Customer Preference Regulations, 
+2018 (TCCCPR, 2018) on 19 th July, 2018, which put in place a framework for 
+regulating Commercial Communication. The TCCCPR, 2018 was amended on 21 st 
+December, 2018 and subsequently, second amendment was issued on 12th February 
+2025. 
+2.  Based on the feedback from stakeholders during various interactions well as 
+in light of recent developments like implementation of  AI-based detection of UCC, by 
+major access providers, a need has been felt to make amendments in some of the 
+existing provisions, and also to add some new provisions to make the regulatory 
+framework more effective and efficient. 
+3. Accordingly, draft amendments to TCCCPR, 2018 have been proposed at 
+Annexure-1 to this letter which also includes the Explanatory Note, outlining the 
+rationale and explaining the necessity of the proposed amendments. For the ease of 
+reference, a draft of consolidated TCCCPR, 2018, incorporating the proposed changes 
+is also enclosed as Annexure-II.  
+4. The aforesaid draft documents amendments to the regulations along with the 
+explanatory note (Annexure-I) are available on the TRAI website www.trai.gov.in  for 
+seeking input/comments from the stakeholders.  
+5. The written comments on Annexure-I are invited from the stakeholders by 12 th 
+April 2026, which may be sent preferably in electronic form to Sh Deepak Sharma, 
+Advisor (QoS-Il), TRAI, on mail-id advqos@trai.gov.in along with detailed reasons and 
+justifications in the format as given below: 
+ 
+ 
+ 
+
+2 
+ 
+Format for stakeholders’ response on draft amendments as in Annexure-I 
+Sl. No Regulation 
+number 
+Sub-
+regulation/ 
+item 
+number 
+Modification 
+proposed to the 
+draft amendment 
+Reasons/ full 
+justification for the 
+proposed 
+modifications 
+     
+     
+     
+ 
+6. Stakeholders may also suggest any other modifications/additions/deletions 
+in the TCCCPR, 2018, in the same format as above by 12th April 2026. 
+7.   The written comments/ suggestions received from the stakeholders shall be 
+published on the TRAI website www.trai.gov.in. The stakeholders may give their 
+counter comments by 27 th April, 2026, which may be sent preferably in electronic 
+form to Sh Deepak Sharma, Advisor (QoS-Il), TRAI, on mail-id advqos@trai.gov.in 
+along with detailed reasons and justifications in the same format as given at para 5 
+above.   
+8. For any clarification/ information, Shri Deepak Sharma, Advisor (QoS-Il), 
+TRAI, may be contacted at 011-20907760 or at email-id advqos@trai.gov.in 
+ 
+(Deepak Sharma) 
+Advisor (QoS-II) 
+Telecom Regulatory Authority of India 
+Enclosures :  
+(a) Annexure-I : The proposed draft amendment along with explanatory 
+note. 
+(b) Annexure-II : The consolidated draft regulation incorporating draft 
+amendments, for ease of reference. 
+ 
+ 
+
+3 
+ 
+ANNEXURE-I 
+ 
+Draft for Consultation 
+    
+    
+  
+ 
+   
+ 
+भारतीय दूरसंचार िविनयामक ÿािधकरण  
+Telecom Regulatory Authority of India 
+  
+  
+   
+  
+  
+Draft Telecom Commercial Communication Preference (Third Amendment) Regulations, 2026 
+ 
+  
+  
+  
+New Delhi, India  
+13th March, 2026 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+World Trade Centre, Tower-F, (4" to 7" Floors), Nauroji Nagar, New Delhi- 110029 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+4 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Written Comments/suggestions on the Draft Telecom Commercial Communication 
+Customer Preference (Third Amendment) Regulations, 2026, are invited from 
+stakeholders by 12 th April, 2026. Comments/ suggestions received from the 
+stakeholders will be posted on TRAI’s website www.trai.gov.in. The stakeholders 
+may give their counter comments by 27 th April, 2026. The comments and counter 
+comments, if any, may be sent preferably in electronic form to Sh Deepak Sharma, 
+Advisor (QoS-Il), TRAI, on mail-id advqos@trai.gov.in along with detailed reasons 
+and justifications in the specified format. 
+For any clarification/ information, Shri Deepak Sharma, Advisor (QoS-II), TRAI, 
+may be contacted at telephone no. 011-20907760 or at email-id 
+advqos@trai.gov.in. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+5 
+ 
+ 
+TO BE PUBLISHED IN THE GAZETTE OF INDIA, EXTRAORDINARY, 
+PART III, SECTION 4 
+ 
+TELECOM REGULATORY AUTHORITY OF INDIA 
+NOTIFICATION 
+New Delhi, the ____ 2026 
+ 
+TELECOM COMMERCIAL COMMUNICATIONS CUSTOMER PREFERENCE (THIRD 
+AMENDMENT) REGULATIONS, 2026  
+(… of 2026) 
+ 
+No.  RG-25/(25)/2023-QoS: - In exercise of the powers conferred upon it by section 36, 
+read with sub-clause (v) of clause (b) and clause (c) of sub-section (1) of section 11, of the 
+Telecom Regulatory Authority of India Act 1997 (24 of 1997), the Telecom Regulatory 
+Authority of India hereby makes the following regulations further to amend the Telecom 
+Commercial Communications Customer Preference Regulations, 2018 (6 of 2018) 
+namely:- 
+1. Short title, extent and commencement. — 
+(1) These regulations may be called the Telecom Commercial Communications Customer 
+Preference (Third Amendment) Regulations, 2026 (… of 2026). 
+(2) These regulations shall apply throughout the territory of India. 
+(3) These shall come into force after thirty days from the date of their publication in the 
+Official Gazette. 
+2. In regulation 2 of the Telecom Commercial Communications Customer Preference 
+Regulations, 2018 (6 of 2018)  (hereinafter referred to as the principal regulations), 
+(a) after clause (e) the following clause shall be inserted, namely; 
+“(ea) An A2P (Application-to-Person) call refers to a voice call that is initiated by an 
+application, software system, or automated platform without direct human dialling 
+and delivered to an individual telecom subscriber, including using autodialling, robo-
+calls and/ or prerecorded/ artificial voice technologies.”  
+(b) for clause (y), the following clause shall be substituted, namely: -  
+“Explicit Consent” means such consent which has been either verified directly from 
+the Recipient in a robust and verifiable manner and recorded by Consent Registrar; 
+or, obtained by the sender through any verifiable means prior to or outside the 
+6 
+ 
+Consent Registration Function framework and subsequently registered in the 
+Consent Register in accordance with the procedure specified by the Authority.” 
+(c) in clause (ai), for the words “clause (3) of section 3 of the Indian Telegraph Act, 
+1885 (13 of 1885)”, the words “clause (g) of section 2 of The Telecommunications 
+Act, 2023 (44 of 2023)”, shall be substituted; 
+(d) for clause (ba), the following clause shall be substituted, namely:- 
+“(ba) “Regulatory Sandbox” means a live testing environment where new products, 
+services, processes, regulatory technology solutions and business models may be 
+deployed for a limited set of eligible customers, for a specified period of time, with 
+certain relaxations in the extant regulatory provisions in order to encourage and 
+facilitate innovation and technological development in telecommunication; 
+development and refinement of Code(s) of Practice; and provide inputs for 
+regulatory interventions and modifications.” 
+(e) for clause (bb), the following clause shall be substituted, namely: - 
+“(bb) “Relationship” means a prior or existing relationship  
+(i) for business or commercial reasons, between a person or entity and a 
+subscriber with or without an exchange of consideration,  
+(ii) on the basis of application regarding products or services made by or 
+submitted by recipient to sender within the three months immediately preceding the 
+date of the receiving of communication, which relationship has not been previously 
+terminated by either party;” 
+(f) in clause (bh), for the words “such Messages”, wherever appearing, the words 
+“such messages or voice calls” shall be substituted; 
+(g) in clause (bn), for the words “a telecom service provided by an Access Provider”  
+the words “any service for telecommunication” shall be substituted; 
+(h) in clause (bo), for the word “telegraph”, the words “telecommunication equipment 
+and/or telecommunication identifier, as defined under The Telecommunications Act, 
+2023 (44 of 2023)” shall be substituted; 
+7 
+ 
+(i) In clause (bw), the words “Any transactional message or transactional voice call”  
+appearing twice shall be deleted from the first para. 
+ 
+3.  In regulation 3 of the principal regulations, in sub-regulation (1), the following proviso 
+shall be inserted, namely: - 
+“Provided that Authority may classify the senders for this purpose and may specify different 
+criteria for different classes of senders.” 
+ 
+4. For regulation 4 of the principal regulations, the following regulation shall be substituted, 
+namely:-  
+“4. Intimation regarding use of A2P calls.- 
+Every Sender shall declare to the Originating Access Provider, in advance, about the use of 
+Application-to-Person (A2P) calls. 
+Provided that any such call made by a sender without prior declaration to the OAP, shall 
+be treated as unsolicited commercial communication (UCC), and the OAP shall take action 
+against such sender as per the provisions of these regulations.” 
+5. In regulation 11 of the principal regulations, in sub-regulation (4), the words “put under 
+usage cap or his telecom resources may be” shall be deleted. 
+ 
+6. After regulation 21 of the principal regulations, the following regulation shall be inserted, 
+namely:-  
+“21A. For taking action against the senders suspected of sending unsolicited commercial 
+communication, as detected by the AI/ML-based UCC_Detect system established by the 
+access providers in accordance with Schedule IV, every access provider shall implement the 
+following:- 
+(a) Every Terminating Access Provider (TAP), shall, through its AI/ML-based 
+UCC_Detect system, identify and flag the Calling Line Identification (CLI) of the 
+sender as “Suspected UCC CLI” based upon the behavioural parameters as 
+8 
+ 
+specified in the AI/ML-based UCC_Detect system, and immediately upon such 
+flagging and in any case within two hours of such flagging, share, through the 
+Distributed Ledger Technology (DLT) platform, the flagged CLI with the concerned 
+Originating Access Providers (OAPs); 
+(b) upon receipt of the flagged CLI from the TAP, every OAP shall immediately issue a 
+notification through SMS or mail or both, to the sender associated with such CLI, 
+informing that based on communication behaviour, the CLI has been flagged as 
+suspected of sending UCC (spam)”; 
+Provided that the authority may prescribe the format and manner of sending such 
+notification from time to time. 
+(c) OAP shall, within one business day of the receipt of the flagged CLI from  TAP, 
+identify unique KYC identifiers of the sender associated with such CLI, using its 
+subscriber records, and share the same through  DLT platform with all other Access 
+Providers, who, within one business day of the receipt of such unique KYC 
+identifiers from OAP, shall identify all the telecom resources allotted by them to such 
+Sender; 
+(d) upon identification of all the telecom resources allotted to such Sender, as referred 
+in the preceding para, all the Access Providers including OAP, shall examine, within 
+next one business day, whether any other CLI allotted to the same Sender has been 
+flagged as “Suspected UCC CLI” by their respective AI/ML-based spam alert 
+systems during the preceding ten days, and all such flagged CLIs mapped to the 
+same sender shall be recorded and shared on  DLT platform by all the Access 
+Providers on the same day; 
+(e) upon receipt of the data of all  CLIs associated with such sender across the network, 
+which have been flagged as “Suspected UCC CLI”, all the concerned OAPs shall 
+check, within one business day of the receipt of such data, whether five  or more 
+CLIs of the sender have been flagged as “Suspected UCC CLI” within a period of 
+last ten days, and if it is found that five  or more CLIs of the sender have been 
+flagged as “Suspected UCC CLI” within the last ten  days, all the concerned OAPs 
+shall take action against the sender as follows: 
+9 
+ 
+(i) for the first such instance, OAP shall, within the next three business days, carry 
+out the re-verification of KYC of the sender as per the licence conditions and take 
+necessary action in accordance with the extant KYC guidelines; 
+(ii) for the second such instance,  OAP shall, within the next five business days, 
+carry out the physical KYC verification of the sender to ensure that the telecom 
+resources allotted by  OAP are not being misused by the sender for sending UCC 
+and  in case  KYC details of the sender, available with  OAP, do not match with 
+the details obtained on physical verification, or if it is found that the telecom 
+resources are being misused by the sender for sending UCC in violation of the 
+provisions of the regulations, outgoing services of all telecom resources including 
+PRI/SIP trunks, SIMs etc. allotted to the sender shall be barred by all the Access 
+Providers for a period of fifteen days, irrespective of whether those telecom 
+resources were actually used or not in making such communications; 
+(iii) for any such subsequent instance, OAP shall, within the next five business days, 
+carry out the physical KYC verification of the sender to ensure that the telecom 
+resources allotted by  OAP are not being misused by the sender for sending UCC 
+and in case  KYC details of the sender, available with  OAP, do not match with 
+the details obtained on physical verification, or if it is found that the telecom 
+resources are being misused by the sender for sending UCC in violation of the 
+provisions of the regulations,  OAP shall take action against the sender as 
+provided  under clause(b) of sub-regulation (6) of regulation 25 of the regulations. 
+ 
+7. In regulation 22 of the of the principal regulations, in sub-regulation (1), for clause 
+(a), the following clause shall be substituted, namely:- 
+“(a) in case of misuse of Headers and/or Content Templates, 
+(i) immediately suspend the use of such misused Header(s) and/or Content 
+Template(s) across all Access Providers as the case may be, and the OAP shall issue 
+a notice to the sender in whose name such Header(s) and/or Content Template(s) 
+are registered, within 24 hours of reporting of misuse to the OAP. Such suspension 
+10 
+ 
+shall remain in force until the conditions specified under sub-clause (ii) are fully 
+complied with by the sender. 
+(ii) require the sender to undertake all of the following remedial actions: 
+1. Reset, within 24 hours of receipt of notice from the Originating Access Provider 
+(OAP), all access credentials including passwords, API keys and system 
+permissions used for submission or delivery of commercial communications, 
+which have been allotted to the sender by the access providers and 
+telemarketers; 
+2. File a formal complaint with the appropriate law enforcement agency under 
+the applicable laws, within 2 business days of receipt of notice from the OAP, 
+clearly identifying whether the misuse arose due to— 
+i.  compromise of login credentials, 
+ii. unauthorized access to systems, 
+iii. misuse by an associated Telemarketer, Aggregator, or Delivery Entity, or 
+iv.  any other identifiable cause, to be specified by the sender; and 
+share with the OAP a copy of the complaint filed. 
+Provided that, if any Telemarketer is an accomplice in the misuse of 
+Headers or Content Templates, the Sender shall file a complaint against 
+such Telemarketer with the law enforcement agencies under relevant laws; 
+3. Where the Sender claims or the OAP determines that misuse occurred due to 
+leakage, cloning, or compromise of credentials, the Sender, within next 5 
+business days shall mandatorily de-register all its Headers and Content 
+Templates including those reported as misused, and get them re-registered 
+to obtain new header and template ids using the bulk tool provided by the 
+concerned registrar access provider(s) to the sender for this purpose; and the 
+sender shall ensure that previously compromised identifiers are not reused; 
+11 
+ 
+4. (a) Conduct within 10 business days of receipt of notice from the OAP, a 
+comprehensive review of all its registered Headers, Content Templates, 
+Consent Templates; and 
+(b) Intimate to the OAP whether the misuse was due to credential leakage, 
+compromise of IT systems or any other reason, to be specified by the sender.  
+iii. Where the Sender fails to fully comply with the obligations under sub-clause (ii) 
+within the stipulated timeframe, or provides an incomplete or false intimation, all 
+commercial communication traffic from such Sender shall be suspended by all the 
+Access Providers until compliance is achieved to the satisfaction of the OAP. 
+Provided that the Authority may, from time to time, prescribe any other procedures, 
+safeguards, timelines, and conditions to safeguard the security of the commercial 
+communications. 
+8. In regulation 23 of the principal regulations, in sub-regulation (1), after clause (b), the 
+following clause shall be inserted, namely:- 
+“(c) to appeal to the Appellate Authority within a period of 15 days from the date of receipt 
+of information about the resolution of the complaint  when the consumer is not satisfied 
+with the redressal of the complaint by the Access provider, or the complaint remain 
+unaddressed, or no intimation of redressal of the complaint is received by the complainant 
+within a period of fifteen(15)  days from the date of registering complaint, whichever is 
+earlier. The complainant shall be able to prefer such appeal through any of the modes 
+specified for lodging a complaint or report under these Regulations. 
+The Appellate Authority shall resolve and reply to such appeal within a period of fifteen 
+(15) days from the date of its receipt. 
+Every Access Provider shall designate a permanent employee working at senior 
+management level as the Appellate Authority. The name and contact details of such 
+designated officer shall be duly published at a prominent place on the official website of 
+the concerned Access Provider.” 
+ 
+ 
+12 
+ 
+9. In regulation 24 of the of the principal regulations,  
+(i) in sub-regulation (2), for the words [“complaint or report regarding violation”] the 
+words “complaint including appeal, if any or report regarding violation” shall be 
+substituted. 
+(ii) in sub-regulation (3), the following sub-regulation shall be substituted, namely: -  
+“(3) to record three years’ history, complainant-wise, with details of all complaints including 
+appeal, if any and alleged violations reported by the complainants, with date and time, 
+and status of resolution of complaints including the supporting documents used by the 
+access providers for resolving the complaints;” 
+(iii) in sub-regulation (4), the following sub-regulation shall be substituted namely:-  
+“to record three years history of sender(s) against which complaint including appeal, if any 
+is made or reported with details of all complaint(s) including appeal, if any, with date(s) 
+and time(s), and status of resolution of complaints;” 
+ 
+10. For regulation 25 of the principal regulations, the following regulation shall be 
+substituted, namely:-  
+“25. Complaint Mechanism: Every Access Provider shall establish systems, functions and 
+processes to resolve complaints made by the Customers; corroborate the complaint data with 
+the data of senders suspected of sending UCC by the AI/ML based UCC detect systems 
+across all the access providers,;  and take remedial action against Senders as provided 
+hereunder (Sender herein shall mean a sender or telemarketer, who has been allotted the 
+telecom resource by the access provider, that has been used for making such communication, 
+and against which the UCC complaint has been made.):- 
+(1) Terminating Access Provider shall record the complaint and report on DL-Complaints 
+in non- repudiable and immutable manner and shall notify, in real time, the details of 
+the complaint to the concerned Originating Access Provider (OAP) except when it is not 
+possible to do so as stipulated in sub-clause (2); 
+(2) in instances where there is non-availability of complete telephone number of the Sender 
+or Header in the complaint registered, TAP shall communicate to the Customer about
