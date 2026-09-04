@@ -1,0 +1,18 @@
+{
+ "week": "2026-W36",
+ "generated": "2026-09-04T13:35:20+05:30",
+ "headline": "Nothing new this week",
+ "body": [],
+ "counts": {
+  "new": 0,
+  "high": 0,
+  "sources_ok": 0,
+  "sources_failed": 0,
+  "assessed": 0,
+  "queued": 0
+ },
+ "notes": [
+  "no developments in the ledger — no model call"
+ ],
+ "upcoming": []
+}
