@@ -1285,17 +1285,16 @@ a.el{color:var(--navy)}
 
 <div class="sheet">
   <div class="head">
-    <div class="wordmark"><a href="/tmt-radar-v2.html">TMT <b>Regulatory Radar</b></a></div>
+    <div class="wordmark"><a href="/">TMT <b>Regulatory Radar</b></a></div>
     <div class="updbar"><div class="updated" id="headstamp"></div></div>
   </div>
-  <nav class="tabs" aria-label="Sections">
-    <a href="/tmt-radar-v2.html">Coverage</a>
-    <a href="/tmt-radar-v2.html">Instruments</a>
-    <a href="/tmt-radar-v2.html">Judgments</a>
-    <a href="/tmt-radar-v2.html">Signals</a>
-    <a href="/tmt-radar-v2.html">Clients</a>
-    <a href="/tmt-radar-v2.html">Audit</a>
-    <a class="tab-scans on" href="/scans.html" aria-current="page">Scans</a>
+  <!-- DEFECT this closes: these were the TMT tracker's six tabs, rendered on every scan page and
+       every one of them linking to /tmt-radar-v2.html. On the EU Pay Transparency scan, pressing
+       "Instruments" left the scan and opened TMT India's ledger — and it shadowed the scan's OWN
+       seven-tab bar, which sits with the content and is the real navigation here. A scan page
+       gets a way home and nothing else; the lanes belong to the scan. -->
+  <nav class="tabs" aria-label="Where you are">
+    <a class="tab-scans on" href="/" aria-current="page">&larr; All scans</a>
   </nav>
   <main class="page" id="main"></main>
 </div>
