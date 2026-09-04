@@ -1,0 +1,24 @@
+{
+ "name": "India AI Regulatory Watch",
+ "intent": "Surface new and changing regulatory requirements in India relevant to advising OpenAI, including obligations, thresholds, guidance and deadlines affecting its activities.",
+ "jurisdictions": [
+  "IN"
+ ],
+ "topics": [
+  "Artificial intelligence",
+  "Regulatory developments"
+ ],
+ "industries": [
+  "Technology"
+ ],
+ "sources": [],
+ "clients": [],
+ "id": "india-ai-regulatory-watch",
+ "no_discover": false,
+ "created": "2026-09-04T13:35:19+05:30",
+ "updated": "2026-09-04T13:35:20+05:30",
+ "budget": {},
+ "discovery_notes": [
+  "discovery failed — only partner sources were gated: RuntimeError: this API key cannot use the model ''. Set TMT_SCAN_MODEL_STRONG to a model the key can use (for example gpt-5-mini, which the rest of this pipeline uses) as a repository variable on the workflow, or grant the key access to ''. Provider said"
+ ]
+}
