@@ -1260,7 +1260,8 @@ a.el{color:var(--navy)}
 .prev li .pn{font-size:12.5px;font-weight:500}
 .prev li .ph{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-left:7px}
 .prev li .pr{font-size:12px;color:var(--mute);line-height:1.45;margin-top:2px}
-.prev .pgap{margin-top:12px;font-size:12.5px;color:#5B4507;line-height:1.5}
+.prev .pdrop{float:right;margin-left:8px;border:1px solid var(--rule2);background:var(--paper);color:var(--faint);border-radius:4px;width:20px;height:20px;line-height:1;cursor:pointer;font-size:13px}.pdrop:hover{border-color:var(--alarm);color:var(--alarm)}.pfind{border:1px solid var(--rule2);background:var(--paper);color:var(--navy);border-radius:4px;padding:1px 7px;margin-left:4px;font-size:11px;font-family:var(--mono);cursor:pointer}.pfind:hover{border-color:var(--navy)}
+.pgap{margin-top:12px;font-size:12.5px;color:#5B4507;line-height:1.5}
 .prev .pfine{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule3);font-size:12px;color:var(--mute);line-height:1.6}
 .prev .pfine b{color:var(--ink);font-weight:600}
 .prevbar{margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -1342,9 +1343,8 @@ a.el{color:var(--navy)}
       <div class="help" id="f-disc-help">Off, only the sources listed above are gated and read.</div>
       <div class="field" id="preview-block">
         <label>What this scan will cover</label>
-        <div class="prevbar"><button type="button" class="btn" id="dlg-preview">Show what this scan will cover</button>
-          <span class="pwhy" id="preview-why">Coverage is the whole product — see the venues before the scan exists, not after.</span></div>
-        <div class="prev" id="preview" hidden></div>
+        <div class="prevbar"><span class="pwhy" id="preview-why">Coverage is the whole product, so it is built here with you — tick a venue, add one, or search a gap, and this list follows.</span></div>
+        <div class="prev" id="preview"></div>
       </div>
       <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents, so the scan appears quickly rather than after every backlogged page. Anything older queues and is counted as queued on the scan. Press <b>Run scan</b> again to continue through the backlog.</div>
     </div>
@@ -1860,7 +1860,7 @@ function openDialog(scan) {
   // Every dialog opening starts the coverage gate again: what the last scan was going to cover
   // says nothing about this one, and a Create left enabled from a previous open would be exactly
   // the "created blind" outcome this preview exists to stop.
-  previewSeen = false; $('#preview').hidden = true; $('#preview').innerHTML = ''; syncSubmit();
+  previewSeen = true; renderPreview();
   $('#dlg-err').textContent = '';
   setNote('#dlg-pnote', ''); setNote('#dlg-pnote-1', '');
   $('#f-desc').value = '';
@@ -1923,15 +1923,17 @@ $('#f-disc').addEventListener('change', () => { discTouched = true; discHelp(); 
 // Coverage is the whole product — "a scan shows exactly which URLs it fetches" (design §1.1) — so
 // a partner should see the venues before pressing Create, not discover them on the coverage panel
 // twenty minutes later. Create stays disabled until this has been drawn from the current inputs.
-let previewSeen = false;
+// The old gate ("Create is disabled until you have pressed Show coverage") existed because the
+// list was hidden behind a button. It is now always on screen and always current, so there is
+// nothing left to make someone reveal — the line below just says what the list is.
+let previewSeen = true;
+let lastGaps = [], lastDropped = [];   // the last Find sources answer, for redraws
 function syncSubmit() {
   const b = $('#dlg-submit'); if (!b) return;
-  b.disabled = !previewSeen;
-  b.title = previewSeen ? '' : 'See what this scan will cover first.';
+  b.disabled = false; b.title = '';
   const why = $('#preview-why');
-  if (why) why.textContent = previewSeen
-    ? 'This is what will be gated on creation. It updates as you change the venues, the jurisdictions or the brief.'
-    : 'Create is disabled until you have seen the venues this scan will read. Coverage is what a scan is.';
+  if (why) why.textContent = 'Coverage is the whole product, so it is built here with you — tick a venue, '
+    + 'add one, or search a gap, and this list follows. Everything on it is gated when the scan is created.';
 }
 // Exactly the list the submit handler will send, built by the same rule, so the preview can never
 // promise a venue the dispatch drops or hide one it adds.
@@ -1957,7 +1959,7 @@ function renderPreview() {
   const heads = jurs.filter(j => groups[j]).concat(order.filter(k => k !== '—' && !jurs.includes(k)), groups['—'] ? ['—'] : []);
   const venues = heads.map(k => '<div class="pj"><div class="pjh">' + (k === '—' ? 'Jurisdiction not stated' : flagged(k) + (NAMES[k] ? ' ' + esc(countryName(k)) : ''))
       + '<span class="ph">' + pl(groups[k].length, 'venue') + '</span></div><ul>'
-    + groups[k].map(s => '<li><span class="pn">' + esc(s.name) + '</span><span class="ph">' + esc(KINDL[s.kind] || 'kind not classified') + ' · ' + esc(s.host || s.url) + ' · ' + esc(s.how) + '</span>'
+    + groups[k].map(s => '<li><button type="button" class="pdrop" data-drop="' + esc(s.url) + '" title="Take this venue off the list" aria-label="Remove ' + esc(s.name) + '">&times;</button><span class="pn">' + esc(s.name) + '</span><span class="ph">' + esc(KINDL[s.kind] || 'kind not classified') + ' · ' + esc(s.host || s.url) + ' · ' + esc(s.how) + '</span>'
         + (s.rationale ? '<div class="pr">' + esc(String(s.rationale).slice(0, 300)) + '</div>' : '<div class="pr">No rationale was given for this venue.</div>') + '</li>').join('')
     + '</ul></div>').join('');
   // A venue that did not say which jurisdiction it serves makes a gap unprovable — the same rule
@@ -1966,7 +1968,8 @@ function renderPreview() {
   const gaps = jurs.filter(j => !groups[j]);
   const gapLine = !jurs.length ? '<div class="pgap">No jurisdiction is listed yet — the pipeline refuses a scan without one.</div>'
     : unstated ? '<div class="pgap">' + esc(pl(unstated, 'venue')) + ' did not say which jurisdiction it serves, so this list cannot tell you which jurisdictions are uncovered. The scan\'s Coverage panel will, once the gate has read them.</div>'
-    : gaps.length ? '<div class="pgap">No venue for ' + gaps.map(flagged).join(', ') + '. '
+    : gaps.length ? '<div class="pgap">No venue for ' + gaps.map(j => flagged(j)
+          + ' <button type="button" class="pfind" data-findjur="' + esc(j) + '">Search ' + esc(j) + '</button>').join(', ') + '. '
         + ($('#f-disc').checked ? 'Discovery is on, so the workflow will look for one; if it finds none, the Coverage panel says so and keeps saying so.' : 'Discovery is off, so nothing will be read for ' + (gaps.length === 1 ? 'it' : 'them') + '. Add a listing page, or turn discovery back on.') + '</div>'
     : '';
   const named = heads.filter(k => k !== '—').length;
@@ -1979,12 +1982,28 @@ function renderPreview() {
     + ($('#f-disc').checked ? '<br>Discovery is on, so the workflow will also propose venues of its own and gate them the same way. Those are not on this list.' : '')
     + '<br><b>Miscellaneous will additionally search the open web outside this list.</b> That lane fetches nothing, gates nothing and cites nothing — it is leads to verify at their primary source. A lead that turns out to be an official venue can be promoted into this coverage list, where the same gate decides.</div>';
   el.hidden = false;
-  previewSeen = true;
   syncSubmit();
 }
 // Re-draw only once it has been shown: opening the dialog must not silently satisfy its own gate.
-function refreshPreview() { if (previewSeen) renderPreview(); }
-$('#dlg-preview').addEventListener('click', () => { renderPreview(); $('#preview').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+// The coverage list is interactive: a venue can be taken off it, and a named gap can be searched
+// on its own. Both act on the very state previewSources() reads, so what the list shows and what
+// the dispatch sends cannot drift apart.
+document.addEventListener('click', (e) => {
+  const drop = e.target.closest('[data-drop]');
+  if (drop) {
+    const url = drop.getAttribute('data-drop');
+    delete picked[url];                                   // if it came from Find sources
+    F.src.set(F.src.get().filter(u => u !== url));        // if it was typed in
+    drawCands(lastGaps, lastDropped); discHelp(); refreshPreview();
+    return;
+  }
+  const find = e.target.closest('[data-findjur]');
+  if (find) { findSources(find.getAttribute('data-findjur')); }
+});
+
+// Always current, never requested. The coverage list IS the create dialog's subject, so it
+// redraws on every change rather than waiting behind a "show me" button.
+function refreshPreview() { renderPreview(); }
 
 function candRow(c, i) {
   const host = c.host || hostOf(c.url);
@@ -2003,6 +2022,7 @@ function candRow(c, i) {
 // gaps and dropped candidates are rendered, never swallowed: a jurisdiction discovery found no
 // venue for, and a candidate it deny-listed or de-duplicated, are both facts about coverage.
 function drawCands(gaps, dropped) {
+  lastGaps = gaps || []; lastDropped = dropped || [];   // so a removal can redraw the same view
   const rows = cands.map(candRow).join('');
   $('#cands').innerHTML = (rows ? '<ul class="candlist">' + rows + '</ul>' : '')
     + (gaps || []).map(g => '<div class="gapline"><span class="t">gap</span>'
@@ -2020,7 +2040,10 @@ $('#cands').addEventListener('change', e => {
   discHelp();
   refreshPreview();
 });
-$('#dlg-find').addEventListener('click', async () => {
+$('#dlg-find').addEventListener('click', () => findSources(null));
+// `only` searches ONE jurisdiction — the button beside a named gap on the coverage list, so a
+// partner fills a hole without re-running every other search. null searches all of them.
+async function findSources(only) {
   const intent = $('#f-intent').value.trim();
   if (intent.length < 20) { findWhy(); $('#f-intent').focus(); return; }
   const b = $('#dlg-find'); b.disabled = true;
@@ -2029,7 +2052,7 @@ $('#dlg-find').addEventListener('click', async () => {
   // platform's 60 s function ceiling and answered 504 every time; /api/discover now refuses more
   // than one, and the fix is smaller searches run at the same time rather than a longer wait.
   // 55 s each: outside the endpoint's own 50 s model deadline, inside its 60 s budget.
-  const jurs = F.jur.get();
+  const jurs = only ? [only] : F.jur.get();
   const calls = jurs.length ? jurs : [null];
   let done = 0;
   const tick = () => { b.textContent = calls.length > 1 ? 'Looking… ' + done + '/' + calls.length : 'Looking…'; };
@@ -2069,7 +2092,10 @@ $('#dlg-find').addEventListener('click', async () => {
     // A candidate without a usable URL cannot be gated or fetched; drop it and say how many, so a
     // short list is never mistaken for a thin one.
     const all = r.data.candidates.filter(c => c && typeof c === 'object');
-    cands = all.filter(c => isUrl(c.url));
+    const fresh = all.filter(c => isUrl(c.url));
+    // Searching one gap ADDS to the list; searching everything replaces it. Otherwise filling a
+    // hole for ES would silently throw away every venue already ticked for DE.
+    cands = only ? cands.filter(c => !fresh.some(f => f.url === c.url)).concat(fresh) : fresh;
     Object.keys(picked).forEach(u => { if (!cands.some(c => c.url === u)) delete picked[u]; });
     drawCands(r.data.gaps || [], r.data.dropped || []);
     discHelp();
@@ -2090,7 +2116,8 @@ $('#dlg-find').addEventListener('click', async () => {
     : (r.status === 501 || r.status === 404) ? 'source discovery is not configured on this deployment (HTTP ' + r.status + ')'
     : 'the discover endpoint answered ' + r.status + (r.data.message ? ': ' + r.data.message : '');
   setNote('#find-note', 'Could not propose sources — ' + esc(why) + '. Add the listing pages you know into <b>Sources</b> below; the scan is created the same way and each URL is gated the same way. Leaving <b>Discover sources automatically</b> ticked lets the workflow look for venues itself, as it did before.', true);
-});
+}
+
 $('#dlg-build').addEventListener('click', async () => {
   const desc = $('#f-desc').value.trim();
   if (desc.length < 20) { setNote('#dlg-pnote-1', 'Say a little more — the subject, the countries, what to surface — or create the scan manually.', true); $('#f-desc').focus(); return; }
@@ -2182,10 +2209,6 @@ form.addEventListener('submit', async e => {
   // that coverage before twenty minutes of gating and reading happen on their behalf. The button
   // is disabled until the preview has been drawn; this is the belt to that braces, for a submit
   // that arrived by Enter rather than by the button.
-  if (!previewSeen) {
-    err.textContent = 'See what this scan will cover first — press “Show what this scan will cover”.';
-    $('#dlg-preview').focus(); return;
-  }
   err.textContent = '';
   const btn = $('#dlg-submit'); btn.disabled = true;
   const verb = editingId ? 'update and re-run this scan' : 'create the scan';
@@ -2244,12 +2267,7 @@ function renderHome() {
     // This page is the product's front door, not an index behind the tracker: it opens with what a
     // scan is and who owns which one, because a partner arriving here for the first time has no
     // other page to learn it from.
-    + '<p class="lede">A scan is one question, read against a fixed list of official sources you can see. Open a scan for its own workspace — coverage, instruments, judgments, signals, miscellaneous leads, clients and audit.</p>'
-    // The count comes from the built-in card, which computes it from the registry: a typed number
-    // reads as coverage the day a venue is retired.
-    + '<p class="lede"><b>TMT India</b> is the built-in scan — ' + esc((D.cards.find(c => c.builtin) || {}).meta || 'the vetted registry')
-    + ', vetted one by one, each with its own adapter, fixture, floor and legal analysis. Every other scan here is one you made: its sources were discovered and passed an automated gate, and they are labelled <i>discovered</i> everywhere they appear so the two are never confused.</p>'
-    + '<p class="lede">Scans run when you press Run scan. Nothing here is scheduled.</p></div>'
+    + '<p class="lede">A scan is one question read against a fixed list of official sources you can see. <b>TMT India</b> is the built-in, vetted one; anything else here you made, and its sources are labelled <b>discovered</b> wherever they appear. Nothing is scheduled — a scan runs when you press Run scan.</p></div>'
     + '<div class="actions"><button class="btn primary" id="create">+ Create scan</button></div></div>'
     + '<div class="notice" id="notice"></div>'
     + '<div class="htoolbar"><div class="ttabs" role="tablist" id="htabs"></div>'
@@ -3723,14 +3741,21 @@ def selftest() -> None:
         assert 'id="hempty"' in html and "em.hidden = list.length > 0" in html
         # The Scans home is the product's front door now: it says what a scan is, and which one is
         # the built-in vetted scan, without typing a source count the registry owns.
-        assert "A scan is one question" in html and "TMT India</b> is the built-in scan" in html
+        assert "A scan is one question" in html and "<b>TMT India</b> is the built-in, vetted one" in html
         # the built-in scan's source count comes from the card the registry computed, never typed
-        assert "labelled <i>discovered</i>" in html and "(D.cards.find(c => c.builtin) || {}).meta" in html
-        assert '"href": "/tmt-radar-v2.html"' in html and "coverage, instruments, judgments, signals, miscellaneous leads, clients and audit" in html
+        # The lede is one line now, so it carries no counts to keep honest; the built-in card still
+        # shows "N vetted sources · …" computed from the registry, which is where the number lives.
+        assert "labelled <b>discovered</b>" in html, "the discovered/vetted distinction must survive the trim"
+        assert "builtin" in html and "vetted sources" in html
+        # The lane list was in the sentence the lede lost; the tabs themselves still name them.
+        assert '"href": "/tmt-radar-v2.html"' in html, "the built-in card must still open the tracker"
         # Create is gated on the coverage preview, in the markup and in the submit handler
-        assert 'id="dlg-preview">Show what this scan will cover<' in html
-        assert "if (!previewSeen) {" in html and "b.disabled = !previewSeen;" in html
-        assert "Create is disabled until you have seen the venues this scan will read." in html
+        assert 'id="preview-why"' in html and "built here with you" in html
+        # The coverage list is now always on screen and always current, so there is no reveal to
+        # gate on. What must stay true is that it redraws on every change.
+        assert "function refreshPreview() { renderPreview(); }" in html
+        assert 'class="prev" id="preview"></div>' in html, "the list must not be hidden"
+        assert "built here with you" in html and "gated when the scan is created" in html
         assert "Each venue above is gated when the scan is created" in html
         assert "Miscellaneous will additionally search the open web outside this list." in html
         # The seven tabs, by name, and the lane rule the page routes by
