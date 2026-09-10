@@ -52,8 +52,8 @@ table{border-collapse:collapse;margin-top:8px}td{padding:7px 14px 7px 0;border-b
 
 def _page(title: str, crumb: str, body: str) -> HTMLResponse:
     return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>{html.escape(title)} · TMT Regulatory Radar</title>{CSS}</head><body><div class="sheet">
-<div class="mast"><div class="wordmark"><a href="/">TMT <b>Regulatory Radar</b></a></div></div>
+<meta name="robots" content="noindex"><title>{html.escape(title)} · Intel Scanner</title>{CSS}</head><body><div class="sheet">
+<div class="mast"><div class="wordmark"><a href="/">Intel <b>Scanner</b></a></div></div>
 <main><div class="crumb">{html.escape(crumb)}</div>{body}</main></div></body></html>""")
 
 

@@ -96,6 +96,10 @@ TOP_KEYS = ("id", "name", "intent", "jurisdictions", "topics", "industries", "cl
 # recorded in health as WITHHELD with who decided and when.
 LEGAL_DECISIONS = ("fetch", "do_not_fetch", "undecided")
 LEGAL_KEYS = ("decision", "by", "on", "note")
+# A client on a scan: the name the enricher rates against, the advice scope it reads, and — for
+# the page's own deterministic matching, the way the TMT India tracker does it — a sector line
+# and keywords. The enricher never sees the keywords; they are the partner's watch-list.
+CLIENT_KEYS = ("name", "scope", "sector", "keywords")
 # schedule — {daily_at: "HH:MM", tz: "Asia/Kolkata", set_by, set_on}: the ONE place a scan can be
 # told to run unattended. Off unless a partner set it, visible on the page, and recorded with who
 # set it and when, because a decision to collect without a person pressing the button is the
@@ -255,15 +259,19 @@ def validate_definition(defn: Any) -> list[str]:
                     if not (1 <= len(c.strip()) <= 120):
                         problems.append(f"clients[{i}] must be 1..120 characters")
                 elif isinstance(c, dict):
-                    extra = set(c) - {"name", "scope"}
+                    extra = set(c) - set(CLIENT_KEYS)
                     if extra:
-                        problems.append(f"clients[{i}]: unknown field(s) {sorted(extra)}")
+                        problems.append(f"clients[{i}]: unknown field(s) {sorted(extra)} (allowed: {', '.join(CLIENT_KEYS)})")
                     if not isinstance(c.get("name"), str) or not (1 <= len(c["name"].strip()) <= 120):
                         problems.append(f"clients[{i}].name must be 1..120 characters")
-                    if "scope" in c and not (isinstance(c["scope"], str) and len(c["scope"]) <= 500):
-                        problems.append(f"clients[{i}].scope must be a string of at most 500 characters")
+                    for k in ("scope", "sector"):
+                        if k in c and not (isinstance(c[k], str) and len(c[k]) <= 500):
+                            problems.append(f"clients[{i}].{k} must be a string of at most 500 characters")
+                    if "keywords" in c and not (isinstance(c["keywords"], list) and len(c["keywords"]) <= 60
+                                                and all(isinstance(k, str) and 1 <= len(k) <= 120 for k in c["keywords"])):
+                        problems.append(f"clients[{i}].keywords must be a list of at most 60 short strings")
                 else:
-                    problems.append(f"clients[{i}] must be a string or {{name, scope}}")
+                    problems.append(f"clients[{i}] must be a string or {{name, scope, sector, keywords}}")
     if "sources" in defn:
         srcs = defn["sources"]
         if not isinstance(srcs, list):
@@ -1729,6 +1737,61 @@ def cmd_dismiss(args) -> int:
     return EXIT_OK
 
 
+def cmd_clients(args) -> int:
+    """Replace the scan's client roster with the one in --from-json ({"clients": [...]}).
+
+    Clients are named on the definition so every run rates each development against each of them
+    by name; the page's Clients tab is where a partner adds one. This edits the roster and nothing
+    else — no run, no re-gate — and the next run picks the new names up."""
+    if not ID_RE.match(args.id or ""):
+        print("clients: --id must match ^[a-z0-9][a-z0-9-]{1,59}$", file=sys.stderr)
+        return EXIT_USAGE
+    paths = paths_for(args.id)
+    defn = common.load_json(paths.definition, None) if paths.definition.exists() else None
+    if not isinstance(defn, dict) or defn.get("id") != args.id:
+        print(f"clients: no scan definition with id '{args.id}'", file=sys.stderr)
+        return EXIT_USAGE
+    try:
+        doc = common.load_json(Path(args.from_json), None)
+    except Exception as e:
+        print(f"clients: could not read {args.from_json}: {e}", file=sys.stderr)
+        return EXIT_USAGE
+    roster = doc.get("clients") if isinstance(doc, dict) else None
+    if not isinstance(roster, list):
+        print("clients: --from-json must hold {\"clients\": [...]}", file=sys.stderr)
+        return EXIT_USAGE
+    cleaned = []
+    for c in roster:
+        if isinstance(c, str):
+            cleaned.append(common.norm_ws(c)[:120])
+        elif isinstance(c, dict):
+            o = {"name": common.norm_ws(str(c.get("name") or ""))[:120]}
+            for k in ("scope", "sector"):
+                if c.get(k):
+                    o[k] = common.norm_ws(str(c[k]))[:500]
+            kws = [common.norm_ws(str(k))[:120] for k in (c.get("keywords") or []) if isinstance(k, str) and common.norm_ws(str(k))]
+            if kws:
+                o["keywords"] = kws[:60]
+            cleaned.append(o)
+        else:
+            cleaned.append(c)   # let the validator name it
+    before = defn.get("clients")
+    defn["clients"] = cleaned
+    problems = validate_definition(defn)
+    if problems:
+        for p in problems:
+            print(f"clients: {p}", file=sys.stderr)
+        return EXIT_USAGE
+    defn["updated"] = common.now_ist()
+    common.atomic_write_json(paths.definition, defn)
+    names = [c if isinstance(c, str) else c["name"] for c in cleaned]
+    common.log(f"clients: {len(cleaned)} on the scan now ({', '.join(names) or 'none'}); was {len(before) if isinstance(before, list) else 0}")
+    common.log("the next run rates every development against each of them by name")
+    _print_summary({"id": args.id, "action": "clients", "clients": names, "exit": EXIT_OK},
+                   getattr(args, "summary_out", None))
+    return EXIT_OK
+
+
 def cmd_legal(args) -> int:
     """Record a partner's decision on whether one source may be fetched.
 
@@ -1931,6 +1994,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--id", required=True)
     x.add_argument("--finding", required=True, metavar="FINDING_ID",
                    help="a 10-character finding id from data/scans/<id>/misc.json (any kind; not one already promoted)")
+    cs = sub.add_parser("clients", help="replace the scan's client roster from a JSON file {clients: [...]}")
+    cs.add_argument("--id", required=True)
+    cs.add_argument("--from-json", required=True, metavar="FILE")
     lg = sub.add_parser("legal", help="record a partner's decision on whether one source may be fetched")
     lg.add_argument("--id", required=True)
     lg.add_argument("--url", required=True, help="a URL on the scan's coverage list")
@@ -1948,7 +2014,7 @@ def build_parser() -> argparse.ArgumentParser:
     for p in (c, r):
         p.add_argument("--no-misc", action="store_true",
                        help="skip the Miscellaneous lane (the open-web search for things outside coverage)")
-    for p in (c, r, d, m, x, lg, f):
+    for p in (c, r, d, m, x, cs, lg, f):
         p.add_argument("--summary-out", metavar="FILE", default=None,
                        help="also write the SUMMARY JSON to FILE (the workflow reads this, not the log)")
     return ap
@@ -1972,6 +2038,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         return cmd_dismiss(args)
     if args.cmd == "legal":
         return cmd_legal(args)
+    if args.cmd == "clients":
+        return cmd_clients(args)
     if args.cmd == "list":
         return cmd_list(args)
     if args.cmd == "propose-filter":

@@ -86,6 +86,20 @@
        "scope": {
         "type": "string",
         "maxLength": 500
+       },
+       "sector": {
+        "type": "string",
+        "maxLength": 500
+       },
+       "keywords": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 120
+        },
+        "description": "The partner's watch-list for the page's own deterministic matching; the enricher never sees these."
        }
       }
      }
@@ -220,12 +234,28 @@
    "additionalProperties": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["decision"],
+    "required": [
+     "decision"
+    ],
     "properties": {
-     "decision": {"type": "string", "enum": ["fetch", "do_not_fetch", "undecided"]},
-     "by": {"type": "string"},
-     "on": {"type": "string"},
-     "note": {"type": "string", "maxLength": 500}
+     "decision": {
+      "type": "string",
+      "enum": [
+       "fetch",
+       "do_not_fetch",
+       "undecided"
+      ]
+     },
+     "by": {
+      "type": "string"
+     },
+     "on": {
+      "type": "string"
+     },
+     "note": {
+      "type": "string",
+      "maxLength": 500
+     }
     }
    }
   },

@@ -49,7 +49,7 @@ IST = _dt.timezone(_dt.timedelta(hours=5, minutes=30))
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,59}$")
 FINDING_RE = re.compile(r"^[a-f0-9]{10}$")
 RESERVED_IDS = {"schema", "tmt-india"}
-ACTIONS = {"create", "run", "delete", "promote", "dismiss", "legal"}
+ACTIONS = {"create", "run", "delete", "promote", "dismiss", "legal", "clients"}
 LEGAL_DECISIONS = ("fetch", "do_not_fetch", "undecided")
 MAX_SCAN_JSON = 60_000           # the same cap the workflow input had; a definition is small
 
@@ -282,6 +282,10 @@ class Jobs:
                 cmd.append("--no-discover")
         else:
             cmd += ["--id", job["scan_id"]]
+        if action == "clients":
+            tmp_def = LOG_DIR / f"{job['id']}.clients.json"
+            tmp_def.write_text(json.dumps({"clients": args.get("clients") or []}, ensure_ascii=False))
+            cmd += ["--from-json", str(tmp_def)]
         if action in ("promote", "dismiss"):
             cmd += ["--finding", args["finding"]]
         if action == "legal":
@@ -383,7 +387,12 @@ def validate_scan_request(body: dict) -> tuple:
             return f"legal needs `decision`, one of: {', '.join(LEGAL_DECISIONS)}.", None
         if note is not None and (not isinstance(note, str) or len(note) > 500):
             return "note must be a string of at most 500 characters.", None
+    clients = body.get("clients")
+    if action == "clients":
+        if not isinstance(clients, list) or len(clients) > 100 or len(json.dumps(clients)) > 60_000:
+            return "clients needs `clients`, a list of at most 100 entries.", None
     return None, {"action": action, "scan_id": scan_id, "scan": scan, "finding": finding,
+                  "clients": clients if action == "clients" else None,
                   "no_discover": bool(no_discover), "workflow": body.get("workflow"),
                   "url": url if action == "legal" else None, "decision": decision if action == "legal" else None,
                   "note": (note or "") if action == "legal" else ""}

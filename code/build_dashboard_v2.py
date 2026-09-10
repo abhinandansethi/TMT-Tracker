@@ -693,7 +693,7 @@ payload: dict[str, Any] = {
 data_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
 
 TEMPLATE = r"""<meta charset="utf-8">
-<title>TMT Regulatory Radar</title>
+<title>TMT India · Intel Scanner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0C3A55">
 <!-- What an open tab polls for while a sweep it started is still running: it fetches this page
@@ -1086,7 +1086,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
 <div class="sheet">
   <div class="head">
     <div class="brand">
-      <a class="wordmark" href="/" title="All scans">TMT <b>Regulatory Radar</b></a>
+      <a class="wordmark" href="/" title="All scans">Intel <b>Scanner</b></a>
       <div class="whoami"><a href="/">Scans</a><span class="crumb">&rsaquo;</span><b>TMT India</b><span class="vetted">Vetted</span></div>
     </div>
     <div class="updbar">

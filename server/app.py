@@ -37,9 +37,9 @@ sys.path.insert(0, str(ROOT))
 from server import admin, assist, jobs, settings  # noqa: E402
 
 DIST = ROOT / "dist"
-REALM = 'Basic realm="TMT Regulatory Radar", charset="UTF-8"'
+REALM = 'Basic realm="Intel Scanner", charset="UTF-8"'
 
-app = FastAPI(title="TMT Regulatory Radar", docs_url=None, redoc_url=None, openapi_url=None)
+app = FastAPI(title="Intel Scanner", docs_url=None, redoc_url=None, openapi_url=None)
 JOBS = jobs.Jobs()
 
 
@@ -146,10 +146,11 @@ async def api_scans(request: Request, user: str = Depends(require_user)):
         v["scan"]["schedule"] = dict(v["scan"]["schedule"], set_by=user, set_on=jobs.now_iso())
     title = f"Scan {v['action']} {v['scan_id']}"
     args = {"scan": v["scan"], "no_discover": v["no_discover"], "finding": v["finding"],
-            "url": v.get("url"), "decision": v.get("decision"), "note": v.get("note")}
+            "url": v.get("url"), "decision": v.get("decision"), "note": v.get("note"), "clients": v.get("clients")}
     job = JOBS.enqueue("scan", v["action"], v["scan_id"], args, title, requested_by=user)
     verb = {"create": "Scan queued", "run": "Run queued", "delete": "Scan removal queued",
-            "promote": "Promotion queued", "dismiss": "Dismissal queued", "legal": "Decision queued"}[v["action"]]
+            "promote": "Promotion queued", "dismiss": "Dismissal queued", "legal": "Decision queued",
+            "clients": "Client roster queued"}[v["action"]]
     return JSONResponse({"ok": True, "message": f"{verb} — it runs on this server now; the page picks the result up itself.",
                          "scan_id": v["scan_id"], "job_id": job["id"], "actionsUrl": job["html_url"]}, status_code=202)
 

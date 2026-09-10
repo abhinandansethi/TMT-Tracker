@@ -800,6 +800,10 @@ def load_scan(root: Path, defn_path: Path) -> dict:
             # on, discovery_notes threw away discovery's account of what it searched and dropped,
             # and budget reset a partner's own caps to the defaults — all on a plain Save.
             "no_misc": defn.get("no_misc") is True,
+            # The radar this layer belongs to, and the partner's per-source legal decisions: both
+            # shown on the page and both re-submitted unchanged by an Edit.
+            "group": str(defn.get("group") or ""), "layer": str(defn.get("layer") or ""),
+            "legal": dict(defn["legal"]) if isinstance(defn.get("legal"), dict) else {},
             # An unattended daily run is the one thing a scan can do without a person; it must be
             # on the page and in the Edit dialog, never a hidden property of the definition.
             "schedule": dict(defn["schedule"]) if isinstance(defn.get("schedule"), dict) else None,
@@ -1368,6 +1372,101 @@ a.el{color:var(--navy)}
 /* ---- the scan's own tab bar. Same vocabulary as the tracker's nav (uppercase mono labels, a
    3px ochre underline on the active one), on paper rather than navy, because the navy bar above
    it is the site's nav and two identical bars would read as one broken one. */
+/* ---- the TMT India tracker's skeleton, on every scan: brand + breadcrumb in the head, the
+   navy tab bar under it, the same table rows, the same client cards. One product, one look. */
+.brand{display:flex;flex-direction:column;gap:3px}
+a.wordmark{text-decoration:none;border:0;display:block}
+.whoami{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:#B9CEDC;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.whoami:empty{display:none}
+.whoami a{color:#B9CEDC;text-decoration:none;border-bottom:1px solid rgba(185,206,220,.4)}
+.whoami a:hover{color:#fff;border-bottom-color:#fff}
+.whoami .crumb{opacity:.55;margin:0}
+.whoami b{color:#fff;font-weight:600}
+.whoami .vetted{background:rgba(230,241,235,.14);color:#CFE6DA;border:1px solid rgba(207,230,218,.35);border-radius:4px;padding:1px 6px;font-size:9.5px;letter-spacing:.08em}
+.whoami .vetted.disc{color:#F1E4B8;border-color:rgba(241,228,184,.4);background:rgba(241,228,184,.12)}
+.headbtns{display:flex;gap:8px;align-items:center}
+.headbtns:empty{display:none}
+#updnow{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--ochre);border:0;padding:7px 14px;transition:opacity .12s}
+#updnow:hover{opacity:.85}
+#updnow:disabled{opacity:.5;cursor:progress}
+.hbtn{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#B9CEDC;background:none;border:1px solid rgba(185,206,220,.4);padding:6px 10px}
+.hbtn:hover{color:#fff;border-color:#fff}
+.hbtn.danger:hover{color:#F6C4B8;border-color:#F6C4B8}
+.tabs button{appearance:none;background:none;border:0;border-bottom:3px solid transparent;padding:13px 18px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:#93B2C6;cursor:pointer;white-space:nowrap}
+.tabs button.on{color:#fff;border-bottom-color:var(--ochre);background:rgba(255,255,255,.06)}
+.tabs button:hover{color:#fff}
+.tabs button .k{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:#6F93AA;margin-left:6px;font-weight:500}
+.tabs button.on .k{color:#D8E4EC}
+.scanline{margin-top:6px}
+.scanline .intent{margin:8px 0 0;max-width:900px;color:var(--mute);font-size:13.5px;line-height:1.55}
+.tablewrap{overflow-x:auto}
+.tbl{min-width:1000px}
+.thead{margin-top:24px;border-bottom:2px solid var(--navy)}
+.thead .r{display:grid;grid-template-columns:var(--grid);column-gap:24px;padding:11px 0 11px 4px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--navy);font-weight:600}
+.row{border-bottom:1px solid var(--rule3);background:var(--paper)}
+.row:hover{background:var(--navy-wash)}
+.row .line{cursor:pointer;display:grid;grid-template-columns:var(--grid);column-gap:24px;align-items:baseline;padding:16px 0 17px 4px}
+.row .line:focus-visible{outline:2px solid var(--navy);outline-offset:-2px}
+.c-date{font-family:var(--mono);font-size:12.5px;color:var(--mute);white-space:nowrap}
+.c-date.none{color:var(--faint)}
+.c-reg{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-title{position:relative;min-width:0}
+.c-title>.t{display:inline;font-family:var(--serif);font-size:17px;font-weight:500;color:var(--ink);border-bottom:1px dotted var(--rule);padding-bottom:2px}
+.row.read .c-title>.t{font-weight:400}
+.c-title>.sub{display:block;margin-top:5px;font-size:12.5px;line-height:1.42;color:var(--mute);max-width:64ch}
+.c-title>.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.c-type span{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;white-space:nowrap;color:var(--navy);background:var(--navy-wash);border:1px solid #C4D6E1}
+.c-type span.quiet{color:var(--faint);background:transparent;border-color:var(--rule2)}
+.c-mark{font-family:var(--mono);font-size:15px;color:var(--navy);text-align:right}
+.cl-eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--navy);margin-bottom:5px}
+.cl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin:26px 0 20px}
+.cl-sub{font-size:13px;color:var(--mute);max-width:640px;line-height:1.5}
+.cl-headbtns{white-space:nowrap}
+.cl-add{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;border-radius:3px;padding:8px 14px;background:var(--ochre);border:1px solid var(--ochre);color:#1a1206}
+.cl-card{border:1px solid var(--rule2);border-radius:9px;padding:16px 20px;margin:12px 0}
+.cl-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.cl-name{font-family:var(--serif);font-size:19px;color:var(--ink)}
+.cl-sec{font-size:12px;color:var(--mute);margin-left:6px}
+.cl-act{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.cl-count{font-family:var(--mono);font-size:11px;color:var(--ochre);margin-right:4px}
+.cl-btn{appearance:none;cursor:pointer;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;border:1px solid var(--rule2);background:#fff;color:var(--navy);padding:4px 9px;border-radius:3px}
+.cl-btn:hover{border-color:var(--navy)}
+.cl-del{color:var(--alarm);border-color:transparent;font-size:15px;padding:0 6px;letter-spacing:0}
+.cl-matches{display:none;margin-top:14px;border-top:1px solid var(--rule2);padding-top:12px}
+.cl-matches.on{display:block}
+.cl-matches ul{list-style:none;margin:0;padding:0}
+.cl-matches li{padding:9px 0;border-top:1px solid #eef2f4}
+.cl-matches li:first-child{border-top:none}
+.cl-matches a{color:var(--navy);text-decoration:none;font-weight:600;font-size:14px}
+.cl-matches a:hover{text-decoration:underline}
+.cl-m{font-size:12px;color:#44555d;margin-top:2px}
+.cl-why{font-size:11px;color:var(--faint);font-style:italic;margin-top:2px}
+.cl-itop{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cl-badge{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.09em;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.b-notify{background:#E9F3EA;color:#276B2E;border:1px solid #B9DCBD}
+.b-review{background:var(--ochre-wash);color:#7A5E0E;border:1px solid #E4D19A}
+.b-monitor{background:#EAF0F4;color:#1B6288;border:1px solid #BFD3E0}
+.b-fyi{background:#F1F3F4;color:#7A868D;border:1px solid #E2E8EC}
+.cl-brief{font-size:12.5px;color:#37474f;line-height:1.5;margin-top:4px;max-width:760px}
+.cl-idraft{margin-top:8px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:5px 12px;border-radius:3px}
+.cl-idraft:hover{background:var(--navy);color:#fff}
+li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
+.cl-ai{display:inline-block;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:20px;padding:1px 7px;margin-left:4px;white-space:nowrap}
+.cl-scope{font-size:12px;color:#37474f;margin-top:6px;max-width:820px;line-height:1.5}
+.cl-scope b{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);font-weight:600;margin-right:6px}
+.cl-none{color:var(--faint);font-style:italic}
+.cl-empty{color:var(--mute);padding:24px 0}
+#cl-modal{display:none;position:fixed;inset:0;background:rgba(0,20,35,.45);z-index:50;align-items:flex-start;justify-content:center;overflow:auto;padding:40px 16px}
+#cl-modal.on{display:flex}
+.cl-dialog{background:#fff;border-radius:10px;max-width:560px;width:100%;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.cl-dialog h3{font-family:var(--serif);font-weight:500;margin:0 0 14px;font-size:21px}
+.cl-lbl{display:block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);margin:14px 0 5px}
+.cl-hint{text-transform:none;letter-spacing:0;color:var(--faint);font-weight:400}
+.cl-in,.cl-ta{width:100%;box-sizing:border-box;border:1px solid var(--rule2);border-radius:4px;padding:8px 10px;font-family:var(--sans);font-size:14px}
+.cl-ta{font-family:var(--mono);font-size:12px}
+.cl-formact{display:flex;gap:10px;margin-top:20px}
+.cl-save{appearance:none;cursor:pointer;background:var(--ochre);border:none;color:#1a1206;font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:9px 18px;border-radius:3px}
+.cl-cancel{appearance:none;cursor:pointer;background:#fff;border:1px solid var(--rule2);color:var(--mute);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;padding:9px 16px;border-radius:3px}
 .vtabs{margin-top:30px;display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--rule2)}
 .vtabs button{appearance:none;cursor:pointer;background:none;border:0;border-bottom:3px solid transparent;
   padding:12px 16px;font-family:var(--sans);font-size:11px;font-weight:600;text-transform:uppercase;
@@ -1531,15 +1630,15 @@ a.el{color:var(--navy)}
 
 <div class="sheet">
   <div class="head">
-    <div class="wordmark"><a href="/">TMT <b>Regulatory Radar</b></a></div>
-    <div class="updbar"><div class="updated" id="headstamp"></div></div>
+    <div class="brand"><a class="wordmark" href="/">Intel <b>Scanner</b></a><div class="whoami" id="whoami"></div></div>
+    <div class="updbar"><div class="updated" id="headstamp"></div><span class="headbtns" id="headbtns"></span></div>
   </div>
   <!-- DEFECT this closes: these were the TMT tracker's six tabs, rendered on every scan page and
        every one of them linking to /tmt-radar-v2.html. On the EU Pay Transparency scan, pressing
        "Instruments" left the scan and opened TMT India's ledger — and it shadowed the scan's OWN
        seven-tab bar, which sits with the content and is the real navigation here. A scan page
        gets a way home and nothing else; the lanes belong to the scan. -->
-  <nav class="tabs" aria-label="Where you are">
+  <nav class="tabs" id="topnav" aria-label="Where you are">
     <a class="tab-scans on" href="/" aria-current="page">&larr; All scans</a>
   </nav>
   <main class="page" id="main"></main>
@@ -1911,6 +2010,7 @@ function mountPending(el, ctx) {
       out.badge = 'Publishing'; out.badgeClass = 'working';
       out.line = kindOf(p) === 'delete' ? 'Removed. Publishing the site without it — the card goes when this page reloads itself.'
         : kindOf(p) === 'legal' ? 'Recorded under your login. Publishing the page with the decision on it.'
+        : kindOf(p) === 'clients' ? 'Roster saved. Publishing the page; the next run rates every development against the new names.'
         : promo
         // Reviewed defect: this card used to say the gate was running. run.py's promote does no
         // such thing — it appends the URL as a PENDING source and commits. The gate (robots.txt,
@@ -1939,8 +2039,9 @@ function mountPending(el, ctx) {
     out.line = promo ? 'Running — this errand only edits the scan’s source list; it reads nothing.'
              : kindOf(p) === 'delete' ? 'Removing the definition and its data.'
              : kindOf(p) === 'legal' ? 'Writing the decision into the scan’s definition; it reads nothing.'
+             : kindOf(p) === 'clients' ? 'Writing the client roster into the scan’s definition; it reads nothing.'
              : 'Running.';
-    if (kindOf(p) === 'delete' || kindOf(p) === 'legal') return out;
+    if (kindOf(p) === 'delete' || kindOf(p) === 'legal' || kindOf(p) === 'clients') return out;
     out.est = aboutMins(mins) + '; usually ' + phaseAt(mins, promo ? PROMOTE_PHASES : RUN_PHASES)
             + ' around now. That is an estimate from the clock — the run reports that it is running, not which step it is on.';
     return out;
@@ -1961,6 +2062,7 @@ function mountPending(el, ctx) {
         ? 'This run reads the newest documents each approved source is showing, within the scan’s own caps. Anything beyond them queues and is counted as queued; press Run scan again to continue through the backlog.'
         : kindOf(p) === 'delete' ? 'The definition, the ledger, the digest and the stored documents are removed together. The audit trail keeps the commit that removed them.'
         : kindOf(p) === 'legal' ? 'The decision is written into the definition with your login and the date. Do not fetch takes effect on the next run.'
+        : kindOf(p) === 'clients' ? 'Keyword matches show at once; the enricher’s own ratings for a new client arrive with the next run.'
         : esc(FIRST_RUN_LINE);
     return '<div class="pcard' + (s.bad ? ' failed' : '') + '">'
       + '<div><div class="name">' + esc(p.name || p.id) + '<span class="badge ' + esc(s.badgeClass) + '">' + esc(s.badge) + '</span></div>'
@@ -2978,7 +3080,7 @@ function renderHome() {
   if (!['all', 'starred'].includes(hs.tab)) hs.tab = 'all';
   if (!['name', 'lastrun', 'new'].includes(hs.sort)) hs.sort = 'name';
   const hsave = () => { try { localStorage.setItem(HKEY, JSON.stringify(hs)); } catch (e) {} };
-  main.innerHTML = '<div class="titlerow"><div><div class="crumb">TMT Regulatory Radar</div><h1 class="title">Scans</h1>'
+  main.innerHTML = '<div class="titlerow"><div><div class="crumb">Intel Scanner</div><h1 class="title">Scans</h1>'
     // This page is the product's front door, not an index behind the tracker: it opens with what a
     // scan is and who owns which one, because a partner arriving here for the first time has no
     // other page to learn it from.
@@ -3117,7 +3219,11 @@ function renderScan() {
 
   // Clients named on the scan, plus any client a development rates that the scan does not name: an
   // orphan rating is a fact about the ledger and gets its own section rather than vanishing.
-  const scanClients = (S.clients || []).map(c => ({ name: clientName(c), scope: (c && typeof c === 'object' && c.scope) ? String(c.scope) : '' })).filter(c => c.name);
+  // The roster is mutable on this page: Add client writes it back through the service and the
+  // page reloads, but the card is drawn at once from this copy so the partner sees it land.
+  let scanClients = (S.clients || []).map(c => ({ name: clientName(c), scope: (c && typeof c === 'object' && c.scope) ? String(c.scope) : '',
+    sector: (c && typeof c === 'object' && c.sector) ? String(c.sector) : '',
+    keywords: (c && typeof c === 'object' && Array.isArray(c.keywords)) ? c.keywords.filter(k => typeof k === 'string' && k.trim()) : [] })).filter(c => c.name);
   const ratedNames = {};
   items.forEach(it => Object.keys(it.relevance.clients || {}).forEach(n => { ratedNames[n] = true; }));
   const orphanClients = Object.keys(ratedNames).filter(n => !scanClients.some(c => c.name.toLowerCase() === n.toLowerCase())).sort();
@@ -3150,24 +3256,25 @@ function renderScan() {
   const layers = group ? '<div class="layers" aria-label="Layers of ' + esc(group) + '"><span class="on">' + esc(layerName) + '</span>'
       + sibs.map(s => '<a href="' + esc(s.href) + '">' + esc(s.layer) + '</a>').join('')
       + '<button type="button" class="btn sm" id="addlayer">+ Add layer</button></div>' : '';
-  main.innerHTML = '<div class="crumb"><a href="/scans.html">Scans</a><span>&rsaquo;</span>' + (group ? esc(group) + '<span>&rsaquo;</span>' : '') + esc(layerName) + '</div>'
-    + '<div class="titlerow"><div>' + (group ? '<div class="radarname">' + esc(group) + '</div>' : '') + '<h1 class="title">' + esc(layerName) + '</h1>' + layers
-    + '<div class="metaline"><span>' + esc(D.meta) + '</span><span class="dot">&middot;</span><span class="flags">' + flags + '</span><span class="dot">&middot;</span><span>Last run <b id="lastrun"></b></span>'
-    + (S.demo ? '<span class="badge demo">Demo</span>' : '') + '<span class="badge discovered">Discovered sources</span></div>'
-    + '<p class="plain">' + scheduleLine(S) + '</p>'
+  // The head and the tab bar are the tracker's: brand, breadcrumb and the Update now button in
+  // the navy head; the lanes as the navy tab bar under it. The scan's own lines (layers, intent,
+  // schedule) sit just below, and the digest opens the Coverage tab.
+  $('#whoami').innerHTML = '<a href="/">Scans</a><span class="crumb">&rsaquo;</span>' + (group ? '<b>' + esc(group) + '</b><span class="crumb">&rsaquo;</span>' : '')
+    + '<b>' + esc(layerName) + '</b><span class="vetted disc">Discovered</span>' + (S.demo ? '<span class="vetted">Demo</span>' : '');
+  // run.py refuses a demo definition with exit 2 (its sources are reserved .test hosts), so the
+  // button says so up front instead of letting a partner queue a run that can only fail.
+  $('#headbtns').innerHTML = '<button id="updnow" type="button"' + (S.demo ? ' disabled title="Demo scans use fixture hosts and cannot be run live — create your own scan" aria-disabled="true"' : ' title="Read every approved source now"') + '>Update now</button>'
+    + '<button type="button" class="hbtn" id="edit">Edit</button>' + (group ? '' : '<button type="button" class="hbtn" id="addlayer">+ Layer</button>')
+    + '<button type="button" class="hbtn danger" id="delete" title="Remove this scan, its ledger and its digest">Delete</button>';
+  main.innerHTML = '<div class="scanline">' + layers
+    + '<div class="metaline"><span>' + esc(D.meta) + '</span><span class="dot">&middot;</span><span class="flags">' + flags + '</span><span class="dot">&middot;</span><span>Last run <b id="lastrun"></b></span><span class="dot">&middot;</span><span>' + scheduleLine(S) + '</span></div>'
     + (S.intent ? '<p class="intent">' + esc(S.intent) + '</p>' : '') + '</div>'
-    // run.py refuses a demo definition with exit 2 (its sources are reserved .test hosts), so the
-    // button says so up front instead of letting a partner queue a run that can only fail.
-    + '<div class="actions"><button class="btn primary' + (S.demo ? ' demo-off' : '') + '" id="run"' + (S.demo ? ' disabled title="Demo scans use fixture hosts and cannot be run live — create your own scan" aria-disabled="true"' : '') + '>Run scan</button><button class="btn" id="edit">Edit</button>' + (group ? '' : '<button type="button" class="btn" id="addlayer">+ Add layer</button>') + '<button class="btn quiet" id="delete" title="Remove this scan, its ledger and its digest">Delete</button></div></div>'
     + '<div class="notice" id="notice"></div>'
     // Run scan and Promote are pressed HERE, so the wait has to be shown here too. Before this the
     // scan page dispatched a run, printed one line, and then looked identical for twelve minutes.
     + '<div class="pending" id="pending"></div>'
     + (D.problems.length ? '<ul class="problems">' + D.problems.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
-    // The digest and its tiles are the scan's masthead: true of every tab, so above all of them.
-    + digestHTML()
-    + '<nav class="vtabs" id="vtabs" role="tablist" aria-label="Scan sections"></nav>'
-    + '<section class="view" id="v-coverage" role="tabpanel" aria-label="Coverage"><div class="coverage">' + coverageHTML() + '</div></section>'
+    + '<section class="view" id="v-coverage" role="tabpanel" aria-label="Coverage">' + digestHTML() + '<div class="coverage">' + coverageHTML() + '</div></section>'
     + '<section class="view" id="v-legal" role="tabpanel" aria-label="Legal"></section>'
     + LANE_DEFS.map(d => '<section class="view" id="v-' + d.k + '" role="tabpanel" aria-label="' + esc(d.label) + '">' + laneShell(d) + '</section>').join('')
     + '<section class="view" id="v-misc" role="tabpanel" aria-label="Miscellaneous"></section>'
@@ -3175,12 +3282,13 @@ function renderScan() {
     + '<section class="view" id="v-audit" role="tabpanel" aria-label="Audit"></section>'
     // The obligations register spans every lane, so it belongs to none of them: it stays below the
     // tabs, where it reads as a property of the scan rather than of whichever tab happens to be open.
-    + '<section class="oblsec" id="oblsec" aria-label="Obligations register">' + obligationsHTML() + '</section>';
+    + '<section class="oblsec" id="oblsec" aria-label="Obligations register">' + obligationsHTML() + '</section>'
+    + '<div id="cl-modal"></div>';
   noticeEl = $('#notice');
   $('#lastrun').textContent = rel(D.generated);
-  $('#run').addEventListener('click', async () => {
+  $('#updnow').addEventListener('click', async () => {
     if (S.demo) return;
-    const b = $('#run'); b.disabled = true;
+    const b = $('#updnow'); b.disabled = true;
     const req = { action: 'run', scan_id: S.id };
     const res = await dispatchScan(req, 'run this scan');
     b.disabled = false;
@@ -3210,7 +3318,7 @@ function renderScan() {
     say('Removal queued — this page will stop existing. Taking you to Scans.', 'warn');
     setTimeout(() => { location.href = '/'; }, 1500);
   });
-  $('#vtabs').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (b) setView(b.dataset.view); });
+  $('#topnav').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (b) setView(b.dataset.view); });
   // A decision on the Legal tab is recorded by the service under the signed-in user's name, then
   // the page rebuilds and reloads itself. "Do not fetch" takes effect on the next run.
   $('#v-legal').addEventListener('change', async e => {
@@ -3229,18 +3337,18 @@ function renderScan() {
     $('#q-' + l).addEventListener('input', e => { lstate[l].q = e.target.value.trim().toLowerCase(); drawLane(l); });
     $('#sort-' + l).addEventListener('change', e => { lstate[l].sort = e.target.value; drawLane(l); });
     $('#ttabs-' + l).addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { lstate[l].tab = b.dataset.tab; drawLane(l); } });
-    $('#tb-' + l).addEventListener('click', e => { const r = e.target.closest('tr.r'); if (r) openDetail(r.dataset.id, r); });
-    $('#tb-' + l).addEventListener('keydown', e => { const r = e.target.closest('tr.r'); if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetail(r.dataset.id, r); } });
+    $('#tb-' + l).addEventListener('click', e => { const r = e.target.closest('.row'); if (r) openDetail(r.dataset.id, r.querySelector('.line')); });
+    $('#tb-' + l).addEventListener('keydown', e => { const r = e.target.closest('.row'); if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetail(r.dataset.id, r.querySelector('.line')); } });
   });
 
   // ---- tab bar ----------------------------------------------------------------------------------
   function drawTabs() {
-    $('#vtabs').innerHTML = VIEWS.map(v => {
+    $('#topnav').innerHTML = VIEWS.map(v => {
       const n = v.n();
       return '<button type="button" role="tab" data-view="' + v.k + '" class="' + (state.view === v.k ? 'on' : '') + '"'
         + ' aria-selected="' + (state.view === v.k) + '" aria-controls="v-' + v.k + '">' + esc(v.label)
         + (n == null ? '' : '<span class="k">' + esc(n) + '</span>') + '</button>';
-    }).join('');
+    }).join('') + '<a class="tab-scans" href="/">&larr; All scans</a>';
   }
   // Each tab draws when it is opened rather than on first paint: a scan with a long ledger would
   // otherwise build seven tables to show one.
@@ -3449,9 +3557,10 @@ function renderScan() {
       + '<div class="toolbar"><div class="ttabs" role="tablist" id="ttabs-' + l + '"></div>'
       + '<div class="tools"><input type="search" id="q-' + l + '" placeholder="Search ' + esc(low) + '" aria-label="Search ' + esc(low) + '">'
       + '<select id="sort-' + l + '" aria-label="Sort ' + esc(low) + '"><option value="newest">Newest</option><option value="relevance">Relevance</option></select></div></div>'
-      + '<div class="tablewrap" id="wrap-' + l + '"><table class="dev"><colgroup><col><col style="width:112px"><col style="width:124px"><col style="width:180px"><col style="width:176px"><col style="width:112px"></colgroup>'
-      + '<thead><tr><th>Development</th><th>Relevance</th><th>Type</th><th>Topics</th><th>Source</th><th>Jurisdiction</th></tr></thead>'
-      + '<tbody id="tb-' + l + '"></tbody></table></div><div id="empty-' + l + '"></div>';
+      // The tracker's table: Date · Source · Development · Type, one grid, click to open.
+      + '<div class="tablewrap" id="wrap-' + l + '"><div class="tbl" style="--grid:104px 150px minmax(0,1fr) 150px 24px">'
+      + '<div class="thead"><div class="r"><div>Date</div><div>Source</div><div>' + esc(d.k === 'judgments' ? 'Matter' : 'Development') + '</div><div>Type</div><div></div></div></div>'
+      + '<div id="tb-' + l + '"></div></div></div><div id="empty-' + l + '"></div>';
   }
   function visible(pool, st) {
     let list = pool.filter(it => st.tab === 'archived' ? state.arch[it.id] : st.tab === 'starred' ? state.star[it.id] && !state.arch[it.id] : st.tab === 'unread' ? isUnread(it) : !state.arch[it.id]);
@@ -3473,16 +3582,17 @@ function renderScan() {
   }
   function srcChip(it) { return kindChip(it.kind, it.tier, it.domain); }
   function rowHTML(it) {
-    return '<tr class="r' + (state.read[it.id] ? ' read' : '') + '" tabindex="0" data-id="' + esc(it.id) + '" aria-label="' + esc(it.title) + '">'
-      + '<td><div class="t"><span class="un" aria-hidden="true"></span><span>' + esc(it.title) + (state.star[it.id] ? '<span class="star" aria-label="starred">&#9733;</span>' : '') + '</span></div>'
-      + (it.headline ? '<div class="h">' + esc(it.headline) + '</div>' : '') + '<div class="w"><b>' + esc(rel(it.date || it.first_seen)) + '</b> &middot; ' + esc(it.domain) + '</div></td>'
-      + '<td>' + relHTML(it.relevance) + '</td>'
+    return '<div class="row' + (state.read[it.id] ? ' read' : '') + '" data-id="' + esc(it.id) + '">'
+      + '<div class="line" tabindex="0" role="button" aria-label="' + esc(it.title) + '">'
+      + '<div class="c-date' + (it.date ? '' : ' none') + '">' + esc(it.date ? fmt(it.date) : 'undated') + '</div>'
+      + '<div class="c-reg" title="' + esc(it.domain) + '">' + esc(it.domain) + '</div>'
+      + '<div class="c-title"><span class="t">' + esc(it.title) + '</span>' + (state.star[it.id] ? '<span class="star" aria-label="starred">&#9733;</span>' : '')
+      + (it.headline ? '<span class="sub">' + esc(it.headline) + '</span>' : '')
+      + '<span class="meta">' + relHTML(it.relevance) + flagged(it.jurisdiction) + it.topics.slice(0, 3).map(t => '<span class="chip">' + esc(t) + '</span>').join('') + '</span></div>'
       // An untyped row is in Signals because nothing has typed it yet, not because it is a signal.
-      + '<td>' + (it.type ? '<span class="chip">' + esc(it.type) + '</span>'
-          : '<span class="chip untyped" title="No type was recorded, so the lane rule parked this development in Signals. It moves when the enricher types it.">untyped</span>') + '</td>'
-      + '<td><div class="chips">' + it.topics.map(t => '<span class="chip">' + esc(t) + '</span>').join('') + '</div></td>'
-      + '<td>' + srcChip(it) + '</td>'
-      + '<td>' + flagged(it.jurisdiction) + '</td></tr>';
+      + '<div class="c-type">' + (it.type ? '<span class="' + (/draft|consult/i.test(it.type) ? 'draft' : '') + '">' + esc(it.type) + '</span>'
+          : '<span class="quiet" title="No type was recorded, so the lane rule parked this development in Signals. It moves when the enricher types it.">untyped</span>') + '</div>'
+      + '<div class="c-mark">&rsaquo;</div></div></div>';
   }
   // A lane with nothing in it must say what would be there and why nothing is: an empty table is
   // otherwise indistinguishable from a broken one, and from a scan that read nothing at all.
@@ -3652,23 +3762,101 @@ function renderScan() {
       + (orphan ? '<div class="cscope">A development rates this client, but the scan definition does not name them. Add them with <b>Edit</b>, or treat the rating as stale.</div>' : '')
       + body + '</div>';
   }
+  // ---- Clients: the TMT India tracker's cards, on a scan --------------------------------------
+  // Two kinds of match, both shown and both labelled: the enricher's own rating of a development
+  // against a client by name (arrives with each run), and the partner's keyword watch-list
+  // matched here, deterministically, the way the tracker does it — so a client added a minute
+  // ago already has a list, and the rating catches up on the next run.
+  const CL_LV = { high: 'notify', medium: 'review', low: 'fyi' };
+  const CL_LABEL = { notify: 'Worth an email', review: 'Partner to judge', monitor: 'Monitor', fyi: 'FYI' };
+  function clientMatches(cl) {
+    const rx = (cl.keywords || []).map(k => { try { return new RegExp(k, 'i'); } catch (e) { return new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); } });
+    const out = [];
+    items.forEach(it => {
+      const rated = it.relevance.clients && it.relevance.clients[cl.name];
+      const hay = [it.title, it.headline, (it.topics || []).join(' ')].filter(Boolean).join(' ');
+      const hits = []; rx.forEach(r => { const m = hay.match(r); if (m) hits.push(m[0].toLowerCase()); });
+      if (!rated && !hits.length) return;
+      const lvl = rated ? (CL_LV[String(rated).toLowerCase()] || 'monitor') : (it.lane === 'judgments' ? 'monitor' : 'review');
+      const reasons = [];
+      if (rated) reasons.push('rated ' + String(rated).toLowerCase() + ' for ' + cl.name + (it.relevance.why ? ' — ' + it.relevance.why : ''));
+      if (hits.length) reasons.push('mentions ' + [...new Set(hits)].slice(0, 4).map(h => "'" + h + "'").join(', '));
+      out.push({ it, lvl, reasons, rated: !!rated });
+    });
+    const ORD = { notify: 0, review: 1, monitor: 2, fyi: 3 };
+    out.sort((a, b) => (ORD[a.lvl] - ORD[b.lvl]) || (b.it.date || '').localeCompare(a.it.date || ''));
+    return out;
+  }
+  const clOpen = {};
+  function clientCard(cl, idx, orphan) {
+    const m = clientMatches(cl), worth = m.filter(x => x.lvl === 'notify').length;
+    const rows = m.slice(0, 80).map(x => { const it = x.it;
+      return '<li class="mat-' + x.lvl + '"><div class="cl-itop"><a href="#" data-dev="' + esc(it.id) + '">' + esc(it.headline || it.title) + '</a>'
+        + '<span class="cl-badge b-' + x.lvl + '">' + esc(CL_LABEL[x.lvl]) + '</span>' + (x.rated ? '' : '<span class="cl-ai">keyword match · not yet rated</span>') + '</div>'
+        + '<div class="cl-m">' + esc(it.domain) + ' · ' + esc(it.type || 'untyped') + ' · ' + esc(it.date ? fmt(it.date) : 'undated') + '</div>'
+        + (it.relevance.action && x.rated ? '<div class="cl-brief">' + esc(it.relevance.action) + '</div>' : '')
+        + '<div class="cl-why">On the radar — ' + esc(x.reasons.join('; ')) + '.</div>'
+        + '<button class="cl-idraft" data-draft="' + esc(it.id) + '" data-client="' + esc(cl.name) + '">Draft email</button></li>'; }).join('');
+    return '<div class="cl-card" data-i="' + idx + '"><div class="cl-top"><div><span class="cl-name">' + esc(cl.name) + '</span>' + (cl.sector ? '<span class="cl-sec">' + esc(cl.sector) + '</span>' : '')
+      + (orphan ? '<span class="badge demo">not named on this scan</span>' : '') + '</div>'
+      + '<div class="cl-act"><span class="cl-count">' + m.length + ' match' + (m.length !== 1 ? 'es' : '') + (worth ? ' · <b>' + worth + ' worth an email</b>' : '') + '</span>'
+      + '<button class="cl-btn" data-act="toggle" data-i="' + idx + '">' + (clOpen[cl.name] ? 'Hide' : 'View') + '</button>'
+      + (orphan ? '' : '<button class="cl-btn" data-act="edit" data-i="' + idx + '">Edit</button><button class="cl-btn cl-del" data-act="del" data-i="' + idx + '">×</button>') + '</div></div>'
+      + (cl.scope ? '<div class="cl-scope"><b>Advises on</b>' + esc(cl.scope) + '</div>' : '')
+      + '<div class="cl-scope"><b>Watches</b>' + ((cl.keywords || []).length ? esc(pl(cl.keywords.length, 'keyword')) + ' · ' : '') + 'rated by name on every run</div>'
+      + '<div class="cl-matches' + (clOpen[cl.name] ? ' on' : '') + '"><ul>' + (rows || '<li class="cl-none">No current development matches this client.</li>') + '</ul></div></div>';
+  }
   function drawClients() {
-    const head = '<div class="viewhead"><div class="eyebrow">Clients</div>'
-      + '<p class="sub">Each client named on this scan, and the developments the enricher rated against them &mdash; the level, why, and the action line, which names the client because the scan does. Draft email is grounded on the stored summary, obligations and text; nothing is ever sent from here.</p></div>';
-    if (!scanClients.length && !orphanClients.length) {
-      $('#v-clients').innerHTML = head + '<div class="laneempty"><h4>This scan names no clients.</h4>'
-        + '<p>Add them with <b>Edit</b>. Every run then rates each development against each client by name, and the action line says what that client should do.</p></div>';
-      return;
-    }
+    const head = '<div class="cl-head"><div><div class="cl-eyebrow">Clients</div>'
+      + '<div class="cl-sub">Each client on this scan, matched to its developments — by the enricher\'s rating and by the client\'s own keywords — with a draft email a click away.</div></div>'
+      + '<div class="cl-headbtns"><button class="cl-add" id="cl-add">+ Add client</button></div></div>';
     $('#v-clients').innerHTML = head
-      + scanClients.map(c => clientSection(c.name, c.scope, false)).join('')
-      + orphanClients.map(n => clientSection(n, '', true)).join('');
+      + (scanClients.length || orphanClients.length
+        ? scanClients.map((c, i) => clientCard(c, i, false)).join('') + orphanClients.map(n => clientCard({ name: n, keywords: [] }, -1, true)).join('')
+        : '<div class="cl-empty">No clients yet. Add one to start matching developments to it.</div>');
+  }
+  function clientForm(idx) {
+    const editing = idx != null, cl = editing ? scanClients[idx] : { name: '', sector: '', scope: '', keywords: [] };
+    $('#cl-modal').innerHTML = '<div class="cl-dialog"><h3>' + (editing ? 'Edit client' : 'Add client') + '</h3>'
+      + '<label class="cl-lbl">Name</label><input id="cf-name" class="cl-in" value="' + esc(cl.name) + '">'
+      + '<label class="cl-lbl">Sector / description</label><input id="cf-sec" class="cl-in" value="' + esc(cl.sector || '') + '">'
+      + '<label class="cl-lbl">Advice scope <span class="cl-hint">— what the firm advises this client on; the enricher reads it and draft emails quote it.</span></label><textarea id="cf-scope" class="cl-ta" rows="2">' + esc(cl.scope || '') + '</textarea>'
+      + '<label class="cl-lbl">Keywords <span class="cl-hint">— one per line; matched against headlines here, at once. Regex ok.</span></label><textarea id="cf-kw" class="cl-ta" rows="5">' + esc((cl.keywords || []).join('\n')) + '</textarea>'
+      + '<div class="cl-formact"><button class="cl-save" id="cf-save">Save</button><button class="cl-cancel" id="cf-cancel">Cancel</button></div></div>';
+    $('#cl-modal').classList.add('on');
+    $('#cf-cancel').onclick = () => $('#cl-modal').classList.remove('on');
+    $('#cf-name').focus();
+    $('#cf-save').onclick = () => {
+      const name = $('#cf-name').value.trim(); if (!name) { $('#cf-name').focus(); return; }
+      const obj = { name, sector: $('#cf-sec').value.trim(), scope: $('#cf-scope').value.trim(),
+        keywords: $('#cf-kw').value.split('\n').map(x => x.trim()).filter(Boolean) };
+      const next = scanClients.slice(); if (editing) next[idx] = obj; else next.push(obj);
+      $('#cl-modal').classList.remove('on');
+      saveClients(next);
+    };
+  }
+  // The roster goes to the service as a whole and comes back on the rebuilt page; meanwhile the
+  // card is drawn from the copy so the wait is not a blank.
+  async function saveClients(next) {
+    const roster = next.map(c => { const o = { name: c.name }; if (c.scope) o.scope = c.scope; if (c.sector) o.sector = c.sector; if (c.keywords && c.keywords.length) o.keywords = c.keywords; return o; });
+    const req = { action: 'clients', scan_id: S.id, clients: roster };
+    const res = await dispatchScan(req, 'save the client roster');
+    if (!res) return;
+    scanClients = next; drawClients();
+    addPending({ id: S.id + ':clients', scan_id: S.id, kind: 'clients', name: S.name + ' · clients', request: req, verb: 'save the client roster',
+                 dispatched_at: new Date().toISOString(), actionsUrl: res.actionsUrl || D.actionsUrl || '' });
   }
   $('#v-clients').addEventListener('click', e => {
+    const add = e.target.closest('#cl-add'); if (add) { clientForm(null); return; }
     const d = e.target.closest('button[data-draft]');
     if (d) { const it = byId[d.dataset.draft]; if (it) draftEmail(it, d.dataset.client, d); return; }
-    const b = e.target.closest('button[data-dev]');
-    if (b) openDetail(b.dataset.dev, b);
+    const a = e.target.closest('a[data-dev]');
+    if (a) { e.preventDefault(); openDetail(a.dataset.dev, a); return; }
+    const b = e.target.closest('button[data-act]'); if (!b) return;
+    const i = +b.dataset.i, act = b.dataset.act, cl = scanClients[i];
+    if (act === 'toggle') { const card = b.closest('.cl-card'), name = card.querySelector('.cl-name').textContent; clOpen[name] = !clOpen[name]; card.querySelector('.cl-matches').classList.toggle('on', clOpen[name]); b.textContent = clOpen[name] ? 'Hide' : 'View'; }
+    else if (act === 'edit' && cl) clientForm(i);
+    else if (act === 'del' && cl) { if (confirm('Remove ' + cl.name + ' from this scan?')) saveClients(scanClients.filter((_, j) => j !== i)); }
   });
 
   // ---- Audit ------------------------------------------------------------------------------------
@@ -3794,7 +3982,7 @@ function renderScan() {
   function closeDetail() {
     panel.classList.remove('on'); scrim.classList.remove('on'); panel.setAttribute('aria-hidden', 'true'); hideHC();
     openId = null;
-    if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); else { const r = $('#v-' + state.view + ' tr.r'); if (r) r.focus(); }
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); else { const r = $('#v-' + state.view + ' .row .line'); if (r) r.focus(); }
   }
   scrim.addEventListener('click', closeDetail);
   document.addEventListener('keydown', e => {
@@ -4044,7 +4232,15 @@ def build(root: Optional[Path] = None, out: Optional[Path] = None) -> dict:
 
     scans = load_scans(root)
     written: list[Path] = []
-    home = render_page(home_payload(scans, built), "Scans · TMT Regulatory Radar", fav)
+    # A deleted scan's page must go with it: the service serves dist/ as it stands, and a page
+    # for a scan that no longer exists is a ghost a partner can still open.
+    live = {s["definition"]["id"] for s in scans}
+    scan_dir = out / "scan"
+    if scan_dir.exists():
+        for stale in scan_dir.glob("*.html"):
+            if stale.stem not in live:
+                stale.unlink()
+    home = render_page(home_payload(scans, built), "Scans · Intel Scanner", fav)
     p = out / "scans.html"
     common.atomic_write_text(p, home)
     written.append(p)
