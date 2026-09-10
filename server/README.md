@@ -27,6 +27,12 @@ loop off machine-wide. The decision and its legal implications are recorded in
 
 ## Install on Ubuntu
 
+From a laptop that has run `az login`, one command does all of the below and puts TLS in front:
+
+    bash server/deploy/push.sh Work WORK_GROUP tmt-radar.centralindia.cloudapp.azure.com
+
+By hand:
+
     sudo git clone <the repo> /opt/tmt-radar          # or rsync a checkout there
     cd /opt/tmt-radar && sudo DOMAIN=radar.example.com bash server/deploy/install.sh
     sudo nano /etc/tmt-radar.env                       # OPENAI_API_KEY and AUTH_USERS, then:
