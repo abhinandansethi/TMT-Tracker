@@ -45,7 +45,7 @@ class Refused(Exception):
 
 def _need_key() -> None:
     if not os.environ.get("OPENAI_API_KEY"):
-        raise Refused(501, "No OpenAI key on this server. Set OPENAI_API_KEY in /etc/tmt-radar.env and restart the service.")
+        raise Refused(501, "No OpenAI key on this server. The admin sets one on the Logins page (/admin).")
 
 
 def _model_call(name: str, system: str, user: str, schema: dict, model: str, web_search: bool = False) -> dict:

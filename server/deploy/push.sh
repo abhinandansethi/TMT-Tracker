@@ -31,5 +31,5 @@ $SSH "cd /opt/tmt-radar && sudo DOMAIN='$DOMAIN' bash server/deploy/install.sh"
 say "health"
 $SSH 'curl -s http://127.0.0.1:8080/api/health; echo; sudo systemctl is-active tmt-radar'
 echo
-echo "NEXT: on the VM, put the real values in /etc/tmt-radar.env (OPENAI_API_KEY, AUTH_USERS), then: sudo systemctl restart tmt-radar"
+echo "NEXT: first install only — open /setup in the browser with the setup code printed above; afterwards logins and the key are managed at /admin."
 [ -n "$DOMAIN" ] && echo "      then open https://$DOMAIN/" || echo "      then open http://$IP/  (plain HTTP — give it a DOMAIN for TLS)"

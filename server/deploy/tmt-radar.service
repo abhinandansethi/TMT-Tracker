@@ -10,6 +10,9 @@ Group=__USER__
 WorkingDirectory=__APP_DIR__
 EnvironmentFile=__ENV__
 Environment=PYTHONUNBUFFERED=1
+# The settings file lives in the service's own state directory (not /etc, which ProtectSystem
+# makes read-only) because the setup and admin pages rewrite it, atomically, as this user.
+Environment=TMT_ENV_FILE=__ENV__
 # One worker process on purpose: the job runner inside it serialises pipeline runs, which two
 # processes would race. Uvicorn's threadpool still serves the pages and the model routes while a
 # job runs.
@@ -21,7 +24,7 @@ TimeoutStopSec=1500
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=full
-ReadWritePaths=__APP_DIR__
+ReadWritePaths=__APP_DIR__ __STATE_DIR__
 
 [Install]
 WantedBy=multi-user.target

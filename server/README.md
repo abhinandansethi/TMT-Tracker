@@ -35,8 +35,7 @@ By hand:
 
     sudo git clone <the repo> /opt/tmt-radar          # or rsync a checkout there
     cd /opt/tmt-radar && sudo DOMAIN=radar.example.com bash server/deploy/install.sh
-    sudo nano /etc/tmt-radar.env                       # OPENAI_API_KEY and AUTH_USERS, then:
-    sudo systemctl restart tmt-radar
+    # then open https://<domain>/setup in a browser with the one-time setup code the installer printed
 
 `DOMAIN` is optional; without it the service answers on the VM's IP over plain HTTP, which is
 fine inside a private network and not fine on the public internet — give it a name and certbot
@@ -44,7 +43,14 @@ puts TLS in front. The installer is idempotent: `git pull` and run it again to u
 
 ## The environment file
 
-`/etc/tmt-radar.env` is the only place secrets live (root-owned, readable by the service user).
+`/var/lib/tmt-radar/settings.env` is the only place secrets live (0600, owned by the service).
+Nobody needs a terminal to fill it: on first run `/setup` (gated by a one-time code the
+installer prints) takes the OpenAI key — verified against the pipeline's model before it is
+saved — and the first login, which becomes the admin; afterwards the admin's **Logins** page
+(`/admin`) adds or removes partners' logins and replaces the key. Every change is written
+atomically and applied in-process, so no restart. Editing by hand still works; then restart.
+It is not in `/etc` because the unit's `ProtectSystem=full` makes `/etc` read-only to the
+service, and this file is the service's to write.
 
     OPENAI_API_KEY=sk-…
     AUTH_USERS="abhi:…

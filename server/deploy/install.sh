@@ -6,7 +6,7 @@
 #
 # What it sets up, and why each piece is there:
 #   /opt/tmt-radar          the checkout — the same files the pipeline has always used
-#   /etc/tmt-radar.env      the ONLY place secrets live (0600, root:tmt-radar)
+#   /var/lib/tmt-radar/settings.env   the ONLY place secrets live (0600, owned by the service, which writes it from /setup and /admin)
 #   tmt-radar.service       uvicorn on 127.0.0.1:8080 as the unprivileged `tmt-radar` user
 #   nginx                   TLS termination + reverse proxy; the app does the Basic Auth itself,
 #                           so the same credentials work whether or not nginx is in front
@@ -15,7 +15,9 @@ set -euo pipefail
 
 APP_DIR="${APP_DIR:-/opt/tmt-radar}"
 SVC_USER="${SVC_USER:-tmt-radar}"
-ENV_FILE="/etc/tmt-radar.env"
+STATE_DIR="/var/lib/$SVC_USER"            # the service's own directory — writable under ProtectSystem
+ENV_FILE="$STATE_DIR/settings.env"        # written by the service's /setup and /admin pages
+LEGACY_ENV="/etc/tmt-radar.env"           # where the first installs put it; moved on upgrade
 DOMAIN="${DOMAIN:-}"           # e.g. radar.trilegal.com — leave empty for plain HTTP on the VM's IP
 
 say() { printf '\n== %s\n' "$*"; }
@@ -39,6 +41,10 @@ sudo -u "$SVC_USER" bash -c "cd '$APP_DIR' && python3 -m venv engine/.venv && en
 
 say "settings file $ENV_FILE"
 SETUP_CODE=""
+mkdir -p "$STATE_DIR"; chown "$SVC_USER:$SVC_USER" "$STATE_DIR"; chmod 0750 "$STATE_DIR"
+if [ -f "$LEGACY_ENV" ] && [ ! -f "$ENV_FILE" ]; then
+  mv "$LEGACY_ENV" "$ENV_FILE"; echo "   moved from $LEGACY_ENV (the service must be able to write it; /etc is read-only to it)"
+fi
 if [ ! -f "$ENV_FILE" ]; then
   # No login and no key yet: a one-time setup code lets the first person configure the service
   # from the browser at /setup (it is deleted once used). There is no starter password on purpose.
@@ -68,7 +74,7 @@ sudo -u "$SVC_USER" git -C "$APP_DIR" config user.name "tmt-radar" || true
 sudo -u "$SVC_USER" git -C "$APP_DIR" config user.email "tmt-radar@localhost" || true
 
 say "systemd unit"
-sed -e "s#__APP_DIR__#$APP_DIR#g" -e "s#__USER__#$SVC_USER#g" -e "s#__ENV__#$ENV_FILE#g" \
+sed -e "s#__APP_DIR__#$APP_DIR#g" -e "s#__USER__#$SVC_USER#g" -e "s#__ENV__#$ENV_FILE#g" -e "s#__STATE_DIR__#$STATE_DIR#g" \
     "$APP_DIR/server/deploy/tmt-radar.service" > /etc/systemd/system/tmt-radar.service
 systemctl daemon-reload
 systemctl enable --now tmt-radar

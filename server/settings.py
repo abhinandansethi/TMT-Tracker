@@ -1,7 +1,9 @@
 """The service's settings file, read and written by the service itself.
 
-/etc/tmt-radar.env is a systemd EnvironmentFile: KEY=VALUE lines, a double-quoted value may span
-lines. It is the only place secrets live. Setup and the admin page write it from the browser so
+/var/lib/tmt-radar/settings.env is a systemd EnvironmentFile: KEY=VALUE lines, a double-quoted
+value may span lines. It is the only place secrets live. It sits in the service's own state
+directory, not /etc, because the unit's ProtectSystem makes /etc read-only and this file is
+rewritten by the service itself. Setup and the admin page write it from the browser so
 that nobody needs a terminal to give the service its key or to add a partner's login; every
 write is applied to os.environ at once (the pipeline reads the environment at call time and jobs
 copy it per subprocess), so no restart is needed for a change to take effect.
@@ -18,7 +20,7 @@ import tempfile
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-ENV_FILE = Path(os.environ.get("TMT_ENV_FILE") or "/etc/tmt-radar.env")
+ENV_FILE = Path(os.environ.get("TMT_ENV_FILE") or "/var/lib/tmt-radar/settings.env")
 USER_RE = re.compile(r"^[A-Za-z0-9._-]{1,40}$")
 KEYS = ("OPENAI_API_KEY", "AUTH_USERS", "TMT_ADMIN_USER", "TMT_SETUP_TOKEN",
         "TMT_SCAN_MODEL", "TMT_SCAN_MODEL_STRONG", "TMT_ASK_MODEL", "TMT_NO_COMMIT", "TMT_SCHEDULER")
