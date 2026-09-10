@@ -73,6 +73,9 @@ say "git identity for the audit-trail commits"
 sudo -u "$SVC_USER" git -C "$APP_DIR" config user.name "tmt-radar" || true
 sudo -u "$SVC_USER" git -C "$APP_DIR" config user.email "tmt-radar@localhost" || true
 
+say "pages (rebuilt on every install — the builders changed with the code, and dist/ is not shipped)"
+sudo -u "$SVC_USER" bash -c "cd '$APP_DIR' && engine/.venv/bin/python code/build_dashboard_v2.py >/dev/null && engine/.venv/bin/python code/build_scans.py | grep -c '^wrote' | sed 's/^/   pages written: /'"
+
 say "systemd unit"
 sed -e "s#__APP_DIR__#$APP_DIR#g" -e "s#__USER__#$SVC_USER#g" -e "s#__ENV__#$ENV_FILE#g" -e "s#__STATE_DIR__#$STATE_DIR#g" \
     "$APP_DIR/server/deploy/tmt-radar.service" > /etc/systemd/system/tmt-radar.service
