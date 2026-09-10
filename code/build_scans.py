@@ -1411,15 +1411,6 @@ a.el{color:var(--navy)}
 .anone.bad{background:var(--alarm-wash);color:var(--alarm)}
 .averify{margin-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;color:var(--faint);line-height:1.7}
 
-/* the header's one sentence about when this scan runs — true for THIS scan, never a slogan */
-function scheduleLine(S) {
-  const sch = S && S.definition && S.definition.schedule;
-  if (sch && sch.daily_at) {
-    const who = sch.set_by ? ' &mdash; set by ' + esc(sch.set_by) + (sch.set_on ? ' on ' + esc(String(sch.set_on).slice(0, 10)) : '') : '';
-    return '<span class="sched on">Runs daily at ' + esc(sch.daily_at) + ' ' + esc(sch.tz || '') + who + ', and whenever a person presses Run scan.</span>';
-  }
-  return 'Runs when a person presses Run scan &mdash; this scan is not scheduled.';
-}
 /* ---- create dialog: the coverage preview that gates Create */
 .prev{margin-top:20px;border:1px solid var(--rule2);border-radius:10px;background:var(--row3);padding:16px 18px}
 .prev h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px;font-weight:500}
@@ -3466,6 +3457,15 @@ function renderScan() {
   // What state the document is in, said above the summary so an absent summary is never mistaken
   // for an empty document. Reviewed defect: queued, unreadable, given-up, enrichment-failed and
   // truncated rows all read "No summary was written." Wording mirrors run.py's own notes.
+  // the header's one sentence about when this scan runs — true for THIS scan, never a slogan
+function scheduleLine(S) {
+  const sch = S && S.definition && S.definition.schedule;
+  if (sch && sch.daily_at) {
+    const who = sch.set_by ? ' &mdash; set by ' + esc(sch.set_by) + (sch.set_on ? ' on ' + esc(String(sch.set_on).slice(0, 10)) : '') : '';
+    return '<span class="sched on">Runs daily at ' + esc(sch.daily_at) + ' ' + esc(sch.tz || '') + who + ', and whenever a person presses Run scan.</span>';
+  }
+  return 'Runs when a person presses Run scan &mdash; this scan is not scheduled.';
+}
   function stateLine(it) {
     const MAX = 3;
     if (!it.enriched) {
