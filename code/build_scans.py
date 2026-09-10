@@ -1550,7 +1550,7 @@ a.el{color:var(--navy)}
     <div class="db only-describe describe">
       <div class="field"><label for="f-desc">What do you want this scan to track?</label>
         <textarea id="f-desc" maxlength="2000" placeholder="Advise multinational-employer clients on national transposition of the Pay Transparency Directive; surface new obligations, thresholds and deadlines by country."></textarea>
-        <div class="help">One box. The model proposes the name, intent, jurisdictions, topics and any official sources it knows, for you to confirm or edit. Nothing is created until you press Create scan, and every proposed source still goes through the gate.</div></div>
+        <div class="help">The model proposes the rest for you to confirm.</div></div>
       <div class="paths"><button type="button" class="btn primary" id="dlg-build">Build the scan</button><span class="or">or</span><button type="button" class="btn" id="dlg-manual">Create manually</button></div>
       <div class="pnote" id="dlg-pnote-1" aria-live="polite"></div>
     </div>
@@ -1562,13 +1562,13 @@ a.el{color:var(--navy)}
         <div class="field"><label for="f-group">Radar<span class="req">*</span></label><input type="text" id="f-group" maxlength="120" autocomplete="off" placeholder="OpenAI"></div>
         <div class="field"><label for="f-layer">Layer</label><input type="text" id="f-layer" maxlength="120" autocomplete="off" placeholder="Regulation"></div>
       </div>
-      <div class="help" id="layer-help">One radar, as many layers as the matter needs — regulation, the company's own announcements, its competitors. Each layer is its own scan with its own sources; add another from the radar's page.</div>
+      <div class="help" id="layer-help">Layers — regulation, the company's own updates, competitors — each with its own sources.</div>
       <input type="hidden" id="f-name">
       <div class="field"><label for="f-intent">Intent<span class="req">*</span></label>
         <textarea id="f-intent" maxlength="1500"></textarea>
-        <div class="help">Brief it the way you would brief an associate: who the clients are, what to advise on, and what to surface — obligations, thresholds, deadlines. Discovery and relevance both read this sentence.</div></div>
+        <div class="help">Who the client is, what to advise on, what to surface.</div></div>
       <div class="field"><label for="f-jur">Jurisdictions<span class="req">*</span></label><div class="cin" id="c-jur"></div>
-        <div class="help">Type a country or an ISO code and press Enter. EU works for Union-level venues. At least one is needed: the pipeline refuses a scan without a jurisdiction.</div></div>
+        <div class="help">Country or code, Enter to add. EU for Union-level.</div></div>
       <div class="field find" id="find-block">
         <label>Find sources</label>
         <div class="findrow"><button type="button" class="btn" id="dlg-find">Find sources</button>
@@ -1576,7 +1576,7 @@ a.el{color:var(--navy)}
           <span class="findcount" id="find-count" aria-live="polite"></span></div>
         <div class="pnote" id="find-note" aria-live="polite"></div>
         <div class="cands" id="cands"></div>
-        <div class="help">These are proposals — nothing has been fetched to produce them. Every one you tick is checked against robots.txt and the site's own terms when the scan is created, and anything that fails is listed as rejected on the coverage panel and never fetched.</div>
+        <div class="help">Proposals only. Ticked ones are checked (robots.txt, terms, parse test) when the scan is created.</div>
       </div>
       <!-- A source by NAME. "TRAI consultation papers" is how a partner thinks of a venue; the
            model finds the listing page it means, the pipeline's own gate checks that page now,
@@ -1586,7 +1586,7 @@ a.el{color:var(--navy)}
         <div class="findrow"><input type="text" id="f-addsrc" maxlength="200" autocomplete="off" placeholder="A name or a URL — TRAI consultation papers, OpenAI news, meity.gov.in/…">
           <button type="button" class="btn" id="dlg-addsrc">Add</button></div>
         <div class="pnote" id="addsrc-note" aria-live="polite"></div>
-        <div class="help">Named, not necessarily by URL. It is looked up, then fetched once and checked — robots.txt, the site's terms, a parse test — and listed above with the verdict. Then add another.</div>
+        <div class="help">Looked up, checked once, listed above with the verdict.</div>
       </div>
       <details class="adv" id="adv"><summary>More options — topics, industries, clients, subject filter, daily run</summary>
       <div class="two">
@@ -1594,11 +1594,11 @@ a.el{color:var(--navy)}
         <div class="field"><label for="f-ind">Industries</label><div class="cin" id="c-ind"></div></div>
       </div>
       <div class="field"><label for="f-src">Listing URLs</label><div class="cin" id="c-src"></div>
-        <div class="help">Optional. A listing page you already trust, by URL; it is still checked — robots, terms and a parse test — before anything is read from it.</div></div>
+        <div class="help">Checked like any other source.</div></div>
       <div class="field"><label for="f-cl">Clients</label><div class="cin" id="c-cl"></div>
         <div class="help">Relevance is rated per named client; the model is asked to name them in the action line.</div></div>
       <div class="field check"><input type="checkbox" id="f-sched"><label for="f-sched">Run daily, unattended, at <input type="time" id="f-sched-at" value="06:30" step="60"> IST</label></div>
-      <div class="help" id="f-sched-help">Off by default. Everything else here runs when a person presses a button; this one setting makes the scan read its approved sources once a day without anyone pressing anything. It is shown on the scan with your name, and the legal analysis of unattended collection is on record (engine/audit/scheduling_decision_2026-09-10.md).</div>
+      <div class="help" id="f-sched-help">Off by default. Shown on the scan with your name.</div>
       <div class="field check"><input type="checkbox" id="f-disc" checked><label for="f-disc">Discover sources automatically</label></div>
       <div class="help" id="f-disc-help">Off, only the sources listed above are gated and read.</div>
       <div class="field" id="preview-block">
@@ -1625,7 +1625,7 @@ a.el{color:var(--navy)}
       </div>
       </details>
       <div class="prev" id="preview"></div>
-      <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents, so the scan appears quickly rather than after every backlogged page. Anything older queues and is counted as queued on the scan. Press <b>Run scan</b> again to continue through the backlog.</div>
+      <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents; the rest queue for the next <b>Run scan</b>.</div>
     </div>
     <div class="df"><div class="err" id="dlg-err" aria-live="polite"></div>
       <div class="actions"><button type="button" class="btn quiet only-form" id="dlg-back">Describe instead</button><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary only-form" id="dlg-submit">Create scan</button></div></div>
@@ -2529,9 +2529,9 @@ function renderPreview() {
       : '<h4>No venue chosen yet</h4><div class="pgap">Nothing is listed, so this scan would read nothing of its own.'
         + ($('#f-disc').checked ? ' Discovery is on, so the workflow will propose venues and gate them; you will first see them on the scan\'s Coverage panel.' : ' Discovery is off too — press Find sources, or add a listing page.') + '</div>')
     + gapLine
-    + '<div class="pfine"><b>Each venue above is gated when the scan is created</b> — reachability, robots.txt, the site\'s own terms and a parse test. Anything that fails is listed as <b>rejected</b> on the scan\'s Coverage panel, with the reason, and is never fetched. Nothing here is coverage until the gate has said so, and a scan reads at most ' + MAX_SOURCES + ' sources.'
-    + ($('#f-disc').checked ? '<br>Discovery is on, so the workflow will also propose venues of its own and gate them the same way. Those are not on this list.' : '')
-    + '<br><b>Miscellaneous will additionally search the open web outside this list.</b> That lane fetches nothing, gates nothing and cites nothing — it is leads to verify at their primary source. A lead that turns out to be an official venue can be promoted into this coverage list, where the same gate decides.</div>';
+    + '<div class="pfine">Gated on create; at most ' + MAX_SOURCES + ' sources.'
+    + ($('#f-disc').checked ? ' Discovery adds its own proposals.' : '')
+    + ' Miscellaneous will additionally search the open web outside this list.</div>';
   el.hidden = false;
   // The subject illustration counts the venues on this list, so it redraws whenever the list does.
   renderSubject();
@@ -2923,7 +2923,7 @@ function renderHome() {
     // This page is the product's front door, not an index behind the tracker: it opens with what a
     // scan is and who owns which one, because a partner arriving here for the first time has no
     // other page to learn it from.
-    + '<p class="lede">A scan is one question read against a fixed list of official sources you can see. <b>TMT India</b> is the built-in, vetted one; anything else here you made, and its sources are labelled <b>discovered</b> wherever they appear. A scan runs when you press Run scan; one that someone has set to run daily says so on its page, with their name.</p></div>'
+    + '<p class="lede">One question, read against official sources you can see. <b>TMT India</b> is the vetted built-in; the rest are yours.</p></div>'
     // "Logins" is the admin's page (partners' logins, the OpenAI key); anyone else who opens it is
     // told who manages logins, which is the right answer for them too.
     + '<div class="actions"><a class="btn quiet" href="/admin">Logins</a><button class="btn primary" id="create">+ Create scan</button></div></div>'
@@ -3314,9 +3314,9 @@ function renderScan() {
       + cell('sources failed', sf, true) + cell('sources empty', se, true) + (C.gated ? cell('sources not fetched (cap)', C.gated, true) : '') + '</div>' : '';
     const uncovered = C.uncovered && C.uncovered.length ? '<div class="gap">No approved source for: ' + C.uncovered.map(flagged).join(', ') + '</div>' : '';
     const discovery = C.discovery && C.discovery.length ? '<div class="grp">Discovery · ' + C.discovery.length + '</div><ul class="disc" id="discovery-notes">' + C.discovery.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul>' : '';
-    return '<h3>Coverage</h3><p class="sub">Every URL this scan reads, with the gate\'s evidence and the last run\'s health. A source not listed here cannot contribute a development.</p>'
-      + '<div class="legend"><span class="badge vetted">Vetted</span><span>A TMT India registry source: a hand-built adapter, a fixture, a floor and a per-site legal analysis stand behind every row it produces.</span>'
-      + '<span class="badge discovered">Discovered</span><span>A source this scan found or was given: it passed the automated gate — reachability, robots.txt, a terms scan and a parse test — and only that evidence, shown below, stands behind it.</span></div>'
+    return '<h3>Coverage</h3><p class="sub">Every source this scan reads, with the gate\'s evidence and the last run\'s health.</p>'
+      + '<div class="legend"><span class="badge vetted">Vetted</span><span>Hand-built, with a per-site legal analysis.</span>'
+      + '<span class="badge discovered">Discovered</span><span>Passed the automated gate; only that evidence stands behind it.</span></div>'
       + lastrun
       // Before the venue list, not after it: what counts as the subject shapes the ledger as much
       // as which venues are read, and a reader who scrolls no further has still been told.
@@ -3325,7 +3325,7 @@ function renderScan() {
       + '<div class="grp">Pending a human decision · ' + C.pending.length + '</div>' + (pending || none)
       + '<div class="grp">Rejected · ' + C.rejected.length + '</div>' + (rejected || none)
       + discovery
-      + '<div class="foot">Scans run when a person presses Run scan. Nothing here is scheduled.</div>';
+      + '';
   }
 
   // ---- Legal --------------------------------------------------------------------------------------
@@ -3373,10 +3373,10 @@ function renderScan() {
     all.forEach(s => { const c = legalClass(s); counts[c] = (counts[c] || 0) + 1; });
     const shown = legalFilter === 'all' ? all : all.filter(s => legalClass(s) === legalFilter);
     const filt = ['all', 'clear', 'flagged', 'disallowed', 'withheld', 'unknown'].map(k => '<option value="' + k + '"' + (legalFilter === k ? ' selected' : '') + '>' + (k === 'all' ? 'All sources' : LEGAL_CLASS[k][0]) + ' (' + (counts[k] || 0) + ')</option>').join('');
-    $('#v-legal').innerHTML = '<div class="coverage"><h3>Legal</h3><p class="sub">Every source on this scan, with what the gate found about fetching it and your call on that. The gate never rules on legality — it reads robots.txt and the site\'s own terms and shows you what it saw. The question it helps answer is the narrow one: does the site say, anywhere the gate could find, that it does not allow this?</p>'
+    $('#v-legal').innerHTML = '<div class="coverage"><h3>Legal</h3><p class="sub">What each site\'s robots.txt and terms say about fetching, and your decision on it.</p>'
       + '<div class="ltools"><label for="lgl-filter">Show</label><select id="lgl-filter">' + filt + '</select></div>'
       + (shown.length ? shown.map(legalRow).join('') : '<div class="src"><div></div><div class="why">None in this group.</div></div>')
-      + '<div class="foot">A decision is recorded under your login with the date. <b>Do not fetch</b> takes effect on the next run; it removes nothing and hides nothing. The standing analysis of what the tracker fetches and how is in engine/audit/.</div></div>';
+      + '<div class="foot">Recorded under your login. <b>Do not fetch</b> takes effect on the next run.</div></div>';
   }
 
   // ---- lane tables -----------------------------------------------------------------------------
@@ -4587,7 +4587,7 @@ def selftest() -> None:
         assert 'id="hempty"' in html and "em.hidden = list.length > 0" in html
         # The Scans home is the product's front door now: it says what a scan is, and which one is
         # the built-in vetted scan, without typing a source count the registry owns.
-        assert "A scan is one question" in html and "<b>TMT India</b> is the built-in, vetted one" in html
+        assert "One question, read against official sources" in html and "<b>TMT India</b> is the vetted built-in" in html
         # the built-in scan's source count comes from the card the registry computed, never typed
         # The lede is one line now, so it carries no counts to keep honest; the built-in card still
         # shows "N vetted sources · …" computed from the registry, which is where the number lives.
@@ -4606,8 +4606,7 @@ def selftest() -> None:
         # gate on. What must stay true is that it redraws on every change.
         assert "function refreshPreview() { renderPreview(); }" in html
         assert 'class="prev" id="preview"></div>' in html, "the list must not be hidden"
-        assert "built here with you" in html and "gated when the scan is created" in html
-        assert "Each venue above is gated when the scan is created" in html
+        assert "Gated on create; at most" in html
         assert "Miscellaneous will additionally search the open web outside this list." in html
         # The subject filter is built WITH the partner, in the same block as the coverage list —
         # not bolted on as an advanced option. Its box, its proposer, its endpoint, and the escape
