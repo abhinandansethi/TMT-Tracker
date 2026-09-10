@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 
@@ -223,6 +223,30 @@ async def api_gate(request: Request, user: str = Depends(require_user)):
         return await run_in_threadpool(assist.gate_one, body.get("url"), body.get("intent") or "", body.get("jurisdictions") or [])
     except assist.Refused as e:
         return _refused(e)
+
+
+@app.post("/api/discover/stream")
+async def api_discover_stream(request: Request, user: str = Depends(require_user)):
+    """Discovery as server-sent events: a line per search, per venue, then the filtered answer.
+    X-Accel-Buffering: no keeps nginx from holding the events back until the end."""
+    body = await _json(request)
+    jur = body.get("jurisdiction")
+    gen = assist.discover_stream(body.get("intent"), jur, body.get("topics") or [], body.get("industries") or [])
+    return StreamingResponse(gen, media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.get("/api/jobs/{jid}/tail")
+async def api_job_tail(jid: str, user: str = Depends(require_user)):
+    """The last lines of a job's log with its state — what the page shows while a scan is built."""
+    if not re.match(r"^[a-f0-9]{12}$", jid):
+        raise HTTPException(400, "bad job id")
+    j = JOBS.get(jid)
+    if not j:
+        raise HTTPException(404, "no such job")
+    text = JOBS.log_text(jid, tail=60) or ""
+    return {"ok": True, "id": jid, "status": j["status"], "conclusion": j["conclusion"], "scan_id": j.get("scan_id"),
+            "action": j.get("action"), "lines": [ln for ln in text.splitlines() if ln.strip()][-60:]}
 
 
 @app.post("/api/propose-filter")

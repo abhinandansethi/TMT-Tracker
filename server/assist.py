@@ -205,6 +205,128 @@ def gate_one(url: str, intent: str, jurisdictions: list) -> dict:
                      "extract": g.get("extract")}}
 
 
+def _sse(event: str, **data) -> str:
+    return "data: " + json.dumps(dict(data, event=event), ensure_ascii=False) + "\n\n"
+
+
+def _complete_objects(buf: str, start: int) -> tuple:
+    """Every complete JSON object in buf[start:] at brace depth 1 inside the candidates array,
+    and the index just past the last one — so the caller can carry on from there."""
+    out, i, n = [], start, len(buf)
+    while i < n:
+        j = buf.find("{", i)
+        if j < 0:
+            break
+        depth, k, in_str, esc_ = 0, j, False, False
+        while k < n:
+            ch = buf[k]
+            if in_str:
+                if esc_:
+                    esc_ = False
+                elif ch == "\\":
+                    esc_ = True
+                elif ch == '"':
+                    in_str = False
+            elif ch == '"':
+                in_str = True
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            k += 1
+        if k >= n or depth != 0:
+            break                       # the object is still arriving
+        try:
+            out.append(json.loads(buf[j:k + 1]))
+        except Exception:
+            pass
+        i = k + 1
+        # past the candidates array the next "{" belongs to a gap; stop at its closing bracket
+        rest = buf[i:].lstrip()
+        if rest.startswith("]"):
+            return out, n
+    return out, i
+
+
+def discover_stream(intent: str, jurisdiction: Optional[str], topics: list, industries: list):
+    """discover_one, as it happens: a server-sent event per search the model runs, per venue as
+    its JSON object completes in the stream, then `done` with the same hygiene-filtered answer
+    discover.propose would have returned. Nothing is fetched by us; the page ticks venues as they
+    land instead of waiting a minute for the whole list."""
+    if not isinstance(intent, str) or not 20 <= len(intent.strip()) <= 1500:
+        yield _sse("error", message="intent must be 20 to 1500 characters."); return
+    if jurisdiction is not None and (not isinstance(jurisdiction, str) or not 1 <= len(jurisdiction) <= 40):
+        yield _sse("error", message="jurisdiction must be a short code or name."); return
+    if not os.environ.get("OPENAI_API_KEY"):
+        yield _sse("error", message="No OpenAI key on this server. The admin sets one on the Logins page (/admin)."); return
+    defn = {"intent": intent.strip(), "jurisdictions": [jurisdiction] if jurisdiction else [],
+            "topics": [t for t in (topics or []) if isinstance(t, str)][:20],
+            "industries": [t for t in (industries or []) if isinstance(t, str)][:20], "sources": []}
+    budget = common.Budget()
+    system, user = discover.build_prompt(defn)
+    client = common.openai_client()
+    yield _sse("start", model=common.MODEL_STRONG, jurisdiction=jurisdiction or "")
+    buf, scanned, seen, final_text = "", -1, set(), ""
+    try:
+        stream = client.responses.create(
+            model=common.MODEL_STRONG, tools=[{"type": "web_search"}], stream=True,
+            input=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+            text={"format": {"type": "json_schema", "name": discover.SCHEMA_NAME, "strict": True, "schema": discover.SCHEMA}})
+        for ev in stream:
+            et = str(getattr(ev, "type", "") or "")
+            if et == "response.output_item.added" or et == "response.output_item.done":
+                item = getattr(ev, "item", None)
+                if getattr(item, "type", "") == "web_search_call":
+                    action = getattr(item, "action", None)
+                    q = getattr(action, "query", None) if action is not None and not isinstance(action, dict) else (action or {}).get("query")
+                    if q and et == "response.output_item.added":
+                        yield _sse("search", query=str(q)[:200])
+                    elif et == "response.output_item.done" and not q:
+                        yield _sse("search", query="")
+            elif et == "response.web_search_call.searching":
+                yield _sse("searching")
+            elif et == "response.output_text.delta":
+                buf += str(getattr(ev, "delta", "") or "")
+                if scanned < 0:
+                    m = re.search(r'"candidates"\s*:\s*\[', buf)
+                    if m:
+                        scanned = m.end()
+                if scanned >= 0:
+                    objs, scanned = _complete_objects(buf, scanned)
+                    for raw in objs:
+                        cand = discover._model_candidate(raw)
+                        if cand and cand.get("url") and cand["url"] not in seen and not discover.deny_reason(cand["url"]):
+                            seen.add(cand["url"])
+                            yield _sse("venue", candidate=cand)
+            elif et == "response.completed":
+                resp = getattr(ev, "response", None)
+                final_text = getattr(resp, "output_text", "") or buf
+            elif et in ("response.failed", "response.incomplete", "error"):
+                err = getattr(ev, "error", None) or getattr(getattr(ev, "response", None), "error", None)
+                yield _sse("error", message=f"The search stopped: {str(err)[:200] if err else et}"); return
+    except SystemExit as e:
+        yield _sse("error", message=str(e)); return
+    except Exception as e:  # noqa: BLE001
+        yield _sse("error", message=f"Discovery failed: {str(common._model_error(e, common.MODEL_STRONG))[:220]}"); return
+    try:
+        out = json.loads(final_text or buf or "{}")
+    except Exception:
+        yield _sse("error", message="The model's answer was not valid JSON."); return
+    raw = out.get("candidates") if isinstance(out, dict) else None
+    kept, dropped = discover.filter_candidates(raw if isinstance(raw, list) else [], defn, budget)
+    gaps = [{"jurisdiction": _clean(g.get("jurisdiction"), 40) or (jurisdiction or ""), "note": _clean(g.get("note"), 200)}
+            for g in ((out.get("gaps") if isinstance(out, dict) else None) or []) if isinstance(g, dict)]
+    yield _sse("done", jurisdiction=jurisdiction or "", candidates=kept, gaps=gaps,
+               dropped=[f"discovery dropped {d.get('url') or '(no url)'}: {d['reason']}" for d in dropped],
+               notes=[], model=common.MODEL_STRONG)
+
+
+def _clean(v, n: int) -> str:
+    return common.norm_ws(str(v))[:n] if isinstance(v, str) else ""
+
+
 def discover_one(intent: str, jurisdiction: Optional[str], topics: list, industries: list) -> dict:
     """One jurisdiction per call — not because of a function ceiling any more, but because a
     narrower search answers better and the page already merges per-jurisdiction answers."""

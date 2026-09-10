@@ -971,6 +971,8 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         dev.pop("enrich_error", None)
         enriched += 1
         enriched_now.append(dev)
+        # One line per document, so the page can show the run as it happens.
+        common.log(f"read {enriched}/{len(to_do)}: {(dev.get('title') or dev.get('url') or '')[:80]}")
 
     ok_statuses = ("OK", "QUIET")
     sources_ok = sum(1 for h in sources_health.values() if h["status"] in ok_statuses)

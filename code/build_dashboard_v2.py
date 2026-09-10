@@ -579,6 +579,28 @@ for _u, _v in _probe.items():
 for _lst in unjudged_by_src.values():
     _lst.sort(key=lambda x: x.get("d") or "", reverse=True)
 
+# The per-source legal analysis on file (engine/audit/legal_analysis_*.json), joined to the
+# registry by source id, for the Legal tab. Read-only on the page: a person wrote it.
+legal_entries: list[dict[str, Any]] = []
+_legal_files = sorted((ROOT / "engine" / "audit").glob("legal_analysis_*.json"))
+if _legal_files:
+    try:
+        _legal_doc = json.loads(_legal_files[-1].read_text())
+        _signoff = {a.get("id"): a for a in (_legal_doc.get("signoff", {}).get("approved") or []) if isinstance(a, dict)}
+        for _e in _legal_doc.get("per_source") or []:
+            if not isinstance(_e, dict) or not _e.get("id"):
+                continue
+            _s = _signoff.get(_e["id"], {})
+            legal_entries.append({
+                "id": _e["id"], "name": VENUE.get(_e["id"], _e.get("authority", _e["id"])[:80]),
+                "url": _e.get("url", ""), "robots": _e.get("robots_verdict", ""),
+                "access": _e.get("access_verdict", ""), "reproduction": _e.get("reproduction_verdict", ""),
+                "overall": _e.get("overall", ""), "terms": (_e.get("terms_scraping_clause") or "")[:400],
+                "access_line": _s.get("access_one_line", ""), "conditions": (_e.get("conditions") or "")[:600],
+                "risk": (_e.get("residual_risk") or "")[:300],
+            })
+    except Exception as _err:  # the tab says so rather than the build failing
+        legal_entries = [{"id": "", "name": f"Legal analysis could not be read: {_err}", "url": "", "robots": "", "access": "", "reproduction": "", "overall": "", "terms": "", "access_line": "", "conditions": "", "risk": ""}]
 audit_groups: list[dict[str, Any]] = []
 _audit_seen_ids: set[str] = set()
 for st in STRATA:
@@ -671,6 +693,7 @@ payload: dict[str, Any] = {
                  "healthAt": (health_doc.get("generated") or "")[:16].replace("T", " "),
                  "tally": health_tally},
     "audit": audit_groups,
+    "legal": legal_entries,
     "shelfCount": len(shelf),
     # --- pipeline state: not rendered, read by the scheduled sweep so a fresh
     # session is fully self-contained (source list, adapter configs, gates, shelf). ---
@@ -882,6 +905,19 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
 .aunj{margin:10px 0 0;padding:9px 11px;border:1px solid var(--warnb,#c9a227);border-radius:6px;background:var(--warnbg,rgba(201,162,39,.07))}.auh{font-weight:600;font-size:12px;letter-spacing:.02em}.aum{font-size:11.5px;opacity:.8;margin:3px 0 7px;line-height:1.45}.alane.unj{background:var(--warnb,#c9a227);color:#1b1b1b;font-weight:700}.anone{font-size:12px;color:#7A5E0E;background:var(--ochre-wash);border:1px solid #E4D19A;border-radius:3px;padding:8px 12px}
 .averify{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-top:10px;line-height:1.7}
 .cl-none{color:var(--faint);font-style:italic}
+/* legal tab */
+.lg-src{border-top:1px solid var(--rule3);padding:14px 0}
+.lg-top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.lg-top b{font-family:var(--serif);font-size:16px;font-weight:500}
+.lg-url{font-family:var(--mono);font-size:10.5px;color:var(--mute);text-decoration:none;border-bottom:1px dotted var(--rule2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60ch}
+.lg-b{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;border-radius:20px;padding:1px 8px;border:1px solid var(--rule2)}
+.lg-b.ok{color:#276B2E;border-color:#B9DCBD;background:#E9F3EA}
+.lg-b.warn{color:#7A5E0E;border-color:#E4D19A;background:var(--ochre-wash)}
+.lg-row{margin-top:6px;font-size:12px;color:var(--mute);display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.lg-k{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);font-weight:600;margin-right:4px}
+.lg-v{font-family:var(--mono);font-size:11px}
+.lg-line{margin-top:6px;font-size:12.5px;color:#37474f;line-height:1.5;max-width:900px}
+.lg-line.cond{color:#5B4507}
 .cl-draft{margin-top:14px;appearance:none;cursor:pointer;font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:3px}
 .cl-draft:disabled{opacity:.4;cursor:default}
 .cl-empty{color:var(--mute);padding:24px 0}
@@ -1100,6 +1136,7 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
 
   <nav class="tabs">
     <button class="on" data-v="coverage">Coverage</button>
+    <button data-v="legal">Legal</button>
     <button data-v="instruments">Instruments</button>
     <button data-v="judgments">Judgments</button>
     <button data-v="signals">Signals</button>
@@ -1163,6 +1200,14 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
     </div>
   </section>
 
+  <section class="view" id="v-legal">
+    <div class="cl-head">
+      <div><div class="cl-eyebrow">Legal</div>
+        <div class="cl-sub">The per-source legal analysis behind this coverage: what is fetched, what the site's robots.txt and terms say, and the access and reproduction verdicts, with conditions.</div></div>
+      <div class="cl-headbtns"><select id="lgl-filter" class="cl-btn"><option value="all">All sources</option><option value="conditions">With conditions</option><option value="permissible">Fully permissible</option><option value="other">Not fully permissible</option></select></div>
+    </div>
+    <div id="legallist"></div>
+  </section>
   <section class="view" id="v-signals">
     <div class="sechead" style="border-top-color:#8A2B1C">
       <div class="l" style="color:#8A2B1C">Signals</div>
@@ -1738,6 +1783,29 @@ function renderCoverage() {
   });
 }
 renderCoverage();
+
+/* legal: the analysis on file, per source — read-only; it was written by a person */
+function renderLegal() {
+  const f = ($('#lgl-filter') || {}).value || 'all';
+  const all = D.legal || [];
+  const cls = e => (e.access !== 'permissible' || e.reproduction !== 'permissible') ? 'other' : (e.conditions ? 'conditions' : 'permissible');
+  const list = f === 'all' ? all : all.filter(e => cls(e) === f);
+  const badge = (v, good) => '<span class="lg-b ' + (v === good ? 'ok' : 'warn') + '">' + esc(String(v || '—').replace(/_/g, ' ')) + '</span>';
+  $('#legallist').innerHTML = list.length ? list.map(e =>
+    '<div class="lg-src"><div class="lg-top"><b>' + esc(e.name) + '</b>'
+      + '<span class="lg-b ' + (e.overall === 'include' ? 'ok' : 'warn') + '">' + esc(e.overall || '—') + '</span>'
+      + '<a class="lg-url" href="' + esc(e.url) + '" target="_blank" rel="noopener">' + esc(e.url.replace(/^https?:\/\//, '')) + '</a></div>'
+      + '<div class="lg-row"><span class="lg-k">Access</span>' + badge(e.access, 'permissible') + ' <span class="lg-k">Reproduction</span>' + badge(e.reproduction, 'permissible')
+      + ' <span class="lg-k">robots.txt</span><span class="lg-v">' + esc(String(e.robots || '—').replace(/_/g, ' ')) + '</span></div>'
+      + (e.access_line ? '<div class="lg-line">' + esc(e.access_line) + '</div>' : '')
+      + (e.terms ? '<div class="lg-line"><span class="lg-k">Terms</span>' + esc(e.terms) + '</div>' : '')
+      + (e.conditions ? '<div class="lg-line cond"><span class="lg-k">Conditions</span>' + esc(e.conditions) + '</div>' : '')
+      + (e.risk ? '<div class="lg-line"><span class="lg-k">Residual risk</span>' + esc(e.risk) + '</div>' : '')
+      + '</div>').join('')
+    : '<div class="cl-empty">No source in this group.</div>';
+}
+const lglSel = $('#lgl-filter'); if (lglSel) lglSel.addEventListener('change', renderLegal);
+renderLegal();
 
 $('#blind').innerHTML = D.coverage.blind.map(b =>
   '<div class="bl"' + (b.q ? ' title="' + esc(b.q) + '"' : '') + '>' +

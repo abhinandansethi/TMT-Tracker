@@ -1193,6 +1193,11 @@ dialog[data-step=form] .only-describe{display:none}
 .pnote{display:none;margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--navy-wash);color:var(--navy);font-size:12.5px;line-height:1.5}
 .pnote.on{display:block}
 .pnote.warn{background:var(--ochre-wash);color:#5B4507}
+.pnote .searching{display:block;margin-top:4px;font-family:var(--mono);font-size:11px;color:var(--faint)}
+.pcard .live{list-style:none;margin:8px 0 0;padding:8px 12px;border-left:2px solid var(--ochre);background:var(--row3);font-family:var(--mono);font-size:11px;line-height:1.6;color:var(--mute)}
+.pcard .live li.approved,.pcard .live li.ok{color:var(--ok)}
+.pcard .live li.rejected,.pcard .live li.failed{color:var(--alarm)}
+.pcard .live li.read,.pcard .live li.sum{color:var(--ink)}
 
 /* create dialog: the source picker. Candidates are proposals — the tick chooses what the gate
    will be asked about, never what gets fetched, and the standing line under the list says so. */
@@ -2067,7 +2072,8 @@ function mountPending(el, ctx) {
     return '<div class="pcard' + (s.bad ? ' failed' : '') + '">'
       + '<div><div class="name">' + esc(p.name || p.id) + '<span class="badge ' + esc(s.badgeClass) + '">' + esc(s.badge) + '</span></div>'
       + '<p class="pstate">' + esc(s.line) + '</p>'
-      + (s.est ? '<p class="pest">' + esc(s.est) + '</p>' : '')
+      + liveHTML(st)
+      + (s.est && !(st && st.tail && st.tail.length) ? '<p class="pest">' + esc(s.est) + '</p>' : '')
       + '<div class="fine">' + fine + (s.note ? '<br>' + esc(s.note) : '') + '</div></div>'
       + '<div class="right"><div class="el" data-since="' + esc(p.dispatched_at || '') + '"></div>'
       + (s.bad ? '<button type="button" class="btn sm" data-retry="' + esc(p.id) + '">Try again</button>' : '')
@@ -2135,8 +2141,40 @@ function mountPending(el, ctx) {
       const mine = runs.filter(x => Date.parse(x.created_at || 0) >= since);
       if (mine.length) runState[p.id] = mine[0];
       else if (!runState[p.id]) runState[p.id] = { message: r.data.message || '' };
+      // The run's own log, as it is written: the service exposes the tail of it, and the card
+      // shows the last few lines — gate verdicts, documents read — instead of a clock estimate.
+      const st = runState[p.id] || {};
+      const jm = String(st.html_url || p.actionsUrl || '').match(/\/api\/jobs\/([a-f0-9]{12})\/log/);
+      if (jm && st.status && st.status !== 'completed') {
+        try {
+          const t = await fetch('/api/jobs/' + jm[1] + '/tail', { headers: { 'Accept': 'application/json' } });
+          if (t.ok) { const tj = await t.json(); if (tj && Array.isArray(tj.lines)) st.tail = tj.lines; }
+        } catch (e) {}
+      }
     }
     draw();
+  }
+  // A log line, in the partner's words. Lines the pipeline writes for itself pass through
+  // trimmed of their prefix; the ones that mark progress are said plainly.
+  function liveLine(raw) {
+    const s = String(raw).replace(/^\[scan\]\s*/, '').trim();
+    let m;
+    if ((m = s.match(/^gate\s+(approved|pending|rejected)\s+(\S+)(.*)$/))) return { k: m[1], t: (m[1] === 'approved' ? '✓ ' : m[1] === 'rejected' ? '✗ ' : '… ') + hostOf(m[2]) + ' — ' + m[1] + (m[3] ? m[3].replace(/^\s*—\s*/, ': ').slice(0, 90) : '') };
+    if ((m = s.match(/^read (\d+)\/(\d+): (.*)$/))) return { k: 'read', t: 'Read ' + m[1] + ' of ' + m[2] + ' — ' + m[3].slice(0, 80) };
+    if ((m = s.match(/^(OK|QUIET|EMPTY|FAILED|GATED|WITHHELD)\s+(\S+)\s+rows (\d+)\s+new (\d+)/))) return { k: m[1].toLowerCase(), t: hostOf(m[2]) + ': ' + m[3] + ' rows, ' + m[4] + ' new' };
+    if ((m = s.match(/^FAILED (\S+) — (.*)$/))) return { k: 'failed', t: '✗ ' + hostOf(m[1]) + ' failed: ' + m[2].slice(0, 90) };
+    if ((m = s.match(/^discovery proposed (\d+)/))) return { k: 'disc', t: 'Discovery proposed ' + m[1] + ' venue' + (m[1] === '1' ? '' : 's') };
+    if (/^discovery:/.test(s)) return { k: 'disc', t: s.slice(0, 100) };
+    if (/^miscellany:/.test(s)) return { k: 'misc', t: 'Miscellaneous: ' + s.replace(/^miscellany:\s*/, '').slice(0, 90) };
+    if ((m = s.match(/^[a-z0-9-]+: (\d+) new, (\d+) enriched/))) return { k: 'sum', t: 'Run finished: ' + m[1] + ' new, ' + m[2] + ' read. Publishing…' };
+    if (/^wrote |^\$ |^SUMMARY|^Traceback|^\s+File /.test(s) || !s) return null;
+    return { k: 'note', t: s.slice(0, 110) };
+  }
+  function liveHTML(st) {
+    const lines = (st && st.tail) || [];
+    const shown = lines.map(liveLine).filter(Boolean).slice(-6);
+    if (!shown.length) return '';
+    return '<ul class="live" aria-label="Run log, live">' + shown.map(x => '<li class="' + esc(x.k) + '">' + esc(x.t) + '</li>').join('') + '</ul>';
   }
 
   el.addEventListener('click', async e => {
@@ -2744,6 +2782,37 @@ $('#cands').addEventListener('change', e => {
   refreshPreview();
 });
 $('#dlg-find').addEventListener('click', () => findSources(null));
+// Discovery as a stream of server-sent events, read off a fetch body. Resolves with the same
+// {ok, status, data} shape postJSON gives, so the merge below is unchanged; `onEvent` gets each
+// search and each venue as it arrives. Falls back to the one-shot endpoint when the stream
+// route is missing (an older service) or refuses to connect.
+async function discoverStream(body, onEvent) {
+  let res;
+  try {
+    res = await fetch(D.api.discover + '/stream', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  } catch (e) { return postJSON(D.api.discover, body, 150000); }
+  if (res.status === 404 || res.status === 405) return postJSON(D.api.discover, body, 150000);
+  if (!res.ok || !res.body) { let d = {}; try { d = await res.json(); } catch (e) {} return { ok: false, status: res.status, data: d }; }
+  const reader = res.body.getReader(), dec = new TextDecoder();
+  let buf = '', done = null;
+  for (;;) {
+    const { value, done: end } = await reader.read();
+    if (end) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf('\n\n')) >= 0) {
+      const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
+      const line = chunk.split('\n').find(l => l.startsWith('data:'));
+      if (!line) continue;
+      let ev = null; try { ev = JSON.parse(line.slice(5)); } catch (e) { continue; }
+      if (!ev) continue;
+      if (ev.event === 'done') done = ev;
+      else if (ev.event === 'error') return { ok: false, status: 502, data: { message: ev.message || 'the search stopped' } };
+      else { try { onEvent(ev); } catch (e) {} }
+    }
+  }
+  return done ? { ok: true, status: 200, data: done } : { ok: false, status: 502, data: { message: 'the search ended without an answer' } };
+}
 
 // ---- a source by name --------------------------------------------------------------------------
 // "TRAI consultation papers" → the model finds the listing page it means (evidence, not memory)
@@ -2827,11 +2896,32 @@ async function findSources(only) {
   let done = 0;
   const tick = () => { b.textContent = calls.length > 1 ? 'Looking… ' + done + '/' + calls.length : 'Looking…'; };
   tick();
-  const results = await Promise.all(calls.map(j => postJSON(D.api.discover,
-      Object.assign({ intent, topics: F.top.get(), industries: F.ind.get() }, j ? { jurisdiction: j } : {}), 150000)
+  // Venues land as the model finds them: each one is added to the list, ticked, the moment its
+  // JSON completes in the stream, and the searches the model runs are shown while it works. A
+  // venue the partner unticks mid-stream stays unticked when the final list arrives.
+  const streamed = {}, searches = {};
+  const progress = () => {
+    const qs = Object.keys(searches).filter(k => searches[k]).slice(-3);
+    const n = Object.keys(streamed).length;
+    setNote('#find-note', (n ? '<b>' + esc(pl(n, 'venue')) + ' so far</b> — tick or drop them as they land. ' : '<b>Searching…</b> ')
+      + (qs.length ? '<span class="searching">' + qs.map(q => 'searched “' + esc(q) + '”').join(' · ') + '</span>' : ''));
+  };
+  const onEvent = j => ev => {
+    if (ev.event === 'search' && ev.query) { searches[ev.query] = 1; progress(); }
+    if (ev.event === 'venue' && ev.candidate && isUrl(ev.candidate.url)) {
+      const c = ev.candidate;
+      if (!streamed[c.url] && !cands.some(x => x.url === c.url)) { cands.push(c); picked[c.url] = true; }
+      streamed[c.url] = 1;
+      drawCands(lastGaps, lastDropped); discHelp(); refreshPreview(); progress();
+    }
+  };
+  if (!only) { cands = cands.filter(c => c.added || c.existing); Object.keys(picked).forEach(u => { if (!cands.some(c => c.url === u)) delete picked[u]; }); drawCands([], []); }
+  progress();
+  const results = await Promise.all(calls.map(j => discoverStream(
+      Object.assign({ intent, topics: F.top.get(), industries: F.ind.get() }, j ? { jurisdiction: j } : {}), onEvent(j))
     .then(x => ({ j: j, r: x }), e => ({ j: j, err: e }))
     .then(x => { done += 1; tick(); return x; })));
-  b.disabled = false; b.textContent = 'Find sources'; findWhy();
+  b.disabled = false; b.textContent = 'Search again'; findWhy();
 
   // Merge the answers. A jurisdiction whose own call failed is named rather than silently missing,
   // because an empty list and an unanswered search are not the same thing.
@@ -2864,15 +2954,19 @@ async function findSources(only) {
     const all = r.data.candidates.filter(c => c && typeof c === 'object');
     const fresh = all.filter(c => isUrl(c.url));
     // Searching one gap ADDS to the list; searching everything replaces it. Otherwise filling a
-    // hole for ES would silently throw away every venue already ticked for DE.
-    cands = only ? cands.filter(c => !fresh.some(f => f.url === c.url)).concat(fresh) : fresh;
+    // hole for ES would silently throw away every venue already ticked for DE. Venues the
+    // partner added by hand or that the scan already has stay either way. The final, filtered
+    // list replaces what streamed in; ticks survive, and a venue not seen mid-stream is ticked.
+    const kept = cands.filter(c => c.added || c.existing || (only && !fresh.some(f => f.url === c.url) && !streamed[c.url]));
+    cands = kept.filter(c => !fresh.some(f => f.url === c.url)).concat(fresh);
+    fresh.forEach(f => { if (!streamed[f.url]) picked[f.url] = true; });
     Object.keys(picked).forEach(u => { if (!cands.some(c => c.url === u)) delete picked[u]; });
     drawCands(r.data.gaps || [], r.data.dropped || []);
     discHelp();
     const notes = [].concat(Array.isArray(r.data.notes) ? r.data.notes : [],
       all.length > cands.length ? [pl(all.length - cands.length, 'candidate') + ' arrived without a usable URL and were left out.'] : []);
     setNote('#find-note', (cands.length
-      ? '<b>' + esc(pl(cands.length, 'candidate')) + ' proposed' + (r.data.model ? ' by ' + esc(r.data.model) : '') + '.</b> Tick the ones this scan should read.'
+      ? '<b>' + esc(pl(cands.length, 'venue')) + ' proposed' + (r.data.model ? ' by ' + esc(r.data.model) : '') + '.</b> Untick any this scan should not read.'
       : '<b>No venue proposed for this brief.</b> Add the listing pages you know by hand below.')
       + (notes.length ? '<br>' + notes.map(esc).join('<br>') : ''), !cands.length);
     // The point of Find sources is to choose coverage, so the coverage preview opens with the
@@ -3085,7 +3179,7 @@ function renderHome() {
     // This page is the product's front door, not an index behind the tracker: it opens with what a
     // scan is and who owns which one, because a partner arriving here for the first time has no
     // other page to learn it from.
-    + '<p class="lede">A scan watches official sources for one client, matter or company and reports what changed. <b>TMT India</b> is the firm\'s vetted built-in.</p></div>'
+    + '<p class="lede">A scan watches official sources for one client, matter or company and reports what changed.</p></div>'
     // "Logins" is the admin's page (partners' logins, the OpenAI key); anyone else who opens it is
     // told who manages logins, which is the right answer for them too.
     + '<div class="actions"><a class="btn quiet" href="/admin">Logins</a><button class="btn primary" id="create">+ Create scan</button></div></div>'
@@ -4843,7 +4937,7 @@ def selftest() -> None:
         assert 'id="hempty"' in html and "em.hidden = list.length > 0" in html
         # The Scans home is the product's front door now: it says what a scan is, and which one is
         # the built-in vetted scan, without typing a source count the registry owns.
-        assert "A scan watches official sources" in html and "<b>TMT India</b> is the firm\\'s vetted built-in" in html
+        assert "A scan watches official sources" in html and "vetted built-in" not in html
         # the built-in scan's source count comes from the card the registry computed, never typed
         # The lede is one line now, so it carries no counts to keep honest; the built-in card still
         # shows "N vetted sources · …" computed from the registry, which is where the number lives.
