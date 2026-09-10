@@ -4553,13 +4553,12 @@ def selftest() -> None:
         # The source picker: its button, its endpoint, and the standing line that must never be
         # edited away — a candidate is a proposal, and the gate is what decides.
         assert 'id="dlg-find">Find sources<' in html and '"discover": "/api/discover"' in html
-        assert "These are proposals — nothing has been fetched to produce them." in html
-        assert "checked against robots.txt and the site's own terms when the scan is created" in html
+        assert "Proposals only. Ticked ones are checked (robots.txt, terms, parse test) when the scan is created." in html
         assert 'id="cands"' in html and "at least 20 characters" in html
         # The first-run promise is the pipeline's number in both places it is made, never a literal
         assert f"the newest {FIRST_RUN_MAX_NEW} documents" in html, "dialog line lost the first-run cap"
         assert f'"firstRunMax": {FIRST_RUN_MAX_NEW}' in html
-        assert "Press <b>Run scan</b> again to continue through the backlog." in html
+        assert "the rest queue for the next <b>Run scan</b>." in html
         assert "'The first run reads the newest ' + FIRST_RUN_MAX + ' documents" in html
         # The pending store, under the contract's key, and the poll that must stand down
         assert "'tmt_scans_pending_v1'" in html and "action: 'status'" in html
@@ -4591,7 +4590,7 @@ def selftest() -> None:
         # the built-in scan's source count comes from the card the registry computed, never typed
         # The lede is one line now, so it carries no counts to keep honest; the built-in card still
         # shows "N vetted sources · …" computed from the registry, which is where the number lives.
-        assert "labelled <b>discovered</b>" in html, "the discovered/vetted distinction must survive the trim"
+        assert 'class="badge discovered">Discovered sources' in html, "the discovered/vetted distinction must survive the trim"
         assert "builtin" in html and "vetted sources" in html
         # The lane list was in the sentence the lede lost; the tabs themselves still name them.
         assert '"href": "/tmt-radar-v2.html"' in html, "the built-in card must still open the tracker"
@@ -4786,7 +4785,7 @@ def selftest() -> None:
         # after a live 202 from /api/scans.)
         assert payload["api"]["discover"] == "/api/discover" and payload["firstRunMax"] == FIRST_RUN_MAX_NEW
         assert 'id="dlg-find">Find sources<' in page and f"the newest {FIRST_RUN_MAX_NEW} documents" in page
-        assert "These are proposals — nothing has been fetched to produce them." in page
+        assert "Proposals only." in page
         # clients keep both contract shapes; no_discover is read as stored
         assert payload["scan"]["clients"] == ["Accenture", {"name": "Annalise.ai", "scope": "employees in Germany and France only"}]
         assert payload["scan"]["no_discover"] is False
