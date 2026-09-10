@@ -1671,9 +1671,12 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
            fields themselves under Details. The list below is the whole point of this step. -->
       <div class="sumline" id="summary-line"></div>
       <input type="hidden" id="f-name">
+      <!-- Where to search is not an advanced setting: a description that names no country gives
+           discovery nothing to look in, so the jurisdictions sit right above the list they shape. -->
+      <div class="field"><label for="f-jur">Jurisdictions<span class="req">*</span></label><div class="cin" id="c-jur"></div></div>
       <div class="field find" id="find-block">
         <label>Coverage — approve or drop each</label>
-        <div class="findrow"><button type="button" class="btn sm" id="dlg-find">Search again</button>
+        <div class="findrow"><button type="button" class="btn sm" id="dlg-find">Find coverage</button>
           <span class="findwhy" id="find-why"></span>
           <span class="findcount" id="find-count" aria-live="polite"></span></div>
         <div class="pnote" id="find-note" aria-live="polite"></div>
@@ -1696,7 +1699,6 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
       </div>
       <div class="field"><label for="f-intent">Intent<span class="req">*</span></label>
         <textarea id="f-intent" maxlength="1500"></textarea></div>
-      <div class="field"><label for="f-jur">Jurisdictions<span class="req">*</span></label><div class="cin" id="c-jur"></div></div>
       <div class="two">
         <div class="field"><label for="f-top">Topics</label><div class="cin" id="c-top"></div></div>
         <div class="field"><label for="f-ind">Industries</label><div class="cin" id="c-ind"></div></div>
@@ -2362,7 +2364,7 @@ function findWhy() {
   // A disabled button with no reason beside it is a dead end; say what is missing and how far off.
   $('#find-why').textContent = short
     ? 'Write the intent first — discovery reads that sentence, and it needs at least 20 characters (' + intent.length + ' so far).'
-    : 'Proposes official venues for this brief. Nothing is fetched, and nothing is created.';
+    : '';
 }
 $('#f-intent').addEventListener('input', findWhy);
 function discHelp() {
@@ -2921,7 +2923,7 @@ async function findSources(only) {
       Object.assign({ intent, topics: F.top.get(), industries: F.ind.get() }, j ? { jurisdiction: j } : {}), onEvent(j))
     .then(x => ({ j: j, r: x }), e => ({ j: j, err: e }))
     .then(x => { done += 1; tick(); return x; })));
-  b.disabled = false; b.textContent = 'Search again'; findWhy();
+  b.disabled = false; b.textContent = 'Find coverage'; findWhy();
 
   // Merge the answers. A jurisdiction whose own call failed is named rather than silently missing,
   // because an empty list and an unanswered search are not the same thing.
@@ -2979,7 +2981,7 @@ async function findSources(only) {
     : err ? 'no discover endpoint is reachable from this page'
     : (r.status === 501 || r.status === 404) ? 'source discovery is not configured on this deployment (HTTP ' + r.status + ')'
     : 'the discover endpoint answered ' + r.status + (r.data.message ? ': ' + r.data.message : '');
-  setNote('#find-note', 'Could not propose sources — ' + esc(why) + '. Add sources below, or press <b>Search again</b>.', true);
+  setNote('#find-note', 'Could not propose sources — ' + esc(why) + '. Add sources below, or press <b>Find coverage</b> again.', true);
 }
 
 // The one line above the list: what the description became. Edits under Details keep it true.
@@ -3012,6 +3014,14 @@ async function buildFromDescription(autoDecide) {
     const notes = [].concat(p.notes ? [p.notes] : [], Array.isArray(r.data.notes) ? r.data.notes : []);
     setNote('#dlg-pnote', notes.length ? notes.map(esc).join('<br>') : '');
     setStep('form'); renderPreview();
+    // No jurisdiction in the description means nowhere to search and a create the pipeline
+    // would refuse. Ask now, above the list, rather than run a search that can only report a gap.
+    if (!F.jur.get().length) {
+      setNote('#find-note', '<b>Which jurisdictions?</b> Add them above — India, EU, US, or a country — then press ' + (autoDecide ? '<b>Create scan</b>' : '<b>Find coverage</b>') + '.', true);
+      if (autoDecide) { $('#f-disc').checked = true; discTouched = true; }
+      F.jur.input.focus();
+      return;
+    }
     if (autoDecide) {
       // "Decide coverage for me": nothing to approve — discovery finds and gates the venues
       // inside the create, and the scan's Coverage tab is where they first appear.
@@ -4902,7 +4912,7 @@ def selftest() -> None:
         assert (out / "favicon.svg").exists()
         # The source picker: its button, its endpoint, and the standing line that must never be
         # edited away — a candidate is a proposal, and the gate is what decides.
-        assert 'id="dlg-find">Search again<' in html and '"discover": "/api/discover"' in html
+        assert 'id="dlg-find">Find coverage<' in html and '"discover": "/api/discover"' in html
         assert 'id="dlg-build">Find coverage<' in html and 'id="dlg-auto">Decide coverage for me<' in html and 'id="summary-line"' in html
         assert "Proposals only. Ticked ones are checked (robots.txt, terms, parse test) when the scan is created." in html
         assert 'id="cands"' in html and "at least 20 characters" in html
@@ -5135,7 +5145,7 @@ def selftest() -> None:
         # too, wired to the same number. (The pending card itself cannot be sampled: it exists only
         # after a live 202 from /api/scans.)
         assert payload["api"]["discover"] == "/api/discover" and payload["firstRunMax"] == FIRST_RUN_MAX_NEW
-        assert 'id="dlg-find">Search again<' in page and f'"firstRunMax": {FIRST_RUN_MAX_NEW}' in page
+        assert 'id="dlg-find">Find coverage<' in page and f'"firstRunMax": {FIRST_RUN_MAX_NEW}' in page
         assert "Proposals only." in page
         # clients keep both contract shapes; no_discover is read as stored
         assert payload["scan"]["clients"] == ["Accenture", {"name": "Annalise.ai", "scope": "employees in Germany and France only"}]
