@@ -1194,6 +1194,10 @@ dialog[data-step=form] .only-describe{display:none}
    will be asked about, never what gets fetched, and the standing line under the list says so. */
 .find .findrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .find .findwhy{font-size:12px;color:var(--faint);line-height:1.45;flex:1;min-width:180px}
+.sumline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;margin-top:4px}
+.sumline .sep{color:var(--off)}
+.sumline .miss{color:#7A5E0E;font-size:12.5px}
+.sumline .btn{margin-left:auto}
 .findcount{margin-left:auto;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
 .findcount.over{color:var(--alarm);font-weight:600}
 #dlg-find:disabled{cursor:not-allowed}
@@ -1550,28 +1554,21 @@ a.el{color:var(--navy)}
     <div class="db only-describe describe">
       <div class="field"><label for="f-desc">What do you want this scan to track?</label>
         <textarea id="f-desc" maxlength="2000" placeholder="Advise multinational-employer clients on national transposition of the Pay Transparency Directive; surface new obligations, thresholds and deadlines by country."></textarea>
-        <div class="help">The model proposes the rest for you to confirm.</div></div>
-      <div class="paths"><button type="button" class="btn primary" id="dlg-build">Build the scan</button><span class="or">or</span><button type="button" class="btn" id="dlg-manual">Create manually</button></div>
+        <div class="help">Then approve the coverage — or let it be decided for you.</div></div>
+      <div class="paths"><button type="button" class="btn primary" id="dlg-build">Find coverage</button><span class="or">or</span><button type="button" class="btn" id="dlg-auto">Decide coverage for me</button><button type="button" class="btn quiet" id="dlg-manual" hidden>Create manually</button></div>
       <div class="pnote" id="dlg-pnote-1" aria-live="polite"></div>
     </div>
     <div class="db only-form">
       <div class="pnote" id="dlg-pnote" aria-live="polite"></div>
       <!-- A radar is a GROUP of layers — "OpenAI" with Regulation / Company updates / Competitors —
            and each layer is a whole scan. The name the pipeline stores is derived from the two. -->
-      <div class="two">
-        <div class="field"><label for="f-group">Radar<span class="req">*</span></label><input type="text" id="f-group" maxlength="120" autocomplete="off" placeholder="OpenAI"></div>
-        <div class="field"><label for="f-layer">Layer</label><input type="text" id="f-layer" maxlength="120" autocomplete="off" placeholder="Regulation"></div>
-      </div>
-      <div class="help" id="layer-help">Layers — regulation, the company's own updates, competitors — each with its own sources.</div>
+      <!-- What the description became: the radar's name and jurisdictions, in one line, with the
+           fields themselves under Details. The list below is the whole point of this step. -->
+      <div class="sumline" id="summary-line"></div>
       <input type="hidden" id="f-name">
-      <div class="field"><label for="f-intent">Intent<span class="req">*</span></label>
-        <textarea id="f-intent" maxlength="1500"></textarea>
-        <div class="help">Who the client is, what to advise on, what to surface.</div></div>
-      <div class="field"><label for="f-jur">Jurisdictions<span class="req">*</span></label><div class="cin" id="c-jur"></div>
-        <div class="help">Country or code, Enter to add. EU for Union-level.</div></div>
       <div class="field find" id="find-block">
-        <label>Find sources</label>
-        <div class="findrow"><button type="button" class="btn" id="dlg-find">Find sources</button>
+        <label>Coverage — approve or drop each</label>
+        <div class="findrow"><button type="button" class="btn sm" id="dlg-find">Search again</button>
           <span class="findwhy" id="find-why"></span>
           <span class="findcount" id="find-count" aria-live="polite"></span></div>
         <div class="pnote" id="find-note" aria-live="polite"></div>
@@ -1582,13 +1579,19 @@ a.el{color:var(--navy)}
            model finds the listing page it means, the pipeline's own gate checks that page now,
            and the row joins the list above with its verdict — approved, pending or rejected. -->
       <div class="field addsrc" id="addsrc-block">
-        <label for="f-addsrc">Add a source</label>
-        <div class="findrow"><input type="text" id="f-addsrc" maxlength="200" autocomplete="off" placeholder="A name or a URL — TRAI consultation papers, OpenAI news, meity.gov.in/…">
+        <label for="f-addsrc">Add</label>
+        <div class="findrow"><input type="text" id="f-addsrc" maxlength="300" autocomplete="off" placeholder="A URL, a source by name, or anything else this radar should catch">
           <button type="button" class="btn" id="dlg-addsrc">Add</button></div>
         <div class="pnote" id="addsrc-note" aria-live="polite"></div>
-        <div class="help">Looked up, checked once, listed above with the verdict.</div>
       </div>
-      <details class="adv" id="adv"><summary>More options — topics, industries, clients, subject filter, daily run</summary>
+      <details class="adv" id="adv"><summary>Details — name, intent, jurisdictions, topics, clients, subject filter, daily run</summary>
+      <div class="two">
+        <div class="field"><label for="f-group">Radar<span class="req">*</span></label><input type="text" id="f-group" maxlength="120" autocomplete="off" placeholder="OpenAI"></div>
+        <div class="field"><label for="f-layer">Layer</label><input type="text" id="f-layer" maxlength="120" autocomplete="off" placeholder="Regulation"></div>
+      </div>
+      <div class="field"><label for="f-intent">Intent<span class="req">*</span></label>
+        <textarea id="f-intent" maxlength="1500"></textarea></div>
+      <div class="field"><label for="f-jur">Jurisdictions<span class="req">*</span></label><div class="cin" id="c-jur"></div></div>
       <div class="two">
         <div class="field"><label for="f-top">Topics</label><div class="cin" id="c-top"></div></div>
         <div class="field"><label for="f-ind">Industries</label><div class="cin" id="c-ind"></div></div>
@@ -2102,7 +2105,7 @@ const DEMO_NOTE = 'Demo scan: fixture data, not a real instrument.';
 // ---- create / edit dialog -------------------------------------------------------------------
 const dlg = $('#dlg'), form = $('#dlg-form');
 // The coverage preview reads the jurisdictions and the typed sources, so both re-draw it.
-const onCoverageInput = () => { if (typeof refreshPreview === 'function') refreshPreview(); };
+const onCoverageInput = () => { if (typeof refreshPreview === 'function') refreshPreview(); if (typeof drawSummary === 'function') drawSummary(); };
 const F = {
   jur: chipInput($('#c-jur'), { inputId: 'f-jur', placeholder: 'Germany, FR, EU…', normalize: jurNorm, onchange: onCoverageInput, render: v => flagged(v) + (NAMES[v] ? ' <span class="mark d">' + esc(countryName(v)) + '</span>' : '') }),
   top: chipInput($('#c-top'), { inputId: 'f-top', placeholder: 'Pay equity, Employment…' }),
@@ -2193,7 +2196,7 @@ function setStep(step) {
   // Every route into the form can have filled the intent without an input event (Create manually
   // carries the description over; Build the scan writes the proposal, or the description on its
   // fallback). Re-read it here so the Find sources button is never disabled beside a full intent.
-  if (step === 'form') findWhy();
+  if (step === 'form') { findWhy(); drawSummary(); }
 }
 function setNote(sel, html, warn) { const el = $(sel); el.className = 'pnote' + (html ? ' on' : '') + (warn ? ' warn' : ''); el.innerHTML = html || ''; }
 $('#dlg-manual').addEventListener('click', () => {
@@ -2636,10 +2639,24 @@ async function addSource() {
     let r = null, err = null;
     try { r = await postJSON(D.api.resolve, Object.assign({ query: q }, ctx), 60000); } catch (e) { err = e; }
     if (!(r && r.ok && r.data.found && r.data.candidate && isUrl(r.data.candidate.url))) {
+      // Not one source, then — a THING to catch ("competitor funding rounds", "EU AI Act
+      // guidance"). It becomes a topic of the radar, and discovery looks for venues for it.
+      if (r && r.ok) {
+        const topics = F.top.get(); if (!topics.some(t => t.toLowerCase() === q.toLowerCase())) F.top.set(topics.concat([q]));
+        b.textContent = 'Searching…';
+        setNote('#addsrc-note', 'Not a single source — added “' + esc(q) + '” to what this radar catches. Looking for places that publish it…');
+        let d = null;
+        try { d = await postJSON(D.api.discover, { intent: q.length >= 20 ? q : ('Track ' + q + ' for ' + ($('#f-group').value.trim() || 'this radar')), topics: [q], industries: [], jurisdiction: F.jur.get()[0] || undefined }, 55000); } catch (e) {}
+        const found = (d && d.ok && Array.isArray(d.data.candidates) ? d.data.candidates : []).filter(c => c && isUrl(c.url) && !cands.some(x => x.url === c.url));
+        found.forEach(c => { cands.push(Object.assign({}, c, { added: true })); picked[c.url] = true; });
+        if (found.length && $('#f-disc').checked && !discTouched) $('#f-disc').checked = false;
+        drawCands(lastGaps, lastDropped); discHelp(); refreshPreview();
+        setNote('#addsrc-note', '“' + esc(q) + '” is now part of this radar' + (found.length ? ' — ' + esc(pl(found.length, 'place')) + ' added above, ticked. ' : '. No specific page found for it; the run\'s own discovery and the Miscellaneous lane will look. ') + 'Add another?', !found.length);
+        b.disabled = false; inp.disabled = false; b.textContent = 'Add'; inp.value = ''; inp.focus(); return;
+      }
       const why = err ? (err.name === 'AbortError' ? 'the lookup took longer than 60 seconds' : 'no lookup endpoint is reachable from this page')
-        : r && r.ok ? ('nothing found with evidence' + (r.data.note ? ' — ' + r.data.note : ''))
         : 'the lookup answered ' + (r ? r.status : '?') + (r && r.data && r.data.message ? ': ' + r.data.message : '');
-      setNote('#addsrc-note', 'Could not resolve “' + esc(q) + '”: ' + esc(why) + '. Paste the listing page\'s URL instead, or name it differently.', true);
+      setNote('#addsrc-note', 'Could not look up “' + esc(q) + '”: ' + esc(why) + '.', true);
       b.disabled = false; inp.disabled = false; b.textContent = 'Add'; inp.focus(); return;
     }
     cand = r.data.candidate;
@@ -2747,14 +2764,26 @@ async function findSources(only) {
   setNote('#find-note', 'Could not propose sources — ' + esc(why) + '. Add the listing pages you know into <b>Sources</b> below; the scan is created the same way and each URL is gated the same way. Leaving <b>Discover sources automatically</b> ticked lets the workflow look for venues itself, as it did before.', true);
 }
 
-$('#dlg-build').addEventListener('click', async () => {
+// The one line above the list: what the description became. Edits under Details keep it true.
+function drawSummary() {
+  const el = $('#summary-line'); if (!el) return;
+  const g = $('#f-group').value.trim(), l = $('#f-layer').value.trim(), jurs = F.jur.get();
+  el.innerHTML = (g ? '<b>' + esc(g) + '</b>' + (l ? ' · ' + esc(l) : '') : '<span class="miss">No name yet</span>')
+    + '<span class="sep">·</span>' + (jurs.length ? jurs.map(flagged).join(' ') : '<span class="miss">no jurisdiction</span>')
+    + '<button type="button" class="btn sm quiet" id="sum-edit">Details</button>';
+}
+document.addEventListener('click', e => { if (e.target.id === 'sum-edit') { $('#adv').open = !$('#adv').open; if ($('#adv').open) $('#f-group').focus(); } });
+['#f-group', '#f-layer'].forEach(s => $(s).addEventListener('input', drawSummary));
+$('#dlg-auto').addEventListener('click', () => buildFromDescription(true));
+$('#dlg-build').addEventListener('click', () => buildFromDescription(false));
+async function buildFromDescription(autoDecide) {
   const desc = $('#f-desc').value.trim();
-  if (desc.length < 20) { setNote('#dlg-pnote-1', 'Say a little more — the subject, the countries, what to surface — or create the scan manually.', true); $('#f-desc').focus(); return; }
-  const b = $('#dlg-build'); b.disabled = true; b.textContent = 'Proposing…';
+  if (desc.length < 20) { setNote('#dlg-pnote-1', 'Say a little more — the subject, the countries, what to surface.', true); $('#f-desc').focus(); return; }
+  const b = $('#dlg-build'), b2 = $('#dlg-auto'); b.disabled = true; b2.disabled = true; (autoDecide ? b2 : b).textContent = 'Reading…';
   setNote('#dlg-pnote-1', '');
   let r = null, err = null;
   try { r = await postJSON(D.api.propose, { description: desc }); } catch (e) { err = e; }
-  b.disabled = false; b.textContent = 'Build the scan';
+  b.disabled = false; b2.disabled = false; b.textContent = 'Find coverage'; b2.textContent = 'Decide coverage for me';
   if (r && r.ok && r.data.proposal) {
     const p = r.data.proposal || {};
     $('#f-name').value = p.name || '';
@@ -2765,8 +2794,18 @@ $('#dlg-build').addEventListener('click', async () => {
     F.top.set(p.topics || []); F.ind.set(p.industries || []);
     F.src.set((p.sources || []).map(s => typeof s === 'string' ? s : (s && s.url) || '').filter(isUrl));
     const notes = [].concat(p.notes ? [p.notes] : [], Array.isArray(r.data.notes) ? r.data.notes : []);
-    setNote('#dlg-pnote', '<b>Proposed from your description.</b> Check every field before creating; the sources listed are suggestions until the gate has read them.' + (notes.length ? '<br>' + notes.map(esc).join('<br>') : ''));
-    setStep('form'); renderPreview(); $('#f-name').focus();
+    setNote('#dlg-pnote', notes.length ? notes.map(esc).join('<br>') : '');
+    setStep('form'); renderPreview();
+    if (autoDecide) {
+      // "Decide coverage for me": nothing to approve — discovery finds and gates the venues
+      // inside the create, and the scan's Coverage tab is where they first appear.
+      $('#f-disc').checked = true; discTouched = true;
+      form.requestSubmit();
+      return;
+    }
+    // The description IS the brief, so the coverage search starts at once; the list is the step.
+    await findSources(null);
+    $('#f-addsrc').focus();
     return;
   }
   // Fallback: the manual form, with one line saying why. The description becomes the intent so
@@ -2775,9 +2814,9 @@ $('#dlg-build').addEventListener('click', async () => {
     : (r.status === 501 || r.status === 404) ? 'the describe path is not configured on this deployment (HTTP ' + r.status + ')'
     : 'the propose endpoint answered ' + r.status + (r.data.message ? ': ' + r.data.message : '');
   if (!$('#f-intent').value.trim()) $('#f-intent').value = desc;
-  setNote('#dlg-pnote', 'Could not build the scan from the description — ' + esc(why) + '. Fill the form in by hand; your description is in the intent box.', true);
-  setStep('form'); $('#f-name').focus();
-});
+  setNote('#dlg-pnote', 'Could not build the scan from the description — ' + esc(why) + '. Fill the details in by hand; your description is in the intent box.', true);
+  setStep('form'); $('#adv').open = true; $('#f-group').focus();
+}
 form.addEventListener('submit', async e => {
   e.preventDefault();
   // The stored name is "Radar — Layer", or just the radar for a scan with one layer.
@@ -2833,8 +2872,8 @@ form.addEventListener('submit', async e => {
   }
   if (editingId) scan.id = editingId;
   const err = $('#dlg-err');
-  if (group.length < 3) { err.textContent = 'Name the radar (3 characters or more) — the client, the matter, the company.'; $('#f-group').focus(); return; }
-  if (intent.length < 20) { err.textContent = 'The intent is what discovery and relevance read — write at least a sentence.'; $('#f-intent').focus(); return; }
+  if (group.length < 3) { err.textContent = 'Name the radar (3 characters or more) — the client, the matter, the company.'; $('#adv').open = true; $('#f-group').focus(); return; }
+  if (intent.length < 20) { err.textContent = 'The intent is what discovery and relevance read — write at least a sentence.'; $('#adv').open = true; $('#f-intent').focus(); return; }
   // Reviewed defect: ticking a venue turns "Discover sources automatically" off, but unticking
   // the last one never turned it back on — so a partner who changed their mind could dispatch a
   // scan with no sources and no discovery, which reads nothing and burns a run to say so.
@@ -2852,8 +2891,9 @@ form.addEventListener('submit', async e => {
   }
   // run.py refuses an empty jurisdictions list; asking here saves a queued create that fails two
   // minutes later on the Actions page.
-  if (!scan.jurisdictions.length) { err.textContent = 'Add at least one jurisdiction — the pipeline refuses a scan without one.'; F.jur.input.focus(); return; }
-  if (!scan.topics.length && !scan.industries.length && !scan.sources.length) { err.textContent = 'Add at least one topic, industry or source, or discovery has nothing to look for.'; F.top.input.focus(); return; }
+  if (!scan.jurisdictions.length) { err.textContent = 'Add at least one jurisdiction — the pipeline refuses a scan without one.'; $('#adv').open = true; F.jur.input.focus(); return; }
+  // Discovery reads the intent; a scan with an intent, discovery on and nothing else is fine.
+  if (!scan.topics.length && !scan.industries.length && !scan.sources.length && !$('#f-disc').checked) { err.textContent = 'Approve at least one source, add one, or turn discovery on.'; $('#adv').open = true; F.top.input.focus(); return; }
   // A filter the run would refuse is worse than none: the page would claim a subject the ledger
   // does not have. Refuse it here, where the box is still in front of the person who wrote it.
   if (scan.subject_filter.regex && !compileSubject(scan.subject_filter.regex)) {
@@ -4552,7 +4592,8 @@ def selftest() -> None:
         assert (out / "favicon.svg").exists()
         # The source picker: its button, its endpoint, and the standing line that must never be
         # edited away — a candidate is a proposal, and the gate is what decides.
-        assert 'id="dlg-find">Find sources<' in html and '"discover": "/api/discover"' in html
+        assert 'id="dlg-find">Search again<' in html and '"discover": "/api/discover"' in html
+        assert 'id="dlg-build">Find coverage<' in html and 'id="dlg-auto">Decide coverage for me<' in html and 'id="summary-line"' in html
         assert "Proposals only. Ticked ones are checked (robots.txt, terms, parse test) when the scan is created." in html
         assert 'id="cands"' in html and "at least 20 characters" in html
         # The first-run promise is the pipeline's number in both places it is made, never a literal
@@ -4784,7 +4825,7 @@ def selftest() -> None:
         # too, wired to the same number. (The pending card itself cannot be sampled: it exists only
         # after a live 202 from /api/scans.)
         assert payload["api"]["discover"] == "/api/discover" and payload["firstRunMax"] == FIRST_RUN_MAX_NEW
-        assert 'id="dlg-find">Find sources<' in page and f"the newest {FIRST_RUN_MAX_NEW} documents" in page
+        assert 'id="dlg-find">Search again<' in page and f"the newest {FIRST_RUN_MAX_NEW} documents" in page
         assert "Proposals only." in page
         # clients keep both contract shapes; no_discover is read as stored
         assert payload["scan"]["clients"] == ["Accenture", {"name": "Annalise.ai", "scope": "employees in Germany and France only"}]
