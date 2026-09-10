@@ -84,13 +84,15 @@ def require_user(request: Request) -> str:
         raise HTTPException(401, "Ask Abhi for your username and password.", headers={"WWW-Authenticate": REALM})
     user, pw = decoded.split(":", 1)
     # Compare EVERY pair, no early exit, so the time taken does not say which username exists.
-    ok = False
+    # Usernames are case-insensitive (Abhi and abhi are one login); passwords are not.
+    ok = False; matched = user
     for u, p in pairs:
-        a = hmac.compare_digest(user.encode(), u.encode()); b = hmac.compare_digest(pw.encode(), p.encode())
-        ok = ok or (a and b)
+        a = hmac.compare_digest(user.lower().encode(), u.lower().encode()); b = hmac.compare_digest(pw.encode(), p.encode())
+        if a and b:
+            ok = True; matched = u
     if not ok:
         raise HTTPException(401, "Ask Abhi for your username and password.", headers={"WWW-Authenticate": REALM})
-    return user
+    return matched
 
 
 # ------------------------------------------------------------------------------ helpers

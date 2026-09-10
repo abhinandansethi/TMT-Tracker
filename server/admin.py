@@ -224,16 +224,19 @@ async def admin_post(request: Request, user: str = Depends(_require_admin)):
         err = settings.check_user(u) or settings.check_password(pw)
         if err:
             return _admin_page(user, err=err)
-        replaced = any(x == u for x, _ in pairs)
-        pairs = [(x, p) for x, p in pairs if x != u] + [(u, pw)]
+        # Usernames are case-insensitive at sign-in, so Abhi and abhi are one login here too.
+        replaced = any(x.lower() == u.lower() for x, _ in pairs)
+        if u.lower() == user.lower():
+            u = user
+        pairs = [(x, p) for x, p in pairs if x.lower() != u.lower()] + [(u, pw)]
         notice = f"Password for {u} replaced." if replaced else f"Login added for {u}. Give them the URL, the username and the password."
     elif action == "remove":
         u = f.get("user", "").strip()
-        if u == user:
+        if u.lower() == user.lower():
             return _admin_page(user, err="You cannot remove your own login.")
-        if not any(x == u for x, _ in pairs):
+        if not any(x.lower() == u.lower() for x, _ in pairs):
             return _admin_page(user, err=f"No login named {u}.")
-        pairs = [(x, p) for x, p in pairs if x != u]
+        pairs = [(x, p) for x, p in pairs if x.lower() != u.lower()]
         notice = f"Login {u} removed — it stops working now."
     elif action == "key":
         key = f.get("key", "").strip()
