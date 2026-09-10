@@ -103,7 +103,12 @@ class Jobs:
         self._wake = threading.Event()
         self._stop = threading.Event()
         self._thread: Optional[threading.Thread] = None
-        # A process that died mid-job leaves 'in_progress' rows behind. They did not finish; say so.
+
+    def _cancel_orphans(self) -> None:
+        """A process that died mid-job leaves 'in_progress' rows behind. They did not finish; say so.
+        Only the WORKER may do this, at its start — a second process opening the same database
+        (a script, a shell) must not brand the live worker's running job as cancelled (it did once,
+        for six minutes, on a partner's create that was in fact still running)."""
         with self.lock:
             n = self.db.execute("UPDATE jobs SET status='completed', conclusion='cancelled', updated_at=? "
                                 "WHERE status='in_progress'", (now_iso(),)).rowcount
@@ -159,6 +164,7 @@ class Jobs:
     def start(self) -> None:
         if self._thread:
             return
+        self._cancel_orphans()
         self._thread = threading.Thread(target=self._loop, name="tmt-jobs", daemon=True)
         self._thread.start()
         if os.environ.get("TMT_SCHEDULER", "1") != "0":

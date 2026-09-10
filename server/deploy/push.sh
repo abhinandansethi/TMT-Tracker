@@ -25,6 +25,15 @@ rsync -az --delete -e "ssh -i $KEY" --rsync-path="sudo rsync" --no-owner --no-gr
   --exclude '.venv' --exclude 'dist/' --exclude 'server/jobs.db' --exclude 'server/logs/' --exclude '__pycache__' \
   "$REPO/" "$USER_@$IP:/opt/tmt-radar/"
 
+say "wait for the job queue to be idle (the install restarts the service, which would kill a running scan)"
+for i in $(seq 1 60); do
+  busy=$($SSH 'cd /opt/tmt-radar && test -f server/jobs.db && sudo -u tmt-radar engine/.venv/bin/python -c "
+import sqlite3; c=sqlite3.connect(\"file:server/jobs.db?mode=ro\", uri=True)
+print(c.execute(\"select count(*) from jobs where status in (\x27in_progress\x27,\x27queued\x27)\").fetchone()[0])" 2>/dev/null || echo 0')
+  [ "${busy:-0}" = "0" ] && { echo "   idle"; break; }
+  echo "   $busy job(s) queued or running — waiting 30 s ($i/60)"; sleep 30
+done
+
 say "install (idempotent)"
 $SSH "cd /opt/tmt-radar && sudo DOMAIN='$DOMAIN' bash server/deploy/install.sh"
 
