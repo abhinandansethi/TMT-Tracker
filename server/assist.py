@@ -268,7 +268,7 @@ def discover_stream(intent: str, jurisdiction: Optional[str], topics: list, indu
     system, user = discover.build_prompt(defn)
     client = common.openai_client()
     yield _sse("start", model=common.MODEL_STRONG, jurisdiction=jurisdiction or "")
-    buf, scanned, seen, final_text = "", -1, set(), ""
+    buf, scanned, seen, final_text, searches_seen = "", -1, set(), "", set()
     try:
         stream = client.responses.create(
             model=common.MODEL_STRONG, tools=[{"type": "web_search"}], stream=True,
@@ -279,12 +279,13 @@ def discover_stream(intent: str, jurisdiction: Optional[str], topics: list, indu
             if et == "response.output_item.added" or et == "response.output_item.done":
                 item = getattr(ev, "item", None)
                 if getattr(item, "type", "") == "web_search_call":
+                    # The query text is on the item once the call is DONE; `added` carries none.
                     action = getattr(item, "action", None)
-                    q = getattr(action, "query", None) if action is not None and not isinstance(action, dict) else (action or {}).get("query")
-                    if q and et == "response.output_item.added":
+                    q = (action.get("query") if isinstance(action, dict) else getattr(action, "query", None)) or ""
+                    key = str(getattr(item, "id", "") or "") + "|" + str(q)
+                    if q and key not in searches_seen:
+                        searches_seen.add(key)
                         yield _sse("search", query=str(q)[:200])
-                    elif et == "response.output_item.done" and not q:
-                        yield _sse("search", query="")
             elif et == "response.web_search_call.searching":
                 yield _sse("searching")
             elif et == "response.output_text.delta":
