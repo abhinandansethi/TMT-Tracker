@@ -1,0 +1,27 @@
+[Unit]
+Description=TMT Regulatory Radar — pages, API and job runner in one process
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__USER__
+Group=__USER__
+WorkingDirectory=__APP_DIR__
+EnvironmentFile=__ENV__
+Environment=PYTHONUNBUFFERED=1
+# One worker process on purpose: the job runner inside it serialises pipeline runs, which two
+# processes would race. Uvicorn's threadpool still serves the pages and the model routes while a
+# job runs.
+ExecStart=__APP_DIR__/engine/.venv/bin/uvicorn server.app:app --host 127.0.0.1 --port 8080 --workers 1 --timeout-keep-alive 30
+Restart=on-failure
+RestartSec=5
+# A scan can take twenty minutes; do not let systemd kill it on stop before the job finishes.
+TimeoutStopSec=1500
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=__APP_DIR__
+
+[Install]
+WantedBy=multi-user.target

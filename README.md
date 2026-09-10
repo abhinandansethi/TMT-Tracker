@@ -111,6 +111,8 @@ Where the pieces live:
     api/ask.js · api/draft.js          Ask a development a question / draft an email or memo, grounded on the stored text
     pipeline/scan/misc.py              the open-web lane: what is happening outside this scan's coverage
     code/build_scans.py                builds dist/scans.html (the landing page) and dist/scan/<id>.html
+    server/                            the whole thing as ONE process on the firm's VM: pages, /api, job runner,
+                                       audit-trail commits — no GitHub, Vercel or laptop in the path (server/README.md)
 
 Secrets: `OPENAI_API_KEY` as a repository secret (the workflow) **and** as a Vercel environment
 variable (Ask, Draft, Propose). Without the Vercel one those three buttons say so and the page

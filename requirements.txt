@@ -9,3 +9,7 @@ pypdf
 anthropic
 openai
 pymupdf
+
+# The VM service (server/): the same pipeline behind one Python process instead of Vercel + Actions.
+fastapi
+uvicorn[standard]

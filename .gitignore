@@ -21,3 +21,5 @@ dist/site.webmanifest
 dist/scans.html
 dist/scan/
 dist/data/
+server/jobs.db
+server/logs/
