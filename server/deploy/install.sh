@@ -77,7 +77,9 @@ say "systemd unit"
 sed -e "s#__APP_DIR__#$APP_DIR#g" -e "s#__USER__#$SVC_USER#g" -e "s#__ENV__#$ENV_FILE#g" -e "s#__STATE_DIR__#$STATE_DIR#g" \
     "$APP_DIR/server/deploy/tmt-radar.service" > /etc/systemd/system/tmt-radar.service
 systemctl daemon-reload
-systemctl enable --now tmt-radar
+# enable --now leaves an already-running service on its OLD code; every install is an update, so restart.
+systemctl enable tmt-radar
+systemctl restart tmt-radar
 sleep 2
 systemctl --no-pager --lines=5 status tmt-radar || true
 
