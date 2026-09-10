@@ -71,6 +71,20 @@ async def _form(request: Request) -> Dict[str, str]:
     return {k: (v[0] if v else "") for k, v in q.items()}
 
 
+def check_key_shape(key: str) -> str:
+    """Catch the wrong thing in the (masked) key field before OpenAI is asked — a pasted error
+    message, a sentence, a blank. An OpenAI key is one token starting with sk-."""
+    if not key:
+        return "The OpenAI key is empty."
+    if " " in key or "\n" in key or not key.startswith("sk-") or len(key) < 20:
+        head = key[:12] + ("…" if len(key) > 12 else "")
+        return f"That is not an OpenAI key — the field received “{head}”. A key is one token starting with sk-; use Show to see what is in the field."
+    return ""
+
+
+SHOW = '<button type="button" class="btn small" style="margin-left:8px" onclick="var i=document.getElementById(\'{id}\');i.type=i.type===\'password\'?\'text\':\'password\';this.textContent=i.type===\'password\'?\'Show\':\'Hide\'">Show</button>'
+
+
 def _verify_key(key: str) -> str:
     """'' when the key can use the pipeline's model, else the model's own error, one line."""
     try:
@@ -98,7 +112,7 @@ def _setup_form(err: str = "", vals: Dict[str, str] = None) -> HTMLResponse:
 <form method="post" action="/setup" autocomplete="off">
 <label for="token">Setup code</label><input type="text" id="token" name="token" value="{html.escape(v.get('token',''))}" required>
 <div class="hint">The one-time code the installer printed (Abhi has it). It is deleted once used.</div>
-<label for="key">OpenAI API key</label><input type="password" id="key" name="key" required>
+<label for="key">OpenAI API key</label><div class="row" style="align-items:center"><input type="password" id="key" name="key" required style="flex:1">{SHOW.format(id="key")}</div>
 <div class="hint">Checked against the model the pipeline uses before anything is saved. Stored only on this machine, in the service's settings file.</div>
 <h2>Your login — this becomes the admin</h2>
 <div class="row"><div><label for="user">Username</label><input type="text" id="user" name="user" value="{html.escape(v.get('user',''))}" required></div>
@@ -128,7 +142,7 @@ async def setup_post(request: Request):
     if not token or not hmac.compare_digest(f.get("token", "").strip().encode(), token.encode()):
         return _setup_form("That setup code is not the one on this server.", f)
     user, pw, pw2, key = f.get("user", "").strip(), f.get("pw", ""), f.get("pw2", ""), f.get("key", "").strip()
-    for err in (settings.check_user(user), settings.check_password(pw), "" if pw == pw2 else "The two passwords differ.", "" if key else "The OpenAI key is empty."):
+    for err in (settings.check_user(user), settings.check_password(pw), "" if pw == pw2 else "The two passwords differ.", check_key_shape(key)):
         if err:
             return _setup_form(err, f)
     verified = False
@@ -184,7 +198,7 @@ def _admin_page(user: str, notice: str = "", err: str = "") -> HTMLResponse:
 <h2>OpenAI key</h2>
 <p>Currently <span style="font-family:var(--mono)">{html.escape(settings.key_hint(os.environ.get("OPENAI_API_KEY") or ""))}</span> · model <span style="font-family:var(--mono)">{html.escape(common.MODEL)}</span>.</p>
 <form method="post" action="/admin" autocomplete="off"><input type="hidden" name="action" value="key">
-<label for="nk">New key</label><input type="password" id="nk" name="key" required>
+<label for="nk">New key</label><div class="row" style="align-items:center"><input type="password" id="nk" name="key" required style="flex:1">{SHOW.format(id="nk")}</div>
 <div class="hint">Verified against the model before it replaces the old one.</div>
 <button class="btn" type="submit">Replace key</button></form>
 <p style="margin-top:34px"><a href="/">← All scans</a></p>""")
@@ -223,8 +237,9 @@ async def admin_post(request: Request, user: str = Depends(_require_admin)):
         notice = f"Login {u} removed — it stops working now."
     elif action == "key":
         key = f.get("key", "").strip()
-        if not key:
-            return _admin_page(user, err="The key is empty.")
+        shape = check_key_shape(key)
+        if shape:
+            return _admin_page(user, err=shape)
         bad = _verify_key(key)
         if bad:
             return _admin_page(user, err="The key could not be verified, so the old one stays: " + bad)
