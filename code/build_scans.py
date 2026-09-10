@@ -1655,7 +1655,7 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
       <div class="field"><label for="f-desc">What do you want this scan to track?</label>
         <textarea id="f-desc" maxlength="2000" placeholder="Advise multinational-employer clients on national transposition of the Pay Transparency Directive; surface new obligations, thresholds and deadlines by country."></textarea>
         <div class="help">Then approve the coverage — or let it be decided for you.</div></div>
-      <div class="paths"><button type="button" class="btn primary" id="dlg-build">Find coverage</button><span class="or">or</span><button type="button" class="btn" id="dlg-auto">Decide coverage for me</button><button type="button" class="btn quiet" id="dlg-manual" hidden>Create manually</button></div>
+      <div class="paths"><button type="button" class="btn primary" id="dlg-build">Find coverage</button><span class="or">or</span><button type="button" class="btn" id="dlg-auto">Decide coverage for me</button><span class="or">or</span><button type="button" class="btn quiet" id="dlg-manual">Add links myself</button></div>
       <div class="pnote" id="dlg-pnote-1" aria-live="polite"></div>
     </div>
     <div class="db only-form">
@@ -2301,11 +2301,14 @@ function setStep(step) {
 }
 function setNote(sel, html, warn) { const el = $(sel); el.className = 'pnote' + (html ? ' on' : '') + (warn ? ' warn' : ''); el.innerHTML = html || ''; }
 $('#dlg-manual').addEventListener('click', () => {
-  // A description typed before choosing the manual path is the intent in the partner's own words;
-  // carrying it over saves retyping and loses nothing.
+  // The partner knows the links. The description (if any) is the intent in their own words; the
+  // details open so the name and jurisdiction get filled, and the Add bar takes the URLs.
   const desc = $('#f-desc').value.trim();
   if (desc && !$('#f-intent').value.trim()) $('#f-intent').value = desc;
-  setStep('form'); $('#f-name').focus();
+  if ($('#f-disc').checked && !discTouched) { $('#f-disc').checked = false; discTouched = true; }
+  setStep('form'); $('#adv').open = true;
+  setNote('#addsrc-note', 'Paste each listing page\'s URL below and press Add; it is checked on the spot. Name, intent and jurisdiction are under Advanced settings.');
+  ($('#f-group').value.trim() ? $('#f-addsrc') : $('#f-group')).focus();
 });
 $('#dlg-back').addEventListener('click', () => { setStep('describe'); $('#f-desc').focus(); });
 
@@ -2767,7 +2770,7 @@ async function addSource() {
         b.textContent = 'Searching…';
         setNote('#addsrc-note', 'Not a single source — added “' + esc(q) + '” to what this radar catches. Looking for places that publish it…');
         let d = null;
-        try { d = await postJSON(D.api.discover, { intent: q.length >= 20 ? q : ('Track ' + q + ' for ' + ($('#f-group').value.trim() || 'this radar')), topics: [q], industries: [], jurisdiction: F.jur.get()[0] || undefined }, 55000); } catch (e) {}
+        try { d = await postJSON(D.api.discover, { intent: q.length >= 20 ? q : ('Track ' + q + ' for ' + ($('#f-group').value.trim() || 'this radar')), topics: [q], industries: [], jurisdiction: F.jur.get()[0] || undefined }, 150000); } catch (e) {}
         const found = (d && d.ok && Array.isArray(d.data.candidates) ? d.data.candidates : []).filter(c => c && isUrl(c.url) && !cands.some(x => x.url === c.url));
         found.forEach(c => { cands.push(Object.assign({}, c, { added: true })); picked[c.url] = true; });
         if (found.length && $('#f-disc').checked && !discTouched) $('#f-disc').checked = false;
@@ -2825,7 +2828,7 @@ async function findSources(only) {
   const tick = () => { b.textContent = calls.length > 1 ? 'Looking… ' + done + '/' + calls.length : 'Looking…'; };
   tick();
   const results = await Promise.all(calls.map(j => postJSON(D.api.discover,
-      Object.assign({ intent, topics: F.top.get(), industries: F.ind.get() }, j ? { jurisdiction: j } : {}), 55000)
+      Object.assign({ intent, topics: F.top.get(), industries: F.ind.get() }, j ? { jurisdiction: j } : {}), 150000)
     .then(x => ({ j: j, r: x }), e => ({ j: j, err: e }))
     .then(x => { done += 1; tick(); return x; })));
   b.disabled = false; b.textContent = 'Find sources'; findWhy();
@@ -2848,7 +2851,7 @@ async function findSources(only) {
       (x.r.data.notes || []).forEach(n => { if (notes.indexOf(n) < 0) notes.push(n); });
     });
     failed.forEach(x => notes.push('The search for ' + (x.j || 'this subject') + ' did not answer'
-      + (x.err && x.err.name === 'AbortError' ? ' within 55 seconds' : '') + ' — nothing from it is listed below.'));
+      + (x.err && x.err.name === 'AbortError' ? ' within 150 seconds' : '') + ' — nothing from it is listed below.'));
     r = { ok: true, status: 200, data: { candidates: merged, gaps: gaps, dropped: dropped,
       notes: notes, model: (okCalls[0].r.data || {}).model } };
   } else {
@@ -2878,11 +2881,11 @@ async function findSources(only) {
     return;
   }
   // Same fallback discipline as the describe path: say why, and leave the manual input working.
-  const why = (err && err.name === 'AbortError') ? 'discovery took longer than 55 seconds'
+  const why = (err && err.name === 'AbortError') ? 'discovery took longer than 150 seconds'
     : err ? 'no discover endpoint is reachable from this page'
     : (r.status === 501 || r.status === 404) ? 'source discovery is not configured on this deployment (HTTP ' + r.status + ')'
     : 'the discover endpoint answered ' + r.status + (r.data.message ? ': ' + r.data.message : '');
-  setNote('#find-note', 'Could not propose sources — ' + esc(why) + '. Add the listing pages you know into <b>Sources</b> below; the scan is created the same way and each URL is gated the same way. Leaving <b>Discover sources automatically</b> ticked lets the workflow look for venues itself, as it did before.', true);
+  setNote('#find-note', 'Could not propose sources — ' + esc(why) + '. Add sources below, or press <b>Search again</b>.', true);
 }
 
 // The one line above the list: what the description became. Edits under Details keep it true.
@@ -2890,10 +2893,8 @@ function drawSummary() {
   const el = $('#summary-line'); if (!el) return;
   const g = $('#f-group').value.trim(), l = $('#f-layer').value.trim(), jurs = F.jur.get();
   el.innerHTML = (g ? '<b>' + esc(g) + '</b>' + (l ? ' · ' + esc(l) : '') : '<span class="miss">No name yet</span>')
-    + '<span class="sep">·</span>' + (jurs.length ? jurs.map(flagged).join(' ') : '<span class="miss">no jurisdiction</span>')
-    + '<button type="button" class="btn sm quiet" id="sum-edit">Advanced settings</button>';
+    + '<span class="sep">·</span>' + (jurs.length ? jurs.map(flagged).join(' ') : '<span class="miss">no jurisdiction</span>');
 }
-document.addEventListener('click', e => { if (e.target.id === 'sum-edit') { $('#adv').open = !$('#adv').open; if ($('#adv').open) $('#f-group').focus(); } });
 ['#f-group', '#f-layer'].forEach(s => $(s).addEventListener('input', drawSummary));
 $('#dlg-auto').addEventListener('click', () => buildFromDescription(true));
 $('#dlg-build').addEventListener('click', () => buildFromDescription(false));
@@ -3084,7 +3085,7 @@ function renderHome() {
     // This page is the product's front door, not an index behind the tracker: it opens with what a
     // scan is and who owns which one, because a partner arriving here for the first time has no
     // other page to learn it from.
-    + '<p class="lede">One question, read against official sources you can see. <b>TMT India</b> is the vetted built-in; the rest are yours.</p></div>'
+    + '<p class="lede">A scan watches official sources for one client, matter or company and reports what changed. <b>TMT India</b> is the firm\'s vetted built-in.</p></div>'
     // "Logins" is the admin's page (partners' logins, the OpenAI key); anyone else who opens it is
     // told who manages logins, which is the right answer for them too.
     + '<div class="actions"><a class="btn quiet" href="/admin">Logins</a><button class="btn primary" id="create">+ Create scan</button></div></div>'
@@ -3093,7 +3094,7 @@ function renderHome() {
     + '<div class="tools"><select id="hsort" aria-label="Sort scans"><option value="name">Sort: name</option><option value="lastrun">Sort: last run</option><option value="new">Sort: new developments</option></select></div></div>'
     + '<div class="pending" id="pending"></div>'
     + '<div class="cards" id="cards"></div>'
-    + (scans.length ? '' : '<div class="empty" id="hempty"><h2>No scans yet.</h2><p>Describe a question the way you would brief an associate — the clients, the jurisdictions, what to surface — and the system finds candidate places to read, gates each one, reads them, and writes you a weekly digest in which every sentence is cited or marked as uncited.</p><p>Runs happen when you press <b>Run scan</b>, never on a schedule. Nothing enters a scan that did not come from a source you can see on its coverage panel.</p><button class="btn primary" id="create2">+ Create your first scan</button></div>');
+    + (scans.length ? '' : '<div class="empty" id="hempty"><h2>No scans yet.</h2><p>Describe what to watch, approve the sources, and the scan reads them and writes a cited digest.</p><button class="btn primary" id="create2">+ Create your first scan</button></div>');
   noticeEl = $('#notice');
   $('#create').addEventListener('click', () => openDialog(null));
   const c2 = $('#create2'); if (c2) c2.addEventListener('click', () => openDialog(null));
@@ -4842,7 +4843,7 @@ def selftest() -> None:
         assert 'id="hempty"' in html and "em.hidden = list.length > 0" in html
         # The Scans home is the product's front door now: it says what a scan is, and which one is
         # the built-in vetted scan, without typing a source count the registry owns.
-        assert "One question, read against official sources" in html and "<b>TMT India</b> is the vetted built-in" in html
+        assert "A scan watches official sources" in html and "<b>TMT India</b> is the firm\\'s vetted built-in" in html
         # the built-in scan's source count comes from the card the registry computed, never typed
         # The lede is one line now, so it carries no counts to keep honest; the built-in card still
         # shows "N vetted sources · …" computed from the registry, which is where the number lives.
