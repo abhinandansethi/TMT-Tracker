@@ -84,7 +84,13 @@ MISC_PROPOSED_BY = "miscellany"   # mirrors misc.PROPOSED_BY; kept local so this
 SOURCE_KEYS_PARTNER = ("url", "name", "jurisdiction", "kind", "rationale")
 SOURCE_KEYS = SOURCE_KEYS_PARTNER + ("host", "status", "tier", "proposed_by", "confidence", "reason", "gate")
 TOP_KEYS = ("id", "name", "intent", "jurisdictions", "topics", "industries", "clients", "sources", "discovery_notes",
-            "budget", "demo", "no_discover", "no_misc", "created", "updated")
+            "subject_filter", "budget", "demo", "no_discover", "no_misc", "created", "updated")
+# The subject filter's vocabulary, mirrored from pipeline/scan/subject.py and kept local for the
+# same reason MISC_PROPOSED_BY is: this file and its selftest must load even when a sibling module
+# is broken or not yet written. The selftest asserts the two agree, so they cannot drift.
+SUBJECT_KEYS = ("regex", "why", "source")
+FILTER_SOURCES = ("proposed", "partner", "none")
+MAX_REGEX, MAX_WHY = 400, 300
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 MAX_READ_ATTEMPTS = 3          # a document that will not read is given up on, loudly, not retried forever
 # How many developments a scan's FIRST run enriches, under the budget's own max_new_per_run.
@@ -166,6 +172,22 @@ def coerce_sources(defn: Any) -> None:
         defn["sources"] = [{"url": s.strip()} if isinstance(s, str) else s for s in defn["sources"]]
 
 
+def coerce_subject_filter(defn: Any) -> None:
+    """A subject filter may be typed as `{"regex": "..."}` alone — that is all the create dialog
+    and /api/propose-filter have to say — and the committed file always holds all three keys.
+    Filled in place, before validation, exactly like coerce_sources, so the validator can mirror
+    scans/schema.json's required-equals-properties discipline without refusing a partner's
+    shorthand. A filter with no regex means no filter, so `source` defaults to "none": the safe
+    reading, and the one that leaves an existing scan's behaviour untouched."""
+    if not isinstance(defn, dict):
+        return
+    f = defn.get("subject_filter")
+    if isinstance(f, dict):
+        f.setdefault("regex", "")
+        f.setdefault("why", "")
+        f.setdefault("source", "partner" if str(f.get("regex") or "").strip() else "none")
+
+
 def budget_notes(defn: Any) -> list[str]:
     """What the budget ceilings will do to this definition's overrides, in the words health
     will carry. Not a validation problem — a partner asking for more than the ceiling gets the
@@ -182,6 +204,7 @@ def validate_definition(defn: Any) -> list[str]:
     if not isinstance(defn, dict):
         return ["definition must be a JSON object"]
     coerce_sources(defn)
+    coerce_subject_filter(defn)
     for k in defn:
         if k not in TOP_KEYS:
             problems.append(f"unknown field '{k}' (allowed: {', '.join(TOP_KEYS)})")
@@ -265,6 +288,25 @@ def validate_definition(defn: Any) -> list[str]:
                     problems.append(f"sources[{i}].rationale must be at most 1000 characters")
                 if isinstance(s.get("jurisdiction"), str) and len(s["jurisdiction"]) > 40:
                     problems.append(f"sources[{i}].jurisdiction must be at most 40 characters")
+    if "subject_filter" in defn:
+        # SHAPE ONLY. Whether the regex compiles is deliberately NOT a validation problem: a
+        # definition that fails validation does not run at all, and refusing to run a scan over a
+        # broken filter would be a worse outcome than reading a few extra rows. subject.prepare()
+        # catches it at run time, reports it as a note and keeps every row.
+        f = defn["subject_filter"]
+        if not isinstance(f, dict):
+            problems.append("subject_filter must be an object {regex, why, source}")
+        else:
+            extra = [k for k in f if k not in SUBJECT_KEYS]
+            if extra:
+                problems.append(f"subject_filter: unknown field(s) {sorted(extra)} "
+                                f"(allowed: {', '.join(SUBJECT_KEYS)})")
+            if not isinstance(f.get("regex"), str) or len(f.get("regex") or "") > MAX_REGEX:
+                problems.append(f"subject_filter.regex must be a string of at most {MAX_REGEX} characters")
+            if not isinstance(f.get("why"), str) or len(f.get("why") or "") > MAX_WHY:
+                problems.append(f"subject_filter.why must be a string of at most {MAX_WHY} characters")
+            if f.get("source") not in FILTER_SOURCES:
+                problems.append(f"subject_filter.source must be one of {list(FILTER_SOURCES)}")
     if "budget" in defn:
         b = defn["budget"]
         if not isinstance(b, dict):
@@ -344,6 +386,55 @@ enrich_dev = _default_enrich
 discover_propose = _default_discover
 gate_assess = _default_gate
 misc_scan = _default_misc
+
+
+def subject_module():
+    """pipeline/scan/subject.py, or None when it cannot be imported.
+
+    Lazy for the reason every sibling here is lazy — run.py and its selftest must load even when
+    one module is broken — and tolerant for a reason of its own: a scan whose filter module will
+    not import must read EVERYTHING, loudly, rather than not run. A filter that is missing costs
+    a wasted reading budget; a run that refuses to start costs the coverage."""
+    try:
+        from . import subject
+        return subject
+    except Exception as e:                              # pragma: no cover - import-time breakage
+        common.log(f"subject filter unavailable: {_err(e)}")
+        return None
+
+
+def subject_filter_for(defn: dict) -> tuple[Optional[dict], list[str]]:
+    """(the filter this run will apply, or None to keep every row; health notes).
+
+    Three ways to end up keeping everything, and health tells them apart. A BROKEN filter is a
+    problem and says so. NO filter at all is also a problem — an unfiltered scan reading a telecom
+    listing for an AI question is exactly what produced 118 developments with three mentions of
+    the subject — so it is named too, and nobody mistakes it for good targeting. A filter
+    deliberately switched off (`source: "none"`) is a partner's decision and gets no note."""
+    raw = defn.get("subject_filter")
+    sub = subject_module()
+    if sub is None:
+        return None, ([f"subject filter ignored, every row kept: pipeline/scan/subject.py could "
+                       f"not be imported"] if raw else [])
+    filt, note = sub.prepare(raw)
+    if note:
+        return None, [note]
+    if filt is None and not (isinstance(raw, dict) and raw.get("source") == "none"):
+        return None, [sub.NO_FILTER_NOTE]
+    return filt, []
+
+
+def propose_subject_filter(intent: str, topics: Any, client, model: Optional[str] = None) -> tuple[dict, str]:
+    """Ask the model ONCE for a subject filter from an intent and topics: ({regex, why, source},
+    note). Exposed here so /api/propose-filter and the create dialog reach it the same way every
+    other step is reached, and validated in code inside subject.propose before it is returned.
+
+    It is a PROPOSAL. Nothing in this file ever stores it: `create` writes the definition it is
+    given, so a filter only ever takes effect after a partner has seen it."""
+    sub = subject_module()
+    if sub is None:
+        return {"regex": "", "why": "", "source": "none"}, "pipeline/scan/subject.py could not be imported"
+    return sub.propose(intent, topics, client, model=model)
 
 
 def rows_and_report(result: Any) -> tuple[list[dict], dict]:
@@ -564,6 +655,15 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
     # notes, which the page reads as problems.
     promoted_ok = gate_promoted(defn, client, budget, scan_notes)
 
+    # The subject filter, decided once before any source is fetched and applied to every listing
+    # below. It is the cheapest instrument in the pipeline and the earliest: a row it drops costs
+    # no ledger entry, no fetch, no document read and no enrichment call, so the reading budget
+    # goes to the subject instead of to whatever else the venue happened to publish.
+    sub = subject_module()
+    subject_filter, sf_notes = subject_filter_for(defn)
+    scan_notes.extend(sf_notes)
+    filtered_total, unjudged_total = 0, 0
+
     approved = [s for s in defn.get("sources") or [] if s.get("status") == "approved"]
     cap_sources = int(budget["max_sources"])
     if len(approved) > cap_sources:
@@ -612,6 +712,24 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
                 h["info"].append(f"extractor dropped {v} row(s): {k}")
         if report.get("seen") is not None:
             h["info"].append(f"extractor saw {report['seen']} candidate row(s)")
+        # Here, per source, before dedupe and before anything is read: what on this listing is
+        # this scan's subject. A row whose title cannot be judged is KEPT and marked — a scan has
+        # no document probe to settle it with, and erring toward keeping is the only safe
+        # direction for a tracker whose promise is that it does not miss things.
+        rows_before = len(rows)
+        if sub and subject_filter:
+            rows, srep = sub.filter_rows(rows, subject_filter)
+            h["info"].extend(sub.source_lines(srep))
+            # The same two numbers again, structured, on the source's own health row. The page
+            # (code/build_scans.py::subject_counts) sums these per venue so a partner auditing for
+            # a miss reads the count beside the venue that lost the rows, not only a run total —
+            # and it treats ABSENT as "this run recorded nothing", not as zero, so the key is
+            # written only when the filter actually ran against this source.
+            filtered_total += int(srep.get("filtered") or 0)
+            unjudged_total += len(srep.get("unsure") or [])
+            h["subject"] = {"dropped": int(srep.get("filtered") or 0),
+                            "kept_terse": len(srep.get("unsure") or []),
+                            "titles": list(srep.get("unsure") or [])[:5]}
         h["rows_seen"] = len(rows)
         dates: list[str] = []
         skipped_bad, undated = 0, 0
@@ -645,6 +763,10 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
                 "snippet": common.norm_ws(str(row.get("snippet") or ""))[:400],
                 "doc_hash": None, "read_as": None, "enriched": False,
             }
+            # Kept only because its title could not be judged against the subject filter. The
+            # development says so on its own record, so nobody reads it as "this is in scope".
+            if row.get("subject_unjudged"):
+                dev["subject_unjudged"] = True
             items.append(dev)
             ids.add(dev_id)
             by_url[cu] = dev
@@ -657,11 +779,17 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         if undated:
             h["info"].append(f"{undated} row(s) carried a date that did not validate — kept undated")
         h["newest_visible"] = max(dates) if dates else None
-        if not rows:
+        if not rows_before:
             h["status"] = "EMPTY"
             h["notes"].append("listing fetched but no rows extracted — page changed, or the extractor missed the list")
         elif h["new"]:
             h["status"] = "OK"
+        elif not rows:
+            # The listing parsed perfectly; every item on it belongs to another subject. That is
+            # the filter working, not a broken venue, so it must not read EMPTY ("page changed")
+            # and must not go in the problems list. QUIET, and the info line says why.
+            h["status"] = "QUIET"
+            h["info"].append(f"all {rows_before} row(s) on this listing are outside this scan's subject filter")
         else:
             h["status"] = "QUIET"
             h["info"].append("nothing new; newest item this venue shows is "
@@ -799,8 +927,12 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         "generated": now,
         "scan": defn.get("id"),
         "sources": sources_health,
+        # `filtered` is how many rows the subject filter kept out of the ledger this run, and
+        # `unjudged` how many it let in because their titles were too terse to judge. Both are 0
+        # for a scan with no filter, which is what every scan was before the filter existed.
         "run": {"new": len(new_devs), "enriched": enriched, "queued": len(rest),
                 "read_failed": read_failed, "enrich_failed": enrich_failed,
+                "filtered": filtered_total, "unjudged": unjudged_total,
                 "ledgered_total": len(items), "week": week},
         # The Miscellaneous lane's own counts, kept apart from `run` because they are not
         # coverage: found is what the search surfaced outside the coverage list this run, new is
@@ -820,12 +952,14 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
     summary = {"id": defn.get("id"), "sources": len(approved), "sources_ok": sources_ok,
                "sources_failed": sources_failed, "new": len(new_devs), "enriched": enriched,
                "queued": len(rest), "read_failed": read_failed, "enrich_failed": enrich_failed,
+               "filtered": filtered_total, "unjudged": unjudged_total,
                "high": high, "ledgered_total": len(items), "week": week,
                "misc": {k: misc_counts.get(k, 0) for k in ("found", "new", "promoted")},
                "exit": EXIT_FAILED_SOURCE if any_failed else EXIT_OK}
     for n in health["notes"]:
         common.log(f"note: {n}")
     common.log(f"{defn.get('id')}: {len(new_devs)} new, {enriched} enriched, {len(rest)} queued, "
+               f"{filtered_total} outside the subject filter, {unjudged_total} kept unjudged, "
                f"{sources_ok} source(s) ok, {sources_failed} failed → {paths.dir}")
     return summary, summary["exit"]
 
@@ -902,6 +1036,11 @@ def create_scan(defn: dict, paths: ScanPaths, client, no_discover: bool,
         defn["no_misc"] = bool(existing.get("no_misc"))
     defn["no_misc"] = bool(no_misc) or bool(defn.get("no_misc"))
     coerce_sources(defn)
+    # The subject filter is STORED AS GIVEN and never invented here. propose_subject_filter is
+    # what puts a suggestion in front of a partner (the create dialog, /api/propose-filter); a
+    # definition that arrives without one gets no filter at all, and the run says so in health.
+    # A filter nobody has seen is worse than no filter: it drops rows in the partner's name.
+    coerce_subject_filter(defn)
     partner = [_candidate_from_partner(s) for s in defn.get("sources") or []]
     # Written first, with partner sources visibly ungated, so a crash in discovery leaves a
     # definition that says exactly what has and has not happened.
@@ -1619,6 +1758,26 @@ def cmd_list(args) -> int:
     return EXIT_OK
 
 
+def cmd_propose_filter(args) -> int:
+    """Print a proposed subject filter and stop. Nothing is written, no scan is touched: this
+    command exists so the create dialog and /api/propose-filter can show a partner a filter to
+    accept, edit or clear before it has any effect on anything.
+
+    A refused or unavailable proposal is EXIT_OK with `source: "none"` and the reason in `note` —
+    "we could not propose one" is a perfectly good answer, and the scan then reads everything and
+    says so, which is the state every scan was in before subject filters existed."""
+    intent = str(getattr(args, "intent", "") or "")
+    if len(intent.strip()) < 20:
+        print("propose-filter: --intent must be at least 20 characters (the partner's own question)",
+              file=sys.stderr)
+        return EXIT_USAGE
+    client = _client_for(bool(getattr(args, "dry_run", False)))
+    filt, note = propose_subject_filter(intent, list(getattr(args, "topic", []) or []), client)
+    out = {"action": "propose-filter", "subject_filter": filt, "note": note, "exit": EXIT_OK}
+    _print_summary(out, getattr(args, "summary_out", None))
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="pipeline.scan.run", description=__doc__.split("\n\n")[0])
     ap.add_argument("--selftest", action="store_true", help="exercise the orchestrator offline")
@@ -1645,10 +1804,17 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--finding", required=True, metavar="FINDING_ID",
                    help="a 10-character finding id from data/scans/<id>/misc.json (any kind; not one already promoted)")
     sub.add_parser("list", help="every scan with its source and development counts")
+    # Proposes a subject filter and PRINTS it. It writes no definition and starts no run: the
+    # partner is the one who decides whether the scan is aimed this way. /api/propose-filter and
+    # the create dialog are the callers this exists for.
+    f = sub.add_parser("propose-filter", help="propose a subject filter from an intent and topics (prints JSON; stores nothing)")
+    f.add_argument("--intent", required=True, help="the partner's question, in their own words")
+    f.add_argument("--topic", action="append", default=[], metavar="TOPIC", help="a topic (repeatable)")
+    f.add_argument("--dry-run", action="store_true", help="FakeClient; no key, no call")
     for p in (c, r):
         p.add_argument("--no-misc", action="store_true",
                        help="skip the Miscellaneous lane (the open-web search for things outside coverage)")
-    for p in (c, r, d, m, x):
+    for p in (c, r, d, m, x, f):
         p.add_argument("--summary-out", metavar="FILE", default=None,
                        help="also write the SUMMARY JSON to FILE (the workflow reads this, not the log)")
     return ap
@@ -1672,6 +1838,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         return cmd_dismiss(args)
     if args.cmd == "list":
         return cmd_list(args)
+    if args.cmd == "propose-filter":
+        return cmd_propose_filter(args)
     ap.print_help()
     return EXIT_USAGE
 
@@ -1803,6 +1971,16 @@ def selftest() -> None:
         assert set(mf["required"]) == set(mf["properties"]) and mf["additionalProperties"] is False
         assert set(schema["$defs"]["misc"]["required"]) == {"generated", "query", "findings", "notes"}
         assert misc_mod.PROPOSED_BY == MISC_PROPOSED_BY and MISC_PROPOSED_BY in SOURCE_PROPOSERS
+        # The subject filter's contract, in the same three places: the schema, this file's local
+        # copy of the vocabulary, and the module that applies it.
+        sf = schema["properties"]["subject_filter"]
+        assert set(sf["required"]) == set(sf["properties"]) == set(SUBJECT_KEYS), sf["properties"]
+        assert sf["additionalProperties"] is False
+        assert tuple(sf["properties"]["source"]["enum"]) == FILTER_SOURCES, sf["properties"]["source"]
+        assert sf["properties"]["regex"]["maxLength"] == MAX_REGEX and sf["properties"]["why"]["maxLength"] == MAX_WHY
+        sub_mod = subject_module()
+        assert sub_mod and sub_mod.SUBJECT_KEYS == SUBJECT_KEYS and sub_mod.FILTER_SOURCES == FILTER_SOURCES
+        assert (sub_mod.MAX_REGEX, sub_mod.MAX_WHY) == (MAX_REGEX, MAX_WHY)
     # sources given as URL strings (the edit dialog's shape) are coerced to {url} and accepted
     strs = dict(demo, sources=["https://gazette.example.test/serie-generale", {"url": "https://ministry.example.test/x"}, "ftp://no"])
     probs = validate_definition(strs)
@@ -1838,6 +2016,26 @@ def selftest() -> None:
         assert any("reserved" in p for p in validate_definition(dict(demo, id=rid))), rid
     assert any("no_discover must be a boolean" in p for p in validate_definition(dict(demo, no_discover="yes")))
     assert validate_definition(dict(demo, no_discover=True)) == []
+    # subject_filter: shape is validated, the regex itself is NOT. A definition whose regex will
+    # not compile must still RUN — the run reports it and reads everything — because a scan that
+    # refuses to start has lost its coverage, while one that reads a few extra rows has not.
+    ai_filter = {"regex": r"artificial\s+intelligence|\bAI\b", "why": "Keeps items that name AI.",
+                 "source": "proposed"}
+    assert validate_definition(dict(demo, subject_filter=ai_filter)) == []
+    assert validate_definition(dict(demo, subject_filter={"regex": "(unclosed", "why": "", "source": "partner"})) == [], \
+        "a regex that will not compile must not stop the scan from running"
+    sfp = validate_definition(dict(demo, subject_filter={"regex": 5, "why": "x" * (MAX_WHY + 1),
+                                                        "source": "guessed", "field": "title"}))
+    for needle in ("subject_filter: unknown field(s) ['field']", "subject_filter.regex must be a string",
+                   f"subject_filter.why must be a string of at most {MAX_WHY}", "subject_filter.source must be one of"):
+        assert any(needle in p for p in sfp), (needle, sfp)
+    assert any("subject_filter must be an object" in p for p in validate_definition(dict(demo, subject_filter="ai")))
+    # the create dialog's shorthand — a bare regex — is filled in place, like a string source
+    short = dict(demo, subject_filter={"regex": r"\bAI\b"})
+    assert validate_definition(short) == [] and short["subject_filter"] == {
+        "regex": r"\bAI\b", "why": "", "source": "partner"}, short["subject_filter"]
+    empty = dict(demo, subject_filter={})
+    assert validate_definition(empty) == [] and empty["subject_filter"]["source"] == "none", empty["subject_filter"]
     # an over-ceiling budget is not a validation problem: it is clamped and said, in health's words
     big = dict(demo, budget={"max_new_per_run": 1000000, "max_sources": 100, "delay_seconds": 0, "max_candidates": 3})
     assert validate_definition(big) == []
@@ -2073,6 +2271,152 @@ def selftest() -> None:
                 assert summ["candidates"] == 6 and summ["gated"]["approved"] == 6 and code6 == 0, summ
             finally:
                 globals()["gate_assess"], globals()["discover_propose"] = saved_gate, saved_disc
+                restore_live()
+
+            # 5e. THE SUBJECT FILTER, end to end, on the rows that produced the defect. Twelve
+            #     titles lifted from data/scans/india-ai-regulation/developments.json: six CERT-In
+            #     vendor bulletins, three TRAI telecom rows (two of them substring traps — TRAI
+            #     and IRDAI both contain "AI") and the three rows out of that scan's 118 that are
+            #     actually about artificial intelligence.
+            fc3 = enable_dry_run()
+            saved_rows, saved_client_for = listing_rows, _client_for
+            try:
+                REAL = [
+                    "Multiple Vulnerabilities in Oracle Products",
+                    "A End of Mainstream for Windows Server 2022",
+                    "Multiple Vulnerabilities in Apple Products",
+                    "Multiple Vulnerabilities in SAP Products",
+                    "Multiple Vulnerabilities in Microsoft Products",
+                    "Multiple Vulnerabilities in Adobe Products",
+                    "Consultation Paper on Cloud Services",
+                    "Consultation Paper on Net Neutrality",
+                    "Direction regarding mandatory adoption of 1600-series numbers by IRDAI regulated entities.",
+                    "Consultation Paper on Leveraging Artificial Intelligence and Big Data in Telecommunication Sector",
+                    "Recommendations on Leveraging Artificial Intelligence and Big Data in Telecommunication Sector",
+                    "Direction regarding institutionalization of AI/ML-based UCC_Detect intelligence "
+                    "for inter-operator sharing and regulatory action against UCC senders.",
+                ]
+
+                def _stub(titles):
+                    globals()["listing_rows"] = lambda body, url, client, defn_, budget: (
+                        [{"title": t, "url": f"/doc/{n}", "date": "2026-08-%02d" % (n + 1)}
+                         for n, t in enumerate(titles)],
+                        {"seen": len(titles), "kept": len(titles), "dropped": {}})
+                globals()["_client_for"] = lambda dry_run: fc3
+                _stub(REAL)
+                src0 = demo["sources"][0]
+                base = dict(demo, sources=[src0], budget=dict(demo["budget"], max_new_per_run=0))
+
+                def _filtered_create(name: str, filt, out: Path) -> tuple:
+                    d = dict(base, name=name)
+                    if filt is not None:
+                        d["subject_filter"] = filt
+                    p = Path(tmp) / f"{common.slug(name)}.json"
+                    p.write_text(json.dumps(d), encoding="utf-8")
+                    assert main(["create", "--from-json", str(p), "--no-discover", "--dry-run",
+                                 "--summary-out", str(out)]) == 0, name
+                    pp = paths_for(common.slug(name))
+                    return (common.load_json(pp.health), common.load_json(pp.developments)["items"],
+                            json.loads(out.read_text(encoding="utf-8")), pp)
+
+                # BEFORE — no subject filter at all: every one of the twelve is ledgered, exactly
+                # as it was before this key existed, and health SAYS the scan is unfiltered so
+                # nobody mistakes it for a well-targeted one.
+                so = Path(tmp) / "subject-summary.json"
+                nh, nl, nsum, _ = _filtered_create("Unfiltered subject demo", None, so)
+                assert len(nl) == 12, len(nl)
+                assert nh["run"]["filtered"] == 0 and nh["run"]["unjudged"] == 0, nh["run"]
+                assert nsum["filtered"] == 0 and nsum["unjudged"] == 0, nsum
+                assert any("no subject filter" in n for n in nh["notes"]), nh["notes"]
+                assert not any("outside this scan's subject filter" in i
+                               for h in nh["sources"].values() for i in h["info"]), nh["sources"]
+
+                # AFTER — the same twelve rows through a filter a partner can read. The three AI
+                # items survive; the six CERT-In bulletins and the TRAI/IRDAI substring traps do
+                # not, and none of them costs a fetch, a ledger row or a reading-budget slot.
+                ai_f = {"regex": r"artificial\s+intelligence|\bA\.?I\.?\b|\bAI/ML\b|machine\s+learning|"
+                                 r"generative|deepfake|algorithmic",
+                        "why": "Keeps items whose title names artificial intelligence or its usual variants.",
+                        "source": "proposed"}
+                fh_, fl, fsum, fpp = _filtered_create("Filtered subject demo", ai_f, so)
+                kept_titles = sorted(d["title"] for d in fl)
+                assert len(fl) == 3, [d["title"] for d in fl]
+                assert all("Artificial Intelligence" in t or "AI/ML" in t for t in kept_titles), kept_titles
+                assert not any("Vulnerabilities" in t or "IRDAI" in t or "Neutrality" in t for t in kept_titles), kept_titles
+                assert fh_["run"]["filtered"] == 9 and fh_["run"]["unjudged"] == 0, fh_["run"]
+                assert fsum["filtered"] == 9 and fsum["unjudged"] == 0, fsum
+                assert not any(d.get("subject_unjudged") for d in fl), fl
+                sh_ = fh_["sources"][src0["url"]]
+                assert sh_["status"] == "OK" and sh_["rows_seen"] == 3, sh_
+                assert "9 row(s) outside this scan's subject filter" in sh_["info"], sh_["info"]
+                # the structured per-source block the page sums (absent is not zero, so an
+                # unfiltered run must not carry the key at all)
+                assert sh_["subject"] == {"dropped": 9, "kept_terse": 0, "titles": []}, sh_["subject"]
+                assert "subject" not in nh["sources"][src0["url"]], nh["sources"][src0["url"]]
+                assert not any("no subject filter" in n for n in fh_["notes"]), fh_["notes"]
+                # The definition keeps the partner's own words, and a re-run re-validates it.
+                assert common.load_json(fpp.definition)["subject_filter"] == ai_f
+                assert main(["run", "--id", fpp.id, "--dry-run"]) == 0
+
+                # A title too terse to judge is KEPT, marked on its own development, and counted —
+                # the one direction a filter with no document probe is allowed to err in.
+                _stub(REAL + ["Corrigendum"])
+                th_, tl, tsum, _ = _filtered_create("Terse subject demo", ai_f, so)
+                assert len(tl) == 4 and th_["run"]["filtered"] == 9 and th_["run"]["unjudged"] == 1, th_["run"]
+                terse = [d for d in tl if d.get("subject_unjudged")]
+                assert [d["title"] for d in terse] == ["Corrigendum"], tl
+                assert tsum["unjudged"] == 1, tsum
+                sh_ = th_["sources"][src0["url"]]
+                assert any(i.startswith("1 row(s) kept: title too terse to judge against the filter")
+                           and "Corrigendum" in i for i in sh_["info"]), sh_["info"]
+                assert sh_["subject"] == {"dropped": 9, "kept_terse": 1, "titles": ["Corrigendum"]}, sh_["subject"]
+                # Kept-because-unjudgeable is not a problem: the row is in the ledger, not lost.
+                assert not any("too terse" in n for n in th_["notes"]), th_["notes"]
+
+                # A MALFORMED regex is reported and IGNORED — every row kept — because a broken
+                # filter that silently drops the subject is the worst outcome available.
+                _stub(REAL)
+                bh_, bl, bsum, _ = _filtered_create(
+                    "Broken filter demo", {"regex": r"artificial intelligence|(unclosed",
+                                           "why": "", "source": "partner"}, so)
+                assert len(bl) == 12 and bh_["run"]["filtered"] == 0, (len(bl), bh_["run"])
+                assert any("does not compile" in n and "every row kept" in n for n in bh_["notes"]), bh_["notes"]
+                assert bsum["filtered"] == 0, bsum
+
+                # source "none" is a partner's decision to read everything: no filter, no note.
+                oh_, ol, _, _ = _filtered_create("Filter off demo",
+                                                 dict(ai_f, source="none"), so)
+                assert len(ol) == 12 and oh_["run"]["filtered"] == 0, (len(ol), oh_["run"])
+                assert not any("subject filter" in n for n in oh_["notes"]), oh_["notes"]
+
+                # A listing on which NOTHING is the subject is QUIET, not EMPTY: the venue is
+                # fine, its business is simply someone else's. "page changed" would be a lie, and
+                # it is a note — the page's problems list — which this must never reach.
+                _stub(REAL[:6])
+                ah_, al, _, _ = _filtered_create("All filtered demo", ai_f, so)
+                assert al == [] and ah_["run"]["filtered"] == 6, (al, ah_["run"])
+                sh_ = ah_["sources"][src0["url"]]
+                assert sh_["status"] == "QUIET" and sh_["notes"] == [], sh_
+                assert "all 6 row(s) on this listing are outside this scan's subject filter" in sh_["info"], sh_["info"]
+
+                # propose-filter proposes and stores NOTHING: no definition is written, no scan
+                # runs, and a refused proposal is a clean "none" the partner can act on.
+                fc3.canned["subject_filter"] = {"regex": ai_f["regex"], "why": ai_f["why"]}
+                assert main(["propose-filter", "--intent", demo["intent"], "--topic", "artificial intelligence",
+                             "--dry-run", "--summary-out", str(so)]) == 0
+                prop = json.loads(so.read_text(encoding="utf-8"))
+                assert prop["subject_filter"]["source"] == "proposed" and prop["note"] == "", prop
+                assert prop["subject_filter"]["regex"] == ai_f["regex"], prop
+                fc3.canned["subject_filter"] = {"regex": ".*", "why": "everything"}
+                assert main(["propose-filter", "--intent", demo["intent"], "--dry-run",
+                             "--summary-out", str(so)]) == 0
+                prop = json.loads(so.read_text(encoding="utf-8"))
+                assert prop["subject_filter"] == {"regex": "", "why": "", "source": "none"}, prop
+                assert "refused" in prop["note"] and "empty string" in prop["note"], prop
+                fc3.canned.pop("subject_filter", None)
+                assert main(["propose-filter", "--intent", "too short", "--dry-run"]) == EXIT_USAGE
+            finally:
+                globals()["listing_rows"], globals()["_client_for"] = saved_rows, saved_client_for
                 restore_live()
 
             # 6. A source whose host has no fixture FAILS: everything is still written, exit 1.
@@ -2440,6 +2784,11 @@ def selftest() -> None:
           f"all quotes verified, digest cites real ids, upcoming computed), idempotent second run, enrichment cap + queue, "
           f"first run reads {FIRST_RUN_MAX_NEW} of 25 and the backlog is picked up by the next run, partner kind/name/"
           f"rationale survive the gate (tier still discovered), no_discover gates 6 partner sources with 0 discovery calls, "
+          f"subject filter on the real india-ai-regulation rows: 12 -> 3 ledgered (9 outside the filter, "
+          f"reported per source and in health.run/SUMMARY), a terse title kept and marked, a malformed "
+          f"regex noted and ignored (12 kept), source='none' and no filter keep everything (and an "
+          f"unfiltered scan says so), an all-filtered listing is QUIET not EMPTY, propose-filter stores "
+          f"nothing and refuses a broad regex, "
           f"FAILED source exit 1 (fetch and extractor error), GATED over budget, delete guarded, undated pair kept, "
           f"enrich error retried then given up, robots read final, clamp noted, --summary-out; "
           f"miscellany lane written beside the ledger (covered host dropped) with NO routine note in health "

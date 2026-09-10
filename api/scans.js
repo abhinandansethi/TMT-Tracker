@@ -43,6 +43,9 @@
 //   api/ask.js, api/draft.js, api/propose.js, api/discover.js  60 — those call a model (and, for
 //                      ask/draft, fetch a source document first) and hold their own inner
 //                      timeouts; 60 is the ceiling those timeouts are set to fit inside.
+//   api/propose-filter.js  30 — one short model call, no fetching and no search tool: it turns an
+//                      intent into the scan's subject_filter regex. Its own MODEL_TIMEOUT_MS is
+//                      25 s, so 30 leaves room to answer with a sentence rather than be killed.
 
 const TOKEN_NAMES = [
   'GITHUB_DISPATCH_TOKEN', 'TMT_TOKEN', 'TMT_DISPATCH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN',
@@ -90,7 +93,25 @@ const RESERVED_IDS = new Set(['schema', 'tmt-india']);
 // re-enabled the lane and threw away discovery's account of what it searched for and did not
 // find, which the coverage panel is supposed to keep showing for as long as it is true.
 const TOP_KEYS = ['id', 'name', 'intent', 'jurisdictions', 'topics', 'industries', 'clients',
-  'sources', 'budget', 'demo', 'created', 'updated', 'no_discover', 'no_misc', 'discovery_notes'];
+  'sources', 'subject_filter', 'budget', 'demo', 'created', 'updated', 'no_discover', 'no_misc',
+  'discovery_notes'];
+// subject_filter — what this scan considers ITS SUBJECT, decided at extraction, before anything
+// is read. THE DEFECT IT ANSWERS: the first real scan asked for Indian AI regulation and ledgered
+// 118 developments of which eight mentioned AI — 103 TRAI telecom listings and 15 CERT-In vendor
+// CVE bulletins — because a scan had inherited the machinery for reading a listing but never the
+// machinery for deciding what on it is the subject. A regex, not a model call per row, for the
+// same reasons engine/registry_v2.json has given every TMT India source a row_filter since the
+// beginning: deterministic, visible on the page, editable by the partner, free per row.
+// /api/propose-filter proposes one at create time; the partner confirms, edits, or clears it.
+// This endpoint only checks the shape — the pipeline compiles it with Python's `re` and applies
+// it, and a row whose title is too terse to judge is KEPT and marked, never dropped.
+const SUBJECT_FILTER_KEYS = ['regex', 'why', 'source'];
+// Who the filter came from. "none" means the partner deliberately turned it off, which the
+// definition records rather than forgetting: an absent subject_filter and an explicit "none" both
+// keep every row, and only the second says a human decided that.
+const SUBJECT_FILTER_SOURCES = ['proposed', 'partner', 'none'];
+const MAX_SUBJECT_REGEX = 400;
+const MAX_SUBJECT_WHY = 300;
 // discovery_notes is written by the pipeline, not typed by a partner, so the cap is only there
 // to stop an absurd payload: one note per venue considered is the natural size.
 const MAX_DISCOVERY_NOTES = 200;
@@ -343,6 +364,38 @@ function definitionError(scan) {
         if (typeof s[k] !== 'string') return `scan.sources[${i}].${k} must be a string.`;
         if (s[k].length > max) return `scan.sources[${i}].${k} must be at most ${max} characters.`;
       }
+    }
+  }
+  // subject_filter is optional, and a definition without one behaves exactly as it does today:
+  // every row its sources list is kept. What is refused here is a MALFORMED one, because a
+  // subject filter that does not survive validation would be dropped or half-applied by the
+  // pipeline, and a filter nobody can read is one nobody can check.
+  if (scan.subject_filter !== undefined) {
+    const f = scan.subject_filter;
+    if (!isObj(f)) {
+      return `scan.subject_filter must be an object {${SUBJECT_FILTER_KEYS.join(', ')}} (or be left out, in which `
+        + 'case every row is kept).';
+    }
+    for (const k of Object.keys(f)) {
+      if (!SUBJECT_FILTER_KEYS.includes(k)) {
+        return `scan.subject_filter.${k} is not a subject-filter field (allowed: ${SUBJECT_FILTER_KEYS.join(', ')}).`;
+      }
+    }
+    if (typeof f.regex !== 'string' || f.regex.trim().length < 1 || f.regex.length > MAX_SUBJECT_REGEX) {
+      // Empty is refused rather than read as "no filter": there are two ways to say that, and both
+      // are explicit. Leave subject_filter out, or keep the regex and set source to "none" so the
+      // scan page can show what was turned off and by whom.
+      return `scan.subject_filter.regex must be 1–${MAX_SUBJECT_REGEX} characters of regular expression. To run this `
+        + 'scan without a subject filter, leave subject_filter out entirely, or set '
+        + 'subject_filter.source to "none".';
+    }
+    if (f.why !== undefined && (typeof f.why !== 'string' || f.why.length > MAX_SUBJECT_WHY)) {
+      return `scan.subject_filter.why must be a string of at most ${MAX_SUBJECT_WHY} characters — one sentence a `
+        + 'partner can check against the regex.';
+    }
+    if (typeof f.source !== 'string' || !SUBJECT_FILTER_SOURCES.includes(f.source)) {
+      return `scan.subject_filter.source must be one of: ${SUBJECT_FILTER_SOURCES.join(', ')} — who this filter came `
+        + 'from ("none" means it is deliberately not applied).';
     }
   }
   if (scan.budget !== undefined) {

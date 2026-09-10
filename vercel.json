@@ -38,6 +38,9 @@
     "api/discover.js": {
       "maxDuration": 60
     },
+    "api/propose-filter.js": {
+      "maxDuration": 30
+    },
     "api/scans.js": {
       "maxDuration": 20
     },

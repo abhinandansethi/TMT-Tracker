@@ -94,8 +94,132 @@ KIND_LABELS = {"gazette": "Gazette", "regulator": "Regulator", "ministry": "Gov"
 # /api/discover is the live source picker's endpoint: it PROPOSES venues and fetches nothing.
 # Every candidate the partner ticks still goes through the Python gate (robots.txt, terms,
 # extraction floor) when the scan is created — the dialog says so, and so does this comment.
+# /api/subject is the subject filter's proposer: it turns {intent, topics} into {ok, regex, why}.
+# Like /api/discover it PROPOSES and nothing more — the regex it returns lands in an input the
+# partner can edit or clear before anything is created, and the run applies whatever is in that box.
 API = {"scans": "/api/scans", "ask": "/api/ask", "draft": "/api/draft", "propose": "/api/propose",
-       "discover": "/api/discover"}
+       "discover": "/api/discover", "subject": "/api/subject"}
+
+# ------------------------------------------------------------------------- the subject filter
+# WHY THIS EXISTS. The first real scan asked for "new Indian AI regulatory requirements … relevant
+# to advising OpenAI on its artificial-intelligence products" and ledgered 118 developments, eight
+# of which mention AI at all: 103 TRAI telecom listings and 15 CERT-In vendor CVE bulletins
+# ("Multiple Vulnerabilities in Oracle Products"). Every one the enricher managed to read came back
+# relevance "low" — it knew, but by then the rows were in the ledger and the first run's whole
+# reading budget had gone on them. A scan inherited the machinery for reading a listing and never
+# the machinery for deciding what on that listing is the subject.
+#
+# The instrument is a REGEX, matched against a row's title before anything is read, exactly as
+# engine/registry_v2.json gives every TMT India source a `row_filter` and engine/radar/core.py
+# applies it. Deterministic, visible on the page, editable by the partner, free per row. The model
+# proposes it once at create time; the partner confirms, edits or clears it.
+#
+# `source` records who decided: "proposed" (the model's, unedited), "partner" (typed or edited
+# here), "none" (cleared — read everything). "none", or no regex, or no subject_filter at all, all
+# mean the same thing and must behave exactly as the product did before this existed: every row
+# every source publishes is ledgered. An existing scan cannot change behaviour by standing still.
+SUBJECT_SOURCES = ("proposed", "partner", "none")
+
+
+def subject_filter_of(defn: dict) -> tuple[dict, list[str]]:
+    """The definition's subject_filter, normalised for the page, plus anything wrong with it.
+
+    Returns (filter, problems). `on` is the only thing the page should branch on: a filter is on
+    when it has a regex AND its source is not "none". A regex that does not compile is reported
+    and shown, never silently treated as absent — the run refused it, and a partner reading
+    "no subject filter" while a broken one sits in the definition would be told a lie about why
+    the ledger is full."""
+    raw = defn.get("subject_filter")
+    problems: list[str] = []
+    if raw is None:
+        return {"on": False, "regex": "", "why": "", "source": "none", "valid": True}, problems
+    if not isinstance(raw, dict):
+        problems.append(f"subject_filter is not an object: {str(raw)[:80]!r} — treated as no filter, "
+                        f"so every row every source publishes is ledgered")
+        return {"on": False, "regex": "", "why": "", "source": "none", "valid": True}, problems
+    regex = str(raw.get("regex") or "").strip()
+    why = str(raw.get("why") or "").strip()
+    src = raw.get("source")
+    if src not in SUBJECT_SOURCES:
+        if src is not None:
+            problems.append(f"subject_filter.source is {str(src)[:40]!r}, which is not one of "
+                            f"{', '.join(SUBJECT_SOURCES)} — shown as "
+                            + ("proposed" if regex else "none"))
+        src = "proposed" if regex else "none"
+    valid = True
+    if regex:
+        try:
+            re.compile(regex)
+        except re.error as e:
+            valid = False
+            problems.append(f"the subject filter's regex does not compile ({e}) — the run cannot have "
+                            f"applied it, so treat this scan's ledger as unfiltered until it is fixed")
+    on = bool(regex) and src != "none"
+    return {"on": on, "regex": regex, "why": why, "source": src, "valid": valid}, problems
+
+
+# core.py's own wording, which the scan pipeline reuses, so a count can be read back off the health
+# line even from a run that recorded no structured number.
+_SUBJ_DROPPED_RE = re.compile(r"(\d+)\s+row\(s\)\s+outside\s+(?:this\s+source's|the)\s+subject\s+filter", re.I)
+_SUBJ_TERSE_RE = re.compile(r"(\d+)\s+row\(s\)[^.]*?too\s+terse\s+to\s+judge", re.I)
+
+
+def _as_count(v: Any) -> Optional[int]:
+    """A count the pipeline may have written as a number or as the list it counted."""
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, (list, tuple)):
+        return len(v)
+    return None
+
+
+def subject_counts(h: dict) -> Optional[dict]:
+    """What the subject filter did at ONE source on the last run: rows dropped as not the subject,
+    and rows kept because their title was too terse to judge.
+
+    Absent is not zero. A run that predates the filter recorded nothing, and a page that renders
+    that as "0 dropped" claims the filter looked and found nothing to drop. So this returns None
+    when the run said nothing, and the page says "no counts recorded" in that case.
+
+    Several shapes are accepted because the number matters more than the key it arrived under:
+    a `subject` object, flat `subject_dropped`/`subject_kept_terse`, core.py's own ingest
+    vocabulary (`filtered` / `unsure`), and — last — the health line's own text, which is the one
+    thing every run writes because the partner reads it."""
+    if not isinstance(h, dict):
+        return None
+    dropped = kept = None
+    titles: list[str] = []
+    sub = h.get("subject") if isinstance(h.get("subject"), dict) else h.get("subject_filter")
+    if isinstance(sub, dict):
+        dropped = _as_count(sub.get("dropped") if sub.get("dropped") is not None else sub.get("filtered"))
+        kept = _as_count(sub.get("kept_terse") if sub.get("kept_terse") is not None else sub.get("unsure"))
+        titles = [str(t)[:160] for t in (sub.get("titles") or sub.get("kept") or []) if t]
+    if dropped is None:
+        dropped = _as_count(h.get("subject_dropped"))
+    if dropped is None:
+        dropped = _as_count(h.get("filtered"))
+    if kept is None:
+        kept = _as_count(h.get("subject_kept_terse"))
+    if kept is None:
+        kept = _as_count(h.get("unsure"))
+    if not titles:
+        titles = [str(t)[:160] for t in (h.get("subject_kept_titles") or []) if t]
+    if dropped is None or kept is None:
+        for line in list(h.get("info") or []) + list(h.get("notes") or []):
+            line = str(line)
+            if dropped is None:
+                m = _SUBJ_DROPPED_RE.search(line)
+                if m:
+                    dropped = int(m.group(1))
+            if kept is None and "terse" in line.lower() and "kept" in line.lower():
+                m = _SUBJ_TERSE_RE.search(line)
+                if m:
+                    kept = int(m.group(1))
+    if dropped is None and kept is None:
+        return None
+    return {"dropped": dropped, "kept_terse": kept, "titles": titles[:5]}
 
 # ----------------------------------------------------------------------------- lane routing
 # ONE rule, shared by the whole product: a development's `type` decides its lane, and a development
@@ -328,7 +452,7 @@ def health_for(health: dict, src: dict) -> Optional[dict]:
     return None
 
 
-def coverage_for(defn: dict, health: dict) -> dict:
+def coverage_for(defn: dict, health: dict) -> dict:  # noqa: C901 — one panel, one function
     """Sources by status with their gate evidence and last-run health, plus what the panel needs
     to say about the gaps: jurisdictions with no approved source, the discovery notes the run
     recorded (gaps, drops, a failed discovery), the approved sources the cap left unread."""
@@ -358,6 +482,9 @@ def coverage_for(defn: dict, health: dict) -> dict:
             "health": {"status": hstatus, "rows_seen": h.get("rows_seen"),
                        "new": h.get("new"), "newest_visible": h.get("newest_visible") or "",
                        "notes": list(h.get("notes") or []), "info": list(h.get("info") or []),
+                       # What the subject filter did at THIS source: a partner auditing for a miss
+                       # needs the number beside the venue that lost the rows, not only a total.
+                       "subject": subject_counts(h),
                        "checked": h.get("checked") or ""} if h else None,
         })
     # Reviewed defect: the header said "4 jurisdictions" while coverage held sources for two and
@@ -379,9 +506,20 @@ def coverage_for(defn: dict, health: dict) -> dict:
     discovery = [n for n in (health.get("notes") or []) if isinstance(n, str) and n.lower().startswith("discovery")]
     discovery_caveats = [n for n in discovery if not n.lower().startswith("discovery dropped")]
     gated = sum(1 for s in groups["approved"] if s["health"] and s["health"]["status"] == "GATED")
+    # The subject filter, and what it did across every source the last run touched. Totals are
+    # summed only over sources that actually recorded a number, and `sources_counted` says how
+    # many those were, so "0 dropped over 5 sources" and "nothing recorded" never look alike.
+    subject, subject_problems = subject_filter_of(defn)
+    unknown.extend(subject_problems)
+    counted = [s["health"]["subject"] for grp in STATUS_ORDER for s in groups[grp]
+               if s["health"] and s["health"]["subject"]]
+    subject["dropped"] = sum(c["dropped"] or 0 for c in counted) if counted else None
+    subject["kept_terse"] = sum(c["kept_terse"] or 0 for c in counted) if counted else None
+    subject["sources_counted"] = len(counted)
+    subject["sources_run"] = sum(1 for grp in STATUS_ORDER for s in groups[grp] if s["health"])
     return {"approved": groups["approved"], "pending": groups["pending"], "rejected": groups["rejected"],
             "uncovered": uncovered, "discovery": discovery, "discovery_caveats": discovery_caveats,
-            "gated": gated, "problems": unknown}
+            "gated": gated, "subject": subject, "problems": unknown}
 
 
 def load_misc(res: Path) -> dict:
@@ -649,6 +787,12 @@ def load_scan(root: Path, defn_path: Path) -> dict:
             # on, discovery_notes threw away discovery's account of what it searched and dropped,
             # and budget reset a partner's own caps to the defaults — all on a plain Save.
             "no_misc": defn.get("no_misc") is True,
+            # The subject filter is EDITED in that dialog rather than merely carried through it,
+            # but the round-trip rule is the same: what Edit reads back is what Save re-submits,
+            # so a partner who opens the dialog and changes a topic does not silently clear the
+            # filter and turn the next run loose on every row every venue publishes.
+            "subject_filter": {"regex": cov["subject"]["regex"], "why": cov["subject"]["why"],
+                               "source": cov["subject"]["source"]},
             "discovery_notes": [str(n) for n in defn.get("discovery_notes") or []],
             "budget": dict(defn.get("budget") or {}),
             "created": defn.get("created", ""), "updated": defn.get("updated", ""),
@@ -1109,6 +1253,21 @@ a.el{color:var(--navy)}
 .upc li .sep{color:var(--off);margin:0 6px}
 .upc .none{color:var(--faint);font-style:italic;margin-top:6px;font-size:13px}
 
+/* the subject filter, on Coverage and again on Audit: a filter standing between a venue and the
+   ledger is a fact about coverage AND a fact anyone auditing for a miss has to know. */
+.subjbox{border:1px solid var(--rule2);border-radius:10px;background:var(--row3);padding:14px 16px;margin-top:8px}
+.subjbox.off{border-color:var(--ochre);background:var(--ochre-wash)}
+.subjbox .rxline{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--paper);border:1px solid var(--rule2);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:pre}
+.subjbox .who{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-right:6px}
+.subjbox p{margin:9px 0 0;font-size:12.5px;line-height:1.55;color:var(--mute)}
+.subjbox p b{color:var(--ink);font-weight:600}
+.subjbox .term{font-family:var(--mono);font-size:11.5px;background:var(--paper);border:1px solid var(--rule2);border-radius:4px;padding:1px 5px;margin:0 3px 3px 0;display:inline-block}
+.subjbox .nums{margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--mute)}
+.subjbox .nums b{font-size:15px;color:var(--ink);font-family:var(--sans);margin-right:4px}
+.subjbox .broken{color:var(--alarm)}
+.coverage .ev.subj{color:var(--mute)}
+.coverage .ev.subj b{color:var(--ink)}
+
 /* obligations register */
 .oblsec{margin-top:44px}
 .oblsec h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:0 0 4px}
@@ -1267,6 +1426,26 @@ a.el{color:var(--navy)}
 .prevbar{margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .prevbar .pwhy{font-size:12px;color:var(--faint);line-height:1.45;flex:1;min-width:200px}
 
+/* ---- create dialog: the subject filter, the other half of "what will this scan collect?".
+   It sits inside the same block as the coverage list, above it, because a partner choosing
+   venues and a partner choosing the subject are answering one question, not two. */
+.subj{margin-top:14px;border:1px solid var(--rule2);border-radius:10px;background:var(--row3);padding:16px 18px}
+.subj h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px;font-weight:500}
+.subrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.subrow input.rx{flex:1;min-width:220px;font-family:var(--mono);font-size:12px;padding:8px 10px;border:1px solid var(--rule2);border-radius:6px;background:var(--paper);color:var(--ink)}
+.subrow input.rx:focus{outline:2px solid var(--navy);outline-offset:-1px}
+.subrow input.rx.bad{border-color:var(--alarm)}
+.subj .btn.sm{padding:6px 10px;font-size:11.5px}
+.subj .swhy{margin-top:9px;font-size:12.5px;color:var(--ink);line-height:1.5}
+.subj .swhy .who{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-right:6px}
+.subj .splain{margin-top:10px;font-size:12.5px;color:var(--mute);line-height:1.55}
+.subj .splain b{color:var(--ink);font-weight:600}
+.subj .splain .term{font-family:var(--mono);font-size:11.5px;background:var(--paper);border:1px solid var(--rule2);border-radius:4px;padding:1px 5px;margin:0 3px 3px 0;display:inline-block}
+.subj .sillus{margin-top:10px;font-size:12.5px;color:var(--mute);line-height:1.55}
+.subj .sbad{margin-top:10px;font-size:12.5px;color:var(--alarm);line-height:1.5}
+.subj .sopen{margin-top:10px;font-size:12.5px;color:#5B4507;line-height:1.55}
+.subj .sopen b{font-weight:600}
+
 @media (max-width:900px){
   .head,.tabs{padding-left:22px;padding-right:22px}
   .clitem,.mrow{grid-template-columns:1fr}
@@ -1344,6 +1523,26 @@ a.el{color:var(--navy)}
       <div class="field" id="preview-block">
         <label>What this scan will cover</label>
         <div class="prevbar"><span class="pwhy" id="preview-why">Coverage is the whole product, so it is built here with you — tick a venue, add one, or search a gap, and this list follows.</span></div>
+        <!-- The subject filter belongs HERE, above the venue list and inside the same block: the
+             venues answer "where will this scan read?" and the filter answers "what on those pages
+             is this scan's subject?". They are one question. A scan created without an answer to
+             the second half reads a regulator's whole listing — the defect this closes ledgered 118
+             developments of which eight mentioned AI, and spent the entire first reading budget on
+             telecom quality-of-service notices and Oracle CVE bulletins. -->
+        <div class="subj" id="subject-block">
+          <h4>Subject — what counts, on the pages above</h4>
+          <div class="subrow">
+            <input type="text" id="f-subject" class="rx" spellcheck="false" autocomplete="off" autocapitalize="off"
+                   aria-label="Subject filter, a regular expression matched against each row's title"
+                   placeholder="\b(AI|artificial intelligence|machine learning)\b">
+            <button type="button" class="btn sm" id="dlg-subject">Propose from the brief</button>
+            <button type="button" class="btn sm quiet" id="subject-clear">Read everything</button>
+          </div>
+          <div class="swhy" id="subject-why"></div>
+          <div class="pnote" id="subject-note" aria-live="polite"></div>
+          <div class="splain" id="subject-plain"></div>
+          <div class="sillus" id="subject-illus"></div>
+        </div>
         <div class="prev" id="preview"></div>
       </div>
       <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents, so the scan appears quickly rather than after every backlogged page. Anything older queues and is counted as queued on the scan. Press <b>Run scan</b> again to continue through the backlog.</div>
@@ -1857,6 +2056,19 @@ function openDialog(scan) {
   cands = []; picked = {}; discTouched = false;
   $('#cands').innerHTML = ''; setNote('#find-note', ''); $('#f-disc-help').textContent = DISC_HELP;
   $('#f-disc').checked = scan ? !scan.no_discover : true;
+  // The subject filter round-trips like no_misc and budget: an Edit that opens, changes a topic
+  // and saves must re-submit the very filter the scan already has. A definition that has never
+  // had one opens empty and says, in the block itself, what creating it that way means.
+  const sf = (scan && scan.subject_filter && typeof scan.subject_filter === 'object') ? scan.subject_filter : {};
+  subject = { regex: String(sf.regex || '').trim(), why: String(sf.why || '').trim(),
+              source: ['proposed', 'partner', 'none'].includes(sf.source) ? sf.source : (sf.regex ? 'proposed' : 'none') };
+  if (!subject.regex) subject.source = 'none';
+  // An Edit is not a fresh proposal: the sentence beside the box belongs to the regex in it until
+  // the model is asked again, so the "you have changed it" caveat starts silent.
+  proposedRegex = subject.source === 'proposed' ? subject.regex : '';
+  proposedWhy = subject.source === 'proposed' ? subject.why : '';
+  $('#f-subject').value = subject.regex;
+  setNote('#subject-note', '');
   // Every dialog opening starts the coverage gate again: what the last scan was going to cover
   // says nothing about this one, and a Create left enabled from a previous open would be exactly
   // the "created blind" outcome this preview exists to stop.
@@ -1919,6 +2131,233 @@ function discHelp() {
 }
 $('#f-disc').addEventListener('change', () => { discTouched = true; discHelp(); refreshPreview(); });
 
+// ---- the subject filter: what counts as this scan's subject, BEFORE it exists ----------------
+// The other half of the coverage question, built with the partner in the same block. A REGEX, not
+// a model call per row: deterministic, visible here, editable here, free to apply, and the same
+// instrument engine/registry_v2.json has given every TMT India source all along. The model
+// proposes it once; whatever is in this box when Create is pressed is what the run applies.
+let subject = { regex: '', why: '', source: 'none' };
+// What the model last proposed, so an edited box can say the sentence beside it was written for
+// something else. Attributing the partner's regex to the model would be a small lie in exactly the
+// place this whole feature exists to be honest about.
+let proposedRegex = '', proposedWhy = '';
+// Python's re accepts a leading (?i); JavaScript's RegExp throws on it. The run is the authority
+// on the pattern, so the page strips that one prefix before testing rather than calling a regex
+// the pipeline would happily compile "invalid".
+function compileSubject(rx) {
+  const s = String(rx || '').trim();
+  if (!s) return null;
+  try { return new RegExp(s.replace(/^\(\?i\)/, ''), 'i'); } catch (e) { return null; }
+}
+// Split a pattern on its TOP-LEVEL alternation, ignoring | inside groups, character classes and
+// escapes. Used only to read the filter back in English — never to decide anything.
+function splitAlts(rx) {
+  const out = []; let cur = '', depth = 0, cls = false;
+  for (let i = 0; i < rx.length; i++) {
+    const c = rx[i];
+    if (c === '\\') { cur += c + (rx[i + 1] || ''); i++; continue; }
+    if (cls) { cur += c; if (c === ']') cls = false; continue; }
+    if (c === '[') { cls = true; cur += c; continue; }
+    if (c === '(') { depth++; cur += c; continue; }
+    if (c === ')') { depth = Math.max(0, depth - 1); cur += c; continue; }
+    if (c === '|' && depth === 0) { out.push(cur); cur = ''; continue; }
+    cur += c;
+  }
+  out.push(cur);
+  return out;
+}
+function balanced(s) {
+  let depth = 0, cls = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '\\') { i++; continue; }
+    if (cls) { if (c === ']') cls = false; continue; }
+    if (c === '[') { cls = true; continue; }
+    if (c === '(') depth++;
+    if (c === ')') { depth--; if (depth < 0) return false; }
+  }
+  return depth === 0;
+}
+function subjectAlts(rx) {
+  let s = String(rx || '').trim().replace(/^\(\?i\)/, '');
+  for (let n = 0; n < 6; n++) {
+    const before = s;
+    s = s.replace(/^\^/, '').replace(/\$$/, '').replace(/^\\b/, '').replace(/\\b$/, '').trim();
+    const m = s.match(/^\((\?:|\?i:)?([\s\S]*)\)$/);
+    if (m && balanced(m[2])) s = m[2];
+    if (s === before) break;
+  }
+  return splitAlts(s).map(a => a.trim()).filter(Boolean);
+}
+// An alternative is "plain" when it reads as the words a partner typed, once \b, \s and escaped
+// punctuation are undone. Anything else is shown AS WRITTEN and counted, because a readback that
+// quietly prettifies a pattern it does not understand is worse than no readback.
+function plainWord(alt) {
+  let w = String(alt).replace(/\\b/g, '').replace(/\\s[+*]?/g, ' ').replace(/\\([.\-\/&'+])/g, '$1').trim();
+  return /^[A-Za-z0-9][A-Za-z0-9 .,&'’\/+-]*$/.test(w) ? w : null;
+}
+function subjectReadback(rx) {
+  const alts = subjectAlts(rx), plain = [], raw = [];
+  alts.forEach(a => { const w = plainWord(a); if (w) plain.push(w); else raw.push(a); });
+  return { plain: plain, raw: raw, total: alts.length };
+}
+function setSubjectFromBox() {
+  const v = $('#f-subject').value;
+  subject.regex = v.trim();
+  // Typing in the box makes the filter the partner's. Clearing it by hand is "read everything"
+  // said the long way, and must record itself as such, not sit as an empty "proposed" filter.
+  subject.source = subject.regex ? 'partner' : 'none';
+  renderSubject();
+}
+function renderSubject() {
+  const box = $('#f-subject'), rx = subject.regex, re = compileSubject(rx);
+  if (box.value.trim() !== rx) box.value = rx;
+  box.classList.toggle('bad', !!rx && !re);
+  const on = !!rx && subject.source !== 'none';
+  const who = subject.source === 'partner' ? 'yours' : subject.source === 'proposed' ? 'proposed by the model' : '';
+  const edited = subject.source === 'partner' && proposedRegex && rx !== proposedRegex;
+  $('#subject-why').innerHTML = !on ? ''
+    : '<span class="who">' + esc(who) + '</span>'
+      + (subject.why ? esc(subject.why) : 'No sentence was written for this filter — say in one line what it is meant to admit, so a partner can check it later.')
+      + (edited ? ' <i>(that sentence was written for the pattern the model proposed; you have changed it.)</i>' : '');
+  if (!on) {
+    $('#subject-plain').innerHTML = '';
+    $('#subject-illus').innerHTML = '<div class="sopen"><b>Read everything: this scan will have no subject filter.</b> '
+      + 'Every row every source on the list below publishes is ledgered — for a busy regulator that is thousands of '
+      + 'items that are not your subject, and the first run\'s whole reading budget is spent on whatever the venue '
+      + 'happens to list first. The scan\'s Coverage and Audit tabs will say so in as many words.</div>';
+    syncSubmit();
+    return;
+  }
+  if (!re) {
+    $('#subject-plain').innerHTML = '<div class="sbad">This is not a valid regular expression, so nothing can be read back from it '
+      + 'and the run would refuse it. Fix it, or press <b>Read everything</b> to create the scan without a filter.</div>';
+    $('#subject-illus').innerHTML = '';
+    syncSubmit();
+    return;
+  }
+  const rb = subjectReadback(rx);
+  $('#subject-plain').innerHTML = (rb.plain.length
+      ? '<b>Rows whose title mentions:</b> ' + rb.plain.slice(0, 24).map(w => '<span class="term">' + esc(w) + '</span>').join('')
+        + (rb.plain.length > 24 ? ' and ' + (rb.plain.length - 24) + ' more' : '')
+      : '<b>This pattern has no plain words to read back.</b>')
+    + (rb.raw.length ? '<br>' + esc(pl(rb.raw.length, 'part')) + ' of it ' + (rb.raw.length === 1 ? 'is' : 'are')
+        + ' not plain words and ' + (rb.raw.length === 1 ? 'is' : 'are') + ' shown as written: '
+        + rb.raw.slice(0, 6).map(w => '<span class="term">' + esc(w) + '</span>').join('') : '')
+    + '<br>Matched case-insensitively against <b>each row\'s title</b>, as the listing prints it, before anything is fetched or read. '
+    + 'A row whose title is <b>too terse to judge</b> — a bare number, a docket reference — is <b>kept</b> and marked, never dropped: '
+    + 'the tracker probes the document in that case, a scan cannot cheaply, and erring toward keeping is the only safe direction.';
+  // WHAT IT WOULD DO, before the scan exists — but only what can honestly be shown. The filter is
+  // applied per ROW at run time and there are no rows yet, so this counts the venues whose own name
+  // or kind the filter's words plainly admit and says, in the same breath, that this is not the test.
+  const list = previewSources();
+  if (!list.length) {
+    $('#subject-illus').innerHTML = '<div class="sillus">No venue is on the list yet, so there is nothing to illustrate this against. '
+      + 'The filter is applied to each row\'s title at run time, not to the venue.</div>';
+  } else {
+    const hit = list.filter(s => re.test((s.name || '') + ' ' + (KINDL[s.kind] || '') + ' ' + (s.host || '')));
+    $('#subject-illus').innerHTML = '<div class="sillus"><b>Illustration, not a promise.</b> Of the ' + esc(pl(list.length, 'venue'))
+      + ' listed below, the filter\'s own words appear in the name or kind of <b>' + hit.length + '</b>'
+      + (hit.length ? ': ' + hit.slice(0, 6).map(s => esc(s.name)).join(', ') + (hit.length > 6 ? ', and ' + (hit.length - 6) + ' more' : '') : '')
+      + '. That is not the test. The test is <b>per row</b>, at run time, on the row\'s title: a venue whose name says nothing '
+      + 'about your subject still contributes every row whose title matches, and a venue whose name matches contributes only '
+      + 'the rows whose titles do.</div>';
+  }
+  syncSubmit();
+}
+$('#f-subject').addEventListener('input', setSubjectFromBox);
+$('#subject-clear').addEventListener('click', () => {
+  subject = { regex: '', why: '', source: 'none' };
+  $('#f-subject').value = '';
+  setNote('#subject-note', '');
+  renderSubject();
+  $('#f-subject').focus();
+});
+$('#dlg-subject').addEventListener('click', async () => {
+  const intent = $('#f-intent').value.trim();
+  if (intent.length < 20) {
+    setNote('#subject-note', 'Write the intent first — the filter is proposed from that sentence and the topics beside it.', true);
+    $('#f-intent').focus(); return;
+  }
+  const b = $('#dlg-subject'); b.disabled = true; b.textContent = 'Proposing…';
+  setNote('#subject-note', '');
+  let r = null, err = null;
+  try { r = await postJSON(D.api.subject, { intent: intent, topics: F.top.get() }, 40000); } catch (e) { err = e; }
+  b.disabled = false; b.textContent = 'Propose from the brief';
+  if (r && r.ok && r.data && typeof r.data.regex === 'string' && r.data.regex.trim()) {
+    proposedRegex = r.data.regex.trim(); proposedWhy = String(r.data.why || '').trim();
+    subject = { regex: proposedRegex, why: proposedWhy, source: 'proposed' };
+    renderSubject();
+    setNote('#subject-note', compileSubject(subject.regex)
+      ? '<b>Proposed from your brief.</b> Read it, edit it, or clear it — whatever is in the box when you press Create is what every run applies.'
+      : '<b>The proposed pattern does not compile.</b> Edit it or press Read everything.', !compileSubject(subject.regex));
+    return;
+  }
+  // No endpoint, no proposal: the box still works, and typing in it is the whole feature.
+  const why = (err && err.name === 'AbortError') ? 'the request took longer than 40 seconds'
+    : err ? 'no subject endpoint is reachable from this page'
+    : (r && (r.status === 501 || r.status === 404)) ? 'the subject proposer is not configured on this deployment (HTTP ' + r.status + ')'
+    : (r && !r.ok) ? 'the endpoint answered ' + r.status + (r.data && r.data.message ? ': ' + r.data.message : '')
+    : 'the endpoint returned no pattern';
+  setNote('#subject-note', 'Could not propose a filter — ' + esc(why) + '. Type one yourself: it is matched against each row\'s '
+    + 'title, so the words your subject is called by are usually enough — <span class="term">\\b(AI|artificial intelligence|machine learning)\\b</span>. '
+    + 'Or press <b>Read everything</b> and accept that every row every venue publishes is ledgered.', true);
+});
+
+// These three are top level on purpose. renderScan() builds its whole shell in one pass, and
+// coverageHTML() runs inside that pass — a const declared further down its body is still in the
+// temporal dead zone when it is read, which blanked the page. They depend on nothing but D.
+
+// ---- the subject filter, shared by Coverage and Audit ---------------------------------------
+// A scan's ledger is decided by two things: which venues it reads, and which rows on those
+// venues count as its subject. Coverage has always shown the first. This shows the second, in
+// both places a partner goes looking — Coverage, because a filter IS coverage, and Audit,
+// because someone auditing for a miss has to know a filter stood between the venue and the
+// ledger. When there is no filter, both say so in as many words rather than staying silent,
+// since silence there reads as "nothing was dropped" when the truth is "nothing was judged".
+const SUBJ = (D.coverage && D.coverage.subject) || { on: false, regex: '', why: '', source: 'none', valid: true };
+function subjectCount(sub, on) {
+  // Per source. Absent is NOT zero: a run that predates the filter recorded nothing, and
+  // rendering that as "0 dropped" would claim the filter looked.
+  if (!sub) return on ? '<div class="ev subj">subject filter: no counts recorded for this source on the last run</div>' : '';
+  const d = sub.dropped, k = sub.kept_terse;
+  return '<div class="ev subj">subject filter: <b>' + esc(d == null ? '—' : d) + '</b> row(s) dropped as not this scan\'s subject'
+    + '<span class="sep">·</span><b>' + esc(k == null ? '—' : k) + '</b> row(s) kept because the title was too terse to judge'
+    + (sub.titles && sub.titles.length ? '<span class="sep">·</span>kept: ' + sub.titles.map(esc).join('; ') : '') + '</div>';
+}
+function subjectPanelHTML() {
+  if (!SUBJ.on) {
+    return '<div class="subjbox off"><p><b>This scan has no subject filter, so every row every source publishes is ledgered.</b> '
+      + 'Nothing stands between the venues below and this scan\'s ledger: whatever a venue lists in the window enters it, '
+      + 'and the reading budget is spent in whatever order the venue happens to publish. For a busy regulator that is '
+      + 'thousands of rows that are not this scan\'s subject. Press <b>Edit</b> and give it one — a pattern matched against '
+      + 'each row\'s title, before anything is fetched.</p>'
+      + (SUBJ.regex ? '<p class="broken">A pattern is stored on this scan but it is switched off (source &ldquo;none&rdquo;): '
+          + '<span class="term">' + esc(SUBJ.regex) + '</span></p>' : '') + '</div>';
+  }
+  const rb = subjectReadback(SUBJ.regex), ok = !!compileSubject(SUBJ.regex) && SUBJ.valid !== false;
+  const who = SUBJ.source === 'partner' ? 'set by the partner' : 'proposed by the model, accepted unedited';
+  const counted = SUBJ.sources_counted || 0, run = SUBJ.sources_run || 0;
+  return '<div class="subjbox"><div class="rxline">' + esc(SUBJ.regex) + '</div>'
+    + '<p><span class="who">' + esc(who) + '</span>' + (SUBJ.why ? esc(SUBJ.why) : 'No sentence was recorded for this filter.') + '</p>'
+    + (ok ? '<p>' + (rb.plain.length
+          ? '<b>Rows whose title mentions:</b> ' + rb.plain.slice(0, 24).map(w => '<span class="term">' + esc(w) + '</span>').join('')
+            + (rb.plain.length > 24 ? ' and ' + (rb.plain.length - 24) + ' more' : '')
+          : '<b>This pattern has no plain words to read back.</b>')
+        + (rb.raw.length ? ' &mdash; ' + esc(pl(rb.raw.length, 'part')) + ' shown as written: '
+            + rb.raw.slice(0, 6).map(w => '<span class="term">' + esc(w) + '</span>').join('') : '')
+        + '</p>'
+      : '<p class="broken"><b>This pattern does not compile</b>, so the run cannot have applied it. '
+        + 'Treat this scan\'s ledger as unfiltered until it is fixed in <b>Edit</b>.</p>')
+    + '<p>Matched case-insensitively against <b>each row\'s title</b> at extraction, before anything is fetched, read or enriched &mdash; '
+    + 'so the reading budget goes to the subject. A row whose title is <b>too terse to judge</b> is <b>kept</b> and counted, never dropped: '
+    + 'erring toward keeping is the only safe direction for a tracker whose promise is that it does not miss things.</p>'
+    + '<div class="nums"><span><b>' + esc(SUBJ.dropped == null ? '—' : SUBJ.dropped) + '</b>rows dropped as not the subject</span>'
+    + '<span><b>' + esc(SUBJ.kept_terse == null ? '—' : SUBJ.kept_terse) + '</b>kept, title too terse to judge</span>'
+    + '<span>' + (counted ? esc(counted) + ' of ' + esc(run) + ' source(s) recorded counts' : 'no source recorded counts on the last run') + '</span></div>'
+    + '</div>';
+}
+
 // ---- the coverage preview: what this scan will read, BEFORE it exists -------------------------
 // Coverage is the whole product — "a scan shows exactly which URLs it fetches" (design §1.1) — so
 // a partner should see the venues before pressing Create, not discover them on the coverage panel
@@ -1930,7 +2369,12 @@ let previewSeen = true;
 let lastGaps = [], lastDropped = [];   // the last Find sources answer, for redraws
 function syncSubmit() {
   const b = $('#dlg-submit'); if (!b) return;
-  b.disabled = false; b.title = '';
+  // The one thing that can hold Create back: a subject filter that does not compile. The run would
+  // refuse it, and a scan created around a refused filter is a scan reading everything while its
+  // page claims a subject.
+  const broken = !!subject.regex && subject.source !== 'none' && !compileSubject(subject.regex);
+  b.disabled = broken;
+  b.title = broken ? 'The subject filter is not a valid regular expression.' : '';
   const why = $('#preview-why');
   if (why) why.textContent = 'Coverage is the whole product, so it is built here with you — tick a venue, '
     + 'add one, or search a gap, and this list follows. Everything on it is gated when the scan is created.';
@@ -1982,6 +2426,8 @@ function renderPreview() {
     + ($('#f-disc').checked ? '<br>Discovery is on, so the workflow will also propose venues of its own and gate them the same way. Those are not on this list.' : '')
     + '<br><b>Miscellaneous will additionally search the open web outside this list.</b> That lane fetches nothing, gates nothing and cites nothing — it is leads to verify at their primary source. A lead that turns out to be an official venue can be promoted into this coverage list, where the same gate decides.</div>';
   el.hidden = false;
+  // The subject illustration counts the venues on this list, so it redraws whenever the list does.
+  renderSubject();
   syncSubmit();
 }
 // Re-draw only once it has been shown: opening the dialog must not silently satisfy its own gate.
@@ -2173,6 +2619,13 @@ form.addEventListener('submit', async e => {
     }));
   const scan = { name, intent, jurisdictions: F.jur.get(), topics: F.top.get(), industries: F.ind.get(),
     sources, clients: F.cl.get().map(n => clientObjs[n] || n) };
+  // The subject filter travels as the partner left it. "none" is sent explicitly rather than
+  // omitted: on an Edit, an omitted key would let the previous filter stand, and pressing
+  // "Read everything" must actually clear it — the consequence the block states is the one the
+  // next run has to deliver.
+  scan.subject_filter = (subject.regex && subject.source !== 'none')
+    ? { regex: subject.regex, why: subject.why, source: subject.source === 'partner' ? 'partner' : 'proposed' }
+    : { regex: '', why: '', source: 'none' };
   // Carry forward what this dialog does not edit. An Edit re-creates the scan from this object,
   // so a key left out here is erased: no_misc silently re-enabled the Miscellaneous lane, budget
   // reset the partner's own caps, and discovery_notes lost discovery's account of its search.
@@ -2205,6 +2658,13 @@ form.addEventListener('submit', async e => {
   // minutes later on the Actions page.
   if (!scan.jurisdictions.length) { err.textContent = 'Add at least one jurisdiction — the pipeline refuses a scan without one.'; F.jur.input.focus(); return; }
   if (!scan.topics.length && !scan.industries.length && !scan.sources.length) { err.textContent = 'Add at least one topic, industry or source, or discovery has nothing to look for.'; F.top.input.focus(); return; }
+  // A filter the run would refuse is worse than none: the page would claim a subject the ledger
+  // does not have. Refuse it here, where the box is still in front of the person who wrote it.
+  if (scan.subject_filter.regex && !compileSubject(scan.subject_filter.regex)) {
+    err.textContent = 'The subject filter is not a valid regular expression, so the run would refuse it. '
+      + 'Fix it, or press Read everything to create this scan without one.';
+    $('#f-subject').focus(); return;
+  }
   // The gate on Create: a scan is its coverage, and this is the last moment the partner can see
   // that coverage before twenty minutes of gating and reading happen on their behalf. The button
   // is disabled until the preview has been drawn; this is the belt to that braces, for a submit
@@ -2575,7 +3035,9 @@ function renderScan() {
         : h.status === 'GATED' ? '<span class="st gated">GATED</span><span class="sep">·</span><span class="gated">approved, but beyond max_sources this run — not fetched</span>' + (h.checked ? '<span class="sep">·</span>recorded ' + esc(rel(h.checked)) : '')
         : '<span class="st">' + esc(h.status) + '</span><span class="sep">·</span>' + esc(h.rows_seen == null ? '?' : h.rows_seen) + ' rows seen<span class="sep">·</span>' + esc(h.new == null ? 0 : h.new) + ' new<span class="sep">·</span>newest visible ' + esc(h.newest_visible ? fmt(h.newest_visible) : '—') + (h.checked ? '<span class="sep">·</span>checked ' + esc(rel(h.checked)) : '');
       const infos = h ? h.notes.map(n => '<li class="warn">' + esc(n) + '</li>').concat(h.info.map(n => '<li>' + esc(n) + '</li>')).join('') : '';
-      return src(s, '<div class="ev">' + line + '</div><div class="ev">gate: ' + esc(s.evidence) + (s.checked ? '<span class="sep">·</span>' + esc(fmt(s.checked)) : '') + '</div>' + (infos ? '<ul class="infos">' + infos + '</ul>' : ''));
+      return src(s, '<div class="ev">' + line + '</div><div class="ev">gate: ' + esc(s.evidence) + (s.checked ? '<span class="sep">·</span>' + esc(fmt(s.checked)) : '') + '</div>'
+        + (h && h.status !== 'GATED' ? subjectCount(h.subject, SUBJ.on) : '')
+        + (infos ? '<ul class="infos">' + infos + '</ul>' : ''));
     }).join('');
     // Pending has several causes and only one of them is a terms question. Reviewed defect: every
     // pending source told the partner to read the site's terms, including one parked for budget.
@@ -2604,6 +3066,9 @@ function renderScan() {
       + '<div class="legend"><span class="badge vetted">Vetted</span><span>A TMT India registry source: a hand-built adapter, a fixture, a floor and a per-site legal analysis stand behind every row it produces.</span>'
       + '<span class="badge discovered">Discovered</span><span>A source this scan found or was given: it passed the automated gate — reachability, robots.txt, a terms scan and a parse test — and only that evidence, shown below, stands behind it.</span></div>'
       + lastrun
+      // Before the venue list, not after it: what counts as the subject shapes the ledger as much
+      // as which venues are read, and a reader who scrolls no further has still been told.
+      + '<div class="grp">Subject filter</div>' + subjectPanelHTML()
       + '<div class="grp">Approved · ' + C.approved.length + (C.gated ? ' · ' + (C.approved.length - C.gated) + ' read this run' : '') + '</div>' + uncovered + (approved || none)
       + '<div class="grp">Pending a human decision · ' + C.pending.length + '</div>' + (pending || none)
       + '<div class="grp">Rejected · ' + C.rejected.length + '</div>' + (rejected || none)
@@ -2869,6 +3334,18 @@ function renderScan() {
             + (h.new == null ? '' : ' &middot; ' + esc(h.new) + ' new')
             + (h.newest_visible ? ' &middot; newest item the venue shows: ' + esc(fmt(h.newest_visible)) : '')
             + (h.checked ? ' &middot; ' + esc(rel(h.checked)) : '') + '</div>'
+          // The filter's own account for THIS link. Someone auditing a suspected miss compares the
+          // live listing with the rows below; if a filter dropped rows between the two, that is
+          // the first thing they need to know, and it belongs here rather than only on Coverage.
+          + (h.status !== 'GATED'
+              ? (h.subject
+                  ? '<div class="ameta">Subject filter: ' + esc(h.subject.dropped == null ? '—' : h.subject.dropped)
+                    + ' row(s) dropped as not this scan’s subject &middot; ' + esc(h.subject.kept_terse == null ? '—' : h.subject.kept_terse)
+                    + ' row(s) kept because the title was too terse to judge'
+                    + (h.subject.titles && h.subject.titles.length ? '<br>kept: ' + h.subject.titles.map(esc).join('; ') : '') + '</div>'
+                  : SUBJ.on ? '<div class="ameta">Subject filter: no counts recorded for this source on the last run &mdash; the number of rows it dropped here is unknown.</div>'
+                  : '<div class="ameta">No subject filter: every row this link published in the window was ledgered.</div>')
+              : '')
           + (h.notes.length ? '<div class="ameta">' + h.notes.map(esc).join('<br>') + '</div>' : '')
           + (h.info.length ? '<div class="ameta">' + h.info.map(esc).join('<br>') + '</div>' : '')
         : '<div class="ameta">No run has touched this source yet.</div>')
@@ -2900,7 +3377,14 @@ function renderScan() {
     // it gets its own section rather than being quietly attributed to nobody.
     const orphans = items.filter(it => !known[it.source_url]);
     const head = '<div class="viewhead"><div class="eyebrow">Audit &mdash; verify us</div>'
-      + '<p class="sub">Link by link from Coverage: every source this scan holds, what it yielded on the last run, and every development traced back to the link it came from. Sources that yielded nothing are listed too &mdash; silence must be checkable, not hidden. Open a source, open its live listing, and compare.</p></div>';
+      + '<p class="sub">Link by link from Coverage: every source this scan holds, what it yielded on the last run, and every development traced back to the link it came from. Sources that yielded nothing are listed too &mdash; silence must be checkable, not hidden. Open a source, open its live listing, and compare.</p>'
+      // A partner auditing for a miss is comparing a venue's listing with this scan's rows. If a
+      // filter stands between the two, the comparison is meaningless until they know it — and if
+      // no filter stands there, the absence is just as load-bearing and is said just as plainly.
+      + '<p class="sub">' + (SUBJ.on
+          ? '<b>A subject filter stands between these venues and the ledger.</b> A row whose title does not match it was never fetched, read or ledgered, so a row you find on a venue and not below may have been dropped here rather than missed. The pattern, the sentence behind it and the per-source counts are on <b>Coverage</b>, and each source below carries its own count.'
+          : '<b>This scan has no subject filter, so every row every source publishes is ledgered.</b> Nothing was dropped for being off-subject: anything a venue listed in the window and this scan does not show below is a miss, not a filter.')
+        + '</p></div>';
     const sec = (label, list, group) => '<div class="miscgrp"><div class="gh">' + esc(label) + ' &middot; ' + list.length + '</div>'
       + (list.length ? list.map(s => auditSrc(s, group)).join('') : '<div class="mnone">None.</div>') + '</div>';
     $('#v-audit').innerHTML = head
@@ -3283,6 +3767,14 @@ def write_sample(dest: Path) -> Path:
         # Edit dialog, Ask and Draft are exercised against the object form.
         "clients": ["Accenture", {"name": "Annalise.ai", "scope": "employees in Germany and France only"}],
         "sources": sources, "budget": {"max_sources": 4, "max_new_per_run": 10, "delay_seconds": 1.5},
+        # The subject filter in the shape the create dialog sends and the run applies: a gazette
+        # publishes everything a state publishes, and only these rows are this scan's subject.
+        # The second sample scan deliberately has NONE, so both pages are exercised: one that says
+        # what its filter dropped, and one that says it has no filter and ledgers everything.
+        "subject_filter": {
+            "regex": r"\b(pay transparency|pay gap|equal pay|gender pay|Entgelttransparenz|transparence salariale|parit(a|à) retributiva|2023/970)\b",
+            "why": "Admits rows whose title names pay transparency, the pay gap or the Directive itself, in each jurisdiction's own language.",
+            "source": "proposed"},
         "no_discover": False, "created": now, "updated": now, "demo": True,
     }
 
@@ -3494,14 +3986,26 @@ def write_sample(dest: Path) -> Path:
     health = {
         "generated": now, "scan": sid,
         "sources": {
+            # Three shapes of subject-filter count, on purpose: the structured object, the flat
+            # keys, and nothing but the health line's own words. The page must read all three,
+            # because the number is what a partner needs and the key it arrives under is not.
             GU: {"status": "OK", "rows_seen": 31, "new": 6, "newest_visible": "2026-09-02", "notes": [],
-                 "info": ["extractor saw 31 candidate row(s)", f"{enrich_failed['id']}: enrichment failed (attempt 1): {enrich_failed['enrich_error']}"],
+                 "subject": {"dropped": 24, "kept_terse": 2,
+                             "titles": ["Comunicato n. 214", "Avviso di rettifica"]},
+                 "info": ["extractor saw 31 candidate row(s)",
+                          "24 row(s) outside this source's subject filter",
+                          "2 row(s) kept because the title was too terse to judge",
+                          f"{enrich_failed['id']}: enrichment failed (attempt 1): {enrich_failed['enrich_error']}"],
                  "checked": now, "name": sources[0]["name"], "tier": "discovered"},
             BM: {"status": "OK", "rows_seen": 24, "new": 3, "newest_visible": "2026-09-01", "notes": [],
+                 "subject_dropped": 19, "subject_kept_terse": 0,
                  "info": [f"{read_failed['id']}: document not read (attempt 2): {read_failed['read_error']}"],
                  "checked": now, "name": sources[1]["name"], "tier": "discovered"},
             LF: {"status": "QUIET", "rows_seen": 40, "new": 0, "newest_visible": "2026-08-21", "notes": [],
-                 "info": ["nothing new; newest item this venue shows is 2026-08-21"], "checked": now, "name": sources[2]["name"], "tier": "discovered"},
+                 "info": ["nothing new; newest item this venue shows is 2026-08-21",
+                          "38 row(s) outside this source's subject filter",
+                          "1 row(s) kept because the title was too terse to judge"],
+                 "checked": now, "name": sources[2]["name"], "tier": "discovered"},
             sources[3]["url"]: {"status": "FAILED", "rows_seen": 0, "new": 0, "newest_visible": None,
                                 "notes": ["fetch failed: HTTPError: 503 Service Unavailable"], "info": [], "checked": now,
                                 "name": sources[3]["name"], "tier": "discovered"},
@@ -3600,6 +4104,30 @@ def selftest() -> None:
     assert [lane_of(t) for t in SIGNAL_TYPES] == ["signals"] * 3
     assert lane_of("") == lane_of(None) == lane_of("Gazette notice") == "signals"
     assert len(set(KNOWN_TYPES)) == 9 and set(LANES) == {lane_of(t) for t in KNOWN_TYPES}
+
+    # The subject filter's normaliser. The three ways of having none — absent, empty, "none" —
+    # must all read as off, because an existing scan cannot change behaviour by standing still.
+    assert subject_filter_of({})[0] == {"on": False, "regex": "", "why": "", "source": "none", "valid": True}
+    assert subject_filter_of({"subject_filter": {"regex": "", "source": "proposed"}})[0]["on"] is False
+    assert subject_filter_of({"subject_filter": {"regex": r"\bAI\b", "source": "none"}})[0]["on"] is False
+    on, probs = subject_filter_of({"subject_filter": {"regex": r"\bAI\b", "why": "w", "source": "partner"}})
+    assert on == {"on": True, "regex": r"\bAI\b", "why": "w", "source": "partner", "valid": True} and not probs
+    # a regex the run would refuse is SHOWN and reported, never silently read as "no filter"
+    bad, probs = subject_filter_of({"subject_filter": {"regex": "(unclosed", "source": "partner"}})
+    assert bad["on"] is True and bad["valid"] is False and any("does not compile" in p for p in probs), probs
+    # an unknown `source` is tolerated, named, and shown as the safest true thing
+    odd, probs = subject_filter_of({"subject_filter": {"regex": "x", "source": "magic"}})
+    assert odd["source"] == "proposed" and any("not one of" in p for p in probs), probs
+    assert subject_filter_of({"subject_filter": "no"})[0]["on"] is False and subject_filter_of({"subject_filter": "no"})[1]
+    # Per-source counts: every shape a run might write, and — the point — absent is not zero.
+    assert subject_counts({}) is None and subject_counts({"info": ["nothing new"]}) is None
+    assert subject_counts({"subject": {"dropped": 3, "kept_terse": 1, "titles": ["a"]}}) == {"dropped": 3, "kept_terse": 1, "titles": ["a"]}
+    assert subject_counts({"subject_dropped": 7, "subject_kept_terse": 0}) == {"dropped": 7, "kept_terse": 0, "titles": []}
+    assert subject_counts({"filtered": 5, "unsure": ["t1", "t2"]}) == {"dropped": 5, "kept_terse": 2, "titles": []}
+    parsed = subject_counts({"info": ["12 row(s) outside this source's subject filter",
+                                      "2 row(s) kept because the title was too terse to judge"]})
+    assert parsed == {"dropped": 12, "kept_terse": 2, "titles": []}, parsed
+    assert subject_counts({"notes": ["9 row(s) outside the subject filter"]}) == {"dropped": 9, "kept_terse": None, "titles": []}
 
     ev = gate_evidence({"reachable": True, "http": 200, "robots": "allowed", "tos": {"checked": ["u"], "flags": []}, "extract": {"rows": 31, "dated": 29, "floor": 8}})
     assert ev == "robots allowed · terms checked: 1 page, no flags · 31 rows parsed, 29 dated", ev
@@ -3758,6 +4286,33 @@ def selftest() -> None:
         assert "built here with you" in html and "gated when the scan is created" in html
         assert "Each venue above is gated when the scan is created" in html
         assert "Miscellaneous will additionally search the open web outside this list." in html
+        # The subject filter is built WITH the partner, in the same block as the coverage list —
+        # not bolted on as an advanced option. Its box, its proposer, its endpoint, and the escape
+        # hatch with the consequence stated plainly.
+        assert 'id="subject-block"' in html and 'id="f-subject"' in html and 'class="rx"' in html
+        assert 'id="dlg-subject">Propose from the brief<' in html and '"subject": "/api/subject"' in html
+        assert 'id="subject-clear">Read everything<' in html
+        assert "Subject — what counts, on the pages above" in html
+        assert "Read everything: this scan will have no subject filter." in html
+        assert "items that are not your subject" in html
+        # What it would do, before the scan exists: the filter's own words back in English, and the
+        # venue count marked as an illustration rather than a promise.
+        assert "<b>Rows whose title mentions:</b>" in html and "each row\\'s title" in html
+        assert "<b>Illustration, not a promise.</b>" in html and "The test is <b>per row</b>" in html
+        # Editing the box makes the filter the partner's; clearing it by hand is "read everything"
+        assert "subject.source = subject.regex ? 'partner' : 'none';" in html
+        # A pattern the run would refuse never leaves this dialog
+        assert "The subject filter is not a valid regular expression" in html
+        # DEFECT this closes: the panel's helpers were declared inside renderScan(), BELOW the one
+        # pass that builds the whole shell, so coverageHTML() read `SUBJ` in its temporal dead zone
+        # and every scan page rendered blank. The selftest reads payloads and strings and never
+        # executes this script, so the order is asserted here instead of being found on a page.
+        assert (html.index("function subjectPanelHTML(") < html.index("if (D.page === 'home') renderHome();")
+                and html.index("const SUBJ =") < html.index("if (D.page === 'home') renderHome();")), \
+            "the subject panel's helpers must be declared before the render dispatch"
+        # Python's (?i) is not a JavaScript flag; the page must not call a pattern the pipeline
+        # compiles happily "invalid" (the run, not the browser, is the authority on the pattern)
+        assert "replace(/^\\(\\?i\\)/, '')" in html, "the (?i) prefix must be stripped before the browser test"
         # The seven tabs, by name, and the lane rule the page routes by
         for label in ("Coverage", "Instruments", "Judgments", "Signals", "Miscellaneous", "Clients", "Audit"):
             assert "label: '" + label + "'" in html, label
@@ -3838,6 +4393,23 @@ def selftest() -> None:
         d0 = payload["scan"]["sources"][0]
         assert d0["name"] and d0["jurisdiction"] == "IT" and d0["rationale"] and d0["kind"] == "gazette", d0
         assert "gate" not in d0 and "tier" not in d0, d0
+        # ---- the subject filter, on a scan that has one --------------------------------------
+        # The count reaches the page under all three shapes a run might write it: the structured
+        # object (Gazzetta), the flat keys (BMFSFJ), and nothing but the health line's own words
+        # (Légifrance). Absent stays absent — a FAILED source recorded nothing and must read "—",
+        # never "0 dropped", which would claim the filter looked.
+        S = cov["subject"]
+        assert S["on"] is True and S["source"] == "proposed" and S["valid"] is True, S
+        assert S["regex"].startswith(r"\b(pay transparency") and S["why"].startswith("Admits rows")
+        assert cov["approved"][0]["health"]["subject"] == {"dropped": 24, "kept_terse": 2,
+                                                           "titles": ["Comunicato n. 214", "Avviso di rettifica"]}
+        assert cov["approved"][1]["health"]["subject"] == {"dropped": 19, "kept_terse": 0, "titles": []}
+        assert cov["approved"][2]["health"]["subject"] == {"dropped": 38, "kept_terse": 1, "titles": []}
+        assert cov["approved"][3]["health"]["subject"] is None, "a FAILED source recorded no counts; absent is not zero"
+        assert S["dropped"] == 81 and S["kept_terse"] == 3 and S["sources_counted"] == 3 and S["sources_run"] == 5, S
+        # It round-trips through Edit exactly like no_misc and budget: what the page reads back is
+        # what Save re-submits, so editing a topic cannot silently turn the next run loose.
+        assert payload["scan"]["subject_filter"] == {"regex": S["regex"], "why": S["why"], "source": "proposed"}
         assert cov["pending"][0]["flags"] and "automatizada" in cov["pending"][0]["flags"][0] and cov["pending"][0]["reason"].startswith("ToS language found")
         assert cov["rejected"][0]["reason"].startswith("robots.txt disallows")
         assert cov["rejected"][0]["evidence"] == "not fetched — robots.txt disallows our agent · terms not checked", cov["rejected"][0]["evidence"]
@@ -3906,6 +4478,14 @@ def selftest() -> None:
         p2 = json.loads(re.search(r'<script id="scan-data" type="application/json">(.*?)</script>', page2, re.S).group(1).replace("<\\/", "</"))
         assert p2["problems"] == ["create did not finish gating 1 source(s) — Edit and save to re-run"], p2["problems"]
         assert p2["scan"]["no_discover"] is True and p2["coverage"]["pending"][0]["reason"] == "not yet gated"
+        # ... and it has NO subject filter. Existing scans must not change behaviour: the payload
+        # says off, and both Coverage and Audit say it in as many words rather than staying silent,
+        # because silence there reads as "nothing was dropped" when the truth is "nothing was judged".
+        assert p2["coverage"]["subject"] == {"on": False, "regex": "", "why": "", "source": "none", "valid": True,
+                                             "dropped": None, "kept_terse": None, "sources_counted": 0,
+                                             "sources_run": 0}, p2["coverage"]["subject"]
+        assert p2["scan"]["subject_filter"] == {"regex": "", "why": "", "source": "none"}
+        assert "This scan has no subject filter, so every row every source publishes is ledgered." in page2
         # ... and it has no misc.json at all: the page must say nobody looked, not that nothing
         # was found, so `present` is false and the tab shows no count.
         assert p2["misc"] == {"present": False, "generated": "", "query": {}, "findings": [], "notes": []}, p2["misc"]
@@ -3951,7 +4531,9 @@ def selftest() -> None:
           "read-failed / enrichment-failed / truncated, 5/1/1 sources incl. FAILED and GATED, 8 misc findings "
           "across 3 kinds and 3 statuses, budget drops + run notes + discovery on the page, 1 unverified "
           "citation, 1 uncited sentence, 4 unrated rows), a scan with no misc.json, an ungated definition, "
-          "publish, failure modes; seven tabs, the Miscellaneous standing copy, the coverage preview gating "
+          "publish, failure modes; the subject filter (normalised, three count shapes read back, absent is "
+          "not zero, round-tripped through Edit, proposed/edited/cleared in the dialog, and a scan without "
+          "one saying so on Coverage and Audit); seven tabs, the Miscellaneous standing copy, the coverage preview gating "
           f"Create, source picker + pending store (first run = {FIRST_RUN_MAX_NEW} documents, from run.FIRST_RUN_MAX_NEW), "
           "and the wait: self pick-up on a changed data stamp, clock-derived phases said to be estimates, "
           "Try again on a failed run, an honest fallback when live status is off, and no CI service named")

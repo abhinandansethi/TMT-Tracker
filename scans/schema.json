@@ -161,6 +161,37 @@
    },
    "description": "What discovery searched for and did not find, or found and dropped, written by run.py create. It lives in the definition rather than in health because a plain `run` rebuilds health from scratch, and the coverage panel must keep saying 'no official venue found for DE' for as long as that is true. Documented here because it was missing: every definition the pipeline has ever written carries this key, and a schema with additionalProperties false was rejecting all of them."
   },
+  "subject_filter": {
+   "type": "object",
+   "description": "What, on a listing, is this scan's subject at all — applied by pipeline/scan/subject.py at extraction, per source, before dedupe and before a single document is read. THE DEFECT IT CLOSES, measured on data/scans/india-ai-regulation: a scan asked to surface Indian AI regulation ledgered 118 developments, of which 103 were TRAI telecom quality-of-service rows and 15 were CERT-In vendor bulletins ('Multiple Vulnerabilities in Oracle Products'); three titles out of 118 mention AI, and the whole first run's reading budget was spent on rows the enricher then rated 'low'. A scan had the machinery for reading a listing but none for deciding what on it is the subject. A REGEX and not a model call per row, for the reasons the tracker's own row_filter is one (engine/registry_v2.json + engine/radar/core.py::_row_included): it is deterministic, it is visible on the page, the partner can edit it, and it costs nothing per row. Three outcomes: a title that matches is kept; a title that does not is dropped and COUNTED, reported per source as 'N row(s) outside this scan's subject filter'; a title too terse to judge is KEPT and marked (`subject_unjudged` on the development), reported as 'M row(s) kept: title too terse to judge against the filter'. The tracker probes the linked document for a terse title and a scan cannot cheaply, so it keeps the row — erring toward keeping is the only safe direction for a tracker whose promise is that it does not miss things. Absent, or `source: \"none\"`, keeps every row exactly as before this key existed, and health then SAYS the scan has no subject filter so nobody mistakes an unfiltered scan for a well-targeted one. A regex that will not compile is NOT a validation error — refusing to run a scan over a broken filter is worse than reading extra rows — it is reported as a note at run time and the filter is treated as absent. Totals reach health.run.filtered / health.run.unjudged and the SUMMARY.",
+   "additionalProperties": false,
+   "required": [
+    "regex",
+    "why",
+    "source"
+   ],
+   "properties": {
+    "regex": {
+     "type": "string",
+     "maxLength": 400,
+     "description": "A Python `re` pattern matched case-insensitively with re.search against the listing title only — an alternation of the subject's words and their obvious variants, e.g. `artificial\\s+intelligence|\\bAI\\b|machine\\s+learning`. Word boundaries matter: without \\b, 'AI' matches TRAI and IRDAI. Empty means no filter. Validated in code before it is ever stored (subject.regex_problem): it must compile, it must not match the empty string (a bare '.*' or an empty alternation branch keeps everything and filters nothing), it must not match a set of subject-free official titles, and a model-proposed one must match something in the scan's own intent and topics."
+    },
+    "why": {
+     "type": "string",
+     "maxLength": 300,
+     "description": "One sentence a partner can check without reading regex: what this keeps and what it leaves out. Shown beside the filter on the scan page, because a filter nobody can check is a filter nobody can correct."
+    },
+    "source": {
+     "type": "string",
+     "enum": [
+      "proposed",
+      "partner",
+      "none"
+     ],
+     "description": "Who is answerable for the regex. 'proposed' is the model's suggestion, made ONCE at create time from the intent and topics (run.py propose-filter / propose_subject_filter) and shown to the partner before it has any effect; 'partner' is a human's own words; 'none' is a deliberate decision to read everything. create stores what it is given and never invents a filter — a filter the partner has not seen drops rows in their name, which is worse than no filter at all."
+    }
+   }
+  },
   "no_misc": {
    "type": "boolean",
    "description": "True when the Miscellaneous lane is switched off for this scan: no open-web search runs and data/scans/<id>/misc.json is left as it is. Recorded by run.py create (or set by hand); `run --no-misc` skips the lane for one run without changing this flag."
