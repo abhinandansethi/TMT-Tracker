@@ -5,6 +5,7 @@
 What this replaces, and with what:
   Vercel static hosting  -> this process serves dist/ (rebuilt after every job)
   Vercel Edge middleware -> HTTP Basic Auth here, same AUTH_USERS semantics as middleware.js
+  editing env by hand    -> /setup (first run) and /admin (logins, key) write the settings file
   Vercel functions       -> /api/* routes calling the pipeline modules directly (server/assist.py)
   GitHub Actions         -> a job queue and one worker in this process (server/jobs.py)
   GitHub as audit trail  -> a commit to the LOCAL git repository after every job
@@ -33,7 +34,7 @@ from starlette.concurrency import run_in_threadpool
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from server import assist, jobs  # noqa: E402
+from server import admin, assist, jobs, settings  # noqa: E402
 
 DIST = ROOT / "dist"
 REALM = 'Basic realm="TMT Regulatory Radar", charset="UTF-8"'
@@ -69,7 +70,9 @@ def require_user(request: Request) -> str:
     if not pairs:
         # Fail closed. There is deliberately no starter pair: a short password in a file in front
         # of a client roster is weakly closed, not closed.
-        raise HTTPException(503, "This server has no credentials configured. Set AUTH_USERS (user:password per line) in /etc/tmt-radar.env and restart.")
+        if os.environ.get("TMT_SETUP_TOKEN"):
+            raise HTTPException(503, "This server is not set up yet. Open /setup with the setup code.")
+        raise HTTPException(503, f"This server has no logins configured. Set AUTH_USERS (user:password per line) in {settings.ENV_FILE} and restart.")
     header = request.headers.get("authorization") or ""
     if not header.startswith("Basic "):
         raise HTTPException(401, "Ask Abhi for your username and password.", headers={"WWW-Authenticate": REALM})
@@ -270,6 +273,9 @@ def _ensure_built() -> None:
         for b in ("code/build_dashboard_v2.py", "code/build_scans.py"):
             subprocess.call([py, b], cwd=str(ROOT))
 
+
+# /setup and /admin are routes, so they go in before the catch-all mount of dist/.
+app.include_router(admin.router)
 
 _ensure_built()
 DIST.mkdir(exist_ok=True)

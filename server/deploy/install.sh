@@ -37,27 +37,31 @@ chown -R "$SVC_USER:$SVC_USER" "$APP_DIR"
 say "python environment (engine/.venv — the path every script already expects)"
 sudo -u "$SVC_USER" bash -c "cd '$APP_DIR' && python3 -m venv engine/.venv && engine/.venv/bin/pip install -q --upgrade pip && engine/.venv/bin/pip install -q -r requirements.txt"
 
-say "secrets file $ENV_FILE"
+say "settings file $ENV_FILE"
+SETUP_CODE=""
 if [ ! -f "$ENV_FILE" ]; then
-  cat > "$ENV_FILE" <<'EOF'
-# TMT Regulatory Radar — service environment. Root-owned, mode 0600. Edit, then: systemctl restart tmt-radar
+  # No login and no key yet: a one-time setup code lets the first person configure the service
+  # from the browser at /setup (it is deleted once used). There is no starter password on purpose.
+  SETUP_CODE="$(openssl rand -hex 12)"
+  cat > "$ENV_FILE" <<EOF
+# TMT Regulatory Radar — service environment. Written by the service's setup and admin pages;
+# editing by hand also works (then: systemctl restart tmt-radar). Owned by the service user, mode 0600.
 OPENAI_API_KEY=
-# One login per partner: user:password, one per line (a password may contain colons). Keep the
-# quotes so newlines survive systemd's parser. Empty = the service answers 503 to everyone —
-# it fails closed until a real pair is here; there is no starter password on purpose.
 AUTH_USERS=""
-# Models. Empty means the code's default (gpt-5.6-luna).
+TMT_ADMIN_USER=
+TMT_SETUP_TOKEN=$SETUP_CODE
 TMT_SCAN_MODEL=
 TMT_SCAN_MODEL_STRONG=
 TMT_ASK_MODEL=
-# Set to 1 to stop the service committing each job to the local git repo (the audit trail).
 TMT_NO_COMMIT=0
 EOF
-  chmod 0600 "$ENV_FILE"; chown "root:$SVC_USER" "$ENV_FILE"; chmod 0640 "$ENV_FILE"
-  echo "   written with placeholders — put the real OPENAI_API_KEY and AUTH_USERS in it before partners use this."
+  echo "   written; no login exists yet — the first person configures it at /setup with the setup code below."
 else
   echo "   exists, left untouched"
+  SETUP_CODE="$(sed -n 's/^TMT_SETUP_TOKEN=//p' "$ENV_FILE" | tr -d '"')"
 fi
+# The service writes this file itself (setup and admin pages), so it must own it.
+chown "$SVC_USER:$SVC_USER" "$ENV_FILE"; chmod 0600 "$ENV_FILE"
 
 say "git identity for the audit-trail commits"
 sudo -u "$SVC_USER" git -C "$APP_DIR" config user.name "tmt-radar" || true
@@ -85,6 +89,9 @@ if [ -n "$DOMAIN" ]; then
 fi
 
 say "done"
+if [ -n "$SETUP_CODE" ]; then
+  echo "   SETUP CODE (one-time, for the /setup page): $SETUP_CODE"
+fi
 echo "   health:  curl -s http://127.0.0.1:8080/api/health"
 echo "   logs:    journalctl -u tmt-radar -f"
 echo "   update:  cd $APP_DIR && sudo -u $SVC_USER git pull && sudo bash server/deploy/install.sh"

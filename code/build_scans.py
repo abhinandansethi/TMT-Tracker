@@ -2742,7 +2742,9 @@ function renderHome() {
     // scan is and who owns which one, because a partner arriving here for the first time has no
     // other page to learn it from.
     + '<p class="lede">A scan is one question read against a fixed list of official sources you can see. <b>TMT India</b> is the built-in, vetted one; anything else here you made, and its sources are labelled <b>discovered</b> wherever they appear. A scan runs when you press Run scan; one that someone has set to run daily says so on its page, with their name.</p></div>'
-    + '<div class="actions"><button class="btn primary" id="create">+ Create scan</button></div></div>'
+    // "Logins" is the admin's page (partners' logins, the OpenAI key); anyone else who opens it is
+    // told who manages logins, which is the right answer for them too.
+    + '<div class="actions"><a class="btn quiet" href="/admin">Logins</a><button class="btn primary" id="create">+ Create scan</button></div></div>'
     + '<div class="notice" id="notice"></div>'
     + '<div class="htoolbar"><div class="ttabs" role="tablist" id="htabs"></div>'
     + '<div class="tools"><select id="hsort" aria-label="Sort scans"><option value="name">Sort: name</option><option value="lastrun">Sort: last run</option><option value="new">Sort: new developments</option></select></div></div>'
