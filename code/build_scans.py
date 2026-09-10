@@ -1221,8 +1221,9 @@ dialog[data-step=form] .only-describe{display:none}
 .candlist li.hgrp{padding:0}
 .candlist li.hgrp>details>summary{display:flex;gap:10px;align-items:baseline;padding:9px 12px;cursor:pointer;list-style:none;font-size:13px;background:var(--panel)}
 .candlist li.hgrp>details>summary::-webkit-details-marker{display:none}
-.candlist li.hgrp>details>summary::before{content:'▸';font-size:11px;color:var(--faint)}
-.candlist li.hgrp>details[open]>summary::before{content:'▾'}
+.candlist li.hgrp>details>summary .tog::before{content:'▸';font-size:11px;color:var(--faint);margin-left:auto}
+.candlist li.hgrp>details[open]>summary .tog::before{content:'▾'}
+.candlist li.hgrp>details>summary>input{margin:0 2px 0 0}
 .candlist li.hgrp>details>summary .nm{font-family:var(--mono);font-weight:500}
 .candlist li.hgrp>details>summary .k{font-size:12px;color:var(--faint)}
 .candlist li.hgrp ul{list-style:none;margin:0;padding:0 0 0 16px}
@@ -1584,7 +1585,7 @@ a.el{color:var(--navy)}
           <button type="button" class="btn" id="dlg-addsrc">Add</button></div>
         <div class="pnote" id="addsrc-note" aria-live="polite"></div>
       </div>
-      <details class="adv" id="adv"><summary>Details — name, intent, jurisdictions, topics, clients, subject filter, daily run</summary>
+      <details class="adv" id="adv"><summary>Advanced settings</summary>
       <div class="two">
         <div class="field"><label for="f-group">Radar<span class="req">*</span></label><input type="text" id="f-group" maxlength="120" autocomplete="off" placeholder="OpenAI"></div>
         <div class="field"><label for="f-layer">Layer</label><input type="text" id="f-layer" maxlength="120" autocomplete="off" placeholder="Regulation"></div>
@@ -1627,8 +1628,6 @@ a.el{color:var(--navy)}
         </div>
       </div>
       </details>
-      <div class="prev" id="preview"></div>
-      <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents; the rest queue for the next <b>Run scan</b>.</div>
     </div>
     <div class="df"><div class="err" id="dlg-err" aria-live="polite"></div>
       <div class="actions"><button type="button" class="btn quiet only-form" id="dlg-back">Describe instead</button><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary only-form" id="dlg-submit">Create scan</button></div></div>
@@ -2503,6 +2502,9 @@ function previewSources() {
 }
 function renderPreview() {
   const list = previewSources(), el = $('#preview');
+  // The grouped list is the coverage; there is no second rendering of it any more. What remains
+  // of this function is the subject illustration and the Create gate.
+  if (!el) { renderSubject(); syncSubmit(); return; }
   const order = [], groups = {};
   list.forEach(s => { const k = s.jurisdiction || '—'; if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(s); });
   // The scan's own jurisdictions lead, in the order they were typed, so a jurisdiction with no
@@ -2601,21 +2603,38 @@ function drawCands(gaps, dropped) {
   const rows = candGroups().map(g => {
     if (g.rows.length === 1) return candRow(g.rows[0]);
     const n = g.rows.filter(c => picked[c.url]).length;
-    return '<li class="hgrp"><details' + (g.rows.some(c => c.added) ? ' open' : '') + '><summary><span class="nm">' + esc(g.host) + '</span><span class="k">' + pl(g.rows.length, 'page') + ' · ' + n + ' ticked</span></summary><ul>' + g.rows.map(candRow).join('') + '</ul></details></li>';
+    // The site row ticks like any other row — all of its pages at once — and opens to pick
+    // among them. Its box is "some" (indeterminate) when only part of the site is ticked.
+    return '<li class="hgrp"><details' + (g.rows.some(c => c.added) ? ' open' : '') + '><summary><input type="checkbox" data-host="' + esc(g.host) + '"' + (n === g.rows.length ? ' checked' : '') + (n && n < g.rows.length ? ' data-some="1"' : '') + ' aria-label="All pages of ' + esc(g.host) + '"><span class="nm">' + esc(g.host) + '</span><span class="k">' + pl(g.rows.length, 'page') + ' · ' + n + ' ticked</span><span class="tog" aria-hidden="true"></span></summary><ul>' + g.rows.map(candRow).join('') + '</ul></details></li>';
   }).join('');
+  // A site left open stays open across a redraw; ticking one of its pages must not fold it away.
+  const openHosts = {}; $$('#cands li.hgrp details[open] input[data-host]').forEach(i => { openHosts[i.dataset.host] = 1; });
   $('#cands').innerHTML = (rows ? '<ul class="candlist">' + rows + '</ul>' : '')
     + (gaps || []).map(g => '<div class="gapline"><span class="t">gap</span>'
         + esc(g && g.note ? g.note : ('No official venue found for ' + ((g && g.jurisdiction) || 'one jurisdiction') + ' — add one by hand if you know it')) + '</div>').join('')
     + (dropped || []).map(t => '<div class="dropline"><span class="t">dropped</span>' + esc(t) + '</div>').join('');
+  $$('#cands input[data-host]').forEach(i => { if (openHosts[i.dataset.host]) i.closest('details').open = true; if (i.dataset.some) i.indeterminate = true; });
 }
+// A click on the site's box must tick, not open or close the site.
+$('#cands').addEventListener('click', e => { if (e.target.matches('input[data-host]')) e.stopPropagation(); });
 $('#cands').addEventListener('change', e => {
+  const hb = e.target.closest('input[type=checkbox][data-host]');
+  if (hb) {
+    cands.filter(c => (c.host || hostOf(c.url) || c.url) === hb.dataset.host).forEach(c => { if (hb.checked) picked[c.url] = true; else delete picked[c.url]; });
+    if (Object.keys(picked).length && $('#f-disc').checked && !discTouched) $('#f-disc').checked = false;
+    drawCands(lastGaps, lastDropped); discHelp(); refreshPreview();
+    return;
+  }
   const cb = e.target.closest('input[type=checkbox][data-url]');
   if (!cb) return;
   if (cb.checked) picked[cb.dataset.url] = true; else delete picked[cb.dataset.url];
+  // The site's own box follows its pages (all / some / none) — redraw so it does.
+  const inSite = !!cb.closest('li.hgrp');
   // Picking venues here is the point: the create then dispatches no_discover:true and the workflow
   // gates the handful you chose. Turned off for you, once, and said out loud — unless you have
   // already set the box yourself, in which case your setting stands.
   if (Object.keys(picked).length && $('#f-disc').checked && !discTouched) $('#f-disc').checked = false;
+  if (inSite) drawCands(lastGaps, lastDropped);
   discHelp();
   refreshPreview();
 });
@@ -2770,7 +2789,7 @@ function drawSummary() {
   const g = $('#f-group').value.trim(), l = $('#f-layer').value.trim(), jurs = F.jur.get();
   el.innerHTML = (g ? '<b>' + esc(g) + '</b>' + (l ? ' · ' + esc(l) : '') : '<span class="miss">No name yet</span>')
     + '<span class="sep">·</span>' + (jurs.length ? jurs.map(flagged).join(' ') : '<span class="miss">no jurisdiction</span>')
-    + '<button type="button" class="btn sm quiet" id="sum-edit">Details</button>';
+    + '<button type="button" class="btn sm quiet" id="sum-edit">Advanced settings</button>';
 }
 document.addEventListener('click', e => { if (e.target.id === 'sum-edit') { $('#adv').open = !$('#adv').open; if ($('#adv').open) $('#f-group').focus(); } });
 ['#f-group', '#f-layer'].forEach(s => $(s).addEventListener('input', drawSummary));
@@ -4597,9 +4616,9 @@ def selftest() -> None:
         assert "Proposals only. Ticked ones are checked (robots.txt, terms, parse test) when the scan is created." in html
         assert 'id="cands"' in html and "at least 20 characters" in html
         # The first-run promise is the pipeline's number in both places it is made, never a literal
-        assert f"the newest {FIRST_RUN_MAX_NEW} documents" in html, "dialog line lost the first-run cap"
+        assert f'"firstRunMax": {FIRST_RUN_MAX_NEW}' in html, "the page lost the first-run cap"
         assert f'"firstRunMax": {FIRST_RUN_MAX_NEW}' in html
-        assert "the rest queue for the next <b>Run scan</b>." in html
+        assert 'id="adv"><summary>Advanced settings</summary>' in html and 'data-host=' in html
         assert "'The first run reads the newest ' + FIRST_RUN_MAX + ' documents" in html
         # The pending store, under the contract's key, and the poll that must stand down
         assert "'tmt_scans_pending_v1'" in html and "action: 'status'" in html
@@ -4645,9 +4664,9 @@ def selftest() -> None:
         # The coverage list is now always on screen and always current, so there is no reveal to
         # gate on. What must stay true is that it redraws on every change.
         assert "function refreshPreview() { renderPreview(); }" in html
-        assert 'class="prev" id="preview"></div>' in html, "the list must not be hidden"
-        assert "Gated on create; at most" in html
-        assert "Miscellaneous will additionally search the open web outside this list." in html
+        # The grouped candidate list IS the coverage list; the old preview block and the first-run
+        # line are gone from the dialog, and the create gate lives on without them.
+        assert 'id="preview"' not in html and 'class="firstrun"' not in html
         # The subject filter is built WITH the partner, in the same block as the coverage list —
         # not bolted on as an advanced option. Its box, its proposer, its endpoint, and the escape
         # hatch with the consequence stated plainly.
@@ -4825,7 +4844,7 @@ def selftest() -> None:
         # too, wired to the same number. (The pending card itself cannot be sampled: it exists only
         # after a live 202 from /api/scans.)
         assert payload["api"]["discover"] == "/api/discover" and payload["firstRunMax"] == FIRST_RUN_MAX_NEW
-        assert 'id="dlg-find">Search again<' in page and f"the newest {FIRST_RUN_MAX_NEW} documents" in page
+        assert 'id="dlg-find">Search again<' in page and f'"firstRunMax": {FIRST_RUN_MAX_NEW}' in page
         assert "Proposals only." in page
         # clients keep both contract shapes; no_discover is read as stored
         assert payload["scan"]["clients"] == ["Accenture", {"name": "Annalise.ai", "scope": "employees in Germany and France only"}]
