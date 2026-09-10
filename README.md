@@ -89,7 +89,9 @@ developments it draws on. Design and data contract: `docs/horizon-design.md`.
 
 What stays true for a scan, exactly as for the tracker: coverage is the whole world (a scan's
 Coverage tab lists what it fetches, what it rejected and why); health is earned by evidence;
-**nothing runs on a schedule** — a scan runs when a person presses *Run scan*; discovered sources
+nothing runs on a schedule unless a partner sets one — a scan runs when a person presses *Run
+scan*, or once a day if its owner chose that (a named decision, on record in
+`engine/audit/scheduling_decision_2026-09-10.md`, shown on the scan); discovered sources
 are labelled *discovered*, never *vetted*; a document that cannot be read is never scored.
 
 **Miscellaneous** is the one lane that is deliberately outside all of that, and it says so on its

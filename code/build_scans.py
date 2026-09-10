@@ -787,6 +787,9 @@ def load_scan(root: Path, defn_path: Path) -> dict:
             # on, discovery_notes threw away discovery's account of what it searched and dropped,
             # and budget reset a partner's own caps to the defaults — all on a plain Save.
             "no_misc": defn.get("no_misc") is True,
+            # An unattended daily run is the one thing a scan can do without a person; it must be
+            # on the page and in the Edit dialog, never a hidden property of the definition.
+            "schedule": dict(defn["schedule"]) if isinstance(defn.get("schedule"), dict) else None,
             # The subject filter is EDITED in that dialog rather than merely carried through it,
             # but the round-trip rule is the same: what Edit reads back is what Save re-submits,
             # so a partner who opens the dialog and changes a topic does not silently clear the
@@ -1408,6 +1411,15 @@ a.el{color:var(--navy)}
 .anone.bad{background:var(--alarm-wash);color:var(--alarm)}
 .averify{margin-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;color:var(--faint);line-height:1.7}
 
+/* the header's one sentence about when this scan runs — true for THIS scan, never a slogan */
+function scheduleLine(S) {
+  const sch = S && S.definition && S.definition.schedule;
+  if (sch && sch.daily_at) {
+    const who = sch.set_by ? ' &mdash; set by ' + esc(sch.set_by) + (sch.set_on ? ' on ' + esc(String(sch.set_on).slice(0, 10)) : '') : '';
+    return '<span class="sched on">Runs daily at ' + esc(sch.daily_at) + ' ' + esc(sch.tz || '') + who + ', and whenever a person presses Run scan.</span>';
+  }
+  return 'Runs when a person presses Run scan &mdash; this scan is not scheduled.';
+}
 /* ---- create dialog: the coverage preview that gates Create */
 .prev{margin-top:20px;border:1px solid var(--rule2);border-radius:10px;background:var(--row3);padding:16px 18px}
 .prev h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px;font-weight:500}
@@ -1420,6 +1432,7 @@ a.el{color:var(--navy)}
 .prev li .ph{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-left:7px}
 .prev li .pr{font-size:12px;color:var(--mute);line-height:1.45;margin-top:2px}
 .prev .pdrop{float:right;margin-left:8px;border:1px solid var(--rule2);background:var(--paper);color:var(--faint);border-radius:4px;width:20px;height:20px;line-height:1;cursor:pointer;font-size:13px}.pdrop:hover{border-color:var(--alarm);color:var(--alarm)}.pfind{border:1px solid var(--rule2);background:var(--paper);color:var(--navy);border-radius:4px;padding:1px 7px;margin-left:4px;font-size:11px;font-family:var(--mono);cursor:pointer}.pfind:hover{border-color:var(--navy)}
+.sched.on{color:var(--ochre);font-weight:600}
 .pgap{margin-top:12px;font-size:12.5px;color:#5B4507;line-height:1.5}
 .prev .pfine{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule3);font-size:12px;color:var(--mute);line-height:1.6}
 .prev .pfine b{color:var(--ink);font-weight:600}
@@ -1518,6 +1531,8 @@ a.el{color:var(--navy)}
         <div class="help">Optional. Add a listing page you already trust; it will still be checked — robots, terms and a parse test — before anything is read from it.</div></div>
       <div class="field"><label for="f-cl">Clients</label><div class="cin" id="c-cl"></div>
         <div class="help">Relevance is rated per named client; the model is asked to name them in the action line.</div></div>
+      <div class="field check"><input type="checkbox" id="f-sched"><label for="f-sched">Run daily, unattended, at <input type="time" id="f-sched-at" value="06:30" step="60"> IST</label></div>
+      <div class="help" id="f-sched-help">Off by default. Everything else here runs when a person presses a button; this one setting makes the scan read its approved sources once a day without anyone pressing anything. It is shown on the scan with your name, and the legal analysis of unattended collection is on record (engine/audit/scheduling_decision_2026-09-10.md).</div>
       <div class="field check"><input type="checkbox" id="f-disc" checked><label for="f-disc">Discover sources automatically</label></div>
       <div class="help" id="f-disc-help">Off, only the sources listed above are gated and read.</div>
       <div class="field" id="preview-block">
@@ -2056,6 +2071,9 @@ function openDialog(scan) {
   cands = []; picked = {}; discTouched = false;
   $('#cands').innerHTML = ''; setNote('#find-note', ''); $('#f-disc-help').textContent = DISC_HELP;
   $('#f-disc').checked = scan ? !scan.no_discover : true;
+  const sch = scan && scan.schedule;
+  $('#f-sched').checked = !!(sch && sch.daily_at);
+  $('#f-sched-at').value = (sch && sch.daily_at) || '06:30';
   // The subject filter round-trips like no_misc and budget: an Edit that opens, changes a topic
   // and saves must re-submit the very filter the scan already has. A definition that has never
   // had one opens empty and says, in the block itself, what creating it that way means.
@@ -2629,6 +2647,11 @@ form.addEventListener('submit', async e => {
   // Carry forward what this dialog does not edit. An Edit re-creates the scan from this object,
   // so a key left out here is erased: no_misc silently re-enabled the Miscellaneous lane, budget
   // reset the partner's own caps, and discovery_notes lost discovery's account of its search.
+  // The schedule is written EXPLICITLY on every save — set, or null to clear — so a partner who
+  // unticks it really turns it off (an absent key would let run.py carry the old one forward).
+  const schedOn = $('#f-sched').checked, schedAt = ($('#f-sched-at').value || '').trim();
+  if (schedOn && !/^([01]\d|2[0-3]):[0-5]\d$/.test(schedAt)) { err.textContent = 'Give the daily run a time (HH:MM).'; $('#f-sched-at').focus(); return; }
+  scan.schedule = schedOn ? { daily_at: schedAt, tz: 'Asia/Kolkata', set_by: (D.user || 'a partner'), set_on: new Date().toISOString() } : null;
   if (editingId && editingDefn) {
     if (editingDefn.no_misc === true) scan.no_misc = true;
     if (editingDefn.budget && Object.keys(editingDefn.budget).length) scan.budget = editingDefn.budget;
@@ -2727,7 +2750,7 @@ function renderHome() {
     // This page is the product's front door, not an index behind the tracker: it opens with what a
     // scan is and who owns which one, because a partner arriving here for the first time has no
     // other page to learn it from.
-    + '<p class="lede">A scan is one question read against a fixed list of official sources you can see. <b>TMT India</b> is the built-in, vetted one; anything else here you made, and its sources are labelled <b>discovered</b> wherever they appear. Nothing is scheduled — a scan runs when you press Run scan.</p></div>'
+    + '<p class="lede">A scan is one question read against a fixed list of official sources you can see. <b>TMT India</b> is the built-in, vetted one; anything else here you made, and its sources are labelled <b>discovered</b> wherever they appear. A scan runs when you press Run scan; one that someone has set to run daily says so on its page, with their name.</p></div>'
     + '<div class="actions"><button class="btn primary" id="create">+ Create scan</button></div></div>'
     + '<div class="notice" id="notice"></div>'
     + '<div class="htoolbar"><div class="ttabs" role="tablist" id="htabs"></div>'
@@ -2874,7 +2897,7 @@ function renderScan() {
     + '<div class="titlerow"><div><h1 class="title">' + esc(S.name) + '</h1>'
     + '<div class="metaline"><span>' + esc(D.meta) + '</span><span class="dot">&middot;</span><span class="flags">' + flags + '</span><span class="dot">&middot;</span><span>Last run <b id="lastrun"></b></span>'
     + (S.demo ? '<span class="badge demo">Demo</span>' : '') + '<span class="badge discovered">Discovered sources</span></div>'
-    + '<p class="plain">Runs when a person presses Run scan &mdash; nothing here is scheduled.</p>'
+    + '<p class="plain">' + scheduleLine(S) + '</p>'
     + (S.intent ? '<p class="intent">' + esc(S.intent) + '</p>' : '') + '</div>'
     // run.py refuses a demo definition with exit 2 (its sources are reserved .test hosts), so the
     // button says so up front instead of letting a partner queue a run that can only fail.

@@ -16,10 +16,13 @@ not negotiable, because they are the reason a law firm can run this at all.
    coverage list. This is the invariant the whole tracker is built on; the scan layer inherits it.
 2. **Health is earned by evidence.** A source is OK because it was fetched, parsed above a floor,
    and produced dated rows — never because nothing complained.
-3. **Human-triggered, never scheduled.** The per-source legal analysis rests on collection being
-   occasional and human-initiated. Harvey says "scans run every hour"; we do not, and the UI says
-   so plainly. A partner presses *Run scan*. That is the compliance position, not a limitation
-   to engineer around.
+3. **Human-triggered by default; scheduled only by a named decision.** The per-source legal
+   analysis was written on the footing that collection is occasional and human-initiated, and
+   that is still how everything runs unless a partner sets a scan's `schedule` — one unattended
+   run a day, shown on the scan with the partner's name, refused for demo scans, switchable off
+   machine-wide. That option was chosen knowingly on 2026-09-10; the decision, its safeguards and
+   what it means for the legal position are in `engine/audit/scheduling_decision_2026-09-10.md`.
+   The TMT India sweep is not scheduled and stays on *Update now*.
 4. **Honest fetching.** The identifying User-Agent and `From` header, robots.txt enforced on every
    request, politeness delay per host, declared-domain check. A discovered source gets the same
    treatment as a vetted one.

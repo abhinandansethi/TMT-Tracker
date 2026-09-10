@@ -17,9 +17,13 @@ runtime path, no Vercel, nothing on anyone's laptop, no personal token anywhere.
 What did not change, on purpose: the files (`scans/`, `data/scans/`, `engine/health.json`), the
 builders, the CLI commands and their exit codes, the page's JavaScript (it posts to the same
 `/api` paths and reads the same status shape), and the rule that **nothing runs unless a person
-pressed a button**. There is no scheduler in this service. The compliance position of the whole
-tracker rests on collection being occasional and human-initiated (`docs/horizon-design.md` §1.3);
-adding a schedule is a decision to take in the open, not a cron line to slip in.
+pressed a button** — with one deliberate exception. A scan whose definition carries `schedule`
+(`{daily_at, tz, set_by, set_on}`, set in the dialog, off by default) is run once a day by the
+scheduler thread in `server/jobs.py`: one run per scan per local day, never while a job for it
+is already queued, never for a demo scan, stamped `scheduled_for` and attributed to the schedule
+in the jobs table so it is never mistaken for a person's request. `TMT_SCHEDULER=0` switches the
+loop off machine-wide. The decision and its legal implications are recorded in
+`engine/audit/scheduling_decision_2026-09-10.md`; the TMT India sweep is not scheduled.
 
 ## Install on Ubuntu
 

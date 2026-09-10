@@ -84,7 +84,13 @@ MISC_PROPOSED_BY = "miscellany"   # mirrors misc.PROPOSED_BY; kept local so this
 SOURCE_KEYS_PARTNER = ("url", "name", "jurisdiction", "kind", "rationale")
 SOURCE_KEYS = SOURCE_KEYS_PARTNER + ("host", "status", "tier", "proposed_by", "confidence", "reason", "gate")
 TOP_KEYS = ("id", "name", "intent", "jurisdictions", "topics", "industries", "clients", "sources", "discovery_notes",
-            "subject_filter", "budget", "demo", "no_discover", "no_misc", "created", "updated")
+            "subject_filter", "budget", "demo", "no_discover", "no_misc", "schedule", "created", "updated")
+# schedule — {daily_at: "HH:MM", tz: "Asia/Kolkata", set_by, set_on}: the ONE place a scan can be
+# told to run unattended. Off unless a partner set it, visible on the page, and recorded with who
+# set it and when, because a decision to collect without a person pressing the button is the
+# decision the per-source legal analysis was written to avoid (docs/horizon-design.md §1.3).
+SCHEDULE_KEYS = ("daily_at", "tz", "set_by", "set_on")
+_HHMM = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 # The subject filter's vocabulary, mirrored from pipeline/scan/subject.py and kept local for the
 # same reason MISC_PROPOSED_BY is: this file and its selftest must load even when a sibling module
 # is broken or not yet written. The selftest asserts the two agree, so they cannot drift.
@@ -318,6 +324,21 @@ def validate_definition(defn: Any) -> list[str]:
                 elif (isinstance(v, bool) or not isinstance(v, (int, float)) or v < 0
                       or (isinstance(v, float) and not math.isfinite(v))):
                     problems.append(f"budget.{k} must be a finite, non-negative number")
+    sch = defn.get("schedule")
+    if sch is not None:
+        if not isinstance(sch, dict):
+            problems.append("schedule must be an object {daily_at, tz, set_by, set_on} or null")
+        else:
+            extra = set(sch) - set(SCHEDULE_KEYS)
+            if extra:
+                problems.append(f"schedule: unknown field(s) {sorted(extra)} (allowed: {', '.join(SCHEDULE_KEYS)})")
+            if not isinstance(sch.get("daily_at"), str) or not _HHMM.match(sch["daily_at"]):
+                problems.append("schedule.daily_at must be HH:MM (24-hour)")
+            if not isinstance(sch.get("tz"), str) or not 1 <= len(sch["tz"]) <= 64:
+                problems.append("schedule.tz must be an IANA zone name such as Asia/Kolkata")
+            for k in ("set_by", "set_on"):
+                if k in sch and not isinstance(sch[k], str):
+                    problems.append(f"schedule.{k} must be a string")
     for k in ("demo", "no_discover", "no_misc"):
         if k in defn and not isinstance(defn[k], bool):
             problems.append(f"{k} must be a boolean")
@@ -1034,6 +1055,10 @@ def create_scan(defn: dict, paths: ScanPaths, client, no_discover: bool,
     # then what the incoming definition says, then what the definition on disk already said.
     if not isinstance(defn.get("no_misc"), bool) and isinstance(existing, dict):
         defn["no_misc"] = bool(existing.get("no_misc"))
+        # A schedule survives an Edit the same way: the dialog may not mention it, and losing it
+        # silently would turn an unattended scan back into a manual one — or vice versa — unnoticed.
+        if "schedule" not in defn and isinstance(existing, dict) and existing.get("schedule"):
+            defn["schedule"] = existing["schedule"]
     defn["no_misc"] = bool(no_misc) or bool(defn.get("no_misc"))
     coerce_sources(defn)
     # The subject filter is STORED AS GIVEN and never invented here. propose_subject_filter is

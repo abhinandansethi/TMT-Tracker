@@ -17,9 +17,12 @@ whole system has always used (scans/, data/scans/, engine/health.json), and ever
 job is also committed to the LOCAL git repository, so `git log` on the VM remains the history it
 was on GitHub — with no GitHub.
 
-Nothing here is scheduled. A job exists because a person pressed a button. The compliance
-position of the whole tracker rests on that (docs/horizon-design.md §1.3); if a schedule is ever
-wanted, it is a deliberate decision to be taken in the open, not a cron line added here.
+A job exists because a person pressed a button — or, for a scan whose definition carries a
+`schedule`, because its daily time came round. That second case was chosen knowingly on
+2026-09-10 (engine/audit/scheduling_decision_2026-09-10.md): it is off unless a partner sets it,
+the page shows it and who set it, and every scheduled run is stamped as such in this table. The
+compliance position the tracker was written under assumed human-triggered collection
+(docs/horizon-design.md §1.3), and the legal analysis is flagged for revisiting on that point.
 """
 from __future__ import annotations
 
@@ -70,7 +73,8 @@ CREATE TABLE IF NOT EXISTS jobs (
   updated_at    TEXT NOT NULL,
   log_path      TEXT,
   summary_json  TEXT,
-  requested_by  TEXT
+  requested_by  TEXT,
+  scheduled_for TEXT                     -- 'YYYY-MM-DD' when the scheduler enqueued it; NULL when a person did
 );
 CREATE INDEX IF NOT EXISTS jobs_created ON jobs(created_at DESC);
 """
@@ -108,14 +112,14 @@ class Jobs:
 
     # ---- enqueue -------------------------------------------------------------------------
     def enqueue(self, kind: str, action: str, scan_id: Optional[str], args: dict,
-                display_title: str, requested_by: Optional[str] = None) -> dict:
+                display_title: str, requested_by: Optional[str] = None, scheduled_for: Optional[str] = None) -> dict:
         jid = uuid.uuid4().hex[:12]
         t = now_iso()
         with self.lock:
             self.db.execute(
-                "INSERT INTO jobs(id,kind,action,scan_id,display_title,args_json,status,created_at,updated_at,requested_by) "
-                "VALUES(?,?,?,?,?,?,'queued',?,?,?)",
-                (jid, kind, action, scan_id, display_title, json.dumps(args), t, t, requested_by))
+                "INSERT INTO jobs(id,kind,action,scan_id,display_title,args_json,status,created_at,updated_at,requested_by,scheduled_for) "
+                "VALUES(?,?,?,?,?,?,'queued',?,?,?,?)",
+                (jid, kind, action, scan_id, display_title, json.dumps(args), t, t, requested_by, scheduled_for))
             self.db.commit()
             row = _row(self.db.execute("SELECT * FROM jobs WHERE id=?", (jid,)).fetchone())
         self._wake.set()
@@ -156,6 +160,66 @@ class Jobs:
             return
         self._thread = threading.Thread(target=self._loop, name="tmt-jobs", daemon=True)
         self._thread.start()
+        if os.environ.get("TMT_SCHEDULER", "1") != "0":
+            threading.Thread(target=self._schedule_loop, name="tmt-schedule", daemon=True).start()
+
+    # ---- the schedule ----------------------------------------------------------------------
+    # The one way a scan runs without a person pressing a button. Chosen knowingly on
+    # 2026-09-10 (engine/audit/scheduling_decision_2026-09-10.md); off for every scan unless
+    # its definition carries `schedule`; visible on the page with who set it; and every run it
+    # starts is stamped scheduled_for so it is never mistaken for a person's request in the log.
+    # TMT_SCHEDULER=0 switches the whole loop off without touching any definition.
+    def _schedule_loop(self) -> None:
+        while not self._stop.is_set():
+            try:
+                self.tick_schedule()
+            except Exception as e:
+                print(f"[schedule] {type(e).__name__}: {e}", flush=True)
+            self._stop.wait(60)
+
+    def due_today(self, sch: dict, now_utc: Optional[_dt.datetime] = None) -> Optional[str]:
+        """The local date a scheduled run is due for, if its time has passed today in the scan's
+        own zone; else None. Pure, so it can be tested with a fixed clock."""
+        try:
+            from zoneinfo import ZoneInfo
+            tz = ZoneInfo(sch.get("tz") or "Asia/Kolkata")
+        except Exception:
+            return None
+        m = re.match(r"^(\d{2}):(\d{2})$", str(sch.get("daily_at") or ""))
+        if not m or not (0 <= int(m.group(1)) <= 23 and 0 <= int(m.group(2)) <= 59):
+            return None                      # "25:99" is not a time; run.py refuses it too, but never trust one caller
+        now = (now_utc or _dt.datetime.now(_dt.timezone.utc)).astimezone(tz)
+        due = now.replace(hour=int(m.group(1)), minute=int(m.group(2)), second=0, microsecond=0)
+        return now.date().isoformat() if now >= due else None
+
+    def tick_schedule(self, now_utc: Optional[_dt.datetime] = None) -> list:
+        """Enqueue a `run` for every scan whose schedule is due today and has not been served
+        today. One per scan per local day, however often this ticks or the service restarts —
+        the jobs table is the memory, not the process."""
+        started = []
+        for path in sorted((ROOT / "scans").glob("*.json")):
+            if path.name == "schema.json":
+                continue
+            try:
+                defn = json.loads(path.read_text())
+            except Exception:
+                continue
+            sch = defn.get("schedule") if isinstance(defn, dict) else None
+            sid = defn.get("id") if isinstance(defn, dict) else None
+            if not (isinstance(sch, dict) and sid and ID_RE.match(sid)) or defn.get("demo"):
+                continue
+            day = self.due_today(sch, now_utc)
+            if not day:
+                continue
+            with self.lock:
+                served = self.db.execute("SELECT 1 FROM jobs WHERE scan_id=? AND scheduled_for=? LIMIT 1", (sid, day)).fetchone()
+                busy = self.db.execute("SELECT 1 FROM jobs WHERE scan_id=? AND status IN ('queued','in_progress') LIMIT 1", (sid,)).fetchone()
+            if served or busy:
+                continue
+            self.enqueue("scan", "run", sid, {}, f"Scan run {sid} (scheduled {sch.get('daily_at')} {sch.get('tz', '')})",
+                         requested_by=f"schedule set by {sch.get('set_by') or 'a partner'}", scheduled_for=day)
+            started.append(sid)
+        return started
 
     def stop(self) -> None:
         self._stop.set(); self._wake.set()

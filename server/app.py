@@ -135,6 +135,10 @@ async def api_scans(request: Request, user: str = Depends(require_user)):
         if not runs:
             out["message"] = "No run recorded yet for this scan on this server."
         return out
+    # Who set a schedule is a fact the SERVER knows (the authenticated user), so it is stamped
+    # here, never trusted from the page — a partner cannot record a schedule in someone else's name.
+    if v["action"] == "create" and isinstance(v["scan"], dict) and isinstance(v["scan"].get("schedule"), dict):
+        v["scan"]["schedule"] = dict(v["scan"]["schedule"], set_by=user, set_on=jobs.now_iso())
     title = f"Scan {v['action']} {v['scan_id']}"
     args = {"scan": v["scan"], "no_discover": v["no_discover"], "finding": v["finding"]}
     job = JOBS.enqueue("scan", v["action"], v["scan_id"], args, title, requested_by=user)
