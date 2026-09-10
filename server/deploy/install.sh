@@ -43,8 +43,9 @@ if [ ! -f "$ENV_FILE" ]; then
 # TMT Regulatory Radar — service environment. Root-owned, mode 0600. Edit, then: systemctl restart tmt-radar
 OPENAI_API_KEY=
 # One login per partner: user:password, one per line (a password may contain colons). Keep the
-# quotes so newlines survive systemd's parser.
-AUTH_USERS="abhi:CHANGE-ME"
+# quotes so newlines survive systemd's parser. Empty = the service answers 503 to everyone —
+# it fails closed until a real pair is here; there is no starter password on purpose.
+AUTH_USERS=""
 # Models. Empty means the code's default (gpt-5.6-luna).
 TMT_SCAN_MODEL=
 TMT_SCAN_MODEL_STRONG=
