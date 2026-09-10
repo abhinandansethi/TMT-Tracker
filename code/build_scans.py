@@ -86,7 +86,7 @@ LEVELS = ("high", "medium", "low")
 # Health vocabulary shared with engine/health.json plus GATED, which only a scan can produce: an
 # approved source the run did not fetch because max_sources was already reached. It is listed so
 # the page can say "not fetched" rather than let a silent gap read as coverage.
-HEALTH_STATUSES = ("OK", "QUIET", "EMPTY", "FAILED", "GATED")
+HEALTH_STATUSES = ("OK", "QUIET", "EMPTY", "FAILED", "GATED", "WITHHELD")
 # discover.KINDS -> the chip label Harvey's Sources column uses (Gov, Gazette, ...). "other" and
 # an absent kind fall back to the host, which is always true even when nobody classified it.
 KIND_LABELS = {"gazette": "Gazette", "regulator": "Regulator", "ministry": "Gov", "court": "Court",
@@ -98,7 +98,7 @@ KIND_LABELS = {"gazette": "Gazette", "regulator": "Regulator", "ministry": "Gov"
 # Like /api/discover it PROPOSES and nothing more — the regex it returns lands in an input the
 # partner can edit or clear before anything is created, and the run applies whatever is in that box.
 API = {"scans": "/api/scans", "ask": "/api/ask", "draft": "/api/draft", "propose": "/api/propose",
-       "discover": "/api/discover", "subject": "/api/subject"}
+       "discover": "/api/discover", "subject": "/api/subject", "resolve": "/api/resolve", "gate": "/api/gate"}
 
 # ------------------------------------------------------------------------- the subject filter
 # WHY THIS EXISTS. The first real scan asked for "new Indian AI regulatory requirements … relevant
@@ -457,6 +457,14 @@ def coverage_for(defn: dict, health: dict) -> dict:  # noqa: C901 — one panel,
     to say about the gaps: jurisdictions with no approved source, the discovery notes the run
     recorded (gaps, drops, a failed discovery), the approved sources the cap left unread."""
     groups: dict[str, list] = {k: [] for k in STATUS_ORDER}
+    # The partner's per-source legal decisions, keyed as written and by a canonical form so a
+    # trailing slash or a scheme change does not lose the decision.
+    canon = lambda u: str(u or "").strip().lower().rstrip("/").replace("http://", "https://")
+    legal_raw = defn.get("legal") if isinstance(defn.get("legal"), dict) else {}
+    legal_of: dict[str, dict] = {}
+    for u, rec in legal_raw.items():
+        if isinstance(rec, dict) and rec.get("decision") in ("fetch", "do_not_fetch"):
+            legal_of[u] = rec; legal_of[canon(u)] = rec
     unknown: list[str] = []
     for src in defn.get("sources") or []:
         if not isinstance(src, dict):
@@ -479,6 +487,11 @@ def coverage_for(defn: dict, health: dict) -> dict:  # noqa: C901 — one panel,
             "proposed_by": src.get("proposed_by") or "", "rationale": src.get("rationale") or "",
             "reason": src.get("reason") or "", "evidence": gate_evidence(gate),
             "flags": flagged_sentences(gate), "checked": gate.get("checked") or "",
+            # The Legal tab reads the gate's raw findings beside the partner's decision on them:
+            # what robots.txt said, which terms pages were read, and the partner's own call.
+            "robots": gate.get("robots") if gate.get("robots") in ("allowed", "disallowed") else "",
+            "tos_checked": [u for u in ((gate.get("tos") or {}).get("checked") or []) if isinstance(u, str)][:6],
+            "legal": (legal_of.get(src.get("url", "")) or legal_of.get(canon(src.get("url", ""))) or None),
             "health": {"status": hstatus, "rows_seen": h.get("rows_seen"),
                        "new": h.get("new"), "newest_visible": h.get("newest_visible") or "",
                        "notes": list(h.get("notes") or []), "info": list(h.get("info") or []),
@@ -852,6 +865,7 @@ def home_payload(scans: list[dict], built: str) -> dict:
         d = s["definition"]
         cards.append({
             "id": d["id"], "name": d["name"], "href": f"/scan/{d['id']}.html", "builtin": False,
+            "group": d.get("group") or "", "layer": d.get("layer") or "",
             "tier": "discovered", "demo": d["demo"], "meta": scan_meta(d, s["coverage"]["gated"]), "flags": d["jurisdictions"],
             "generated": s["generated"],
             # When the DEFINITION last changed, which a run does not always move. A promotion
@@ -878,6 +892,7 @@ def scan_payload(s: dict, built: str) -> dict:
             "generated": s["generated"],
             "problems": s["problems"], "clientNames": client_names(), "actionsUrl": _actions_url(), "api": API,
             "firstRunMax": FIRST_RUN_MAX_NEW, "maxSources": MAX_SOURCES,
+            "siblings": s.get("siblings") or [],
             # misc.json has its own stamp: a Miscellaneous-only run changes nothing else on the
             # page, and an open tab must still notice that the lane refreshed.
             "stamp": stamp_of(d["id"], s["generated"], d.get("updated", ""), s["misc"].get("generated", ""))}
@@ -1199,6 +1214,48 @@ dialog[data-step=form] .only-describe{display:none}
 .cand .conf.c-low{color:#7A5E0E}
 .cand .chost{display:block;font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:3px}
 .cand .crat{display:block;margin-top:3px;font-size:12px;color:var(--mute);line-height:1.45}
+.candlist li.hgrp{padding:0}
+.candlist li.hgrp>details>summary{display:flex;gap:10px;align-items:baseline;padding:9px 12px;cursor:pointer;list-style:none;font-size:13px;background:var(--panel)}
+.candlist li.hgrp>details>summary::-webkit-details-marker{display:none}
+.candlist li.hgrp>details>summary::before{content:'▸';font-size:11px;color:var(--faint)}
+.candlist li.hgrp>details[open]>summary::before{content:'▾'}
+.candlist li.hgrp>details>summary .nm{font-family:var(--mono);font-weight:500}
+.candlist li.hgrp>details>summary .k{font-size:12px;color:var(--faint)}
+.candlist li.hgrp ul{list-style:none;margin:0;padding:0 0 0 16px}
+.candlist li.hgrp ul li{border-top:1px solid var(--rule3)}
+.gb{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;border-radius:20px;padding:1px 7px;border:1px solid transparent}
+.gb.approved{color:var(--ok);border-color:var(--ok)}
+.gb.pending{color:#7A5E0E;border-color:#C9A227}
+.gb.rejected{color:var(--alarm);border-color:var(--alarm)}
+.addsrc .findrow{display:flex;gap:8px;align-items:center}
+.addsrc .findrow input[type=text]{flex:1;border:1px solid var(--rule);border-radius:6px;padding:8px 10px;font-size:13px;background:#fff}
+details.adv{margin-top:18px;border-top:1px solid var(--rule2);padding-top:6px}
+details.adv>summary{cursor:pointer;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:8px 0}
+details.adv>summary:hover{color:var(--ink)}
+.layers{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.layers a,.layers .on{font-size:12.5px;padding:3px 10px;border-radius:20px;border:1px solid var(--rule)}
+.layers .on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.layers a:hover{border-color:var(--ink);text-decoration:none}
+.radarname{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.radar{margin-top:18px;border:1px solid var(--rule2);border-radius:10px;padding:6px 14px 10px}
+.radar .rhead{display:flex;gap:12px;align-items:baseline;padding:8px 0 4px}
+.radar .rhead h2{font-family:var(--serif);font-weight:400;font-size:20px;margin:0}
+.radar .rhead .k{font-size:12px;color:var(--faint);margin-right:auto}
+.radar .card{margin-top:8px}
+.ltools{display:flex;gap:10px;align-items:center;margin:14px 0 6px}
+.ltools label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.ltools select,.ldec select{border:1px solid var(--rule);border-radius:6px;padding:5px 8px;font-size:12.5px;background:#fff}
+.lsrc{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px;padding:12px 0;border-top:1px solid var(--rule3)}
+.lsrc .lmain .n{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.lsrc .lmain .ev{font-size:12px;color:var(--mute);margin-top:4px;word-break:break-all}
+.lsrc .lmain .note{font-size:12px;color:var(--faint);margin-top:6px}
+.lc{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;border-radius:20px;padding:1px 8px;border:1px solid var(--rule)}
+.lc.clear{color:var(--ok);border-color:var(--ok)}
+.lc.flagged{color:#7A5E0E;border-color:#C9A227}
+.lc.disallowed,.lc.withheld{color:var(--alarm);border-color:var(--alarm)}
+.ldec label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.ldec select{width:100%}
+.ldec .by{font-size:11.5px;color:var(--faint);margin-top:6px;line-height:1.4}
 .gapline,.dropline{margin-top:6px;font-size:12.5px;line-height:1.5}
 .gapline{color:#5B4507}
 .dropline{color:var(--mute)}
@@ -1499,16 +1556,19 @@ a.el{color:var(--navy)}
     </div>
     <div class="db only-form">
       <div class="pnote" id="dlg-pnote" aria-live="polite"></div>
-      <div class="field"><label for="f-name">Name<span class="req">*</span></label><input type="text" id="f-name" maxlength="120" autocomplete="off"></div>
+      <!-- A radar is a GROUP of layers — "OpenAI" with Regulation / Company updates / Competitors —
+           and each layer is a whole scan. The name the pipeline stores is derived from the two. -->
+      <div class="two">
+        <div class="field"><label for="f-group">Radar<span class="req">*</span></label><input type="text" id="f-group" maxlength="120" autocomplete="off" placeholder="OpenAI"></div>
+        <div class="field"><label for="f-layer">Layer</label><input type="text" id="f-layer" maxlength="120" autocomplete="off" placeholder="Regulation"></div>
+      </div>
+      <div class="help" id="layer-help">One radar, as many layers as the matter needs — regulation, the company's own announcements, its competitors. Each layer is its own scan with its own sources; add another from the radar's page.</div>
+      <input type="hidden" id="f-name">
       <div class="field"><label for="f-intent">Intent<span class="req">*</span></label>
         <textarea id="f-intent" maxlength="1500"></textarea>
         <div class="help">Brief it the way you would brief an associate: who the clients are, what to advise on, and what to surface — obligations, thresholds, deadlines. Discovery and relevance both read this sentence.</div></div>
       <div class="field"><label for="f-jur">Jurisdictions<span class="req">*</span></label><div class="cin" id="c-jur"></div>
         <div class="help">Type a country or an ISO code and press Enter. EU works for Union-level venues. At least one is needed: the pipeline refuses a scan without a jurisdiction.</div></div>
-      <div class="two">
-        <div class="field"><label for="f-top">Topics</label><div class="cin" id="c-top"></div></div>
-        <div class="field"><label for="f-ind">Industries</label><div class="cin" id="c-ind"></div></div>
-      </div>
       <div class="field find" id="find-block">
         <label>Find sources</label>
         <div class="findrow"><button type="button" class="btn" id="dlg-find">Find sources</button>
@@ -1518,8 +1578,23 @@ a.el{color:var(--navy)}
         <div class="cands" id="cands"></div>
         <div class="help">These are proposals — nothing has been fetched to produce them. Every one you tick is checked against robots.txt and the site's own terms when the scan is created, and anything that fails is listed as rejected on the coverage panel and never fetched.</div>
       </div>
-      <div class="field"><label for="f-src">Sources</label><div class="cin" id="c-src"></div>
-        <div class="help">Optional. Add a listing page you already trust; it will still be checked — robots, terms and a parse test — before anything is read from it.</div></div>
+      <!-- A source by NAME. "TRAI consultation papers" is how a partner thinks of a venue; the
+           model finds the listing page it means, the pipeline's own gate checks that page now,
+           and the row joins the list above with its verdict — approved, pending or rejected. -->
+      <div class="field addsrc" id="addsrc-block">
+        <label for="f-addsrc">Add a source</label>
+        <div class="findrow"><input type="text" id="f-addsrc" maxlength="200" autocomplete="off" placeholder="A name or a URL — TRAI consultation papers, OpenAI news, meity.gov.in/…">
+          <button type="button" class="btn" id="dlg-addsrc">Add</button></div>
+        <div class="pnote" id="addsrc-note" aria-live="polite"></div>
+        <div class="help">Named, not necessarily by URL. It is looked up, then fetched once and checked — robots.txt, the site's terms, a parse test — and listed above with the verdict. Then add another.</div>
+      </div>
+      <details class="adv" id="adv"><summary>More options — topics, industries, clients, subject filter, daily run</summary>
+      <div class="two">
+        <div class="field"><label for="f-top">Topics</label><div class="cin" id="c-top"></div></div>
+        <div class="field"><label for="f-ind">Industries</label><div class="cin" id="c-ind"></div></div>
+      </div>
+      <div class="field"><label for="f-src">Listing URLs</label><div class="cin" id="c-src"></div>
+        <div class="help">Optional. A listing page you already trust, by URL; it is still checked — robots, terms and a parse test — before anything is read from it.</div></div>
       <div class="field"><label for="f-cl">Clients</label><div class="cin" id="c-cl"></div>
         <div class="help">Relevance is rated per named client; the model is asked to name them in the action line.</div></div>
       <div class="field check"><input type="checkbox" id="f-sched"><label for="f-sched">Run daily, unattended, at <input type="time" id="f-sched-at" value="06:30" step="60"> IST</label></div>
@@ -1527,8 +1602,6 @@ a.el{color:var(--navy)}
       <div class="field check"><input type="checkbox" id="f-disc" checked><label for="f-disc">Discover sources automatically</label></div>
       <div class="help" id="f-disc-help">Off, only the sources listed above are gated and read.</div>
       <div class="field" id="preview-block">
-        <label>What this scan will cover</label>
-        <div class="prevbar"><span class="pwhy" id="preview-why">Coverage is the whole product, so it is built here with you — tick a venue, add one, or search a gap, and this list follows.</span></div>
         <!-- The subject filter belongs HERE, above the venue list and inside the same block: the
              venues answer "where will this scan read?" and the filter answers "what on those pages
              is this scan's subject?". They are one question. A scan created without an answer to
@@ -1549,8 +1622,9 @@ a.el{color:var(--navy)}
           <div class="splain" id="subject-plain"></div>
           <div class="sillus" id="subject-illus"></div>
         </div>
-        <div class="prev" id="preview"></div>
       </div>
+      </details>
+      <div class="prev" id="preview"></div>
       <div class="firstrun">The first run reads the newest __FIRST_RUN_MAX__ documents, so the scan appears quickly rather than after every backlogged page. Anything older queues and is counted as queued on the scan. Press <b>Run scan</b> again to continue through the backlog.</div>
     </div>
     <div class="df"><div class="err" id="dlg-err" aria-live="polite"></div>
@@ -1833,7 +1907,9 @@ function mountPending(el, ctx) {
     }
     if (done) {
       out.badge = 'Publishing'; out.badgeClass = 'working';
-      out.line = promo
+      out.line = kindOf(p) === 'delete' ? 'Removed. Publishing the site without it — the card goes when this page reloads itself.'
+        : kindOf(p) === 'legal' ? 'Recorded under your login. Publishing the page with the decision on it.'
+        : promo
         // Reviewed defect: this card used to say the gate was running. run.py's promote does no
         // such thing — it appends the URL as a PENDING source and commits. The gate (robots.txt,
         // the site's terms, the parse test) runs at the start of the next run, so the card now
@@ -1859,7 +1935,10 @@ function mountPending(el, ctx) {
     }
     out.badge = 'Running'; out.badgeClass = 'working';
     out.line = promo ? 'Running — this errand only edits the scan’s source list; it reads nothing.'
-                     : 'Running.';
+             : kindOf(p) === 'delete' ? 'Removing the definition and its data.'
+             : kindOf(p) === 'legal' ? 'Writing the decision into the scan’s definition; it reads nothing.'
+             : 'Running.';
+    if (kindOf(p) === 'delete' || kindOf(p) === 'legal') return out;
     out.est = aboutMins(mins) + '; usually ' + phaseAt(mins, promo ? PROMOTE_PHASES : RUN_PHASES)
             + ' around now. That is an estimate from the clock — the run reports that it is running, not which step it is on.';
     return out;
@@ -1878,6 +1957,8 @@ function mountPending(el, ctx) {
           : 'Promoting is the only route from Miscellaneous into coverage, and it is a request, not a decision: the same gate that judged every other source will judge this URL at the start of the next run.')
       : kindOf(p) === 'run'
         ? 'This run reads the newest documents each approved source is showing, within the scan’s own caps. Anything beyond them queues and is counted as queued; press Run scan again to continue through the backlog.'
+        : kindOf(p) === 'delete' ? 'The definition, the ledger, the digest and the stored documents are removed together. The audit trail keeps the commit that removed them.'
+        : kindOf(p) === 'legal' ? 'The decision is written into the definition with your login and the date. Do not fetch takes effect on the next run.'
         : esc(FIRST_RUN_LINE);
     return '<div class="pcard' + (s.bad ? ' failed' : '') + '">'
       + '<div><div class="name">' + esc(p.name || p.id) + '<span class="badge ' + esc(s.badgeClass) + '">' + esc(s.badge) + '</span></div>'
@@ -2045,22 +2126,35 @@ let srcObjs = {};
 // fetched, and every ticked URL still goes through the Python gate when the scan is created.
 let cands = [], picked = {}, discTouched = false;
 const DISC_HELP = 'Off, only the sources listed above are gated and read.';
-function openDialog(scan) {
+// `preset` opens the dialog for a NEW layer of an existing radar: {group} is filled in and the
+// partner writes the layer's own intent — regulation, the company's announcements, competitors.
+function openDialog(scan, preset) {
+  preset = preset || null;
   editingDefn = scan || null;
   editingId = scan ? scan.id : null;
   clientObjs = {};
   (scan ? scan.clients : []).forEach(c => { const n = clientName(c); if (n && typeof c === 'object') clientObjs[n] = c; });
-  $('#dlg-title').textContent = scan ? 'Edit scan' : 'Create scan';
-  $('#dlg-submit').textContent = scan ? 'Save and re-run' : 'Create scan';
+  $('#dlg-title').textContent = scan ? 'Edit scan' : preset ? 'Add a layer to ' + preset.group : 'Create scan';
+  $('#dlg-submit').textContent = scan ? 'Save and re-run' : preset ? 'Create layer' : 'Create scan';
   $('#f-name').value = scan ? scan.name : '';
+  $('#f-group').value = scan ? (scan.group || scan.name) : preset ? preset.group : '';
+  $('#f-layer').value = scan ? (scan.layer || '') : '';
   $('#f-intent').value = scan ? scan.intent : '';
-  F.jur.set(scan ? scan.jurisdictions : []); F.top.set(scan ? scan.topics : []); F.ind.set(scan ? scan.industries : []);
+  F.jur.set(scan ? scan.jurisdictions : preset && preset.jurisdictions ? preset.jurisdictions : []); F.top.set(scan ? scan.topics : []); F.ind.set(scan ? scan.industries : []);
   srcObjs = {};
   (scan ? scan.sources : []).forEach(s => { if (s && typeof s === 'object' && s.url) srcObjs[s.url] = s; });
-  F.src.set(scan ? scan.sources.map(s => typeof s === 'string' ? s : (s && s.url) || '').filter(Boolean) : []);
-  F.cl.set(scan ? scan.clients.map(clientName).filter(Boolean) : []);
+  // An Edit shows the scan's sources in the SAME grouped list a create builds, ticked, each with
+  // the gate's last verdict — so the list a partner edits is the list the scan actually has.
   cands = []; picked = {}; discTouched = false;
-  $('#cands').innerHTML = ''; setNote('#find-note', ''); $('#f-disc-help').textContent = DISC_HELP;
+  (scan ? scan.sources : []).forEach(s => {
+    if (!s || typeof s !== 'object' || !isUrl(s.url)) return;
+    cands.push(Object.assign({}, s, { gate_status: s.status || '', gate_reason: s.reason || '', existing: true }));
+    picked[s.url] = true;
+  });
+  F.src.set([]);
+  F.cl.set(scan ? scan.clients.map(clientName).filter(Boolean) : []);
+  drawCands([], []); setNote('#find-note', ''); setNote('#addsrc-note', ''); $('#f-addsrc').value = ''; $('#f-disc-help').textContent = DISC_HELP;
+  $('#adv').open = false;
   $('#f-disc').checked = scan ? !scan.no_discover : true;
   const sch = scan && scan.schedule;
   $('#f-sched').checked = !!(sch && sch.daily_at);
@@ -2088,10 +2182,10 @@ function openDialog(scan) {
   // Two paths, both from Harvey's launch material (design §2): describe it in one box and let
   // the model propose the structure, or fill the structured form directly. An edit of an existing
   // scan has nothing to describe, so it opens straight on the form.
-  setStep(scan ? 'form' : 'describe');
+  setStep(scan || preset ? 'form' : 'describe');
   findWhy();          // the describe step too: it is the state the form will open in
   dlg.showModal();
-  (scan ? $('#f-name') : $('#f-desc')).focus();
+  (scan ? $('#f-group') : preset ? $('#f-layer') : $('#f-desc')).focus();
 }
 function setStep(step) {
   dlg.dataset.step = step;
@@ -2396,8 +2490,10 @@ function previewSources() {
   // Who put a venue on the list is part of what the partner is being asked to approve. An Edit
   // re-opens venues the definition already carries, and `proposed_by` on those is the truth —
   // calling a discovered venue "added by you" would misattribute the choice back to the reader.
+  // A stored source says "IN (India)"; the chip says "IN". Compare the code, or every stored
+  // source reads as a gap in its own jurisdiction (seen on Edit of the first real scan).
   const from = (o, url, fallback) => ({ url: url, name: o.name || hostOf(url) || url, host: o.host || hostOf(url),
-    jurisdiction: (o.jurisdiction || '').toUpperCase(), kind: o.kind || '', rationale: o.rationale || '',
+    jurisdiction: String(o.jurisdiction || '').trim().split(/[\s(]/)[0].toUpperCase(), kind: o.kind || '', rationale: o.rationale || '',
     how: o.proposed_by ? 'proposed by ' + o.proposed_by : fallback });
   return chosen.map(c => from(c, c.url, 'proposed by discovery'))
     .concat(F.src.get().filter(u => !chosenUrls.includes(u)).map(u => from(srcObjs[u] || {}, u, 'added by you')));
@@ -2427,7 +2523,9 @@ function renderPreview() {
     : '';
   const named = heads.filter(k => k !== '—').length;
   el.innerHTML = (list.length
-      ? '<h4>' + esc(pl(list.length, 'venue')) + (named ? ' across ' + esc(pl(named, 'jurisdiction')) : ', none stating a jurisdiction') + '</h4>' + venues
+      // The grouped list above IS the coverage list now; this block keeps only what that list
+      // cannot say — the count across jurisdictions, the gaps, and what the gate will do.
+      ? '<h4>' + esc(pl(list.length, 'venue')) + (named ? ' across ' + esc(pl(named, 'jurisdiction')) : ', none stating a jurisdiction') + '</h4>'
       : '<h4>No venue chosen yet</h4><div class="pgap">Nothing is listed, so this scan would read nothing of its own.'
         + ($('#f-disc').checked ? ' Discovery is on, so the workflow will propose venues and gate them; you will first see them on the scan\'s Coverage panel.' : ' Discovery is off too — press Find sources, or add a listing page.') + '</div>')
     + gapLine
@@ -2460,25 +2558,48 @@ document.addEventListener('click', (e) => {
 // redraws on every change rather than waiting behind a "show me" button.
 function refreshPreview() { renderPreview(); }
 
+// The gate's verdict on a row, when one exists: a source added by name was checked on the spot,
+// and an Edit carries each source's last verdict. A discovery proposal has none yet.
+function gateBadge(c) {
+  const st = c.gate_status || '';
+  if (!st) return '';
+  const label = st === 'approved' ? 'Approved' : st === 'rejected' ? 'Rejected' : 'Pending';
+  return '<span class="gb ' + esc(st) + '" title="' + esc(c.gate_reason || (st === 'approved' ? 'Passed the gate: reachable, robots.txt allows it, no terms wording flagged, the list parsed' : '')) + '">' + label + '</span>';
+}
 function candRow(c, i) {
   const host = c.host || hostOf(c.url);
   const kind = KINDL[c.kind] || host || 'Source';
   const conf = ['high', 'medium', 'low'].includes(c.confidence) ? c.confidence : '';
+  const who = c.added ? 'added by you' : c.proposed_by && c.proposed_by !== 'discovery' ? 'proposed by ' + c.proposed_by : '';
   return '<li><label class="cand"><input type="checkbox" data-url="' + esc(c.url) + '"' + (picked[c.url] ? ' checked' : '') + '>'
     + '<span><span class="ctop"><span class="nm">' + esc(c.name || host || c.url) + '</span>'
     + '<span class="kind">' + esc(kind) + '</span>'
     + (c.jurisdiction ? '<span class="jur">' + flagged(c.jurisdiction) + '</span>' : '')
-    + (conf ? '<span class="conf c-' + conf + '">' + conf + ' confidence</span>' : '<span class="conf">confidence not given</span>')
+    + gateBadge(c)
+    + (who ? '<span class="conf">' + esc(who) + '</span>' : conf ? '<span class="conf c-' + conf + '">' + conf + ' confidence</span>' : '<span class="conf">confidence not given</span>')
     + '</span>'
-    + '<span class="chost">' + esc(host || c.url) + '</span>'
+    + '<span class="chost">' + esc(c.url) + '</span>'
+    + (c.gate_status && c.gate_status !== 'approved' && c.gate_reason ? '<span class="crat">' + esc(String(c.gate_reason).slice(0, 300)) + '</span>' : '')
     + (c.rationale ? '<span class="crat">' + esc(String(c.rationale).slice(0, 300)) + '</span>' : '')
     + '</span></label></li>';
+}
+// One entry per SITE. Discovery often returns four MeitY pages and three from the gazette; a
+// flat list of twelve rows hides that the scan reads five publishers. A site with several pages
+// folds them under its name, ticked count beside it, and opens on a click.
+function candGroups() {
+  const order = [], by = {};
+  cands.forEach(c => { const h = c.host || hostOf(c.url) || c.url; if (!by[h]) { by[h] = []; order.push(h); } by[h].push(c); });
+  return order.map(h => ({ host: h, rows: by[h] }));
 }
 // gaps and dropped candidates are rendered, never swallowed: a jurisdiction discovery found no
 // venue for, and a candidate it deny-listed or de-duplicated, are both facts about coverage.
 function drawCands(gaps, dropped) {
   lastGaps = gaps || []; lastDropped = dropped || [];   // so a removal can redraw the same view
-  const rows = cands.map(candRow).join('');
+  const rows = candGroups().map(g => {
+    if (g.rows.length === 1) return candRow(g.rows[0]);
+    const n = g.rows.filter(c => picked[c.url]).length;
+    return '<li class="hgrp"><details' + (g.rows.some(c => c.added) ? ' open' : '') + '><summary><span class="nm">' + esc(g.host) + '</span><span class="k">' + pl(g.rows.length, 'page') + ' · ' + n + ' ticked</span></summary><ul>' + g.rows.map(candRow).join('') + '</ul></details></li>';
+  }).join('');
   $('#cands').innerHTML = (rows ? '<ul class="candlist">' + rows + '</ul>' : '')
     + (gaps || []).map(g => '<div class="gapline"><span class="t">gap</span>'
         + esc(g && g.note ? g.note : ('No official venue found for ' + ((g && g.jurisdiction) || 'one jurisdiction') + ' — add one by hand if you know it')) + '</div>').join('')
@@ -2496,6 +2617,59 @@ $('#cands').addEventListener('change', e => {
   refreshPreview();
 });
 $('#dlg-find').addEventListener('click', () => findSources(null));
+
+// ---- a source by name --------------------------------------------------------------------------
+// "TRAI consultation papers" → the model finds the listing page it means (evidence, not memory)
+// → the pipeline's own gate fetches it once and rules → the row joins the list, ticked, with the
+// verdict on it. Two calls, both shown; nothing is created and nothing is added to any scan.
+async function addSource() {
+  const q = $('#f-addsrc').value.trim(), b = $('#dlg-addsrc'), inp = $('#f-addsrc');
+  if (q.length < 3) { setNote('#addsrc-note', 'Name the source — a publisher and a series, or a URL.', true); inp.focus(); return; }
+  b.disabled = true; inp.disabled = true;
+  const ctx = { intent: $('#f-intent').value.trim(), jurisdictions: F.jur.get() };
+  let cand = null;
+  if (isUrl(q)) {
+    cand = { url: q, name: hostOf(q), host: hostOf(q), kind: 'other', rationale: '', proposed_by: 'partner' };
+  } else {
+    b.textContent = 'Looking…';
+    setNote('#addsrc-note', 'Looking up “' + esc(q) + '” — the model searches for the listing page this name means.');
+    let r = null, err = null;
+    try { r = await postJSON(D.api.resolve, Object.assign({ query: q }, ctx), 60000); } catch (e) { err = e; }
+    if (!(r && r.ok && r.data.found && r.data.candidate && isUrl(r.data.candidate.url))) {
+      const why = err ? (err.name === 'AbortError' ? 'the lookup took longer than 60 seconds' : 'no lookup endpoint is reachable from this page')
+        : r && r.ok ? ('nothing found with evidence' + (r.data.note ? ' — ' + r.data.note : ''))
+        : 'the lookup answered ' + (r ? r.status : '?') + (r && r.data && r.data.message ? ': ' + r.data.message : '');
+      setNote('#addsrc-note', 'Could not resolve “' + esc(q) + '”: ' + esc(why) + '. Paste the listing page\'s URL instead, or name it differently.', true);
+      b.disabled = false; inp.disabled = false; b.textContent = 'Add'; inp.focus(); return;
+    }
+    cand = r.data.candidate;
+  }
+  if (cands.some(c => c.url === cand.url)) {
+    picked[cand.url] = true; drawCands(lastGaps, lastDropped); refreshPreview();
+    setNote('#addsrc-note', esc(cand.url) + ' is already on the list — ticked.');
+    b.disabled = false; inp.disabled = false; b.textContent = 'Add'; inp.value = ''; inp.focus(); return;
+  }
+  b.textContent = 'Checking…';
+  setNote('#addsrc-note', 'Found <b>' + esc(cand.name || cand.url) + '</b> — ' + esc(cand.url) + '. Fetching it once to check robots.txt, the site\'s terms and that the list parses…');
+  let g = null, gerr = null;
+  try { g = await postJSON(D.api.gate, Object.assign({ url: cand.url }, ctx), 90000); } catch (e) { gerr = e; }
+  const st = g && g.ok ? String(g.data.status || 'pending') : 'pending';
+  const reason = g && g.ok ? String(g.data.reason || '') : (gerr && gerr.name === 'AbortError' ? 'the check took longer than 90 seconds; the gate runs again when the scan is created' : 'the gate could not be reached from this page; it runs when the scan is created');
+  if (g && g.ok && isUrl(g.data.url)) cand.url = g.data.url;   // the gate follows a redirect and reports the final URL
+  cands.push(Object.assign({}, cand, { added: true, gate_status: st, gate_reason: reason }));
+  picked[cand.url] = true;
+  if ($('#f-disc').checked && !discTouched) $('#f-disc').checked = false;
+  drawCands(lastGaps, lastDropped); discHelp(); refreshPreview();
+  setNote('#addsrc-note', (st === 'approved' ? '<b>Approved</b> — reachable, robots.txt allows it, no terms wording flagged, the list parsed. '
+    : st === 'rejected' ? '<b>Rejected</b> — ' + esc(reason) + '. It is on the list unticked; untick or remove it. '
+    : '<b>Pending</b> — ' + esc(reason) + '. A person decides on the Legal tab; nothing is fetched from it until then. ')
+    + 'Add another?', st === 'rejected');
+  if (st === 'rejected') delete picked[cand.url];
+  drawCands(lastGaps, lastDropped); refreshPreview();
+  b.disabled = false; inp.disabled = false; b.textContent = 'Add'; inp.value = ''; inp.focus();
+}
+$('#dlg-addsrc').addEventListener('click', addSource);
+$('#f-addsrc').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addSource(); } });
 // `only` searches ONE jurisdiction — the button beside a named gap on the coverage list, so a
 // partner fills a hole without re-running every other search. null searches all of them.
 async function findSources(only) {
@@ -2584,6 +2758,7 @@ $('#dlg-build').addEventListener('click', async () => {
   if (r && r.ok && r.data.proposal) {
     const p = r.data.proposal || {};
     $('#f-name').value = p.name || '';
+    if (!$('#f-group').value.trim()) $('#f-group').value = p.name || '';
     $('#f-intent').value = p.intent || desc;
     // Jurisdictions may arrive as codes or as {code, name} objects; the chip input normalises either.
     F.jur.set((p.jurisdictions || []).map(j => typeof j === 'string' ? j : (j && (j.code || j.name)) || '').filter(Boolean));
@@ -2605,7 +2780,10 @@ $('#dlg-build').addEventListener('click', async () => {
 });
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  const name = $('#f-name').value.trim(), intent = $('#f-intent').value.trim();
+  // The stored name is "Radar — Layer", or just the radar for a scan with one layer.
+  const group = $('#f-group').value.trim(), layer = $('#f-layer').value.trim();
+  const name = layer ? group + ' — ' + layer : group, intent = $('#f-intent').value.trim();
+  $('#f-name').value = name;
   // Sources go as {url} objects: run.validate_definition requires objects (reviewed defect: URL
   // strings passed api/scans.js, then the workflow exited 2 with nothing committed). Clients go
   // back as the object they came in as, or the plain name.
@@ -2628,6 +2806,8 @@ form.addEventListener('submit', async e => {
     }));
   const scan = { name, intent, jurisdictions: F.jur.get(), topics: F.top.get(), industries: F.ind.get(),
     sources, clients: F.cl.get().map(n => clientObjs[n] || n) };
+  if (group) scan.group = group;
+  if (layer) scan.layer = layer;
   // The subject filter travels as the partner left it. "none" is sent explicitly rather than
   // omitted: on an Edit, an omitted key would let the previous filter stand, and pressing
   // "Read everything" must actually clear it — the consequence the block states is the one the
@@ -2648,10 +2828,12 @@ form.addEventListener('submit', async e => {
     if (editingDefn.budget && Object.keys(editingDefn.budget).length) scan.budget = editingDefn.budget;
     if ((editingDefn.discovery_notes || []).length) scan.discovery_notes = editingDefn.discovery_notes;
     if (editingDefn.demo === true) scan.demo = true;
+    // The partner's per-source legal decisions are not edited here; they travel unchanged.
+    if (editingDefn.legal && typeof editingDefn.legal === 'object' && Object.keys(editingDefn.legal).length) scan.legal = editingDefn.legal;
   }
   if (editingId) scan.id = editingId;
   const err = $('#dlg-err');
-  if (name.length < 3) { err.textContent = 'Give the scan a name (3 characters or more).'; $('#f-name').focus(); return; }
+  if (group.length < 3) { err.textContent = 'Name the radar (3 characters or more) — the client, the matter, the company.'; $('#f-group').focus(); return; }
   if (intent.length < 20) { err.textContent = 'The intent is what discovery and relevance read — write at least a sentence.'; $('#f-intent').focus(); return; }
   // Reviewed defect: ticking a venue turns "Discover sources automatically" off, but unticking
   // the last one never turned it back on — so a partner who changed their mind could dispatch a
@@ -2758,6 +2940,8 @@ function renderHome() {
   $('#hsort').addEventListener('change', e => { hs.sort = e.target.value; hsave(); drawCards(); });
   $('#htabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { hs.tab = b.dataset.tab; hsave(); setTabHash(hs.tab); drawCards(); } });
   $('#cards').addEventListener('click', e => {
+    const al = e.target.closest('button[data-addlayer]');
+    if (al) { openDialog(null, { group: al.dataset.addlayer, jurisdictions: (al.dataset.jurs || '').split(',').filter(Boolean) }); return; }
     const b = e.target.closest('button[data-star]'); if (!b) return;
     e.preventDefault();
     const id = b.dataset.star;
@@ -2775,7 +2959,17 @@ function renderHome() {
     // The built-in tracker leads on every tab and under every sort: it is the vetted reference the
     // discovered scans are measured against, and a partner should never have to look for it.
     const builtin = D.cards.filter(c => c.builtin);
-    $('#cards').innerHTML = builtin.concat(list).map(c => card(c, !!hs.star[c.id])).join('')
+    // A radar with several layers is one heading with its layers beneath it; a scan on its own is
+    // its own card. The order inside a group is the order of the list (the chosen sort).
+    const order = [], groups = {};
+    builtin.concat(list).forEach(c => { const g = c.group || ''; const k = g ? 'g:' + g : 'c:' + c.id; if (!groups[k]) { groups[k] = { group: g, cards: [] }; order.push(k); } groups[k].cards.push(c); });
+    $('#cards').innerHTML = order.map(k => {
+      const g = groups[k];
+      if (!g.group) return card(g.cards[0], !!hs.star[g.cards[0].id]);
+      return '<div class="radar"><div class="rhead"><h2>' + esc(g.group) + '</h2><span class="k">' + pl(g.cards.length, 'layer') + '</span>'
+        + '<button type="button" class="btn sm" data-addlayer="' + esc(g.group) + '" data-jurs="' + esc((g.cards[0].flags || []).join(',')) + '">+ Add layer</button></div>'
+        + g.cards.map(c => card(Object.assign({}, c, { name: c.layer || c.name }), !!hs.star[c.id])).join('') + '</div>';
+    }).join('')
       + (hs.tab === 'starred' && !list.length && !builtin.some(c => hs.star[c.id]) ? '<div class="hnone">No starred scans yet — press ☆ on a card to keep it here.</div>' : '');
     $$('.card .last').forEach(el => { el.textContent = 'Last run ' + rel(el.dataset.iso); });
   }
@@ -2789,6 +2983,8 @@ function renderHome() {
   mountPending($('#pending'), {
     mine: () => true,                       // every errand in this browser is shown on the home page
     builtNow: p => {
+      // A removal is finished when the card is GONE — the opposite test from every other errand.
+      if (kindOf(p) === 'delete') return !builtIds[p.id];
       // A create is finished when the scan has a card: that card IS the committed result.
       if (builtIds[p.id]) return true;
       const c = cardById[p.scan_id || p.id];
@@ -2869,6 +3065,8 @@ function renderScan() {
 
   const VIEWS = [
     { k: 'coverage', label: 'Coverage', n: () => D.coverage.approved.length },
+    // Every source with what the gate found about fetching it and the partner's own call on that.
+    { k: 'legal', label: 'Legal', n: () => D.coverage.approved.length + D.coverage.pending.length + D.coverage.rejected.length },
     { k: 'instruments', label: 'Instruments', n: () => laneItems.instruments.filter(it => !state.arch[it.id]).length },
     { k: 'judgments', label: 'Judgments', n: () => laneItems.judgments.filter(it => !state.arch[it.id]).length },
     { k: 'signals', label: 'Signals', n: () => laneItems.signals.filter(it => !state.arch[it.id]).length },
@@ -2886,15 +3084,22 @@ function renderScan() {
 
   const main = $('#main');
   const flags = S.jurisdictions.map(j => flagged(j)).join(' ');
-  main.innerHTML = '<div class="crumb"><a href="/scans.html">Scans</a><span>&rsaquo;</span>' + esc(S.name) + '</div>'
-    + '<div class="titlerow"><div><h1 class="title">' + esc(S.name) + '</h1>'
+  // A layer of a radar is titled by its layer, under the radar's name, with its sibling layers as
+  // a switcher; a scan on its own is titled as itself.
+  const group = S.group || '', layerName = group ? (S.layer || S.name) : S.name;
+  const sibs = (D.siblings || []).slice().sort((a, b) => a.layer.localeCompare(b.layer));
+  const layers = group ? '<div class="layers" aria-label="Layers of ' + esc(group) + '"><span class="on">' + esc(layerName) + '</span>'
+      + sibs.map(s => '<a href="' + esc(s.href) + '">' + esc(s.layer) + '</a>').join('')
+      + '<button type="button" class="btn sm" id="addlayer">+ Add layer</button></div>' : '';
+  main.innerHTML = '<div class="crumb"><a href="/scans.html">Scans</a><span>&rsaquo;</span>' + (group ? esc(group) + '<span>&rsaquo;</span>' : '') + esc(layerName) + '</div>'
+    + '<div class="titlerow"><div>' + (group ? '<div class="radarname">' + esc(group) + '</div>' : '') + '<h1 class="title">' + esc(layerName) + '</h1>' + layers
     + '<div class="metaline"><span>' + esc(D.meta) + '</span><span class="dot">&middot;</span><span class="flags">' + flags + '</span><span class="dot">&middot;</span><span>Last run <b id="lastrun"></b></span>'
     + (S.demo ? '<span class="badge demo">Demo</span>' : '') + '<span class="badge discovered">Discovered sources</span></div>'
     + '<p class="plain">' + scheduleLine(S) + '</p>'
     + (S.intent ? '<p class="intent">' + esc(S.intent) + '</p>' : '') + '</div>'
     // run.py refuses a demo definition with exit 2 (its sources are reserved .test hosts), so the
     // button says so up front instead of letting a partner queue a run that can only fail.
-    + '<div class="actions"><button class="btn primary' + (S.demo ? ' demo-off' : '') + '" id="run"' + (S.demo ? ' disabled title="Demo scans use fixture hosts and cannot be run live — create your own scan" aria-disabled="true"' : '') + '>Run scan</button><button class="btn" id="edit">Edit</button></div></div>'
+    + '<div class="actions"><button class="btn primary' + (S.demo ? ' demo-off' : '') + '" id="run"' + (S.demo ? ' disabled title="Demo scans use fixture hosts and cannot be run live — create your own scan" aria-disabled="true"' : '') + '>Run scan</button><button class="btn" id="edit">Edit</button>' + (group ? '' : '<button type="button" class="btn" id="addlayer">+ Add layer</button>') + '<button class="btn quiet" id="delete" title="Remove this scan, its ledger and its digest">Delete</button></div></div>'
     + '<div class="notice" id="notice"></div>'
     // Run scan and Promote are pressed HERE, so the wait has to be shown here too. Before this the
     // scan page dispatched a run, printed one line, and then looked identical for twelve minutes.
@@ -2904,6 +3109,7 @@ function renderScan() {
     + digestHTML()
     + '<nav class="vtabs" id="vtabs" role="tablist" aria-label="Scan sections"></nav>'
     + '<section class="view" id="v-coverage" role="tabpanel" aria-label="Coverage"><div class="coverage">' + coverageHTML() + '</div></section>'
+    + '<section class="view" id="v-legal" role="tabpanel" aria-label="Legal"></section>'
     + LANE_DEFS.map(d => '<section class="view" id="v-' + d.k + '" role="tabpanel" aria-label="' + esc(d.label) + '">' + laneShell(d) + '</section>').join('')
     + '<section class="view" id="v-misc" role="tabpanel" aria-label="Miscellaneous"></section>'
     + '<section class="view" id="v-clients" role="tabpanel" aria-label="Clients"></section>'
@@ -2929,7 +3135,36 @@ function renderScan() {
   $('#oblsec').addEventListener('click', e => { const b = e.target.closest('button[data-dev]'); if (b) openDetail(b.dataset.dev, b); });
   $('#main').addEventListener('click', e => { const a = e.target.closest('a[data-dev]'); if (a) { e.preventDefault(); openDetail(a.dataset.dev, a); } });
   $('#edit').addEventListener('click', () => openDialog(S));
+  $('#addlayer').addEventListener('click', () => openDialog(null, { group: group || S.name, jurisdictions: S.jurisdictions }));
+  // Deleting is the one errand that cannot be undone from this page: the definition, the ledger,
+  // the stored texts and the digest go. It asks once, in plain words, then leaves for the home
+  // page, where the card disappears when the removal has landed.
+  $('#delete').addEventListener('click', async () => {
+    if (!confirm('Delete “' + S.name + '”? Its sources, ledger, digest and stored documents are removed. This cannot be undone.')) return;
+    const b = $('#delete'); b.disabled = true;
+    const req = { action: 'delete', scan_id: S.id };
+    const res = await dispatchScan(req, 'delete this scan');
+    b.disabled = false;
+    if (!res) return;
+    addPending({ id: S.id, scan_id: S.id, kind: 'delete', name: S.name, request: req, verb: 'delete this scan',
+                 dispatched_at: new Date().toISOString(), actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+    say('Removal queued — this page will stop existing. Taking you to Scans.', 'warn');
+    setTimeout(() => { location.href = '/'; }, 1500);
+  });
   $('#vtabs').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (b) setView(b.dataset.view); });
+  // A decision on the Legal tab is recorded by the service under the signed-in user's name, then
+  // the page rebuilds and reloads itself. "Do not fetch" takes effect on the next run.
+  $('#v-legal').addEventListener('change', async e => {
+    const sel = e.target.closest('select[data-legal-url]'); if (!sel) return;
+    const url = sel.dataset.legalUrl, decision = sel.value;
+    sel.disabled = true;
+    const req = { action: 'legal', scan_id: S.id, url: url, decision: decision };
+    const res = await dispatchScan(req, 'record this decision');
+    if (!res) { sel.disabled = false; sel.value = sel.dataset.was || 'undecided'; return; }
+    addPending({ id: S.id + ':legal:' + url, scan_id: S.id, kind: 'legal', name: S.name + ' · ' + (decision === 'do_not_fetch' ? 'do not fetch ' : decision === 'fetch' ? 'fetch ' : 'undecided: ') + url,
+                 request: req, verb: 'record this decision', dispatched_at: new Date().toISOString(), actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+  });
+  $('#v-legal').addEventListener('change', e => { if (e.target.id === 'lgl-filter') drawLegal(); });
   LANE_DEFS.forEach(d => {
     const l = d.k;
     $('#q-' + l).addEventListener('input', e => { lstate[l].q = e.target.value.trim().toLowerCase(); drawLane(l); });
@@ -2956,6 +3191,7 @@ function renderScan() {
     VIEWS.forEach(v => { $('#v-' + v.k).classList.toggle('on', v.k === k); });
     drawTabs();
     if (LANE_BY[k]) drawLane(k);
+    else if (k === 'legal') drawLegal();
     else if (k === 'misc') drawMisc();
     else if (k === 'clients') drawClients();
     else if (k === 'audit') drawAudit();
@@ -3090,6 +3326,57 @@ function renderScan() {
       + '<div class="grp">Rejected · ' + C.rejected.length + '</div>' + (rejected || none)
       + discovery
       + '<div class="foot">Scans run when a person presses Run scan. Nothing here is scheduled.</div>';
+  }
+
+  // ---- Legal --------------------------------------------------------------------------------------
+  // Fetching a public listing page is a grey area, and the product's position is that the gate
+  // collects the evidence and a PERSON decides. This tab is that decision, per source: what
+  // robots.txt said, which terms pages were read and what in them was flagged, the gate's verdict,
+  // and a dropdown for the partner's call. "Do not fetch" keeps the source listed and skips it on
+  // every run (WITHHELD in health, with the name and the date). Nothing here is legal advice; it
+  // is the record of a decision and the evidence it was taken on.
+  let legalFilter = 'all';
+  function legalClass(s) {
+    const dec = s.legal && s.legal.decision;
+    if (dec === 'do_not_fetch') return 'withheld';
+    if (s.robots === 'disallowed') return 'disallowed';
+    if ((s.flags || []).length) return 'flagged';
+    if (s.robots === 'allowed' && !(s.flags || []).length) return 'clear';
+    return 'unknown';
+  }
+  const LEGAL_CLASS = {
+    clear: ['Nothing found against it', 'robots.txt allows the page and the terms pages the gate read say nothing against automated access.'],
+    flagged: ['Terms wording flagged', 'A sentence in the site\'s terms mentions automated access, scraping or similar. It is quoted here; read it and decide.'],
+    disallowed: ['robots.txt disallows', 'The site\'s robots.txt refuses the page to our User-Agent. The pipeline never fetches it, whatever is decided here.'],
+    withheld: ['Withheld by a partner', 'A partner decided not to fetch this source. It stays listed and every run skips it.'],
+    unknown: ['Not yet checked', 'The gate has not fetched this page (not gated yet, unreachable, or parked for budget), so there is no evidence to weigh.'],
+  };
+  function legalRow(s) {
+    const cls = legalClass(s), dec = (s.legal && s.legal.decision) || 'undecided';
+    const opt = v => '<option value="' + v + '"' + (dec === v ? ' selected' : '') + '>' + ({ undecided: 'Undecided', fetch: 'Fetch — nothing forbids it', do_not_fetch: 'Do not fetch' })[v] + '</option>';
+    return '<div class="lsrc ' + cls + '"><div class="lmain">'
+      + '<div class="n"><b>' + esc(s.name) + '</b><span class="host">' + esc(s.host) + '</span><span class="lc ' + cls + '">' + esc(LEGAL_CLASS[cls][0]) + '</span><span class="st">gate: ' + esc(s.status) + '</span></div>'
+      + '<div class="ev"><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.url) + '</a></div>'
+      + '<div class="ev">robots.txt: <b>' + esc(s.robots === 'allowed' ? 'allows this page' : s.robots === 'disallowed' ? 'disallows this page' : 'not read') + '</b>'
+      + '<span class="sep">·</span>terms pages read: ' + ((s.tos_checked || []).length ? (s.tos_checked || []).map(u => '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(u.replace(/^https?:\/\//, '')) + '</a>').join(', ') : '<b>none found</b>') + '</div>'
+      + (s.flags || []).map(f => '<blockquote class="quote">“' + esc(f) + '”</blockquote>').join('')
+      + (s.reason && s.status !== 'approved' ? '<div class="why">' + esc(s.reason) + '</div>' : '')
+      + '<div class="note">' + esc(LEGAL_CLASS[cls][1]) + '</div></div>'
+      + '<div class="ldec"><label>Decision</label><select data-legal-url="' + esc(s.url) + '" data-was="' + esc(dec) + '"' + (S.demo ? ' disabled' : '') + '>' + opt('undecided') + opt('fetch') + opt('do_not_fetch') + '</select>'
+      + (s.legal && s.legal.by ? '<div class="by">' + esc(s.legal.by) + (s.legal.on ? ' · ' + esc(fmt(s.legal.on)) : '') + (s.legal.note ? '<br>' + esc(s.legal.note) : '') + '</div>' : '<div class="by">no decision recorded</div>')
+      + '</div></div>';
+  }
+  function drawLegal() {
+    const C = D.coverage, all = [].concat(C.approved, C.pending, C.rejected);
+    const sel = $('#lgl-filter'); if (sel) legalFilter = sel.value;
+    const counts = { all: all.length };
+    all.forEach(s => { const c = legalClass(s); counts[c] = (counts[c] || 0) + 1; });
+    const shown = legalFilter === 'all' ? all : all.filter(s => legalClass(s) === legalFilter);
+    const filt = ['all', 'clear', 'flagged', 'disallowed', 'withheld', 'unknown'].map(k => '<option value="' + k + '"' + (legalFilter === k ? ' selected' : '') + '>' + (k === 'all' ? 'All sources' : LEGAL_CLASS[k][0]) + ' (' + (counts[k] || 0) + ')</option>').join('');
+    $('#v-legal').innerHTML = '<div class="coverage"><h3>Legal</h3><p class="sub">Every source on this scan, with what the gate found about fetching it and your call on that. The gate never rules on legality — it reads robots.txt and the site\'s own terms and shows you what it saw. The question it helps answer is the narrow one: does the site say, anywhere the gate could find, that it does not allow this?</p>'
+      + '<div class="ltools"><label for="lgl-filter">Show</label><select id="lgl-filter">' + filt + '</select></div>'
+      + (shown.length ? shown.map(legalRow).join('') : '<div class="src"><div></div><div class="why">None in this group.</div></div>')
+      + '<div class="foot">A decision is recorded under your login with the date. <b>Do not fetch</b> takes effect on the next run; it removes nothing and hides nothing. The standing analysis of what the tracker fetches and how is in engine/audit/.</div></div>';
   }
 
   // ---- lane tables -----------------------------------------------------------------------------
@@ -3705,6 +3992,12 @@ def build(root: Optional[Path] = None, out: Optional[Path] = None) -> dict:
     published = {}
     for s in scans:
         sid = s["definition"]["id"]
+        # The other layers of this scan's radar, so its page can switch between them.
+        grp = s["definition"].get("group") or ""
+        s["siblings"] = [{"id": o["definition"]["id"], "name": o["definition"]["name"],
+                          "layer": o["definition"].get("layer") or o["definition"]["name"],
+                          "href": f"/scan/{o['definition']['id']}.html"}
+                         for o in scans if grp and (o["definition"].get("group") or "") == grp and o is not s]
         page = render_page(scan_payload(s, built), f"{s['definition']['name']} · Scans", fav)
         p = out / "scan" / f"{sid}.html"
         common.atomic_write_text(p, page)
@@ -4303,7 +4596,12 @@ def selftest() -> None:
         # The lane list was in the sentence the lede lost; the tabs themselves still name them.
         assert '"href": "/tmt-radar-v2.html"' in html, "the built-in card must still open the tracker"
         # Create is gated on the coverage preview, in the markup and in the submit handler
-        assert 'id="preview-why"' in html and "built here with you" in html
+        # The dialog asks for a radar and a layer, then intent and jurisdictions; sources arrive
+        # grouped by site, and one can be added by name and gated on the spot. The rest is folded.
+        assert 'id="f-group"' in html and 'id="f-layer"' in html and 'id="f-addsrc"' in html and 'id="adv"' in html
+        assert "function candGroups()" in html and "async function addSource()" in html and '"resolve": "/api/resolve"' in html and '"gate": "/api/gate"' in html
+        # Every scan page carries the Legal tab, the delete button and the layer switcher.
+        assert "function drawLegal()" in html and 'id="delete"' in html and "data-legal-url" in html and 'id="addlayer"' in html
         # The coverage list is now always on screen and always current, so there is no reveal to
         # gate on. What must stay true is that it redraws on every change.
         assert "function refreshPreview() { renderPreview(); }" in html
@@ -4339,7 +4637,7 @@ def selftest() -> None:
         # compiles happily "invalid" (the run, not the browser, is the authority on the pattern)
         assert "replace(/^\\(\\?i\\)/, '')" in html, "the (?i) prefix must be stripped before the browser test"
         # The seven tabs, by name, and the lane rule the page routes by
-        for label in ("Coverage", "Instruments", "Judgments", "Signals", "Miscellaneous", "Clients", "Audit"):
+        for label in ("Coverage", "Legal", "Instruments", "Judgments", "Signals", "Miscellaneous", "Clients", "Audit"):
             assert "label: '" + label + "'" in html, label
         assert "id: 'v-'" not in html and "data-view=" in html
         # The Miscellaneous standing copy: the four sentences that must never be edited away

@@ -145,10 +145,11 @@ async def api_scans(request: Request, user: str = Depends(require_user)):
     if v["action"] == "create" and isinstance(v["scan"], dict) and isinstance(v["scan"].get("schedule"), dict):
         v["scan"]["schedule"] = dict(v["scan"]["schedule"], set_by=user, set_on=jobs.now_iso())
     title = f"Scan {v['action']} {v['scan_id']}"
-    args = {"scan": v["scan"], "no_discover": v["no_discover"], "finding": v["finding"]}
+    args = {"scan": v["scan"], "no_discover": v["no_discover"], "finding": v["finding"],
+            "url": v.get("url"), "decision": v.get("decision"), "note": v.get("note")}
     job = JOBS.enqueue("scan", v["action"], v["scan_id"], args, title, requested_by=user)
     verb = {"create": "Scan queued", "run": "Run queued", "delete": "Scan removal queued",
-            "promote": "Promotion queued", "dismiss": "Dismissal queued"}[v["action"]]
+            "promote": "Promotion queued", "dismiss": "Dismissal queued", "legal": "Decision queued"}[v["action"]]
     return JSONResponse({"ok": True, "message": f"{verb} — it runs on this server now; the page picks the result up itself.",
                          "scan_id": v["scan_id"], "job_id": job["id"], "actionsUrl": job["html_url"]}, status_code=202)
 
@@ -201,6 +202,24 @@ async def api_discover(request: Request, user: str = Depends(require_user)):
         jur = js[0] if js else None
     try:
         return await run_in_threadpool(assist.discover_one, body.get("intent"), jur, body.get("topics") or [], body.get("industries") or [])
+    except assist.Refused as e:
+        return _refused(e)
+
+
+@app.post("/api/resolve")
+async def api_resolve(request: Request, user: str = Depends(require_user)):
+    body = await _json(request)
+    try:
+        return await run_in_threadpool(assist.resolve_source, body.get("query"), body.get("intent") or "", body.get("jurisdictions") or [])
+    except assist.Refused as e:
+        return _refused(e)
+
+
+@app.post("/api/gate")
+async def api_gate(request: Request, user: str = Depends(require_user)):
+    body = await _json(request)
+    try:
+        return await run_in_threadpool(assist.gate_one, body.get("url"), body.get("intent") or "", body.get("jurisdictions") or [])
     except assist.Refused as e:
         return _refused(e)
 

@@ -204,6 +204,31 @@
    "type": "string",
    "description": "Bumped on every create/run that writes the definition."
   },
+  "group": {
+   "type": "string",
+   "maxLength": 120,
+   "description": "The radar this scan is one layer of — 'OpenAI' for layers Regulation / Company updates / Competitors. Arrangement only: each layer is a whole scan."
+  },
+  "layer": {
+   "type": "string",
+   "maxLength": 120,
+   "description": "This scan's layer name within its group, e.g. 'Regulation'."
+  },
+  "legal": {
+   "type": "object",
+   "description": "The partner's per-source decision on whether it is acceptable to fetch, keyed by source URL. The gate collects the evidence (robots.txt, the site's terms wording) and never rules; this records the human call. do_not_fetch keeps the source on the list and makes every run skip it (health WITHHELD).",
+   "additionalProperties": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["decision"],
+    "properties": {
+     "decision": {"type": "string", "enum": ["fetch", "do_not_fetch", "undecided"]},
+     "by": {"type": "string"},
+     "on": {"type": "string"},
+     "note": {"type": "string", "maxLength": 500}
+    }
+   }
+  },
   "schedule": {
    "description": "Unattended daily run — OFF unless a partner set it. {daily_at, tz, set_by, set_on}. A person choosing this is choosing collection without a person pressing the button, which the per-source legal analysis was written to avoid; the page shows the schedule and who set it, and docs/horizon-design.md §1.3 records the decision.",
    "oneOf": [

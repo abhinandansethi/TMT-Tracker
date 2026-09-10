@@ -49,7 +49,8 @@ IST = _dt.timezone(_dt.timedelta(hours=5, minutes=30))
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,59}$")
 FINDING_RE = re.compile(r"^[a-f0-9]{10}$")
 RESERVED_IDS = {"schema", "tmt-india"}
-ACTIONS = {"create", "run", "delete", "promote", "dismiss"}
+ACTIONS = {"create", "run", "delete", "promote", "dismiss", "legal"}
+LEGAL_DECISIONS = ("fetch", "do_not_fetch", "undecided")
 MAX_SCAN_JSON = 60_000           # the same cap the workflow input had; a definition is small
 
 
@@ -283,6 +284,11 @@ class Jobs:
             cmd += ["--id", job["scan_id"]]
         if action in ("promote", "dismiss"):
             cmd += ["--finding", args["finding"]]
+        if action == "legal":
+            # Who decided is the signed-in user the SERVICE saw, passed from the request record —
+            # never a name the page chose.
+            cmd += ["--url", args["url"], "--decision", args["decision"], "--by", str(job.get("requested_by") or ""),
+                    "--note", str(args.get("note") or "")]
         cmd += ["--summary-out", str(summary_path)]
         log.write("$ " + " ".join(shlex.quote(c) for c in cmd) + "\n"); log.flush()
         code = subprocess.call(cmd, cwd=str(ROOT), env=env, stdout=log, stderr=subprocess.STDOUT)
@@ -369,8 +375,18 @@ def validate_scan_request(body: dict) -> tuple:
     no_discover = body.get("no_discover")
     if no_discover is not None and not isinstance(no_discover, bool):
         return "no_discover must be true or false.", None
+    url, decision, note = body.get("url"), body.get("decision"), body.get("note")
+    if action == "legal":
+        if not isinstance(url, str) or not re.match(r"^https?://\S+$", url) or len(url) > 2000:
+            return "legal needs `url`, an http(s) URL on the scan's coverage list.", None
+        if decision not in LEGAL_DECISIONS:
+            return f"legal needs `decision`, one of: {', '.join(LEGAL_DECISIONS)}.", None
+        if note is not None and (not isinstance(note, str) or len(note) > 500):
+            return "note must be a string of at most 500 characters.", None
     return None, {"action": action, "scan_id": scan_id, "scan": scan, "finding": finding,
-                  "no_discover": bool(no_discover), "workflow": body.get("workflow")}
+                  "no_discover": bool(no_discover), "workflow": body.get("workflow"),
+                  "url": url if action == "legal" else None, "decision": decision if action == "legal" else None,
+                  "note": (note or "") if action == "legal" else ""}
 
 
 def _slug(s: str) -> str:

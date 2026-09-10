@@ -84,7 +84,18 @@ MISC_PROPOSED_BY = "miscellany"   # mirrors misc.PROPOSED_BY; kept local so this
 SOURCE_KEYS_PARTNER = ("url", "name", "jurisdiction", "kind", "rationale")
 SOURCE_KEYS = SOURCE_KEYS_PARTNER + ("host", "status", "tier", "proposed_by", "confidence", "reason", "gate")
 TOP_KEYS = ("id", "name", "intent", "jurisdictions", "topics", "industries", "clients", "sources", "discovery_notes",
-            "subject_filter", "budget", "demo", "no_discover", "no_misc", "schedule", "created", "updated")
+            "subject_filter", "budget", "demo", "no_discover", "no_misc", "schedule", "group", "layer", "legal",
+            "created", "updated")
+# group / layer — a radar is a GROUP of scans, one per layer: "OpenAI" with layers "Regulation",
+# "Company updates", "Competitors". Each layer is a whole scan (its own coverage, ledger, digest,
+# Miscellaneous lane, schedule); the group is only how the pages arrange them. Both optional.
+# legal — the partner's per-source decision on whether it is acceptable to fetch, keyed by URL:
+# {decision: fetch | do_not_fetch | undecided, by, on, note}. The gate collects the evidence
+# (robots.txt, the site's terms wording); this records the human call on it. `do_not_fetch`
+# keeps the source on the coverage list — approved, visible — and makes every run skip it,
+# recorded in health as WITHHELD with who decided and when.
+LEGAL_DECISIONS = ("fetch", "do_not_fetch", "undecided")
+LEGAL_KEYS = ("decision", "by", "on", "note")
 # schedule — {daily_at: "HH:MM", tz: "Asia/Kolkata", set_by, set_on}: the ONE place a scan can be
 # told to run unattended. Off unless a partner set it, visible on the page, and recorded with who
 # set it and when, because a decision to collect without a person pressing the button is the
@@ -339,6 +350,28 @@ def validate_definition(defn: Any) -> list[str]:
             for k in ("set_by", "set_on"):
                 if k in sch and not isinstance(sch[k], str):
                     problems.append(f"schedule.{k} must be a string")
+    for k in ("group", "layer"):
+        if k in defn and (not isinstance(defn[k], str) or len(defn[k]) > 120):
+            problems.append(f"{k} must be a string of at most 120 characters")
+    legal = defn.get("legal")
+    if legal is not None:
+        if not isinstance(legal, dict):
+            problems.append("legal must be an object keyed by source URL")
+        else:
+            for url, rec in legal.items():
+                if not _is_url(url):
+                    problems.append(f"legal: '{url}' is not an http(s) URL")
+                if not isinstance(rec, dict):
+                    problems.append(f"legal[{url}] must be an object {{decision, by, on, note}}")
+                    continue
+                extra = set(rec) - set(LEGAL_KEYS)
+                if extra:
+                    problems.append(f"legal[{url}]: unknown field(s) {sorted(extra)} (allowed: {', '.join(LEGAL_KEYS)})")
+                if rec.get("decision") not in LEGAL_DECISIONS:
+                    problems.append(f"legal[{url}].decision must be one of: {', '.join(LEGAL_DECISIONS)}")
+                for k in ("by", "on", "note"):
+                    if k in rec and not isinstance(rec[k], str):
+                        problems.append(f"legal[{url}].{k} must be a string")
     for k in ("demo", "no_discover", "no_misc"):
         if k in defn and not isinstance(defn[k], bool):
             problems.append(f"{k} must be a boolean")
@@ -695,6 +728,7 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         budget.note_drop(f"{len(approved) - cap_sources} approved source(s) not fetched — max_sources={cap_sources}")
         approved = approved[:cap_sources]
 
+    legal = defn.get("legal") if isinstance(defn.get("legal"), dict) else {}
     for src in approved:
         url = src["url"]
         h = {"status": "FAILED", "rows_seen": 0, "new": 0, "newest_visible": None,
@@ -703,6 +737,16 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         if url in promoted_ok:
             h["info"].append(promoted_ok[url])
         sources_health[url] = h
+        # A partner's "do not fetch" is final for this run: the source stays on the list, approved
+        # and visible, and health says who withheld it rather than pretending it was read.
+        dec = legal.get(url) or legal.get(canon_url(url)) or {}
+        if isinstance(dec, dict) and dec.get("decision") == "do_not_fetch":
+            h["status"] = "WITHHELD"
+            h["notes"].append(f"not fetched: {dec.get('by') or 'a partner'} decided on the Legal tab"
+                              + (f" ({dec['on'][:10]})" if isinstance(dec.get("on"), str) and dec.get("on") else "")
+                              + (f" — {dec['note'][:200]}" if dec.get("note") else ""))
+            common.log(f"WITHHELD {url} — do_not_fetch, decided by {dec.get('by') or 'a partner'}")
+            continue
         try:
             body, info = fetch_listing(url, budget["delay_seconds"], _declared_hosts(url))
         except Exception as e:
@@ -1059,6 +1103,12 @@ def create_scan(defn: dict, paths: ScanPaths, client, no_discover: bool,
         # silently would turn an unattended scan back into a manual one — or vice versa — unnoticed.
         if "schedule" not in defn and isinstance(existing, dict) and existing.get("schedule"):
             defn["schedule"] = existing["schedule"]
+    # The group a layer belongs to, and the partner's per-source legal decisions, survive an Edit
+    # the same way: neither is something a re-submitted form should be able to erase by omission.
+    if isinstance(existing, dict):
+        for k in ("group", "layer", "legal"):
+            if k not in defn and existing.get(k):
+                defn[k] = existing[k]
     defn["no_misc"] = bool(no_misc) or bool(defn.get("no_misc"))
     coerce_sources(defn)
     # The subject filter is STORED AS GIVEN and never invented here. propose_subject_filter is
@@ -1679,6 +1729,59 @@ def cmd_dismiss(args) -> int:
     return EXIT_OK
 
 
+def cmd_legal(args) -> int:
+    """Record a partner's decision on whether one source may be fetched.
+
+    The gate gathers evidence — robots.txt, the wording of the site's own terms — and parks a
+    doubtful source as pending. It never rules on legality, because that is a grey area and the
+    call belongs to a person. This is where that call is written down: keyed by URL, with who
+    made it and when, and `do_not_fetch` makes every later run skip the source and say so in
+    health (WITHHELD). `undecided` clears a previous decision."""
+    if not ID_RE.match(args.id or ""):
+        print("legal: --id must match ^[a-z0-9][a-z0-9-]{1,59}$", file=sys.stderr)
+        return EXIT_USAGE
+    if args.decision not in LEGAL_DECISIONS:
+        print(f"legal: --decision must be one of: {', '.join(LEGAL_DECISIONS)}", file=sys.stderr)
+        return EXIT_USAGE
+    if not _is_url(args.url):
+        print("legal: --url must be an http(s) URL", file=sys.stderr)
+        return EXIT_USAGE
+    paths = paths_for(args.id)
+    defn = common.load_json(paths.definition, None) if paths.definition.exists() else None
+    if not isinstance(defn, dict) or defn.get("id") != args.id:
+        print(f"legal: no scan definition with id '{args.id}'", file=sys.stderr)
+        return EXIT_USAGE
+    match = next((s for s in defn.get("sources") or []
+                  if isinstance(s, dict) and s.get("url") and canon_url(s["url"]) == canon_url(args.url)), None)
+    if match is None:
+        print(f"legal: {args.url} is not on this scan's coverage list — a decision needs a source to be about", file=sys.stderr)
+        return EXIT_USAGE
+    url = match["url"]
+    legal = defn.get("legal") if isinstance(defn.get("legal"), dict) else {}
+    if args.decision == "undecided":
+        legal.pop(url, None)
+    else:
+        legal[url] = {"decision": args.decision, "by": common.norm_ws(args.by or "")[:80] or "a partner",
+                      "on": common.now_ist(), "note": common.norm_ws(args.note or "")[:500]}
+    if legal:
+        defn["legal"] = legal
+    else:
+        defn.pop("legal", None)
+    problems = validate_definition(defn)
+    if problems:
+        for p in problems:
+            print(f"legal: the decision would make the definition invalid: {p}", file=sys.stderr)
+        return EXIT_USAGE
+    defn["updated"] = common.now_ist()
+    common.atomic_write_json(paths.definition, defn)
+    common.log(f"legal {args.decision} {url} — by {legal.get(url, {}).get('by', '') or args.by or 'a partner'}")
+    if args.decision == "do_not_fetch":
+        common.log("every later run skips this source and records it as WITHHELD; it stays on the coverage list")
+    _print_summary({"id": args.id, "action": "legal", "url": url, "decision": args.decision, "exit": EXIT_OK},
+                   getattr(args, "summary_out", None))
+    return EXIT_OK
+
+
 def cmd_promote(args) -> int:
     """Move one Miscellaneous finding into the scan's coverage list, where the gate decides.
 
@@ -1828,6 +1931,12 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--id", required=True)
     x.add_argument("--finding", required=True, metavar="FINDING_ID",
                    help="a 10-character finding id from data/scans/<id>/misc.json (any kind; not one already promoted)")
+    lg = sub.add_parser("legal", help="record a partner's decision on whether one source may be fetched")
+    lg.add_argument("--id", required=True)
+    lg.add_argument("--url", required=True, help="a URL on the scan's coverage list")
+    lg.add_argument("--decision", required=True, choices=LEGAL_DECISIONS)
+    lg.add_argument("--by", default="", help="who decided (the service passes the signed-in user)")
+    lg.add_argument("--note", default="", help="why, in the partner's words")
     sub.add_parser("list", help="every scan with its source and development counts")
     # Proposes a subject filter and PRINTS it. It writes no definition and starts no run: the
     # partner is the one who decides whether the scan is aimed this way. /api/propose-filter and
@@ -1839,7 +1948,7 @@ def build_parser() -> argparse.ArgumentParser:
     for p in (c, r):
         p.add_argument("--no-misc", action="store_true",
                        help="skip the Miscellaneous lane (the open-web search for things outside coverage)")
-    for p in (c, r, d, m, x, f):
+    for p in (c, r, d, m, x, lg, f):
         p.add_argument("--summary-out", metavar="FILE", default=None,
                        help="also write the SUMMARY JSON to FILE (the workflow reads this, not the log)")
     return ap
@@ -1861,6 +1970,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         return cmd_promote(args)
     if args.cmd == "dismiss":
         return cmd_dismiss(args)
+    if args.cmd == "legal":
+        return cmd_legal(args)
     if args.cmd == "list":
         return cmd_list(args)
     if args.cmd == "propose-filter":
