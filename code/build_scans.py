@@ -503,8 +503,11 @@ def coverage_for(defn: dict, health: dict) -> dict:  # noqa: C901 — one panel,
     # Reviewed defect: the header said "4 jurisdictions" while coverage held sources for two and
     # nothing said the other two were searched and came up empty. Computed from the approved
     # list, so it is true whatever discovery reported.
-    covered = {s["jurisdiction"].upper() for s in groups["approved"] if s["jurisdiction"]}
-    uncovered = [str(j).upper() for j in defn.get("jurisdictions") or [] if str(j).upper() not in covered]
+    # A source says "IN (India)"; the scan says "IN". Compare the code, or every stored source
+    # reads as a gap in its own jurisdiction ("no source for IN" beside three Indian sources).
+    code = lambda j: str(j or "").strip().split("(")[0].split()[0].upper() if str(j or "").strip() else ""
+    covered = {code(s["jurisdiction"]) for s in groups["approved"] if s["jurisdiction"]}
+    uncovered = [str(j).upper() for j in defn.get("jurisdictions") or [] if code(j) not in covered]
     # A partner-typed source arrives without a jurisdiction, so the line would call every
     # jurisdiction uncovered on a dialog-created scan (review finding). Only claim a gap when every
     # approved source says which jurisdiction it serves.
