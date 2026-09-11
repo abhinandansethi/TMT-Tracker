@@ -881,7 +881,9 @@ def unified_items(s: dict) -> list[dict]:
             "headline": it["headline"] if it["headline"] and it["headline"] != it["title"] else "",
             "date": it["date"] or (it["first_seen"] or "")[:10], "first_seen": it["first_seen"] or "",
             "source": it["domain"], "type": it["type"] or ("untyped" if it.get("untyped") else ""),
-            "level": lvl, "url": it["url"],
+            # Two different links: `url` is the document itself; `source_url` is the coverage
+            # venue it was read from (the listing page on the scan's own Coverage tab).
+            "level": lvl, "url": it["url"], "source_url": it["source_url"],
             "summary": " ".join(p.get("text", "") for p in it["summary"] if isinstance(p, dict)).strip()[:1500],
             "why": it["relevance"]["why"], "action": it["relevance"]["action"],
         })
@@ -906,21 +908,26 @@ def tmt_entry(out: Optional[Path]) -> dict:
     def row(r: dict, lane: str) -> dict:
         llm = r.get("llm") if isinstance(r.get("llm"), dict) else {}
         short, official = str(r.get("short") or ""), str(r.get("official") or "")
+        doc, page = str(r.get("doc") or ""), str(r.get("page") or "")
+        # Two different links: `doc` is the instrument itself; `page` is the venue listing it was
+        # read from. A row with only one of them uses it for both — one real link, not a broken
+        # second one — and the page never shows the same URL twice.
         return {"id": str(r.get("id") or ""), "lane": lane, "title": short or official,
                 "headline": official if official and official != short else "",
                 "date": str(r.get("date") or ""), "first_seen": str(r.get("date") or ""),
                 "source": str(r.get("reg") or r.get("venue") or ""), "type": str(r.get("type") or "").replace("_", " "),
-                "level": "low" if r.get("routine") else "", "url": str(r.get("doc") or r.get("page") or ""),
+                "level": "low" if r.get("routine") else "", "url": doc or page, "source_url": page or doc,
                 "summary": str(llm.get("brief") or r.get("gist") or "")[:1500], "why": str(llm.get("so_what") or ""), "action": ""}
     items = [row(r, "instruments") for r in t.get("rows") or [] if isinstance(r, dict)]
     items += [row(r, "judgments") for r in t.get("judgments") or [] if isinstance(r, dict)]
     for sg in t.get("signals") or []:
         if not isinstance(sg, dict):
             continue
+        secondary = str(sg.get("secondary_url") or "")
         items.append({"id": "", "lane": "signals", "title": str(sg.get("title") or ""), "headline": "",
                       "date": str(sg.get("date_reported") or ""), "first_seen": str(sg.get("date_reported") or ""),
                       "source": str(sg.get("issuing_body") or ""), "type": str(sg.get("official_status") or ""),
-                      "level": "", "url": str(sg.get("secondary_url") or ""), "summary": str(sg.get("what_happened") or "")[:1500],
+                      "level": "", "url": secondary, "source_url": secondary, "summary": str(sg.get("what_happened") or "")[:1500],
                       "why": "", "action": ""})
     entry["items"] = items
     entry["generated"] = t.get("updatedISO") or entry["generated"]
@@ -3476,7 +3483,11 @@ function renderHome() {
       + '<span class="ulvl ' + LVL[u.level] + '">' + esc(u.level ? u.level.toUpperCase() : '') + '</span></div>'
       + (open ? '<div class="udet">' + (u.summary ? '<p>' + esc(u.summary) + '</p>' : '<p class="none">No summary was written for this development.</p>')
         + (u.why ? '<div class="uk">Why it matters</div><p>' + esc(u.why) + '</p>' : '') + (u.action ? '<div class="uk">Action</div><p>' + esc(u.action) + '</p>' : '')
+        // Two different links, only when they are in fact different: the document itself, and
+        // the coverage venue it was read from. A development with only one known URL uses it
+        // for both fields (run.py's unified shape), so this never shows the same link twice.
         + '<div class="uacts">' + (u.url ? '<a href="' + esc(u.url) + '" target="_blank" rel="noopener">Open the document ↗</a>' : '')
+        + (u.source_url && u.source_url !== u.url ? '<a href="' + esc(u.source_url) + '" target="_blank" rel="noopener">Open the source ↗</a>' : '')
         + (u.scan.kind === 'scan' && u.id ? '<button type="button" class="btn sm" data-draft="' + esc(u.id) + '" data-scanid="' + esc(u.scan.id) + '">Draft email</button>' : '') + '</div></div>' : '') + '</div>';
   }
   function oneButtons() {
