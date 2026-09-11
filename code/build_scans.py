@@ -1423,6 +1423,40 @@ a.wordmark{text-decoration:none;border:0;display:block}
 .c-type span{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;white-space:nowrap;color:var(--navy);background:var(--navy-wash);border:1px solid #C4D6E1}
 .c-type span.quiet{color:var(--faint);background:transparent;border-color:var(--rule2)}
 .c-mark{font-family:var(--mono);font-size:15px;color:var(--navy);text-align:right}
+/* coverage: the tracker's venue cards */
+.cov-tally{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase;white-space:nowrap;padding-top:6px}
+.cov-grid{margin-top:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:44px;row-gap:34px}
+@media (max-width:1000px){.cov-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cov-grp{border-top:1px solid var(--rule);padding-top:11px}
+.cov-grp .h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px}
+.cov-grp .h b{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.cov-grp .h i{font-family:var(--mono);font-size:10px;color:var(--ghost);font-style:normal}
+.ven{display:grid;grid-template-columns:minmax(0,1fr) 80px 90px;column-gap:12px;align-items:center;padding:10px 0 9px;border-bottom:1px solid var(--rule3)}
+.ven .n{font-family:var(--serif);font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ven .t{font-family:var(--mono);font-size:10.5px;color:var(--ghost);white-space:nowrap}
+.ven .s{display:flex;align-items:center;justify-content:flex-end;gap:7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.ven .s.ok{color:var(--ok)}.ven .s.quiet{color:var(--faint)}.ven .s.warn{color:#7A6210}.ven .s.bad{color:var(--alarm);font-weight:600}.ven .s.pending{color:var(--ghost)}
+.vdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--navy);border:1px solid transparent}
+.vdot.ok{background:var(--ok)}.vdot.quiet{background:transparent;border-color:var(--off)}.vdot.warn{background:var(--ochre)}.vdot.bad{background:var(--alarm)}.vdot.pending{background:transparent;border-color:var(--off)}
+.ven .vlink{grid-column:1/-1;font-family:var(--mono);font-size:10px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ven .vlink a{color:var(--mute);text-decoration:none;border-bottom:1px dotted var(--rule2)}
+.ven .vlink a:hover{color:var(--navy)}
+.ven.x{cursor:pointer}.ven.x:hover{background:var(--navy-wash)}.ven.open{background:var(--navy-wash)}
+.ven .vdet{display:none;grid-column:1/-1;margin-top:8px;padding:8px 0 2px;border-top:1px dashed var(--rule2);font-size:12px}
+.ven.open .vdet{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 12px}
+.ven .vdet .k{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);font-weight:600;padding-top:2px}
+.ven .vdet .v{color:#37474f;line-height:1.5;word-break:break-word}
+.ven .vdet .vnotes,.ven .vdet blockquote{grid-column:1/-1;margin:4px 0 0;padding:0 0 0 12px;list-style:none;font-size:11.5px;color:var(--mute);line-height:1.5}
+.ven .vdet .vnotes li.warn{color:#5B4507}
+.ven .vdet blockquote{border-left:2px solid var(--ochre);font-family:var(--serif);font-size:13px;color:var(--ink)}
+.cov-legend{margin-top:14px;display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--faint)}
+.cov-legend span{display:flex;align-items:center;gap:7px}
+.cov-two{margin-top:30px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:44px}
+@media (max-width:800px){.cov-two{grid-template-columns:1fr}}
+.cov-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);border-top:2px solid var(--ink);padding-top:10px;margin-bottom:6px}
+.cov-sub.warn{color:#7A6210}
+.cov-none{font-size:12.5px;color:var(--faint);font-style:italic;padding:8px 0}
+.cov-notes{margin:26px 0 0;padding:0;list-style:none;font-family:var(--mono);font-size:10.5px;color:var(--faint);line-height:1.7}
 .cl-eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--navy);margin-bottom:5px}
 .cl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin:26px 0 20px}
 .cl-sub{font-size:13px;color:var(--mute);max-width:640px;line-height:1.5}
@@ -3285,7 +3319,7 @@ function card(c, starred) {
   return '<div class="card' + (c.builtin ? ' builtin' : '') + '">'
     + '<a class="cardmain" href="' + esc(c.href) + '"><div class="name">' + esc(c.name) + tierBadge(c.tier) + (c.demo ? '<span class="badge demo">Demo</span>' : '') + '</div>'
     + '<div class="meta"><span>' + esc(c.meta) + '</span>' + (flags ? '<span class="flags" aria-label="' + esc((c.flags || []).join(', ')) + '">' + flags + '</span>' : '') + '</div>'
-    + (c.problems && c.problems.length ? '<ul class="problems">' + c.problems.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '') + '</a>'
+    + '</a>'
     + '<div class="right"><div class="kpi">' + c.kpi.map(k => esc(k.n) + '<small>' + esc(k.label) + '</small>').join('<span class="sep">·</span>') + '</div>'
     + '<div class="last" data-iso="' + esc(c.generated) + '"></div>'
     + '<button type="button" class="hstar' + (starred ? ' on' : '') + '" data-star="' + esc(c.id) + '" aria-pressed="' + !!starred + '" aria-label="' + (starred ? 'Unstar ' : 'Star ') + esc(c.name) + '" title="' + (starred ? 'Starred in this browser' : 'Star this scan (this browser only)') + '">' + (starred ? '★' : '☆') + '</button></div></div>';
@@ -3382,7 +3416,8 @@ function renderScan() {
     // Run scan and Promote are pressed HERE, so the wait has to be shown here too. Before this the
     // scan page dispatched a run, printed one line, and then looked identical for twelve minutes.
     + '<div class="pending" id="pending"></div>'
-    + (D.problems.length ? '<ul class="problems">' + D.problems.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
+    // The run's notes (queued backlog, unread documents, discovery caveats) are facts about the
+    // last run, not alarms: they live at the foot of the Coverage panel, in small type.
     // Coverage is the landing view, as on TMT India: the source list first, the digest under it.
     + '<section class="view" id="v-coverage" role="tabpanel" aria-label="Coverage"><div class="coverage">' + coverageHTML() + '</div>' + digestHTML() + '</section>'
     + '<section class="view" id="v-legal" role="tabpanel" aria-label="Legal"></section>'
@@ -3429,6 +3464,16 @@ function renderScan() {
     setTimeout(() => { location.href = '/'; }, 1500);
   });
   $('#topnav').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (b) setView(b.dataset.view); });
+  // A venue card opens on a click (not on its link), as on the tracker.
+  $('#v-coverage').addEventListener('click', e => {
+    if (e.target.closest('a')) return;
+    const v = e.target.closest('.ven.x'); if (!v) return;
+    covOpen = covOpen === v.dataset.url ? null : v.dataset.url; drawCoverage();
+  });
+  $('#v-coverage').addEventListener('keydown', e => {
+    const v = e.target.closest('.ven.x'); if (!v || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault(); covOpen = covOpen === v.dataset.url ? null : v.dataset.url; drawCoverage();
+  });
   // A decision on the Legal tab is recorded by the service under the signed-in user's name, then
   // the page rebuilds and reloads itself. "Do not fetch" takes effect on the next run.
   $('#v-legal').addEventListener('change', async e => {
@@ -3547,62 +3592,72 @@ function renderScan() {
   }
 
   // ---- coverage ------------------------------------------------------------------------------
+  // The TMT India tracker's coverage, on a scan: venue cards in columns by site — name, newest
+  // item, status dot, the exact URL — that open on a click to show the evidence. Pending and
+  // rejected sources sit below in two columns, the way the tracker shows what is not yet live.
+  let covOpen = null;
   function coverageHTML() {
-    const C = D.coverage;
-    const src = (s, extra) => '<div class="src"><div class="dotc ' + esc(s.health ? s.health.status : '') + '" title="' + esc(s.health ? s.health.status : 'not run') + '"></div><div>'
-      + '<div class="n"><b>' + esc(s.name) + '</b><span class="host">' + esc(s.host) + '</span>' + (s.jurisdiction ? '<span>' + flagged(s.jurisdiction) + '</span>' : '')
-      + kindChip(s.kind, s.tier, s.host)
-      + (s.proposed_by ? '<span class="st">proposed by ' + esc(s.proposed_by) + (s.confidence ? ', ' + esc(s.confidence) + ' confidence' : '') + '</span>' : '') + '</div>'
-      + (s.rationale ? '<div class="why">' + esc(s.rationale) + '</div>' : '') + extra + '</div></div>';
-    const approved = C.approved.map(s => {
-      const h = s.health;
-      // GATED is not a fetch result: the source is approved but sat beyond max_sources on this run,
-      // so nothing was read from it. Saying so here is what keeps the cap from reading as coverage.
-      // A GATED source was never fetched, so its stamp is when the cap was RECORDED, not a check
-      // (reviewed defect: "checked 3 min ago" on a source nothing touched).
-      const line = !h ? '<span class="st">NOT RUN</span>'
-        : h.status === 'GATED' ? '<span class="st gated">GATED</span><span class="sep">·</span><span class="gated">approved, but beyond max_sources this run — not fetched</span>' + (h.checked ? '<span class="sep">·</span>recorded ' + esc(rel(h.checked)) : '')
-        : '<span class="st">' + esc(h.status) + '</span><span class="sep">·</span>' + esc(h.rows_seen == null ? '?' : h.rows_seen) + ' rows seen<span class="sep">·</span>' + esc(h.new == null ? 0 : h.new) + ' new<span class="sep">·</span>newest visible ' + esc(h.newest_visible ? fmt(h.newest_visible) : '—') + (h.checked ? '<span class="sep">·</span>checked ' + esc(rel(h.checked)) : '');
-      const infos = h ? h.notes.map(n => '<li class="warn">' + esc(n) + '</li>').concat(h.info.map(n => '<li>' + esc(n) + '</li>')).join('') : '';
-      return src(s, '<div class="ev">' + line + '</div><div class="ev">gate: ' + esc(s.evidence) + (s.checked ? '<span class="sep">·</span>' + esc(fmt(s.checked)) : '') + '</div>'
-        + (h && h.status !== 'GATED' ? subjectCount(h.subject, SUBJ.on) : '')
-        + (infos ? '<ul class="infos">' + infos + '</ul>' : ''));
-    }).join('');
-    // Pending has several causes and only one of them is a terms question. Reviewed defect: every
-    // pending source told the partner to read the site's terms, including one parked for budget.
+    const C = D.coverage, R = D.run || {};
+    const stOf = s => {
+      const h = s.health; if (!h) return { cls: 'pending', label: 'NOT RUN' };
+      const st = h.status;
+      return st === 'OK' ? { cls: 'ok', label: 'OK' } : st === 'QUIET' ? { cls: 'quiet', label: 'QUIET' } : st === 'EMPTY' ? { cls: 'warn', label: 'EMPTY' }
+        : st === 'GATED' ? { cls: 'pending', label: 'NOT FETCHED' } : st === 'WITHHELD' ? { cls: 'pending', label: 'WITHHELD' } : { cls: 'bad', label: st || 'FAILED' };
+    };
+    const kv = (k, v) => '<div class="k">' + k + '</div><div class="v">' + v + '</div>';
+    const pretty = u => String(u || '').replace(/^https?:\/\/(www\.)?/, '').slice(0, 90);
+    const ven = (s, st, det) => '<div class="ven x' + (covOpen === s.url ? ' open' : '') + '" data-url="' + esc(s.url) + '" tabindex="0" role="button" aria-expanded="' + (covOpen === s.url) + '">'
+      + '<div class="n" title="' + esc(s.name) + '">' + esc(s.name) + '</div>'
+      + '<div class="t">' + esc(s.health && s.health.newest_visible ? s.health.newest_visible : (s.health && s.health.rows_seen != null ? s.health.rows_seen + ' rows' : '—')) + '</div>'
+      + '<div class="s ' + st.cls + '"><span>' + esc(st.label) + '</span><span class="vdot ' + st.cls + '"></span></div>'
+      + '<div class="vlink"><a href="' + esc(s.url) + '" target="_blank" rel="noopener" title="The exact URL the scan fetches">' + esc(pretty(s.url)) + '</a></div>'
+      + '<div class="vdet">' + det + '</div></div>';
+    const detApproved = s => {
+      const h = s.health, p = [];
+      if (h && h.checked) p.push(kv('Last checked', esc(fmt(h.checked))));
+      if (h && h.rows_seen != null) p.push(kv('Rows seen', esc(h.rows_seen) + (h.new != null ? ' · ' + esc(h.new) + ' new' : '')));
+      if (h && h.status === 'GATED') p.push(kv('Not fetched', 'approved, but beyond the max_sources cap this run'));
+      if (h && h.subject && SUBJ.on) p.push(kv('Subject filter', esc((h.subject.kept == null ? '?' : h.subject.kept) + ' kept · ' + (h.subject.dropped == null ? '?' : h.subject.dropped) + ' outside')));
+      p.push(kv('Gate', esc(s.evidence) + (s.checked ? ' · ' + esc(fmt(s.checked)) : '')));
+      if (s.proposed_by) p.push(kv('Proposed by', esc(s.proposed_by) + (s.confidence ? ', ' + esc(s.confidence) + ' confidence' : '')));
+      if (s.rationale) p.push(kv('Why', esc(s.rationale)));
+      const notes = h ? (h.notes || []).map(n => '<li class="warn">' + esc(n) + '</li>').concat((h.info || []).map(n => '<li>' + esc(n) + '</li>')).join('') : '';
+      return p.join('') + (notes ? '<ul class="vnotes">' + notes + '</ul>' : '');
+    };
+    // Pending has several causes and only one of them is a terms question.
     const pendingNote = s => {
       const r = s.reason || '';
-      if (/^budget:/i.test(r)) return 'Not gated: the scan already holds max_sources approved sources. Raise the budget or drop one.';
-      if (/^not yet gated/i.test(r)) return 'Not gated: create did not finish. Edit and save to gate it.';
-      if (s.flags.length || /^ToS language/i.test(r)) return 'A person must read this site\'s terms before it is approved. Nothing is fetched from it until then.';
-      return 'The gate could not decide; a person must. Nothing is fetched from it until then.';
+      if (/^budget:/i.test(r)) return 'Not gated: the scan already holds max_sources approved sources.';
+      if (/^not yet gated/i.test(r)) return 'Not gated yet: the next run judges it.';
+      if ((s.flags || []).length || /^ToS language/i.test(r)) return 'A person decides on the Legal tab before anything is fetched from it.';
+      return 'The gate could not decide; a person must, on the Legal tab.';
     };
-    const pending = C.pending.map(s => src(s, '<div class="ev">gate: ' + esc(s.evidence) + '</div>' + (s.reason ? '<div class="why">' + esc(s.reason) + '</div>' : '')
-      + s.flags.map(f => '<blockquote class="quote">“' + esc(f) + '”</blockquote>').join('')
-      + '<div class="note">' + esc(pendingNote(s)) + '</div>')).join('');
-    const rejected = C.rejected.map(s => src(s, '<div class="reason">' + esc(s.reason || 'rejected by the gate') + '</div><div class="ev">gate: ' + esc(s.evidence) + '</div>')).join('');
-    const none = '<div class="src"><div></div><div class="why">None.</div></div>';
-    // The last run's counts, in one line, so a FAILED source or a queued backlog is visible the
-    // moment the panel opens (reviewed defect: health.run and sources_failed were never rendered).
-    const R = D.run || {}, sf = D.counts.sources_failed || 0, se = D.counts.sources_empty || 0;
-    const cell = (label, n, bad) => '<span' + (bad && n ? ' class="bad"' : '') + '><b>' + esc(n == null ? '—' : n) + '</b> ' + label + '</span>';
-    const lastrun = D.generated ? '<div class="grp">Last run · ' + esc(stampText(D.generated)) + ' IST</div><div class="lastrun" id="lastrun-block">'
-      + cell('new', R.new) + cell('enriched', R.enriched) + cell('queued', R.queued, true) + cell('not read', R.read_failed, true) + cell('enrichment failed', R.enrich_failed, true)
-      + cell('sources failed', sf, true) + cell('sources empty', se, true) + (C.gated ? cell('sources not fetched (cap)', C.gated, true) : '') + '</div>' : '';
-    const uncovered = C.uncovered && C.uncovered.length ? '<div class="gap">No approved source for: ' + C.uncovered.map(flagged).join(', ') + '</div>' : '';
-    const discovery = C.discovery && C.discovery.length ? '<div class="grp">Discovery · ' + C.discovery.length + '</div><ul class="disc" id="discovery-notes">' + C.discovery.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul>' : '';
-    return '<h3>Coverage</h3><p class="sub">Every source this scan reads, with the gate\'s evidence and the last run\'s health.</p>'
-      + '<div class="legend"><span class="badge vetted">Vetted</span><span>Hand-built, with a per-site legal analysis.</span>'
-      + '<span class="badge discovered">Discovered</span><span>Passed the automated gate; only that evidence stands behind it.</span></div>'
-      + lastrun
-      // Before the venue list, not after it: what counts as the subject shapes the ledger as much
-      // as which venues are read, and a reader who scrolls no further has still been told.
-      + '<div class="grp">Subject filter</div>' + subjectPanelHTML()
-      + '<div class="grp">Approved · ' + C.approved.length + (C.gated ? ' · ' + (C.approved.length - C.gated) + ' read this run' : '') + '</div>' + uncovered + (approved || none)
-      + '<div class="grp">Pending a human decision · ' + C.pending.length + '</div>' + (pending || none)
-      + '<div class="grp">Rejected · ' + C.rejected.length + '</div>' + (rejected || none)
-      + discovery
-      + '';
+    const detPending = s => (s.reason ? kv('Gate', esc(s.reason)) : '') + (s.flags || []).map(f => '<blockquote class="quote">“' + esc(f) + '”</blockquote>').join('') + kv('Next', esc(pendingNote(s))) + (s.rationale ? kv('Why', esc(s.rationale)) : '');
+    const detRejected = s => kv('Gate', esc(s.reason || 'rejected by the gate')) + (s.rationale ? kv('Why', esc(s.rationale)) : '');
+    // Approved, in columns by site — a site with several pages is one column, like a regulator
+    // on the tracker.
+    const order = [], byHost = {};
+    C.approved.forEach(s => { const h = s.host || hostOf(s.url) || s.url; if (!byHost[h]) { byHost[h] = []; order.push(h); } byHost[h].push(s); });
+    const grid = order.length ? '<div class="cov-grid">' + order.map(h => '<div class="cov-grp"><div class="h"><b>' + esc(h) + '</b><i>' + esc(pl(byHost[h].length, 'venue')) + '</i></div>'
+      + byHost[h].map(s => ven(s, stOf(s), detApproved(s))).join('') + '</div>').join('') + '</div>'
+      : '<div class="cov-none">No approved source yet' + (C.pending.length ? ' — ' + esc(pl(C.pending.length, 'source')) + ' waiting for a decision below.' : '.') + '</div>';
+    const two = (C.pending.length || C.rejected.length) ? '<div class="cov-two">'
+      + '<div><div class="cov-sub warn">Pending a decision · ' + C.pending.length + '</div>' + (C.pending.map(s => ven(s, { cls: 'pending', label: 'PENDING' }, detPending(s))).join('') || '<div class="cov-none">None.</div>') + '</div>'
+      + '<div><div class="cov-sub">Rejected by the gate · ' + C.rejected.length + '</div>' + (C.rejected.map(s => ven(s, { cls: 'bad', label: 'REJECTED' }, detRejected(s))).join('') || '<div class="cov-none">None.</div>') + '</div></div>' : '';
+    const live = C.approved.filter(s => s.health && ['OK', 'QUIET'].includes(s.health.status)).length;
+    const tally = [pl(order.length, 'site'), pl(C.approved.length, 'venue'), live + ' live'].concat(R.queued ? [R.queued + ' queued'] : [], C.uncovered && C.uncovered.length ? ['no source for ' + C.uncovered.join(', ')] : []).join(' · ');
+    // Discovery's caveats and the run's own notes, small and at the end — facts, not alarms.
+    const notes = [].concat(C.discovery_caveats || [], D.problems || []).filter((n, i, a) => a.indexOf(n) === i);
+    return '<div class="cl-head" style="margin-bottom:6px"><div><div class="cl-eyebrow">Coverage</div>'
+      + '<div class="cl-sub">Every source this scan reads. If a venue is not on this list, nothing from it can enter the ledger.</div></div>'
+      + '<div class="cov-tally">' + esc(tally) + (D.generated ? ' · last run ' + esc(stampText(D.generated)) + ' IST' : '') + '</div></div>'
+      + grid
+      + '<div class="cov-legend"><span><i class="vdot ok"></i>Producing developments</span><span><i class="vdot quiet"></i>Reachable, nothing new (date = newest item there)</span><span><i class="vdot warn"></i>Empty</span><span><i class="vdot bad"></i>Failed</span><span><i class="vdot pending"></i>Not fetched</span></div>'
+      + two
+      + (notes.length ? '<ul class="cov-notes">' + notes.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul>' : '');
+  }
+  function drawCoverage() {
+    const el = $('#v-coverage .coverage'); if (el) el.innerHTML = coverageHTML();
   }
 
   // ---- Legal --------------------------------------------------------------------------------------

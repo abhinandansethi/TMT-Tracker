@@ -45,6 +45,7 @@ Rules this file enforces, each learned from the engine the hard way:
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import datetime as _dt
 import hashlib
 import json
@@ -53,6 +54,7 @@ import os
 import re
 import shutil
 import sys
+import threading
 from pathlib import Path
 from typing import Any, Callable, Optional
 from urllib.parse import urljoin, urlparse, urlunparse
@@ -910,7 +912,16 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
                           "and are no longer retried: " + ", ".join(d["id"] for d in given_up[:10]))
     enriched = read_failed = enrich_failed = 0
     enriched_now: list[dict] = []
-    for dev in to_do:
+
+    # Reading is where a run spends its time: fetch the document, then a model call to summarise
+    # it. The model calls overlap across a small pool of threads; the FETCHES do not — they take
+    # a lock and go one at a time, so the politeness the legal basis rests on (one request at a
+    # time, the delay between them) is exactly what it was when this loop was sequential. Each
+    # worker touches only its own `dev`; the counters are tallied here, in order, from what it
+    # returns. Under a dry run there is one worker, so the fake client is never shared.
+    fetch_lock = threading.Lock()
+
+    def _read_one(dev: dict) -> str:
         src_h = sources_health.get(dev.get("source_url") or "")
         sink = src_h["info"] if src_h else scan_notes
         # extract.document_text never raises for a bad document: it returns "" and puts the
@@ -919,14 +930,14 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         # document was ledgered as "empty text" and re-fetched three times — even when
         # robots.txt had said no, which is the one answer that will not change.
         rep: dict = {}
-        try:
-            text, read_as = document_text(dev["url"], budget, client, report=rep)
-        except Exception as e:
-            dev["read_attempts"] = dev.get("read_attempts", 0) + 1
-            dev["read_error"] = _err(e)
-            read_failed += 1
-            sink.append(f"{dev['id']}: document not read (attempt {dev['read_attempts']}): {dev['read_error']}")
-            continue
+        with fetch_lock:
+            try:
+                text, read_as = document_text(dev["url"], budget, client, report=rep)
+            except Exception as e:
+                dev["read_attempts"] = dev.get("read_attempts", 0) + 1
+                dev["read_error"] = _err(e)
+                sink.append(f"{dev['id']}: document not read (attempt {dev['read_attempts']}): {dev['read_error']}")
+                return "read_failed"
         text = text or ""
         limit = int(budget["max_doc_chars"])
         if len(text) > limit:
@@ -940,12 +951,11 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
             else:
                 dev["read_attempts"] = dev.get("read_attempts", 0) + 1
             dev["read_error"] = reason[:300]
-            read_failed += 1
             sink.append(f"{dev['id']}: document not read (attempt {dev['read_attempts']}): {dev['read_error']}")
-            continue
+            return "read_failed"
         h = _sha1(text)
         if dev.get("enriched") and dev.get("doc_hash") == h:
-            continue
+            return "unchanged"
         common.atomic_write_text(paths.text_file(dev["id"]), text)
         dev.update({"doc_hash": h, "read_as": read_as, "text_file": f"text/{dev['id']}.txt"})
         try:
@@ -959,9 +969,8 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
             # page rendered as a verdict. An error record is a failed attempt, nothing more.
             dev["read_attempts"] = dev.get("read_attempts", 0) + 1
             dev["enrich_error"] = str(e.get("error") if isinstance(e, dict) else "enricher returned no record")[:240]
-            enrich_failed += 1
             sink.append(f"{dev['id']}: enrichment failed (attempt {dev['read_attempts']}): {dev['enrich_error']}")
-            continue
+            return "enrich_failed"
         for k in ENRICH_FIELDS:
             if k in e and e[k] not in (None, ""):
                 dev[k] = e[k]
@@ -969,10 +978,27 @@ def run_scan(defn: dict, paths: ScanPaths, client, max_new: Optional[int] = None
         dev["enriched_at"] = now
         dev.pop("read_error", None)
         dev.pop("enrich_error", None)
-        enriched += 1
-        enriched_now.append(dev)
-        # One line per document, so the page can show the run as it happens.
-        common.log(f"read {enriched}/{len(to_do)}: {(dev.get('title') or dev.get('url') or '')[:80]}")
+        return "ok"
+
+    workers = 1 if common.DRY_RUN else max(1, min(6, int(os.environ.get("TMT_READ_WORKERS") or 4)))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers, thread_name_prefix="read") as pool:
+        futures = [(dev, pool.submit(_read_one, dev)) for dev in to_do]
+        for dev, fut in futures:
+            try:
+                outcome = fut.result()
+            except Exception as ex:  # a worker died outside the paths above: count it as a failed reading
+                dev["read_attempts"] = dev.get("read_attempts", 0) + 1
+                dev["enrich_error"] = _err(ex)[:240]
+                outcome = "enrich_failed"
+            if outcome == "read_failed":
+                read_failed += 1
+            elif outcome == "enrich_failed":
+                enrich_failed += 1
+            elif outcome == "ok":
+                enriched += 1
+                enriched_now.append(dev)
+                # One line per document, so the page can show the run as it happens.
+                common.log(f"read {enriched}/{len(to_do)}: {(dev.get('title') or dev.get('url') or '')[:80]}")
 
     ok_statuses = ("OK", "QUIET")
     sources_ok = sum(1 for h in sources_health.values() if h["status"] in ok_statuses)
