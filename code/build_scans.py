@@ -3340,6 +3340,9 @@ function renderScan() {
   ['read', 'star', 'arch', 'promoted'].forEach(k => { if (!state[k] || typeof state[k] !== 'object') state[k] = {}; });
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
   let openId = null, lastFocus = null;
+  // The open venue card on Coverage. Declared HERE, before the first render, because the render
+  // reads it: a `let` further down is not hoisted and the whole page went blank on it once.
+  let covOpen = null;
 
   // ---- lanes ------------------------------------------------------------------------------------
   // The builder stamped `lane` on every development using the contract's one routing rule; the page
@@ -3595,7 +3598,6 @@ function renderScan() {
   // The TMT India tracker's coverage, on a scan: venue cards in columns by site — name, newest
   // item, status dot, the exact URL — that open on a click to show the evidence. Pending and
   // rejected sources sit below in two columns, the way the tracker shows what is not yet live.
-  let covOpen = null;
   function coverageHTML() {
     const C = D.coverage, R = D.run || {};
     const stOf = s => {
