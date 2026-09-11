@@ -3231,7 +3231,9 @@ function renderHome() {
     builtin.concat(list).forEach(c => { const g = c.group || ''; const k = g ? 'g:' + g : 'c:' + c.id; if (!groups[k]) { groups[k] = { group: g, cards: [] }; order.push(k); } groups[k].cards.push(c); });
     $('#cards').innerHTML = order.map(k => {
       const g = groups[k];
-      if (!g.group) return card(g.cards[0], !!hs.star[g.cards[0].id]);
+      // A radar with ONE layer is just a scan: a plain card, like TMT India. The group box
+      // appears only when there are layers to switch between.
+      if (!g.group || g.cards.length === 1) return card(g.cards[0], !!hs.star[g.cards[0].id]);
       return '<div class="radar"><div class="rhead"><h2>' + esc(g.group) + '</h2><span class="k">' + pl(g.cards.length, 'layer') + '</span>'
         + '<button type="button" class="btn sm" data-addlayer="' + esc(g.group) + '" data-jurs="' + esc((g.cards[0].flags || []).join(',')) + '">+ Add layer</button></div>'
         + g.cards.map(c => card(Object.assign({}, c, { name: c.layer || c.name }), !!hs.star[c.id])).join('') + '</div>';
@@ -3350,7 +3352,9 @@ function renderScan() {
     { k: 'clients', label: 'Clients', n: () => scanClients.length + orphanClients.length },
     { k: 'audit', label: 'Audit', n: () => D.coverage.approved.length + D.coverage.pending.length + D.coverage.rejected.length },
   ];
-  if (!VIEWS.some(v => v.k === state.view)) state.view = 'coverage';
+  // Opening a scan lands on Coverage, as TMT India does. The tab a partner had open last time is
+  // not carried across visits; a #tab= in the URL (a reload mid-work, a shared link) still wins.
+  state.view = 'coverage';
 
   const main = $('#main');
   const flags = S.jurisdictions.map(j => flagged(j)).join(' ');
@@ -3379,7 +3383,8 @@ function renderScan() {
     // scan page dispatched a run, printed one line, and then looked identical for twelve minutes.
     + '<div class="pending" id="pending"></div>'
     + (D.problems.length ? '<ul class="problems">' + D.problems.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
-    + '<section class="view" id="v-coverage" role="tabpanel" aria-label="Coverage">' + digestHTML() + '<div class="coverage">' + coverageHTML() + '</div></section>'
+    // Coverage is the landing view, as on TMT India: the source list first, the digest under it.
+    + '<section class="view" id="v-coverage" role="tabpanel" aria-label="Coverage"><div class="coverage">' + coverageHTML() + '</div>' + digestHTML() + '</section>'
     + '<section class="view" id="v-legal" role="tabpanel" aria-label="Legal"></section>'
     + LANE_DEFS.map(d => '<section class="view" id="v-' + d.k + '" role="tabpanel" aria-label="' + esc(d.label) + '">' + laneShell(d) + '</section>').join('')
     + '<section class="view" id="v-misc" role="tabpanel" aria-label="Miscellaneous"></section>'
