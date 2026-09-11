@@ -37,9 +37,9 @@ sys.path.insert(0, str(ROOT))
 from server import admin, assist, jobs, settings  # noqa: E402
 
 DIST = ROOT / "dist"
-REALM = 'Basic realm="Intel Scanner", charset="UTF-8"'
+REALM = 'Basic realm="Delta Scanner", charset="UTF-8"'
 
-app = FastAPI(title="Intel Scanner", docs_url=None, redoc_url=None, openapi_url=None)
+app = FastAPI(title="Delta Scanner", docs_url=None, redoc_url=None, openapi_url=None)
 JOBS = jobs.Jobs()
 
 

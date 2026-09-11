@@ -1105,16 +1105,14 @@ h1.title{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.1
 .ph .k{color:var(--faint);font-weight:400;letter-spacing:.06em;text-transform:none}
 .app-left input[type=search]{width:100%;margin-top:12px;border:1px solid var(--rule);border-radius:6px;padding:8px 10px;font-size:13px;background:#fff}
 .app-left input[type=search]:focus{border-color:var(--ink);outline:none}
-.selrow{margin:8px 0 4px;font-family:var(--mono);font-size:10.5px;color:var(--faint);display:flex;gap:6px;align-items:center}
-.selrow button{appearance:none;background:none;border:0;padding:0;font:inherit;color:var(--navy);cursor:pointer}
-.selrow button:hover{text-decoration:underline}
-.srow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:11px 4px;border-bottom:1px solid var(--rule3);cursor:pointer}
+/* one scan selected at a time — a plain clickable row, not a checkbox list */
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;padding:11px 10px;margin:0 -10px;border-radius:6px;cursor:pointer}
 .srow:hover{background:var(--row3)}
-.srow input{margin-top:3px}
+.srow.on{background:var(--navy-wash)}
+.srow.allrow{border-bottom:1px solid var(--rule3);border-radius:0;margin-bottom:4px;padding-bottom:13px}
 .srow .sn{font-size:14px;font-weight:600;line-height:1.3;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
 .srow .ss{font-size:11.5px;color:var(--mute);margin-top:2px;line-height:1.4}
 .srow .sc{font-family:var(--mono);font-size:10.5px;color:var(--ochre);white-space:nowrap;padding-top:3px}
-.srow:not(.on) .sn,.srow:not(.on) .ss{color:var(--faint)}
 .uprow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:12px 0 6px}
 .uprow label{font-size:12.5px;color:var(--mute)}
 .uprow select{border:1px solid var(--rule);border-radius:6px;padding:5px 8px;font-size:12.5px;background:#fff;margin-left:4px}
@@ -1291,11 +1289,17 @@ table.dev .chips{gap:3px}
 /* dialogs */
 dialog{border:0;border-radius:12px;padding:0;box-shadow:var(--shadow);width:640px;max-width:calc(100vw - 32px);max-height:calc(100vh - 48px);color:var(--ink);font-family:var(--sans)}
 dialog::backdrop{background:rgba(17,19,21,.28)}
-dialog .dh{padding:24px 30px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-dialog h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:0;line-height:1.2}
-dialog .db{padding:6px 30px 26px}
-dialog .df{padding:16px 30px 22px;border-top:1px solid var(--rule3);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+dialog .dh,#review-host .dh{padding:24px 30px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+dialog h2,#review-host h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:0;line-height:1.2}
+dialog .db,#review-host .db{padding:6px 30px 26px}
+dialog .df,#review-host .df{padding:16px 30px 22px;border-top:1px solid var(--rule3);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 dialog .df .err{color:var(--alarm);font-size:12.5px}
+/* the create form, relocated here instead of staying in the <dialog> once coverage is ready */
+#review-host{grid-column:2;border:1px solid var(--rule2);border-radius:10px;background:#fff}
+#review-host .dh{padding:20px 24px 0}
+#review-host .db{padding:6px 24px 22px}
+#review-host .df{padding:14px 24px 20px}
+#review-host .only-describe{display:none!important}
 .field{margin-top:16px}
 /* Direct children only: the source picker's candidate rows are labels too, and they are prose,
    not field captions (defect: every venue name and rationale rendered in shouting mono grey). */
@@ -1803,7 +1807,7 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
 
 <div class="sheet">
   <div class="head">
-    <div class="brand"><a class="wordmark" href="/">Intel <b>Scanner</b></a><div class="whoami" id="whoami"></div></div>
+    <div class="brand"><a class="wordmark" href="/">Delta <b>Scanner</b></a><div class="whoami" id="whoami"></div></div>
     <div class="updbar"><div class="updated" id="headstamp"></div><span class="headbtns" id="headbtns"></span></div>
   </div>
   <!-- DEFECT this closes: these were the TMT tracker's six tabs, rendered on every scan page and
@@ -1966,8 +1970,9 @@ const FIRST_RUN_MAX = (typeof D.firstRunMax === 'number' && D.firstRunMax > 0) ?
 const MAX_SOURCES = (typeof D.maxSources === 'number' && D.maxSources > 0) ? D.maxSources : 12;
 const FIRST_RUN_LINE = 'The first run reads the newest ' + FIRST_RUN_MAX + ' documents so the scan appears quickly; anything older queues and is counted as queued. Press Run scan again to continue through the backlog.';
 
-$('#headstamp').innerHTML = D.page === 'home'
-  ? 'Human-run scans · <span>nothing scheduled</span>'
+// The app has its own "Last refreshed" line in its own header; the site masthead carries none
+// on the home page rather than repeat it.
+$('#headstamp').innerHTML = D.page === 'home' ? ''
   : 'Last run <span>' + esc(D.generated ? stampText(D.generated) + ' IST' : 'never') + '</span>';
 
 // ---- notice bar ------------------------------------------------------------------------------
@@ -2449,7 +2454,40 @@ let cands = [], picked = {}, discTouched = false;
 const DISC_HELP = 'Off, only the sources listed above are gated and read.';
 // `preset` opens the dialog for a NEW layer of an existing radar: {group} is filled in and the
 // partner writes the layer's own intent — regulation, the company's announcements, competitors.
+// ---- the create dialog's form step, moved into the right panel instead of staying in the modal
+// On the home page only: pressing "Find coverage" or "Add links myself" closes the <dialog> and
+// relocates the SAME <form id="dlg-form"> element (fields, ids, listeners — all of it, untouched)
+// into #review-host beside the scan list, so approving coverage and pressing Create scan happen
+// on the one screen rather than in a second one. `#review-host` only exists on the home page;
+// elsewhere (editing a scan, adding a layer) these are no-ops and the dialog behaves as before.
+function restoreFormToDialog() {
+  const host = $('#review-host');
+  if (host && host.contains(form)) {
+    dlg.appendChild(form);
+    host.hidden = true;
+    const right = $('#app-right'); if (right) right.hidden = false;
+  }
+}
+function enterReview() {
+  const host = $('#review-host');
+  if (!host) { setStep('form'); return; }   // no review panel on this page (a scan page) — behave as before
+  if (dlg.open) dlg.close();
+  host.hidden = false;
+  const right = $('#app-right'); if (right) right.hidden = true;
+  host.appendChild(form);
+  setStep('form');
+}
+function exitReview(toDescribe) {
+  restoreFormToDialog();
+  if (toDescribe) {
+    setStep('describe');
+    if (!dlg.open) dlg.showModal();
+    $('#f-desc').focus();
+  }
+  if (window.__appRefresh) window.__appRefresh();
+}
 function openDialog(scan, preset) {
+  restoreFormToDialog();   // a review left open from an earlier attempt must not eat this open
   preset = preset || null;
   editingDefn = scan || null;
   editingId = scan ? scan.id : null;
@@ -2523,11 +2561,11 @@ $('#dlg-manual').addEventListener('click', () => {
   const desc = $('#f-desc').value.trim();
   if (desc && !$('#f-intent').value.trim()) $('#f-intent').value = desc;
   if ($('#f-disc').checked && !discTouched) { $('#f-disc').checked = false; discTouched = true; }
-  setStep('form'); $('#adv').open = true;
+  enterReview(); $('#adv').open = true;
   setNote('#addsrc-note', 'Paste each listing page\'s URL below and press Add; it is checked on the spot. Name, intent and jurisdiction are under Advanced settings.');
   ($('#f-group').value.trim() ? $('#f-addsrc') : $('#f-group')).focus();
 });
-$('#dlg-back').addEventListener('click', () => { setStep('describe'); $('#f-desc').focus(); });
+$('#dlg-back').addEventListener('click', () => exitReview(true));
 
 // ---- source picker: discovery moved out of the workflow and into the browser ------------------
 // Discovery used to happen invisibly inside the run, so the partner never saw or chose the venues
@@ -3190,10 +3228,10 @@ async function buildFromDescription(autoDecide) {
     F.src.set((p.sources || []).map(s => typeof s === 'string' ? s : (s && s.url) || '').filter(isUrl));
     const notes = [].concat(p.notes ? [p.notes] : [], Array.isArray(r.data.notes) ? r.data.notes : []);
     setNote('#dlg-pnote', notes.length ? notes.map(esc).join('<br>') : '');
-    setStep('form'); renderPreview();
     // No jurisdiction in the description means nowhere to search and a create the pipeline
     // would refuse. Ask now, above the list, rather than run a search that can only report a gap.
     if (!F.jur.get().length) {
+      enterReview(); renderPreview();
       setNote('#find-note', '<b>Which jurisdictions?</b> Add them above — India, EU, US, or a country — then press ' + (autoDecide ? '<b>Create scan</b>' : '<b>Find coverage</b>') + '.', true);
       if (autoDecide) { $('#f-disc').checked = true; discTouched = true; }
       F.jur.input.focus();
@@ -3201,12 +3239,14 @@ async function buildFromDescription(autoDecide) {
     }
     if (autoDecide) {
       // "Decide coverage for me": nothing to approve — discovery finds and gates the venues
-      // inside the create, and the scan's Coverage tab is where they first appear.
+      // inside the create, and the scan's Coverage tab is where they first appear. The dialog
+      // stays as it is (open, on the description) until the create answers.
       $('#f-disc').checked = true; discTouched = true;
       form.requestSubmit();
       return;
     }
     // The description IS the brief, so the coverage search starts at once; the list is the step.
+    enterReview(); renderPreview();
     await findSources(null);
     $('#f-addsrc').focus();
     return;
@@ -3218,7 +3258,7 @@ async function buildFromDescription(autoDecide) {
     : 'the propose endpoint answered ' + r.status + (r.data.message ? ': ' + r.data.message : '');
   if (!$('#f-intent').value.trim()) $('#f-intent').value = desc;
   setNote('#dlg-pnote', 'Could not build the scan from the description — ' + esc(why) + '. Fill the details in by hand; your description is in the intent box.', true);
-  setStep('form'); $('#adv').open = true; $('#f-group').focus();
+  enterReview(); $('#adv').open = true; $('#f-group').focus();
 }
 form.addEventListener('submit', async e => {
   e.preventDefault();
@@ -3324,9 +3364,15 @@ form.addEventListener('submit', async e => {
       kind: 'create', action: 'create', request: req, verb: verb,
       actionsUrl: res.actionsUrl || D.actionsUrl || '' });
     dlg.close();
+    restoreFormToDialog();
+    if (window.__appRefresh) window.__appRefresh();
+    const right = $('#app-right'); if (right) right.hidden = false;
+    const host = $('#review-host'); if (host) host.hidden = true;
   }
 });
-$$('[data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
+// A close button whose dialog is null was moved into the review panel — cancel the review
+// rather than throw closing a dialog it is no longer inside.
+$$('[data-close]').forEach(b => b.addEventListener('click', () => { const d = b.closest('dialog'); if (d) d.close(); else exitReview(false); }));
 
 // ---- draft modal ------------------------------------------------------------------------------
 const modal = $('#modal');
@@ -3360,45 +3406,56 @@ function renderHome() {
   const APP_KEY = 'tmt_app';
   const LANE_LABEL = { instruments: 'Instruments', judgments: 'Judgments', signals: 'Signals' };
   const MODES = [['updates', 'Updates'], ['coverage', 'Coverage'], ['legal', 'Legal'], ['clients', 'Clients'], ['audit', 'Audit'], ['misc', 'Miscellaneous']];
+  const ALL = '__all__';
   const main = $('#main');
   // The app has no tab bar of its own: the head's nav (a way back to "All scans") is for the
   // scan pages, and this IS all scans.
   const nav = $('#topnav'); if (nav) nav.style.display = 'none';
   const scans = (D.app && D.app.scans) || [];
   const byId = {}; scans.forEach(s => { byId[s.id] = s; });
-  // What is ticked, the search, the lane, the period and the mode live in this browser only.
-  let st = { off: {}, q: '', lane: 'all', since: '30', mode: 'updates', open: null };
+  // One scan selected at a time — ALL by default. The search, the lane, the period and the
+  // mode live in this browser only.
+  let st = { sel: ALL, q: '', lane: 'all', since: '30', mode: 'updates', open: null };
   try { st = Object.assign(st, JSON.parse(localStorage.getItem(APP_KEY) || '{}')); } catch (e) {}
-  if (!st.off || typeof st.off !== 'object') st.off = {};
+  if (st.sel !== ALL && !byId[st.sel]) st.sel = ALL;
   if (!MODES.some(m => m[0] === st.mode)) st.mode = 'updates';
   if (!['all', 'instruments', 'judgments', 'signals'].includes(st.lane)) st.lane = 'all';
   if (!['7', '30', '90', '365', 'all'].includes(String(st.since))) st.since = '30';
   const save = () => { try { localStorage.setItem(APP_KEY, JSON.stringify(st)); } catch (e) {} };
-  const ticked = () => scans.filter(s => !st.off[s.id]);
+  const selected = () => st.sel === ALL ? scans : scans.filter(s => s.id === st.sel);
   const refreshed = scans.map(s => s.generated).filter(Boolean).sort().pop() || '';
 
   main.innerHTML = '<div class="app">'
-    + '<div class="app-head"><div><div class="crumb">Intel Scanner</div><h1 class="title" id="app-title">Updates</h1></div>'
+    + '<div class="app-head"><div><div class="crumb">Delta Scanner</div><h1 class="title" id="app-title">Updates</h1></div>'
     + '<div class="app-tools">' + (refreshed ? '<span class="refreshed">Last refreshed <b>' + esc(stampText(refreshed)) + ' IST</b></span>' : '')
     + '<select id="app-mode" aria-label="Section">' + MODES.map(m => '<option value="' + m[0] + '"' + (st.mode === m[0] ? ' selected' : '') + '>' + m[1] + '</option>').join('') + '</select>'
     + '<button class="btn primary" id="create">+ New scan</button></div></div>'
     + '<div class="notice" id="notice"></div><div class="pending" id="pending"></div>'
     + '<div class="app-cols"><aside class="app-left"><div class="ph"><span>1 · Scans</span><span class="k" id="app-lcount"></span></div>'
     + '<input type="search" id="app-q" placeholder="Search scans" value="' + esc(st.q) + '">'
-    + '<div class="selrow"><button type="button" data-selall>Select all</button><span>·</span><button type="button" data-selnone>Clear</button></div>'
     + '<div id="app-list"></div></aside>'
-    + '<section class="app-right" id="app-right"></section></div></div>';
+    + '<section class="app-right" id="app-right"></section>'
+    + '<section class="review-host" id="review-host" hidden></section></div></div>';
   noticeEl = $('#notice');
+  // The right panel's own re-draw, reachable from the create-dialog code (which is top-level,
+  // shared with every scan page) so it can refresh this screen once a create/edit/delete lands.
+  window.__appRefresh = () => { drawList(); drawRight(); };
 
-  // ---- left: the scans -----------------------------------------------------------------------
+  // ---- left: the scans, one selected at a time -------------------------------------------------
+  function scanRow(s) {
+    const on = st.sel === s.id;
+    return '<div class="srow' + (on ? ' on' : '') + '" data-scan="' + esc(s.id) + '" tabindex="0" role="button" aria-pressed="' + on + '">'
+      + '<div class="sb"><div class="sn">' + esc(s.name) + (s.kind === 'tmt' ? '<span class="badge vetted">Vetted</span>' : '') + (s.demo ? '<span class="badge demo">Demo</span>' : '') + '</div><div class="ss">' + esc(s.sub) + '</div></div>'
+      + '<div class="sc">' + (s.new ? esc(s.new) + ' new' : (s.generated ? '' : 'not run')) + '</div></div>';
+  }
   function drawList() {
     const q = st.q.trim().toLowerCase();
     const shown = scans.filter(s => !q || (s.name + ' ' + s.sub).toLowerCase().includes(q));
     $('#app-lcount').textContent = pl(scans.length, 'scan') + ' · ' + pl(scans.reduce((n, s) => n + s.items.length, 0), 'update');
-    $('#app-list').innerHTML = shown.map(s => '<label class="srow' + (st.off[s.id] ? '' : ' on') + '"><input type="checkbox" data-scan="' + esc(s.id) + '"' + (st.off[s.id] ? '' : ' checked') + '>'
-      + '<div class="sb"><div class="sn">' + esc(s.name) + (s.kind === 'tmt' ? '<span class="badge vetted">Vetted</span>' : '') + (s.demo ? '<span class="badge demo">Demo</span>' : '') + '</div><div class="ss">' + esc(s.sub) + '</div></div>'
-      + '<div class="sc">' + (s.new ? esc(s.new) + ' new' : (s.generated ? '' : 'not run')) + '</div></label>').join('')
-      || '<div class="cl-empty">No scan matches.</div>';
+    const allNew = scans.reduce((n, s) => n + (s.new || 0), 0);
+    const allRow = !q ? '<div class="srow allrow' + (st.sel === ALL ? ' on' : '') + '" data-scan="' + ALL + '" tabindex="0" role="button" aria-pressed="' + (st.sel === ALL) + '">'
+      + '<div class="sb"><div class="sn">All scans</div></div><div class="sc">' + (allNew ? esc(allNew) + ' new' : '') + '</div></div>' : '';
+    $('#app-list').innerHTML = allRow + (shown.map(scanRow).join('') || (q ? '<div class="cl-empty">No scan matches.</div>' : ''));
   }
 
   // ---- right: updates -------------------------------------------------------------------------
@@ -3406,13 +3463,13 @@ function renderHome() {
   const sinceDate = () => { if (st.since === 'all') return ''; const d = new Date(); d.setDate(d.getDate() - Number(st.since)); return d.toISOString().slice(0, 10); };
   function pool() {
     const cut = sinceDate(), out = [];
-    ticked().forEach(s => s.items.forEach(it => { if (!cut || (it.date || it.first_seen || '') >= cut) out.push(Object.assign({ scan: s }, it)); }));
+    selected().forEach(s => s.items.forEach(it => { if (!cut || (it.date || it.first_seen || '') >= cut) out.push(Object.assign({ scan: s }, it)); }));
     out.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (a.scan.name).localeCompare(b.scan.name));
     return out;
   }
   function updRow(u, key) {
     const open = st.open === key;
-    const meta = [u.scan.name, u.source, u.date ? fmt(u.date) : 'undated', u.type].filter(Boolean).map(esc).join(' · ');
+    const meta = [st.sel === ALL ? u.scan.name : '', u.source, u.date ? fmt(u.date) : 'undated', u.type].filter(Boolean).map(esc).join(' · ');
     return '<div class="upd' + (open ? ' open' : '') + '" data-key="' + esc(key) + '"><div class="uline" tabindex="0" role="button" aria-expanded="' + open + '">'
       + '<span class="udot ' + LVL[u.level] + '" title="' + esc(u.level ? u.level + ' relevance' : 'not rated') + '"></span>'
       + '<div class="ub"><div class="ut">' + esc(u.title) + '</div><div class="um">' + meta + '</div>' + (u.headline ? '<div class="uh">' + esc(u.headline) + '</div>' : '') + '</div>'
@@ -3420,12 +3477,11 @@ function renderHome() {
       + (open ? '<div class="udet">' + (u.summary ? '<p>' + esc(u.summary) + '</p>' : '<p class="none">No summary was written for this development.</p>')
         + (u.why ? '<div class="uk">Why it matters</div><p>' + esc(u.why) + '</p>' : '') + (u.action ? '<div class="uk">Action</div><p>' + esc(u.action) + '</p>' : '')
         + '<div class="uacts">' + (u.url ? '<a href="' + esc(u.url) + '" target="_blank" rel="noopener">Open the document ↗</a>' : '')
-        + '<a href="' + esc(u.scan.href) + '" target="_blank" rel="noopener">Open in ' + esc(u.scan.name) + ' ↗</a>'
         + (u.scan.kind === 'scan' && u.id ? '<button type="button" class="btn sm" data-draft="' + esc(u.id) + '" data-scanid="' + esc(u.scan.id) + '">Draft email</button>' : '') + '</div></div>' : '') + '</div>';
   }
   function oneButtons() {
-    const t = ticked(); if (t.length !== 1) return '';
-    const s = t[0];
+    if (st.sel === ALL) return '';
+    const s = byId[st.sel]; if (!s) return '';
     return '<div class="onebtns">' + (s.demo ? '' : '<button type="button" class="btn sm" data-run="' + esc(s.id) + '">Update now</button>')
       + (s.kind === 'scan' ? '<button type="button" class="btn sm quiet" data-edit="' + esc(s.id) + '">Edit</button><button type="button" class="btn sm quiet" data-del="' + esc(s.id) + '">Delete</button>' : '') + '</div>';
   }
@@ -3433,25 +3489,25 @@ function renderHome() {
     const all = pool(), counts = { all: all.length, instruments: 0, judgments: 0, signals: 0 };
     all.forEach(u => { counts[u.lane] = (counts[u.lane] || 0) + 1; });
     const list = st.lane === 'all' ? all : all.filter(u => u.lane === st.lane);
-    const t = ticked();
-    $('#app-right').innerHTML = '<div class="ph"><span>2 · What has changed</span><span class="k">' + esc(pl(counts.all, 'update')) + ' across ' + esc(pl(t.length, 'scan')) + '</span></div>'
+    const t = selected();
+    $('#app-right').innerHTML = '<div class="ph"><span>2 · What has changed</span><span class="k">' + esc(pl(counts.all, 'update')) + (st.sel === ALL ? ' across ' + esc(pl(t.length, 'scan')) : '') + '</span></div>'
       + '<div class="uprow"><label>Since <select id="app-since">' + [['7', 'last 7 days'], ['30', 'last 30 days'], ['90', 'last 90 days'], ['365', 'last 12 months'], ['all', 'all time']].map(o => '<option value="' + o[0] + '"' + (st.since === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>'
       + '<div class="chips">' + [['all', 'All'], ['instruments', 'Instruments'], ['judgments', 'Judgments'], ['signals', 'Signals']].map(c => '<button type="button" data-lane="' + c[0] + '" class="' + (st.lane === c[0] ? 'on' : '') + '">' + c[1] + '<span class="k">' + (counts[c[0]] || 0) + '</span></button>').join('') + '</div>'
       + oneButtons() + '</div>'
       + '<div id="app-updates">' + (list.length ? list.slice(0, 400).map(u => updRow(u, u.scan.id + ':' + (u.id || u.title))).join('')
-        : '<div class="cl-empty">' + (t.length ? 'Nothing in this period' + (st.lane !== 'all' ? ' in ' + LANE_LABEL[st.lane] : '') + '. Widen "since", or press Update now.' : 'Tick a scan on the left.') + '</div>')
+        : '<div class="cl-empty">Nothing in this period' + (st.lane !== 'all' ? ' in ' + LANE_LABEL[st.lane] : '') + '. Widen "since", or press Update now.</div>')
       + (list.length > 400 ? '<div class="cl-empty">Showing the newest 400 of ' + list.length + ' — narrow the period.</div>' : '') + '</div>';
   }
   // ---- right: a scan's own section, embedded --------------------------------------------------
   function drawEmbedded() {
-    const t = ticked(), label = MODES.find(m => m[0] === st.mode)[1];
-    $('#app-right').innerHTML = '<div class="ph"><span>2 · ' + esc(label) + '</span><span class="k">' + esc(pl(t.length, 'scan')) + '</span>' + oneButtons() + '</div>'
-      + (t.length ? t.map(s => {
+    const t = selected(), label = MODES.find(m => m[0] === st.mode)[1];
+    $('#app-right').innerHTML = '<div class="ph"><span>2 · ' + esc(label) + '</span>' + (st.sel === ALL ? '<span class="k">' + esc(pl(t.length, 'scan')) + '</span>' : '') + oneButtons() + '</div>'
+      + t.map(s => {
           if (st.mode === 'misc' && s.kind === 'tmt') return '<div class="emb"><div class="eh"><b>' + esc(s.name) + '</b><span class="k">has no Miscellaneous lane — its sources are vetted, not discovered</span></div></div>';
           const src = s.href + '?embed=1#tab=' + st.mode;
-          return '<div class="emb"><div class="eh"><b>' + esc(s.name) + '</b><a href="' + esc(s.href) + '#tab=' + st.mode + '" target="_blank" rel="noopener">open full page ↗</a></div>'
+          return '<div class="emb"><div class="eh"><b>' + esc(s.name) + '</b></div>'
             + '<iframe data-id="' + esc(s.href) + '" src="' + esc(src) + '" title="' + esc(s.name + ' — ' + label) + '" loading="lazy"></iframe></div>';
-        }).join('') : '<div class="cl-empty">Tick a scan on the left.</div>');
+        }).join('');
   }
   window.addEventListener('message', e => {
     if (e.origin !== location.origin || !e.data || !e.data.tmtEmbed) return;
@@ -3466,14 +3522,11 @@ function renderHome() {
   $('#create').addEventListener('click', () => openDialog(null));
   $('#app-mode').addEventListener('change', e => { st.mode = e.target.value; save(); drawRight(); });
   $('#app-q').addEventListener('input', e => { st.q = e.target.value; save(); drawList(); });
-  $('.app-left').addEventListener('click', e => {
-    if (e.target.closest('[data-selall]')) { st.off = {}; save(); drawList(); drawRight(); }
-    if (e.target.closest('[data-selnone]')) { scans.forEach(s => { st.off[s.id] = true; }); save(); drawList(); drawRight(); }
-  });
-  $('#app-list').addEventListener('change', e => {
-    const cb = e.target.closest('input[data-scan]'); if (!cb) return;
-    if (cb.checked) delete st.off[cb.dataset.scan]; else st.off[cb.dataset.scan] = true;
-    save(); drawList(); drawRight();
+  function selectScan(id) { st.sel = id; save(); drawList(); drawRight(); }
+  $('#app-list').addEventListener('click', e => { const row = e.target.closest('.srow'); if (row) selectScan(row.dataset.scan); });
+  $('#app-list').addEventListener('keydown', e => {
+    const row = e.target.closest('.srow'); if (!row || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault(); selectScan(row.dataset.scan);
   });
   $('#app-right').addEventListener('change', e => { if (e.target.id === 'app-since') { st.since = e.target.value; save(); drawUpdates(); } });
   $('#app-right').addEventListener('click', async e => {
@@ -4619,7 +4672,7 @@ def build(root: Optional[Path] = None, out: Optional[Path] = None) -> dict:
         for stale in scan_dir.glob("*.html"):
             if stale.stem not in live:
                 stale.unlink()
-    home = render_page(home_payload(scans, built, out), "Intel Scanner", fav)
+    home = render_page(home_payload(scans, built, out), "Delta Scanner", fav)
     p = out / "scans.html"
     common.atomic_write_text(p, home)
     written.append(p)

@@ -18,6 +18,7 @@ import json
 import os
 import re
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import Any, Callable, Optional
@@ -158,6 +159,24 @@ class Budget:
 
 # ----------------------------------------------------------------------------- fetching
 _last_hit: dict[str, float] = {}
+# The politeness delay is PER HOST (see polite_get below): two different sites may be fetched at
+# the same time without either seeing more than one request a second from us. What must never
+# happen is two THREADS racing the same host's delay check — each would see the other's gap as
+# free and both would fire early. One lock per host, created on first use, serialises exactly
+# that: gating and reading run several sources at once, but never two requests to one site.
+_host_locks: dict[str, threading.Lock] = {}
+_host_locks_guard = threading.Lock()
+
+
+def _host_lock(host: str) -> threading.Lock:
+    with _host_locks_guard:
+        lk = _host_locks.get(host)
+        if lk is None:
+            lk = threading.Lock()
+            _host_locks[host] = lk
+        return lk
+
+
 MAX_BYTES = 25_000_000
 FETCH_TIMEOUT = 45
 
@@ -248,10 +267,14 @@ def polite_get(url: str, delay: float = 1.5, allowed_hosts: Optional[list[str]] 
     current = url
     while True:
         host = _check_hop(current, allowed_hosts)
-        wait = delay - (time.monotonic() - _last_hit.get(host, 0.0))
-        if wait > 0:
-            time.sleep(wait)
-        _last_hit[host] = time.monotonic()
+        # Held for the wait AND the write, never for the request itself: two threads fetching the
+        # SAME host queue here, one after another, at least `delay` apart; two threads fetching
+        # DIFFERENT hosts take different locks and never wait on each other.
+        with _host_lock(host):
+            wait = delay - (time.monotonic() - _last_hit.get(host, 0.0))
+            if wait > 0:
+                time.sleep(wait)
+            _last_hit[host] = time.monotonic()
         r = _http_get(current, headers)
         status = getattr(r, "status_code", 0) or 0
         location = (getattr(r, "headers", {}) or {}).get("location") or (getattr(r, "headers", {}) or {}).get("Location")

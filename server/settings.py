@@ -25,7 +25,7 @@ USER_RE = re.compile(r"^[A-Za-z0-9._-]{1,40}$")
 KEYS = ("OPENAI_API_KEY", "AUTH_USERS", "TMT_ADMIN_USER", "TMT_SETUP_TOKEN",
         "TMT_SCAN_MODEL", "TMT_SCAN_MODEL_STRONG", "TMT_ASK_MODEL", "TMT_NO_COMMIT", "TMT_SCHEDULER")
 
-HEADER = """# Intel Scanner — service environment. Written by the service's setup and admin pages;
+HEADER = """# Delta Scanner — service environment. Written by the service's setup and admin pages;
 # editing by hand also works (then: systemctl restart tmt-radar). Owned by the service user, mode 0600.
 # AUTH_USERS: one login per partner, user:password per line, inside the quotes.
 # TMT_ADMIN_USER: the one login that may open /admin and manage the others.

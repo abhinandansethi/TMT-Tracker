@@ -1192,23 +1192,35 @@ def create_scan(defn: dict, paths: ScanPaths, client, no_discover: bool,
 
     extractor = bind_extractor(client, defn, budget)
     cap_s = int(budget["max_sources"])
+
+    # Every candidate is gated, in parallel — different sites never wait on each other (only the
+    # per-host politeness delay in common.polite_get serialises two requests to the SAME site).
+    # The max_sources cap is applied AFTER, in the candidates' own order, exactly as the old
+    # sequential loop applied it: the first cap_s approvals stay approved, any beyond that are
+    # turned back to pending with the same "budget: …" reason. The difference — every candidate
+    # now carries real gate evidence, including the ones the cap parks — is a strict improvement:
+    # the Coverage and Legal tabs no longer show "not gated" for a source that was, in fact, checked.
+    def _gate_one(cand: dict) -> dict:
+        try:
+            return _normalise_source(gate_assess(cand, budget, extractor), cand, "gate returned no decision")
+        except Exception as e:
+            return _normalise_source({"status": "pending", "reason": f"gate unavailable: {_err(e)}"}, cand, "")
+
+    workers = 1 if common.DRY_RUN else max(1, min(6, int(os.environ.get("TMT_GATE_WORKERS") or 5)))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers, thread_name_prefix="gate") as pool:
+        gated = list(pool.map(_gate_one, uniq))
+
     approved_n = 0
     results: list[dict] = []
-    for cand in uniq:
-        if approved_n >= cap_s:
-            results.append(_normalise_source({"status": "pending",
-                                              "reason": f"budget: max_sources={cap_s} already approved — not gated"},
-                                             cand, ""))
-            continue
-        try:
-            src = gate_assess(cand, budget, extractor)
-            src = _normalise_source(src, cand, "gate returned no decision")
-        except Exception as e:
-            src = _normalise_source({"status": "pending", "reason": f"gate unavailable: {_err(e)}"}, cand, "")
+    for src in gated:
         if src["status"] == "approved":
             approved_n += 1
+            if approved_n > cap_s:
+                src["status"] = "pending"
+                src["reason"] = f"budget: max_sources={cap_s} already approved — not gated"
         results.append(src)
         common.log(f"gate {src['status']:8s} {src['url']}" + (f" — {src.get('reason')}" if src.get("reason") else ""))
+    approved_n = min(approved_n, cap_s)
     defn["sources"] = results
     defn["updated"] = common.now_ist()
     common.atomic_write_json(paths.definition, defn)

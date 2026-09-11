@@ -1,4 +1,4 @@
-# The service — Intel Scanner on one machine
+# The service — Delta Scanner on one machine
 
 Everything the tracker did across GitHub Actions, Vercel functions, Vercel hosting and a
 personal access token, as **one Python process on the firm's own VM**. No GitHub in the

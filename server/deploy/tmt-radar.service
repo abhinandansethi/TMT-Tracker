@@ -1,5 +1,5 @@
 [Unit]
-Description=Intel Scanner — pages, API and job runner in one process
+Description=Delta Scanner — pages, API and job runner in one process
 After=network-online.target
 Wants=network-online.target
 

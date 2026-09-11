@@ -19,6 +19,7 @@ dist/icon-*.png
 dist/site.webmanifest
 # Scans pages and the data they publish for api/ask.js — built by code/build_scans.py
 dist/scans.html
+dist/tmt-india.json
 dist/scan/
 dist/data/
 server/jobs.db

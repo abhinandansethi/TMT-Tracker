@@ -1,4 +1,4 @@
-# Intel Scanner (formerly TMT Regulatory Radar) - handover
+# Delta Scanner (formerly TMT Regulatory Radar) - handover
 
 A regulatory tracker for the TMT team. Detection is deterministic and local: the firm machine
 reaches every gov.in venue directly, so a registry-driven engine (`engine/`, zero LLM) sweeps
