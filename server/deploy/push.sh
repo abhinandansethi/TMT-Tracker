@@ -21,9 +21,20 @@ $SSH 'echo "   ssh ok: $(hostname) $(lsb_release -ds 2>/dev/null || cat /etc/os-
 say "copy the checkout (no venv, no built pages, no job logs — the installer makes those)"
 $SSH 'sudo mkdir -p /opt/tmt-radar'
 # The installer hands /opt/tmt-radar to the service user, so rsync runs as root on the far side.
+# CODE ONLY. The VM owns its state — the scan definitions, their data, the engine's ledger and
+# health, the brief cache, the job queue, the built pages, and its own git history (the audit
+# trail the service commits to). Before these excludes, --delete mirrored the laptop's checkout
+# over all of it and every push erased the partners' scans and the last sweep. Never again.
 rsync -az --delete -e "ssh -i $KEY" --rsync-path="sudo rsync" --no-owner --no-group \
-  --exclude '.venv' --exclude 'dist/' --exclude 'server/jobs.db' --exclude 'server/logs/' --exclude '__pycache__' \
+  --exclude '.git/' --exclude '.venv' --exclude 'dist/' --exclude '__pycache__' \
+  --exclude 'server/jobs.db' --exclude 'server/logs/' \
+  --exclude 'scans/' --exclude 'data/' \
+  --exclude 'engine/health.json' --exclude 'engine/ledger.db' --exclude 'engine/ledger.jsonl' \
+  --exclude 'pipeline/brief_cache.json' \
   "$REPO/" "$USER_@$IP:/opt/tmt-radar/"
+# scans/schema.json is code (the contract), not state — it travels on its own.
+rsync -az -e "ssh -i $KEY" --rsync-path="sudo rsync" --no-owner --no-group "$REPO/scans/schema.json" "$USER_@$IP:/opt/tmt-radar/scans/schema.json"
+DEPLOY_REV="$(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
 say "wait for the job queue to be idle (the install restarts the service, which would kill a running scan)"
 for i in $(seq 1 60); do
@@ -35,7 +46,7 @@ print(c.execute(\"select count(*) from jobs where status in (\x27in_progress\x27
 done
 
 say "install (idempotent)"
-$SSH "cd /opt/tmt-radar && sudo DOMAIN='$DOMAIN' bash server/deploy/install.sh"
+$SSH "cd /opt/tmt-radar && sudo DOMAIN='$DOMAIN' DEPLOY_REV='$DEPLOY_REV' bash server/deploy/install.sh"
 
 say "health"
 $SSH 'curl -s http://127.0.0.1:8080/api/health; echo; sudo systemctl is-active tmt-radar'

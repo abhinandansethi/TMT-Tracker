@@ -72,6 +72,12 @@ chown "$SVC_USER:$SVC_USER" "$ENV_FILE"; chmod 0600 "$ENV_FILE"
 say "git identity for the audit-trail commits"
 sudo -u "$SVC_USER" git -C "$APP_DIR" config user.name "tmt-radar" || true
 sudo -u "$SVC_USER" git -C "$APP_DIR" config user.email "tmt-radar@localhost" || true
+# The code that just arrived is recorded in the VM's OWN history, between the service's state
+# commits, so the audit trail says which code produced which run.
+if [ -n "${DEPLOY_REV:-}" ]; then
+  sudo -u "$SVC_USER" git -C "$APP_DIR" add -A . >/dev/null 2>&1 || true
+  sudo -u "$SVC_USER" git -C "$APP_DIR" commit -qm "deploy: code at $DEPLOY_REV" >/dev/null 2>&1 && echo "   recorded: deploy $DEPLOY_REV" || echo "   nothing new to record"
+fi
 
 say "pages (rebuilt on every install — the builders changed with the code, and dist/ is not shipped)"
 sudo -u "$SVC_USER" bash -c "cd '$APP_DIR' && engine/.venv/bin/python code/build_dashboard_v2.py >/dev/null && engine/.venv/bin/python code/build_scans.py | grep -c '^wrote' | sed 's/^/   pages written: /'"
