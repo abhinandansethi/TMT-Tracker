@@ -757,6 +757,9 @@ input::placeholder{color:var(--ghost)}
 .sheet{max-width:1440px;margin:0 auto;background:var(--paper);min-height:100vh}
 .pad{padding:0 64px}
 
+/* embedded in the one-screen app: chrome off, content only */
+.embed .head,.embed .tabs,.embed .stale-bar,.embed .upd-note{display:none!important}
+.embed .view{padding-left:4px;padding-right:4px;padding-bottom:30px}
 /* header */
 .head{background:var(--navy);color:#fff;padding:26px 64px 22px;display:flex;align-items:baseline;
   justify-content:space-between;gap:24px;flex-wrap:wrap}
@@ -1237,6 +1240,15 @@ a.t:hover{color:var(--navy);border-bottom-color:var(--navy);border-bottom-style:
 <script id="tracker-data" type="application/json">__DATA__</script>
 <script>
 const D = JSON.parse(document.getElementById('tracker-data').textContent);
+// Embedded in the one-screen app (?embed=1): no head, no tab bar — the app has its own — and
+// the page tells the parent how tall it is so the frame fits it.
+if (/[?&]embed=1/.test(location.search)) {
+  document.documentElement.classList.add('embed');
+  const tell = () => { try { parent.postMessage({ tmtEmbed: true, id: location.pathname, height: document.documentElement.scrollHeight }, location.origin); } catch (e) {} };
+  window.addEventListener('load', tell);
+  if (window.ResizeObserver) new ResizeObserver(tell).observe(document.body);
+  setInterval(tell, 1500);
+}
 const $ = s => document.querySelector(s);
 const esc = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const prettyUrl = u => { try { const x = new URL(u); return x.hostname.replace(/^www\./,'') + x.pathname.replace(/\/$/,''); } catch(e) { return u; } };
@@ -2081,6 +2093,9 @@ html = (TEMPLATE.replace("__DATA__", data_json).replace("__FAVICON_SVG__", _favi
         .replace("__STAMP__", payload["updatedISO"]))
 _out = DIST / "tmt-radar-v2.html"
 _out.write_text(html, encoding="utf-8")
+# The same payload as data, for the one-screen app (build_scans.py) to list TMT India's updates
+# beside every other scan's. Written after the page so the two can never disagree.
+(DIST / "tmt-india.json").write_text(data_json, encoding="utf-8")
 
 # Vercel promotes any build that exits 0. dist/ also holds the legacy v1 page, so it is never
 # empty and Vercel's own missing-output-directory guard can never fire — meaning a build that

@@ -98,7 +98,8 @@ KIND_LABELS = {"gazette": "Gazette", "regulator": "Regulator", "ministry": "Gov"
 # Like /api/discover it PROPOSES and nothing more — the regex it returns lands in an input the
 # partner can edit or clear before anything is created, and the run applies whatever is in that box.
 API = {"scans": "/api/scans", "ask": "/api/ask", "draft": "/api/draft", "propose": "/api/propose",
-       "discover": "/api/discover", "subject": "/api/subject", "resolve": "/api/resolve", "gate": "/api/gate"}
+       "discover": "/api/discover", "subject": "/api/subject", "resolve": "/api/resolve", "gate": "/api/gate",
+       "sweep": "/api/sweep"}
 
 # ------------------------------------------------------------------------- the subject filter
 # WHY THIS EXISTS. The first real scan asked for "new Indian AI regulatory requirements … relevant
@@ -866,7 +867,79 @@ def scan_meta(defn: dict, gated: int = 0) -> str:
     return " · ".join(parts)
 
 
-def home_payload(scans: list[dict], built: str) -> dict:
+# ----------------------------------------------------------------------------- the one screen
+# Every scan's developments in ONE shape, so the app can list them in a single stream with
+# TMT India's: which lane, what it is, where and when it came from, how relevant, and enough of
+# the summary to read without leaving the list. Nothing here is computed — it is the ledger's
+# own fields, chosen.
+def unified_items(s: dict) -> list[dict]:
+    out = []
+    for it in s["items"]:
+        lvl = it["relevance"]["level"] if it["relevance"]["level"] in ("high", "medium", "low") else ""
+        out.append({
+            "id": it["id"], "lane": it["lane"], "title": it["title"],
+            "headline": it["headline"] if it["headline"] and it["headline"] != it["title"] else "",
+            "date": it["date"] or (it["first_seen"] or "")[:10], "first_seen": it["first_seen"] or "",
+            "source": it["domain"], "type": it["type"] or ("untyped" if it.get("untyped") else ""),
+            "level": lvl, "url": it["url"],
+            "summary": " ".join(p.get("text", "") for p in it["summary"] if isinstance(p, dict)).strip()[:1500],
+            "why": it["relevance"]["why"], "action": it["relevance"]["action"],
+        })
+    return out
+
+
+def tmt_entry(out: Optional[Path]) -> dict:
+    """TMT India as a scan in the app's list: the tracker's rows, judgments and signals in the
+    unified shape, read from the JSON its builder writes beside its page. Without that file the
+    entry still lists — with its card facts and no updates — rather than the app losing it."""
+    bc = builtin_card()
+    entry = {"id": "tmt-india", "name": "TMT India", "kind": "tmt", "href": "/tmt-radar-v2.html", "sub": bc.get("meta", ""),
+             "generated": bc.get("generated", ""), "updated": "", "new": 0, "items": [], "defn": None, "demo": False}
+    p = (out or (ROOT / "dist")) / "tmt-india.json"
+    if not p.exists():
+        return entry
+    try:
+        t = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return entry
+
+    def row(r: dict, lane: str) -> dict:
+        llm = r.get("llm") if isinstance(r.get("llm"), dict) else {}
+        short, official = str(r.get("short") or ""), str(r.get("official") or "")
+        return {"id": str(r.get("id") or ""), "lane": lane, "title": short or official,
+                "headline": official if official and official != short else "",
+                "date": str(r.get("date") or ""), "first_seen": str(r.get("date") or ""),
+                "source": str(r.get("reg") or r.get("venue") or ""), "type": str(r.get("type") or "").replace("_", " "),
+                "level": "low" if r.get("routine") else "", "url": str(r.get("doc") or r.get("page") or ""),
+                "summary": str(llm.get("brief") or r.get("gist") or "")[:1500], "why": str(llm.get("so_what") or ""), "action": ""}
+    items = [row(r, "instruments") for r in t.get("rows") or [] if isinstance(r, dict)]
+    items += [row(r, "judgments") for r in t.get("judgments") or [] if isinstance(r, dict)]
+    for sg in t.get("signals") or []:
+        if not isinstance(sg, dict):
+            continue
+        items.append({"id": "", "lane": "signals", "title": str(sg.get("title") or ""), "headline": "",
+                      "date": str(sg.get("date_reported") or ""), "first_seen": str(sg.get("date_reported") or ""),
+                      "source": str(sg.get("issuing_body") or ""), "type": str(sg.get("official_status") or ""),
+                      "level": "", "url": str(sg.get("secondary_url") or ""), "summary": str(sg.get("what_happened") or "")[:1500],
+                      "why": "", "action": ""})
+    entry["items"] = items
+    entry["generated"] = t.get("updatedISO") or entry["generated"]
+    week = (datetime.now().date() - timedelta(days=7)).isoformat()
+    entry["new"] = sum(1 for i in items if i["date"] >= week)
+    return entry
+
+
+def app_scans(scans: list[dict], out: Optional[Path]) -> list[dict]:
+    rows = [tmt_entry(out)]
+    for s in scans:
+        d = s["definition"]
+        rows.append({"id": d["id"], "name": d["name"], "kind": "scan", "href": f"/scan/{d['id']}.html",
+                     "sub": scan_meta(d, s["coverage"]["gated"]), "generated": s["generated"], "updated": d.get("updated", ""),
+                     "new": s["counts"]["new"], "items": unified_items(s), "defn": d, "demo": d["demo"]})
+    return rows
+
+
+def home_payload(scans: list[dict], built: str, out: Optional[Path] = None) -> dict:
     cards = [builtin_card()]
     for s in scans:
         d = s["definition"]
@@ -886,6 +959,8 @@ def home_payload(scans: list[dict], built: str) -> dict:
     return {"page": "home", "builtISO": built, "cards": cards, "clientNames": client_names(),
             "actionsUrl": _actions_url(), "api": API, "firstRunMax": FIRST_RUN_MAX_NEW,
             "maxSources": MAX_SOURCES,
+            # The one screen: every scan with its updates in one shape (TMT India first).
+            "app": {"scans": app_scans(scans, out)},
             # Reviewed defect: the stamp was ids + last-run times only, so a promotion — which
             # commits a changed definition and no new developments — left it identical, and a home
             # page waiting for one would have polled for ever without noticing it had landed.
@@ -942,6 +1017,10 @@ a:hover{color:var(--navy);text-decoration:underline;text-underline-offset:3px}
 input,select,button,textarea{font-family:inherit;font-size:inherit;color:inherit}
 input::placeholder,textarea::placeholder{color:var(--ghost)}
 .sheet{max-width:1440px;margin:0 auto;background:var(--paper);min-height:100vh}
+/* embedded in the one-screen app: chrome off, content only */
+.embed .head,.embed .tabs,.embed .scanline{display:none!important}
+.embed .page{padding:6px 4px 30px}
+.embed .sheet{min-height:0}
 
 /* header — identical to the tracker's */
 .head{background:var(--navy);color:#fff;padding:26px 64px 22px;display:flex;align-items:baseline;
@@ -1014,6 +1093,58 @@ h1.title{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.1
 
 /* home cards */
 .lede{max-width:640px;color:var(--mute);font-size:13.5px;line-height:1.55;margin:8px 0 0}
+/* ---- the one screen ---- */
+.app-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.app-tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.app-tools .refreshed{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--faint)}
+.app-tools .refreshed b{color:var(--ink);font-weight:500}
+.app-tools select{border:1px solid var(--rule);border-radius:6px;padding:7px 10px;font-size:13px;background:#fff}
+.app-cols{display:grid;grid-template-columns:320px minmax(0,1fr);gap:36px;margin-top:22px;align-items:start}
+@media (max-width:900px){.app-cols{grid-template-columns:1fr}}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);font-weight:600;border-bottom:2px solid var(--navy);padding-bottom:9px}
+.ph .k{color:var(--faint);font-weight:400;letter-spacing:.06em;text-transform:none}
+.app-left input[type=search]{width:100%;margin-top:12px;border:1px solid var(--rule);border-radius:6px;padding:8px 10px;font-size:13px;background:#fff}
+.app-left input[type=search]:focus{border-color:var(--ink);outline:none}
+.selrow{margin:8px 0 4px;font-family:var(--mono);font-size:10.5px;color:var(--faint);display:flex;gap:6px;align-items:center}
+.selrow button{appearance:none;background:none;border:0;padding:0;font:inherit;color:var(--navy);cursor:pointer}
+.selrow button:hover{text-decoration:underline}
+.srow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:11px 4px;border-bottom:1px solid var(--rule3);cursor:pointer}
+.srow:hover{background:var(--row3)}
+.srow input{margin-top:3px}
+.srow .sn{font-size:14px;font-weight:600;line-height:1.3;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.srow .ss{font-size:11.5px;color:var(--mute);margin-top:2px;line-height:1.4}
+.srow .sc{font-family:var(--mono);font-size:10.5px;color:var(--ochre);white-space:nowrap;padding-top:3px}
+.srow:not(.on) .sn,.srow:not(.on) .ss{color:var(--faint)}
+.uprow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:12px 0 6px}
+.uprow label{font-size:12.5px;color:var(--mute)}
+.uprow select{border:1px solid var(--rule);border-radius:6px;padding:5px 8px;font-size:12.5px;background:#fff;margin-left:4px}
+.chips{display:flex;gap:2px}
+.chips button{appearance:none;cursor:pointer;background:none;border:0;border-radius:6px;padding:6px 11px;font-size:12.5px;color:var(--mute)}
+.chips button .k{font-family:var(--mono);font-size:10px;color:var(--faint);margin-left:5px}
+.chips button.on{background:var(--panel);color:var(--ink)}
+.chips button.on .k{color:var(--ink)}
+.onebtns{margin-left:auto;display:flex;gap:6px}
+.upd{border-bottom:1px solid var(--rule3)}
+.upd .uline{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 4px;cursor:pointer}
+.upd .uline:hover,.upd.open .uline{background:var(--navy-wash)}
+.udot{width:8px;height:8px;border-radius:50%;margin-top:7px;background:transparent;border:1px solid var(--off)}
+.udot.red{background:var(--alarm);border-color:var(--alarm)}.udot.amber{background:var(--ochre);border-color:var(--ochre)}.udot.grey{background:var(--off)}
+.upd .ut{font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.35}
+.upd .um{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:3px}
+.upd .uh{font-size:12.5px;color:var(--mute);margin-top:3px;line-height:1.45;max-width:80ch}
+.ulvl{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;padding-top:5px;white-space:nowrap}
+.ulvl.red{color:var(--alarm);font-weight:600}.ulvl.amber{color:#7A6210}.ulvl.grey{color:var(--faint)}
+.udet{padding:4px 4px 16px 30px;max-width:90ch}
+.udet p{margin:6px 0;font-size:13.5px;line-height:1.6}
+.udet p.none{color:var(--faint);font-style:italic}
+.udet .uk{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--navy);font-weight:600;margin-top:10px}
+.uacts{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:12.5px}
+.uacts a{color:var(--navy);text-decoration:none;border-bottom:1px dotted var(--rule)}
+.emb{margin-top:14px}
+.emb .eh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0 6px;font-size:14px}
+.emb .eh .k{font-size:12px;color:var(--faint)}
+.emb .eh a{font-family:var(--mono);font-size:10.5px;color:var(--faint);text-decoration:none}
+.emb iframe{width:100%;border:0;min-height:320px;height:600px;display:block;background:#fff}
 .cards{margin-top:30px;display:flex;flex-direction:column;gap:12px}
 .card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;border:1px solid var(--rule2);border-radius:10px;
   padding:20px 24px;background:#fff;color:inherit;transition:border-color .12s,box-shadow .12s}
@@ -1787,6 +1918,15 @@ li.mat-notify{border-left:2px solid #3E9C48;padding-left:12px;margin-left:-14px}
 <script>
 'use strict';
 const D = JSON.parse(document.getElementById('scan-data').textContent);
+// Embedded in the one-screen app (?embed=1): no head, no tab bar, no scan line — the app has
+// its own — and the page tells the parent how tall it is so the frame fits it.
+if (/[?&]embed=1/.test(location.search)) {
+  document.documentElement.classList.add('embed');
+  const tell = () => { try { parent.postMessage({ tmtEmbed: true, id: location.pathname, height: document.documentElement.scrollHeight }, location.origin); } catch (e) {} };
+  window.addEventListener('load', tell);
+  if (window.ResizeObserver) new ResizeObserver(tell).observe(document.body);
+  setInterval(tell, 1500);
+}
 const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3210,122 +3350,191 @@ if (D.page === 'home') renderHome(); else renderScan();
 
 function tierBadge(t) { return t === 'vetted' ? '<span class="badge vetted">Vetted</span>' : '<span class="badge discovered">Discovered sources</span>'; }
 
+// ============================================================================================
+// The one screen. Left: every scan, ticked. Right: what changed across the ticked scans, or —
+// when the dropdown asks — a scan's Coverage / Legal / Clients / Audit / Miscellaneous, shown
+// in the same panel through the scan's own page, embedded. There is no other screen to go to.
 function renderHome() {
+  // Declared inside: the dispatch below this function runs before any top-level `const` down
+  // here would be initialised (the page went blank on exactly that once).
+  const APP_KEY = 'tmt_app';
+  const LANE_LABEL = { instruments: 'Instruments', judgments: 'Judgments', signals: 'Signals' };
+  const MODES = [['updates', 'Updates'], ['coverage', 'Coverage'], ['legal', 'Legal'], ['clients', 'Clients'], ['audit', 'Audit'], ['misc', 'Miscellaneous']];
   const main = $('#main');
-  const scans = D.cards.filter(c => !c.builtin);
-  // Stars, the chosen tab and the sort live in this browser only (design §2), under one key so
-  // the home page's memory can be cleared in one go.
-  const HKEY = 'tmt_scans_home';
-  let hs = { star: {}, tab: 'all', sort: 'name' };
-  try { hs = Object.assign(hs, JSON.parse(localStorage.getItem(HKEY) || '{}')); } catch (e) {}
-  if (!hs.star || typeof hs.star !== 'object') hs.star = {};
-  if (!['all', 'starred'].includes(hs.tab)) hs.tab = 'all';
-  if (!['name', 'lastrun', 'new'].includes(hs.sort)) hs.sort = 'name';
-  const hsave = () => { try { localStorage.setItem(HKEY, JSON.stringify(hs)); } catch (e) {} };
-  main.innerHTML = '<div class="titlerow"><div><div class="crumb">Intel Scanner</div><h1 class="title">Scans</h1>'
-    // This page is the product's front door, not an index behind the tracker: it opens with what a
-    // scan is and who owns which one, because a partner arriving here for the first time has no
-    // other page to learn it from.
-    + '<p class="lede">A scan watches official sources for one client, matter or company and reports what changed.</p></div>'
-    // "Logins" is the admin's page (partners' logins, the OpenAI key); anyone else who opens it is
-    // told who manages logins, which is the right answer for them too.
-    + '<div class="actions"><a class="btn quiet" href="/admin">Logins</a><button class="btn primary" id="create">+ Create scan</button></div></div>'
-    + '<div class="notice" id="notice"></div>'
-    + '<div class="htoolbar"><div class="ttabs" role="tablist" id="htabs"></div>'
-    + '<div class="tools"><select id="hsort" aria-label="Sort scans"><option value="name">Sort: name</option><option value="lastrun">Sort: last run</option><option value="new">Sort: new developments</option></select></div></div>'
-    + '<div class="pending" id="pending"></div>'
-    + '<div class="cards" id="cards"></div>'
-    + (scans.length ? '' : '<div class="empty" id="hempty"><h2>No scans yet.</h2><p>Describe what to watch, approve the sources, and the scan reads them and writes a cited digest.</p><button class="btn primary" id="create2">+ Create your first scan</button></div>');
+  // The app has no tab bar of its own: the head's nav (a way back to "All scans") is for the
+  // scan pages, and this IS all scans.
+  const nav = $('#topnav'); if (nav) nav.style.display = 'none';
+  const scans = (D.app && D.app.scans) || [];
+  const byId = {}; scans.forEach(s => { byId[s.id] = s; });
+  // What is ticked, the search, the lane, the period and the mode live in this browser only.
+  let st = { off: {}, q: '', lane: 'all', since: '30', mode: 'updates', open: null };
+  try { st = Object.assign(st, JSON.parse(localStorage.getItem(APP_KEY) || '{}')); } catch (e) {}
+  if (!st.off || typeof st.off !== 'object') st.off = {};
+  if (!MODES.some(m => m[0] === st.mode)) st.mode = 'updates';
+  if (!['all', 'instruments', 'judgments', 'signals'].includes(st.lane)) st.lane = 'all';
+  if (!['7', '30', '90', '365', 'all'].includes(String(st.since))) st.since = '30';
+  const save = () => { try { localStorage.setItem(APP_KEY, JSON.stringify(st)); } catch (e) {} };
+  const ticked = () => scans.filter(s => !st.off[s.id]);
+  const refreshed = scans.map(s => s.generated).filter(Boolean).sort().pop() || '';
+
+  main.innerHTML = '<div class="app">'
+    + '<div class="app-head"><div><div class="crumb">Intel Scanner</div><h1 class="title" id="app-title">Updates</h1></div>'
+    + '<div class="app-tools">' + (refreshed ? '<span class="refreshed">Last refreshed <b>' + esc(stampText(refreshed)) + ' IST</b></span>' : '')
+    + '<select id="app-mode" aria-label="Section">' + MODES.map(m => '<option value="' + m[0] + '"' + (st.mode === m[0] ? ' selected' : '') + '>' + m[1] + '</option>').join('') + '</select>'
+    + '<button class="btn primary" id="create">+ New scan</button></div></div>'
+    + '<div class="notice" id="notice"></div><div class="pending" id="pending"></div>'
+    + '<div class="app-cols"><aside class="app-left"><div class="ph"><span>1 · Scans</span><span class="k" id="app-lcount"></span></div>'
+    + '<input type="search" id="app-q" placeholder="Search scans" value="' + esc(st.q) + '">'
+    + '<div class="selrow"><button type="button" data-selall>Select all</button><span>·</span><button type="button" data-selnone>Clear</button></div>'
+    + '<div id="app-list"></div></aside>'
+    + '<section class="app-right" id="app-right"></section></div></div>';
   noticeEl = $('#notice');
-  $('#create').addEventListener('click', () => openDialog(null));
-  const c2 = $('#create2'); if (c2) c2.addEventListener('click', () => openDialog(null));
-  $('#hsort').value = hs.sort;
-  $('#hsort').addEventListener('change', e => { hs.sort = e.target.value; hsave(); drawCards(); });
-  $('#htabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { hs.tab = b.dataset.tab; hsave(); setTabHash(hs.tab); drawCards(); } });
-  $('#cards').addEventListener('click', e => {
-    const al = e.target.closest('button[data-addlayer]');
-    if (al) { openDialog(null, { group: al.dataset.addlayer, jurisdictions: (al.dataset.jurs || '').split(',').filter(Boolean) }); return; }
-    const b = e.target.closest('button[data-star]'); if (!b) return;
-    e.preventDefault();
-    const id = b.dataset.star;
-    if (hs.star[id]) delete hs.star[id]; else hs.star[id] = true;
-    hsave(); drawCards();
-  });
-  const kpiNew = c => (c.kpi && c.kpi[0] && typeof c.kpi[0].n === 'number') ? c.kpi[0].n : 0;
-  function drawCards() {
-    const starred = D.cards.filter(c => hs.star[c.id]).length;
-    $('#htabs').innerHTML = [['starred', 'Starred', starred], ['all', 'All', D.cards.length]].map(([k, l, n]) => '<button type="button" role="tab" data-tab="' + k + '" class="' + (hs.tab === k ? 'on' : '') + '" aria-selected="' + (hs.tab === k) + '">' + l + '<span class="k">' + n + '</span></button>').join('');
-    const list = D.cards.filter(c => !c.builtin && (hs.tab === 'all' || hs.star[c.id]));
-    const byName = (a, b) => a.name.localeCompare(b.name);
-    list.sort(hs.sort === 'lastrun' ? ((a, b) => (b.generated || '').localeCompare(a.generated || '') || byName(a, b))
-      : hs.sort === 'new' ? ((a, b) => (kpiNew(b) - kpiNew(a)) || byName(a, b)) : byName);
-    // The built-in tracker leads on every tab and under every sort: it is the vetted reference the
-    // discovered scans are measured against, and a partner should never have to look for it.
-    const builtin = D.cards.filter(c => c.builtin);
-    // A radar with several layers is one heading with its layers beneath it; a scan on its own is
-    // its own card. The order inside a group is the order of the list (the chosen sort).
-    const order = [], groups = {};
-    builtin.concat(list).forEach(c => { const g = c.group || ''; const k = g ? 'g:' + g : 'c:' + c.id; if (!groups[k]) { groups[k] = { group: g, cards: [] }; order.push(k); } groups[k].cards.push(c); });
-    $('#cards').innerHTML = order.map(k => {
-      const g = groups[k];
-      // A radar with ONE layer is just a scan: a plain card, like TMT India. The group box
-      // appears only when there are layers to switch between.
-      if (!g.group || g.cards.length === 1) return card(g.cards[0], !!hs.star[g.cards[0].id]);
-      return '<div class="radar"><div class="rhead"><h2>' + esc(g.group) + '</h2><span class="k">' + pl(g.cards.length, 'layer') + '</span>'
-        + '<button type="button" class="btn sm" data-addlayer="' + esc(g.group) + '" data-jurs="' + esc((g.cards[0].flags || []).join(',')) + '">+ Add layer</button></div>'
-        + g.cards.map(c => card(Object.assign({}, c, { name: c.layer || c.name }), !!hs.star[c.id])).join('') + '</div>';
-    }).join('')
-      + (hs.tab === 'starred' && !list.length && !builtin.some(c => hs.star[c.id]) ? '<div class="hnone">No starred scans yet — press ☆ on a card to keep it here.</div>' : '');
-    $$('.card .last').forEach(el => { el.textContent = 'Last run ' + rel(el.dataset.iso); });
+
+  // ---- left: the scans -----------------------------------------------------------------------
+  function drawList() {
+    const q = st.q.trim().toLowerCase();
+    const shown = scans.filter(s => !q || (s.name + ' ' + s.sub).toLowerCase().includes(q));
+    $('#app-lcount').textContent = pl(scans.length, 'scan') + ' · ' + pl(scans.reduce((n, s) => n + s.items.length, 0), 'update');
+    $('#app-list').innerHTML = shown.map(s => '<label class="srow' + (st.off[s.id] ? '' : ' on') + '"><input type="checkbox" data-scan="' + esc(s.id) + '"' + (st.off[s.id] ? '' : ' checked') + '>'
+      + '<div class="sb"><div class="sn">' + esc(s.name) + (s.kind === 'tmt' ? '<span class="badge vetted">Vetted</span>' : '') + (s.demo ? '<span class="badge demo">Demo</span>' : '') + '</div><div class="ss">' + esc(s.sub) + '</div></div>'
+      + '<div class="sc">' + (s.new ? esc(s.new) + ' new' : (s.generated ? '' : 'not run')) + '</div></label>').join('')
+      || '<div class="cl-empty">No scan matches.</div>';
   }
 
-  // ---- pending runs: dispatched, not yet on this page -----------------------------------------
-  // The home page's job here is a CREATE: the scan has no card until the workflow has committed
-  // and the site has rebuilt. A promotion dispatched from a scan page also lands here, keyed by
-  // finding rather than by scan.
+  // ---- right: updates -------------------------------------------------------------------------
+  const LVL = { high: 'red', medium: 'amber', low: 'grey', '': 'none' };
+  const sinceDate = () => { if (st.since === 'all') return ''; const d = new Date(); d.setDate(d.getDate() - Number(st.since)); return d.toISOString().slice(0, 10); };
+  function pool() {
+    const cut = sinceDate(), out = [];
+    ticked().forEach(s => s.items.forEach(it => { if (!cut || (it.date || it.first_seen || '') >= cut) out.push(Object.assign({ scan: s }, it)); }));
+    out.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (a.scan.name).localeCompare(b.scan.name));
+    return out;
+  }
+  function updRow(u, key) {
+    const open = st.open === key;
+    const meta = [u.scan.name, u.source, u.date ? fmt(u.date) : 'undated', u.type].filter(Boolean).map(esc).join(' · ');
+    return '<div class="upd' + (open ? ' open' : '') + '" data-key="' + esc(key) + '"><div class="uline" tabindex="0" role="button" aria-expanded="' + open + '">'
+      + '<span class="udot ' + LVL[u.level] + '" title="' + esc(u.level ? u.level + ' relevance' : 'not rated') + '"></span>'
+      + '<div class="ub"><div class="ut">' + esc(u.title) + '</div><div class="um">' + meta + '</div>' + (u.headline ? '<div class="uh">' + esc(u.headline) + '</div>' : '') + '</div>'
+      + '<span class="ulvl ' + LVL[u.level] + '">' + esc(u.level ? u.level.toUpperCase() : '') + '</span></div>'
+      + (open ? '<div class="udet">' + (u.summary ? '<p>' + esc(u.summary) + '</p>' : '<p class="none">No summary was written for this development.</p>')
+        + (u.why ? '<div class="uk">Why it matters</div><p>' + esc(u.why) + '</p>' : '') + (u.action ? '<div class="uk">Action</div><p>' + esc(u.action) + '</p>' : '')
+        + '<div class="uacts">' + (u.url ? '<a href="' + esc(u.url) + '" target="_blank" rel="noopener">Open the document ↗</a>' : '')
+        + '<a href="' + esc(u.scan.href) + '" target="_blank" rel="noopener">Open in ' + esc(u.scan.name) + ' ↗</a>'
+        + (u.scan.kind === 'scan' && u.id ? '<button type="button" class="btn sm" data-draft="' + esc(u.id) + '" data-scanid="' + esc(u.scan.id) + '">Draft email</button>' : '') + '</div></div>' : '') + '</div>';
+  }
+  function oneButtons() {
+    const t = ticked(); if (t.length !== 1) return '';
+    const s = t[0];
+    return '<div class="onebtns">' + (s.demo ? '' : '<button type="button" class="btn sm" data-run="' + esc(s.id) + '">Update now</button>')
+      + (s.kind === 'scan' ? '<button type="button" class="btn sm quiet" data-edit="' + esc(s.id) + '">Edit</button><button type="button" class="btn sm quiet" data-del="' + esc(s.id) + '">Delete</button>' : '') + '</div>';
+  }
+  function drawUpdates() {
+    const all = pool(), counts = { all: all.length, instruments: 0, judgments: 0, signals: 0 };
+    all.forEach(u => { counts[u.lane] = (counts[u.lane] || 0) + 1; });
+    const list = st.lane === 'all' ? all : all.filter(u => u.lane === st.lane);
+    const t = ticked();
+    $('#app-right').innerHTML = '<div class="ph"><span>2 · What has changed</span><span class="k">' + esc(pl(counts.all, 'update')) + ' across ' + esc(pl(t.length, 'scan')) + '</span></div>'
+      + '<div class="uprow"><label>Since <select id="app-since">' + [['7', 'last 7 days'], ['30', 'last 30 days'], ['90', 'last 90 days'], ['365', 'last 12 months'], ['all', 'all time']].map(o => '<option value="' + o[0] + '"' + (st.since === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>'
+      + '<div class="chips">' + [['all', 'All'], ['instruments', 'Instruments'], ['judgments', 'Judgments'], ['signals', 'Signals']].map(c => '<button type="button" data-lane="' + c[0] + '" class="' + (st.lane === c[0] ? 'on' : '') + '">' + c[1] + '<span class="k">' + (counts[c[0]] || 0) + '</span></button>').join('') + '</div>'
+      + oneButtons() + '</div>'
+      + '<div id="app-updates">' + (list.length ? list.slice(0, 400).map(u => updRow(u, u.scan.id + ':' + (u.id || u.title))).join('')
+        : '<div class="cl-empty">' + (t.length ? 'Nothing in this period' + (st.lane !== 'all' ? ' in ' + LANE_LABEL[st.lane] : '') + '. Widen "since", or press Update now.' : 'Tick a scan on the left.') + '</div>')
+      + (list.length > 400 ? '<div class="cl-empty">Showing the newest 400 of ' + list.length + ' — narrow the period.</div>' : '') + '</div>';
+  }
+  // ---- right: a scan's own section, embedded --------------------------------------------------
+  function drawEmbedded() {
+    const t = ticked(), label = MODES.find(m => m[0] === st.mode)[1];
+    $('#app-right').innerHTML = '<div class="ph"><span>2 · ' + esc(label) + '</span><span class="k">' + esc(pl(t.length, 'scan')) + '</span>' + oneButtons() + '</div>'
+      + (t.length ? t.map(s => {
+          if (st.mode === 'misc' && s.kind === 'tmt') return '<div class="emb"><div class="eh"><b>' + esc(s.name) + '</b><span class="k">has no Miscellaneous lane — its sources are vetted, not discovered</span></div></div>';
+          const src = s.href + '?embed=1#tab=' + st.mode;
+          return '<div class="emb"><div class="eh"><b>' + esc(s.name) + '</b><a href="' + esc(s.href) + '#tab=' + st.mode + '" target="_blank" rel="noopener">open full page ↗</a></div>'
+            + '<iframe data-id="' + esc(s.href) + '" src="' + esc(src) + '" title="' + esc(s.name + ' — ' + label) + '" loading="lazy"></iframe></div>';
+        }).join('') : '<div class="cl-empty">Tick a scan on the left.</div>');
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || !e.data || !e.data.tmtEmbed) return;
+    $$('#app-right iframe').forEach(f => { if (f.dataset.id === e.data.id) f.style.height = (Number(e.data.height) + 24) + 'px'; });
+  });
+  function drawRight() {
+    $('#app-title').textContent = MODES.find(m => m[0] === st.mode)[1];
+    if (st.mode === 'updates') drawUpdates(); else drawEmbedded();
+  }
+
+  // ---- wiring ---------------------------------------------------------------------------------
+  $('#create').addEventListener('click', () => openDialog(null));
+  $('#app-mode').addEventListener('change', e => { st.mode = e.target.value; save(); drawRight(); });
+  $('#app-q').addEventListener('input', e => { st.q = e.target.value; save(); drawList(); });
+  $('.app-left').addEventListener('click', e => {
+    if (e.target.closest('[data-selall]')) { st.off = {}; save(); drawList(); drawRight(); }
+    if (e.target.closest('[data-selnone]')) { scans.forEach(s => { st.off[s.id] = true; }); save(); drawList(); drawRight(); }
+  });
+  $('#app-list').addEventListener('change', e => {
+    const cb = e.target.closest('input[data-scan]'); if (!cb) return;
+    if (cb.checked) delete st.off[cb.dataset.scan]; else st.off[cb.dataset.scan] = true;
+    save(); drawList(); drawRight();
+  });
+  $('#app-right').addEventListener('change', e => { if (e.target.id === 'app-since') { st.since = e.target.value; save(); drawUpdates(); } });
+  $('#app-right').addEventListener('click', async e => {
+    const lane = e.target.closest('button[data-lane]'); if (lane) { st.lane = lane.dataset.lane; save(); drawUpdates(); return; }
+    const dr = e.target.closest('button[data-draft]');
+    if (dr) {
+      dr.disabled = true; dr.textContent = 'Drafting…';
+      let r = null; try { r = await postJSON(D.api.draft, { scan: dr.dataset.scanid, dev: dr.dataset.draft, kind: 'email' }); } catch (err) {}
+      dr.disabled = false; dr.textContent = 'Draft email';
+      if (r && r.ok && r.data.text) showModal('Draft email', r.data.text, r.data.note || ''); else say('Could not draft: ' + esc((r && r.data && r.data.message) || 'the draft endpoint did not answer'), 'warn');
+      return;
+    }
+    const run = e.target.closest('button[data-run]');
+    if (run) {
+      const s = byId[run.dataset.run]; if (!s) return;
+      run.disabled = true;
+      if (s.kind === 'tmt') {
+        let r = null; try { r = await postJSON(D.api.sweep || '/api/sweep', { workflow: 'sweep' }); } catch (err) {}
+        run.disabled = false;
+        say(r && r.ok ? 'Sweep queued — every vetted source is checked, then this page reloads itself.' : 'Could not queue the sweep: ' + esc((r && r.data && r.data.message) || 'no answer'), r && r.ok ? '' : 'warn');
+        return;
+      }
+      const req = { action: 'run', scan_id: s.id };
+      const res = await dispatchScan(req, 'run this scan'); run.disabled = false;
+      if (res) addPending({ id: s.id, scan_id: s.id, kind: 'run', name: s.name, request: req, verb: 'run this scan', dispatched_at: new Date().toISOString(), actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+      return;
+    }
+    const ed = e.target.closest('button[data-edit]'); if (ed) { const s = byId[ed.dataset.edit]; if (s && s.defn) openDialog(s.defn); return; }
+    const del = e.target.closest('button[data-del]');
+    if (del) {
+      const s = byId[del.dataset.del]; if (!s) return;
+      if (!confirm('Delete “' + s.name + '”? Its sources, ledger, digest and stored documents are removed. This cannot be undone.')) return;
+      const req = { action: 'delete', scan_id: s.id };
+      const res = await dispatchScan(req, 'delete this scan');
+      if (res) addPending({ id: s.id, scan_id: s.id, kind: 'delete', name: s.name, request: req, verb: 'delete this scan', dispatched_at: new Date().toISOString(), actionsUrl: res.actionsUrl || D.actionsUrl || '' });
+      return;
+    }
+    const line = e.target.closest('.uline');
+    if (line && !e.target.closest('a')) { const key = line.parentElement.dataset.key; st.open = st.open === key ? null : key; drawUpdates(); }
+  });
+  $('#app-right').addEventListener('keydown', e => {
+    const line = e.target.closest('.uline'); if (!line || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault(); const key = line.parentElement.dataset.key; st.open = st.open === key ? null : key; drawUpdates();
+  });
+
+  // ---- pending: what was dispatched from here, until it lands --------------------------------
   const builtIds = {}, cardById = {};
-  D.cards.forEach(c => { builtIds[c.id] = true; cardById[c.id] = c; });
+  (D.cards || []).forEach(c => { builtIds[c.id] = true; cardById[c.id] = c; });
   mountPending($('#pending'), {
-    mine: () => true,                       // every errand in this browser is shown on the home page
+    mine: () => true,
     builtNow: p => {
-      // A removal is finished when the card is GONE — the opposite test from every other errand.
       if (kindOf(p) === 'delete') return !builtIds[p.id];
-      // A create is finished when the scan has a card: that card IS the committed result.
-      if (builtIds[p.id]) return true;
-      const c = cardById[p.scan_id || p.id];
-      if (!c) return false;
+      if (builtIds[p.id] && kindOf(p) === 'create') return true;
+      const c = cardById[p.scan_id || p.id]; if (!c) return false;
       const since = Date.parse(p.dispatched_at || 0);
-      // A promotion commits a changed DEFINITION and no new developments, so the definition's own
-      // stamp is what moves. A run commits developments, so its stamp is the last-run time. Both
-      // are on the card, and either one advancing past the dispatch means this errand has landed.
       return Date.parse(c.updated || 0) > since || Date.parse(c.generated || 0) > since;
     },
-    onLanded: p => {
-      // A promotion changes one thing and it is not on this page: the scan's source list. Say
-      // where the verdict will be, and that the gate has not spoken yet.
-      if (kindOf(p) === 'promote') {
-        say('“' + esc(p.name || p.scan_id) + '” has the promoted venue in its sources now, as <b>pending</b>. '
-          + 'The gate judges it at the start of the next run — open the scan and press <b>Run scan</b>.', 'warn');
-      }
-    },
-    onDraw: list => { const em = $('#hempty'); if (em) em.hidden = list.length > 0; },
+    onLanded: p => { if (kindOf(p) === 'promote') say('The promoted venue is in the scan’s sources now, as <b>pending</b> on its Coverage.', 'warn'); },
   });
-  // The home page has tabs too (Starred / All); the hash keeps the partner on the one they chose
-  // when this page reloads itself after a run lands.
-  const hhash = tabFromHash();
-  if (['all', 'starred'].includes(hhash)) hs.tab = hhash;
-  setTabHash(hs.tab);
-  drawCards();
-}
-function card(c, starred) {
-  const flags = (c.flags || []).map(flag).filter(Boolean).join(' ');
-  return '<div class="card' + (c.builtin ? ' builtin' : '') + '">'
-    + '<a class="cardmain" href="' + esc(c.href) + '"><div class="name">' + esc(c.name) + tierBadge(c.tier) + (c.demo ? '<span class="badge demo">Demo</span>' : '') + '</div>'
-    + '<div class="meta"><span>' + esc(c.meta) + '</span>' + (flags ? '<span class="flags" aria-label="' + esc((c.flags || []).join(', ')) + '">' + flags + '</span>' : '') + '</div>'
-    + '</a>'
-    + '<div class="right"><div class="kpi">' + c.kpi.map(k => esc(k.n) + '<small>' + esc(k.label) + '</small>').join('<span class="sep">·</span>') + '</div>'
-    + '<div class="last" data-iso="' + esc(c.generated) + '"></div>'
-    + '<button type="button" class="hstar' + (starred ? ' on' : '') + '" data-star="' + esc(c.id) + '" aria-pressed="' + !!starred + '" aria-label="' + (starred ? 'Unstar ' : 'Star ') + esc(c.name) + '" title="' + (starred ? 'Starred in this browser' : 'Star this scan (this browser only)') + '">' + (starred ? '★' : '☆') + '</button></div></div>';
+
+  drawList(); drawRight();
 }
 
 // ============================================================================================
@@ -4410,7 +4619,7 @@ def build(root: Optional[Path] = None, out: Optional[Path] = None) -> dict:
         for stale in scan_dir.glob("*.html"):
             if stale.stem not in live:
                 stale.unlink()
-    home = render_page(home_payload(scans, built), "Scans · Intel Scanner", fav)
+    home = render_page(home_payload(scans, built, out), "Intel Scanner", fav)
     p = out / "scans.html"
     common.atomic_write_text(p, home)
     written.append(p)
@@ -5009,10 +5218,11 @@ def selftest() -> None:
         assert "GitHub" not in html, "the page must not name the CI service"
         assert ">Open the run log<" in html or "'Open the run log'" in html
         # "No scans yet" is not true while one is being created, so the empty block is addressable
-        assert 'id="hempty"' in html and "em.hidden = list.length > 0" in html
+        # The one screen: the scan list, the section dropdown, and every scan's updates in one shape.
+        assert 'id="app-list"' in html and 'id="app-mode"' in html and '"app": {"scans": [' in html and '"id": "tmt-india"' in html
         # The Scans home is the product's front door now: it says what a scan is, and which one is
         # the built-in vetted scan, without typing a source count the registry owns.
-        assert "A scan watches official sources" in html and "vetted built-in" not in html
+        assert "1 · Scans" in html and "2 · What has changed" in html and "vetted built-in" not in html
         # the built-in scan's source count comes from the card the registry computed, never typed
         # The lede is one line now, so it carries no counts to keep honest; the built-in card still
         # shows "N vetted sources · …" computed from the registry, which is where the number lives.
