@@ -23,12 +23,15 @@ from typing import Dict, List, Tuple
 ENV_FILE = Path(os.environ.get("TMT_ENV_FILE") or "/var/lib/tmt-radar/settings.env")
 USER_RE = re.compile(r"^[A-Za-z0-9._-]{1,40}$")
 KEYS = ("OPENAI_API_KEY", "AUTH_USERS", "TMT_ADMIN_USER", "TMT_SETUP_TOKEN",
-        "TMT_SCAN_MODEL", "TMT_SCAN_MODEL_STRONG", "TMT_ASK_MODEL", "TMT_NO_COMMIT", "TMT_SCHEDULER")
+        "TMT_SCAN_MODEL", "TMT_SCAN_MODEL_STRONG", "TMT_ASK_MODEL", "TMT_NO_COMMIT", "TMT_SCHEDULER",
+        "TMT_OPEN")
 
 HEADER = """# Delta Scanner — service environment. Written by the service's setup and admin pages;
 # editing by hand also works (then: systemctl restart tmt-radar). Owned by the service user, mode 0600.
 # AUTH_USERS: one login per partner, user:password per line, inside the quotes.
 # TMT_ADMIN_USER: the one login that may open /admin and manage the others.
+# TMT_OPEN=1: the site opens with no login for anyone with the URL. /admin stays behind the real
+# login regardless — this only decides who can VIEW the site, never who can spend the OpenAI key.
 # Model names empty = the code's default (gpt-5.6-luna). TMT_NO_COMMIT=1 stops the audit-trail commits.
 """
 

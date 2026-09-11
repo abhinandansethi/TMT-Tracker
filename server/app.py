@@ -66,6 +66,17 @@ def _pairs() -> list:
 
 
 def require_user(request: Request) -> str:
+    # Demo mode: the site opens with no login, for everyone with the URL — a partner clicked
+    # through this every time to look at a demo, which is the wrong trade for something with no
+    # confidential data behind it yet. `real_require_user` (the actual pairs-based check) is
+    # unchanged and still guards /admin, so the OpenAI key and the login list stay protected —
+    # opening the SITE is not the same decision as opening who can spend the key or manage logins.
+    if os.environ.get("TMT_OPEN") == "1":
+        return os.environ.get("TMT_OPEN_NAME") or "a visitor"
+    return real_require_user(request)
+
+
+def real_require_user(request: Request) -> str:
     pairs = _pairs()
     if not pairs:
         # Fail closed. There is deliberately no starter pair: a short password in a file in front

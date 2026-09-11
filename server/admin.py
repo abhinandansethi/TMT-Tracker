@@ -167,8 +167,12 @@ async def setup_post(request: Request):
 
 # ------------------------------------------------------------------------------ /admin
 def _require_admin(request: Request) -> str:
-    from server.app import require_user
-    user = require_user(request)
+    # The REAL login check, always — not the TMT_OPEN bypass require_user uses for the site
+    # itself. Opening the site to anyone with the URL is one decision; letting anyone replace
+    # the OpenAI key or the partner roster is a different one, and this page stays behind the
+    # actual pair every time, open mode or not.
+    from server.app import real_require_user
+    user = real_require_user(request)
     admin = os.environ.get("TMT_ADMIN_USER") or ""
     if not admin or not hmac.compare_digest(user.encode(), admin.encode()):
         who = admin or "the person who set the server up"
@@ -179,6 +183,7 @@ def _require_admin(request: Request) -> str:
 def _admin_page(user: str, notice: str = "", err: str = "") -> HTMLResponse:
     cur = settings.read()
     pairs = settings.pairs_from(cur.get("AUTH_USERS") or os.environ.get("AUTH_USERS") or "")
+    is_open = (cur.get("TMT_OPEN") or os.environ.get("TMT_OPEN") or "") == "1"
     rows = "".join(
         f'<tr><td class="u">{html.escape(u)}{"<span class=tag>admin</span>" if u == user else ""}</td><td>'
         + ("" if u == user else f'<form method="post" action="/admin" style="margin:0"><input type="hidden" name="action" value="remove"><input type="hidden" name="user" value="{html.escape(u)}"><button class="btn small" type="submit">Remove login</button></form>')
@@ -186,9 +191,16 @@ def _admin_page(user: str, notice: str = "", err: str = "") -> HTMLResponse:
     from pipeline.scan import common
     n = f'<div class="notice">{html.escape(notice)}</div>' if notice else ""
     e = f'<div class="problem">{html.escape(err)}</div>' if err else ""
+    open_form = (f'<form method="post" action="/admin" style="margin-top:8px"><input type="hidden" name="action" value="open"><input type="hidden" name="value" value="0">'
+                f'<button class="btn small" type="submit">Turn off — require logins again</button></form>' if is_open else
+                f'<form method="post" action="/admin" style="margin-top:8px"><input type="hidden" name="action" value="open"><input type="hidden" name="value" value="1">'
+                f'<button class="btn small" type="submit">Turn on — no login to view the site</button></form>')
     return _page("Admin", "Scans › Admin", f"""
 <h1>Logins and the key</h1>
 <p>One login per partner. A password is shown once, when you set it; there is no way to read one back — set a new one instead.</p>{n}{e}
+<h2>Open access</h2>
+<p>{"<b>On</b> — anyone with the URL can open the site and use it, no login. This page still needs your login." if is_open else "<b>Off</b> — the site asks for one of the logins below."}</p>
+{open_form}
 <h2>Logins</h2><table>{rows}</table>
 <form method="post" action="/admin" autocomplete="off"><input type="hidden" name="action" value="add">
 <div class="row"><div><label for="nu">Username</label><input type="text" id="nu" name="user" required></div>
@@ -238,6 +250,12 @@ async def admin_post(request: Request, user: str = Depends(_require_admin)):
             return _admin_page(user, err=f"No login named {u}.")
         pairs = [(x, p) for x, p in pairs if x.lower() != u.lower()]
         notice = f"Login {u} removed — it stops working now."
+    elif action == "open":
+        want = f.get("value") == "1"
+        cur["TMT_OPEN"] = "1" if want else ""
+        notice = ("The site now opens with no login — anyone with this URL can view and use it. "
+                  "This page stays behind your login either way." if want
+                  else "Logins are required again to open the site.")
     elif action == "key":
         key = f.get("key", "").strip()
         shape = check_key_shape(key)
